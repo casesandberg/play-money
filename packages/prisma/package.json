@@ -1,0 +1,8 @@
+{
+  "name": "@play-money/prisma",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "prisma": "^5.13.0"
+  }
+}
