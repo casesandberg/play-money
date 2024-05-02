@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
+    "db:studio": "npx prisma studio",
     "dev": "turbo dev",
     "lint": "turbo lint",
     "type-check": "turbo type-check",
@@ -9,15 +10,18 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
+    "@play-money/prettier-config": "*",
+    "@play-money/typescript-config": "*",
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.11",
-    "@play-money/prettier-config": "*",
-    "@play-money/typescript-config": "*",
     "turbo": "latest"
   },
   "engines": {
     "node": ">=18"
+  },
+  "prisma": {
+    "schema": "packages/prisma/schema.prisma"
   },
   "packageManager": "npm@10.5.0",
   "workspaces": [
