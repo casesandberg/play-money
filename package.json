@@ -1,17 +1,17 @@
 {
   "private": true,
   "scripts": {
-    "build": "turbo build",
-    "db:studio": "npx prisma studio",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "type-check": "turbo type-check",
-    "clean": "turbo clean",
+    "build": "dotenv -- turbo build",
+    "dev": "dotenv -- turbo dev",
+    "lint": "dotenv -- turbo lint",
+    "type-check": "dotenv -- turbo type-check",
+    "clean": "dotenv -- turbo clean",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
     "@play-money/prettier-config": "*",
     "@play-money/typescript-config": "*",
+    "dotenv-cli": "^7.4.1",
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.11",

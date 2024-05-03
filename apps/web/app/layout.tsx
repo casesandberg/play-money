@@ -1,3 +1,5 @@
+import { auth } from '@play-money/auth'
+import { SessionProvider } from '@play-money/auth/components/SessionProvider'
 import './globals.css'
 import '@play-money/ui/styles.css'
 import type { Metadata } from 'next'
@@ -10,10 +12,14 @@ export const metadata: Metadata = {
   description: 'Prediction market platform',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }): JSX.Element {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth()
+
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <SessionProvider session={session}>{children}</SessionProvider>
+      </body>
     </html>
   )
 }
