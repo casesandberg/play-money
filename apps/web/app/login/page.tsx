@@ -1,5 +1,5 @@
-import { LoginForm } from '@play-money/auth/components/LoginForm'
+import { LoginPage } from '@play-money/auth/pages/LoginPage'
 
-export default function LoginPage() {
-  return <LoginForm />
+export default function AppLoginPage() {
+  return <LoginPage />
 }

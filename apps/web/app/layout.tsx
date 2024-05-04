@@ -4,6 +4,7 @@ import './globals.css'
 import '@play-money/ui/styles.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { Toaster } from '@play-money/ui/toaster'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,6 +20,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en">
       <body className={inter.className}>
         <SessionProvider session={session}>{children}</SessionProvider>
+        <Toaster />
       </body>
     </html>
   )

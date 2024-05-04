@@ -9,15 +9,13 @@ import { Button } from '@play-money/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
 import { toast } from '@play-money/ui/use-toast'
-import Link from 'next/link'
-import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
 const FormSchema = _UserModel.pick({ email: true, password: true })
 
 type FormData = z.infer<typeof FormSchema>
 
-export function LoginForm({ csrf }: { csrf: string }) {
+export function RegisterForm() {
   const router = useRouter()
   const form = useForm({
     resolver: zodResolver(FormSchema),
@@ -29,19 +27,23 @@ export function LoginForm({ csrf }: { csrf: string }) {
 
   const onSubmit = async (data: FormData) => {
     const { email, password } = data
-
     try {
-      const response = await signIn('credentials', { email, password, redirect: false })
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/auth/register`, {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      })
 
-      console.log(response)
-      if (response?.error) {
-        throw new Error()
+      if (!response.ok) {
+        const { message } = await response.json()
+        throw new Error(message || 'Network response was not ok')
       }
 
-      router.push('/')
+      const _json = await response.json()
+
+      router.push('/login')
     } catch (error: any) {
-      console.error('Login Failed:', error)
-      toast({ title: 'Login Failed', description: error.message })
+      console.error('Registration Failed:', error)
+      toast({ title: 'Registration Failed', description: error.message })
     }
   }
 
@@ -67,12 +69,7 @@ export function LoginForm({ csrf }: { csrf: string }) {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <div className="flex items-center">
-                <FormLabel>Password</FormLabel>
-                <Link href="/forgot-password" className="ml-auto inline-block text-sm underline">
-                  Forgot your password?
-                </Link>
-              </div>
+              <FormLabel>Password</FormLabel>
               <FormControl>
                 <Input placeholder="Password" {...field} type="password" />
               </FormControl>
@@ -82,7 +79,7 @@ export function LoginForm({ csrf }: { csrf: string }) {
           )}
         />
         <Button type="submit" className="w-full">
-          Login
+          Create Account
         </Button>
       </form>
     </Form>

@@ -1,10 +1,10 @@
 import type { Config } from 'tailwindcss'
 import sharedConfig from '@play-money/tailwind-config'
 
-const config: Pick<Config, 'prefix' | 'presets' | 'content'> = {
+const config = {
   content: ['./src/**/*.tsx'],
-  prefix: 'ui-',
+  prefix: '',
   presets: [sharedConfig],
-}
+} satisfies Config
 
 export default config

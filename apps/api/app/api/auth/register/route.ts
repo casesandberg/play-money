@@ -16,7 +16,7 @@ export async function POST(req: Request, res: Response) {
     })
 
     if (existingUser) {
-      return new Response('User already exists', { status: 409 })
+      return new Response(JSON.stringify({ message: 'User with that email already exists' }), { status: 409 })
     }
 
     const salt = bcrypt.genSaltSync(10)
@@ -39,6 +39,6 @@ export async function POST(req: Request, res: Response) {
     )
   } catch (error) {
     console.error('Request error', error)
-    return new Response('Error processing request', { status: 500 })
+    return new Response(JSON.stringify({ message: 'Error processing request' }), { status: 500 })
   }
 }

@@ -10,10 +10,11 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@play-money/auth": "*",
+    "@play-money/ui": "*",
     "next": "^14.1.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "@play-money/ui": "*"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.1.1",
