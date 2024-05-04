@@ -1,5 +1,11 @@
 {
   "extends": "@play-money/typescript-config/react-library.json",
   "include": ["."],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
   "exclude": ["dist", "build", "node_modules"]
 }

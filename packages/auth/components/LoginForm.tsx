@@ -1,37 +1,39 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { _UserModel } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
+import { Alert, AlertDescription } from '@play-money/ui/alert'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
 import { toast } from '@play-money/ui/use-toast'
-import Link from 'next/link'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { Sparkles } from 'lucide-react'
 
-const FormSchema = _UserModel.pick({ email: true, password: true })
+const FormSchema = _UserModel.pick({ email: true })
 
 type FormData = z.infer<typeof FormSchema>
 
-export function LoginForm({ csrf }: { csrf: string }) {
+export function LoginForm() {
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       email: '',
-      password: '',
     },
   })
 
   const onSubmit = async (data: FormData) => {
-    const { email, password } = data
+    const { email } = data
 
     try {
-      const response = await signIn('credentials', { email, password, redirect: false })
+      setIsLoading(true)
+      const response = await signIn('resend', { email, redirect: false })
 
       console.log(response)
       if (response?.error) {
@@ -41,7 +43,9 @@ export function LoginForm({ csrf }: { csrf: string }) {
       router.push('/')
     } catch (error: any) {
       console.error('Login Failed:', error)
-      toast({ title: 'Login Failed', description: error.message })
+      toast({ title: 'There was an issue signing you in', description: 'Please try again later' })
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -57,34 +61,21 @@ export function LoginForm({ csrf }: { csrf: string }) {
               <FormControl>
                 <Input placeholder="Email" {...field} />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <div className="flex items-center">
-                <FormLabel>Password</FormLabel>
-                <Link href="/forgot-password" className="ml-auto inline-block text-sm underline">
-                  Forgot your password?
-                </Link>
-              </div>
-              <FormControl>
-                <Input placeholder="Password" {...field} type="password" />
-              </FormControl>
 
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit" className="w-full">
-          Login
+        <Button type="submit" className="w-full" loading={isLoading}>
+          Sign in with email
         </Button>
       </form>
+
+      <Alert variant="muted">
+        <Sparkles className="h-4 w-4" />
+        <div />
+        <AlertDescription>We will email you a magic link for a password-free sign in.</AlertDescription>
+      </Alert>
     </Form>
   )
 }

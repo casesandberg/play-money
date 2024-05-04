@@ -3,6 +3,7 @@ import Credentials from 'next-auth/providers/credentials'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import db, { _UserModel } from '@play-money/database'
 import bcrypt from 'bcryptjs'
+import Resend from 'next-auth/providers/resend'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(db),
@@ -13,9 +14,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
   pages: {
     signIn: '/login',
+    error: '/login',
   },
 
   providers: [
+    Resend({
+      from: 'case@casesandberg.com',
+    }),
     Credentials({
       name: 'Email',
       credentials: {

@@ -1,32 +1,31 @@
-import Image from 'next/image'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import React from 'react'
-import { cookies } from 'next/headers'
 
 import { LoginForm } from '../components/LoginForm'
 
 export function LoginPage() {
-  const csrf = cookies().get('next-auth.csrf-token')?.value.split('|')[0] ?? ''
-
   return (
     <div className="w-full h-screen lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
       <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[350px] gap-6">
+        <div className="mx-auto grid w-[350px] gap-8 px-4">
           <div className="grid gap-2 text-center">
-            <h1 className="text-2xl font-bold">Login</h1>
-            <p className="text-balance text-sm text-muted-foreground">
-              Enter your email below to login to your account
-            </p>
+            <h1 className="text-2xl font-bold">Sign in to Play Money</h1>
           </div>
 
-          <LoginForm csrf={csrf} />
+          <LoginForm />
 
-          <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
-            <Link href="/register" className="underline">
-              Sign up
+          <p className="px-8 text-center text-sm text-muted-foreground">
+            By clicking continue, you agree to our{' '}
+            <Link href="/terms" className="underline underline-offset-4 hover:text-primary">
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link href="/privacy" className="underline underline-offset-4 hover:text-primary">
+              Privacy Policy
             </Link>
-          </div>
+            .
+          </p>
         </div>
       </div>
       <div className="hidden lg:block bg-primary">

@@ -7,6 +7,7 @@
   "exports": {
     "./styles.css": "./dist/index.css",
     "./utils": "./src/lib/utils.ts",
+    "./alert": "./src/components/ui/alert.tsx",
     "./button": "./src/components/ui/button.tsx",
     "./form": "./src/components/ui/form.tsx",
     "./input": "./src/components/ui/input.tsx",
