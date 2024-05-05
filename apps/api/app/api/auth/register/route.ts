@@ -1,44 +1,35 @@
-import db, { _UserModel } from '@play-money/database'
-import bcrypt from 'bcryptjs'
-import { generateFromEmail } from 'unique-username-generator'
+import { _UserModel } from '@play-money/database'
+import { UserExistsError } from '@play-money/auth/lib/exceptions'
+import { registerUser } from '@play-money/auth/lib/registerUser'
+import { formatZodError } from '@play-money/api-helpers/lib/formatZodError'
+import { NextResponse } from 'next/server'
+import * as z from 'zod'
 
 export const dynamic = 'force-dynamic'
 
-export async function POST(req: Request, res: Response) {
+const RequestBody = _UserModel.pick({ email: true, password: true })
+type RequestBody = z.infer<typeof RequestBody>
+
+const ResponseBody = z.union([_UserModel.pick({ id: true, email: true }), z.object({ error: z.string() })])
+type ResponseBody = z.infer<typeof ResponseBody>
+
+export async function POST(req: Request): Promise<NextResponse<ResponseBody>> {
   try {
     const body = await req.json()
-    const { email, password } = _UserModel.pick({ email: true, password: true }).parse(body)
+    const { email, password } = RequestBody.parse(body)
 
-    const existingUser = await db.user.findUnique({
-      where: {
-        email,
-      },
-    })
+    const user = await registerUser({ email, password })
 
-    if (existingUser) {
-      return new Response(JSON.stringify({ message: 'User with that email already exists' }), { status: 409 })
+    return NextResponse.json({ id: user.id, email: user.email }, { status: 201 })
+  } catch (error) {
+    if (error instanceof UserExistsError) {
+      return NextResponse.json({ error: error.message }, { status: 409 })
     }
 
-    const salt = bcrypt.genSaltSync(10)
-    const hashedPassword = bcrypt.hashSync(password, salt)
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: formatZodError(error) }, { status: 422 })
+    }
 
-    const user = await db.user.create({
-      data: {
-        email: email,
-        password: hashedPassword,
-        username: generateFromEmail(email, 3),
-      },
-    })
-
-    return new Response(
-      JSON.stringify({
-        message: 'User created successfully',
-        user: { id: user.id, email: user.email },
-      }),
-      { status: 201 }
-    )
-  } catch (error) {
-    console.error('Request error', error)
-    return new Response(JSON.stringify({ message: 'Error processing request' }), { status: 500 })
+    return NextResponse.json({ error: 'Error processing request' }, { status: 500 })
   }
 }

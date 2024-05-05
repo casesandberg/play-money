@@ -1,0 +1,10 @@
+{
+  "name": "@play-money/api-helpers",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "dependencies": {
+    "zod-validation-error": "^3.2.0"
+  }
+}
