@@ -1,5 +1,5 @@
 import { _UserModel } from '@play-money/database'
-import * as z from 'zod'
+import z from 'zod'
 
 export const dynamic = 'force-dynamic'
 

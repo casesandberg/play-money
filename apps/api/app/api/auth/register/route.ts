@@ -1,9 +1,9 @@
 import { _UserModel } from '@play-money/database'
 import { UserExistsError } from '@play-money/auth/lib/exceptions'
 import { registerUser } from '@play-money/auth/lib/registerUser'
-import { createSchema, formatZodError } from '@play-money/api-helpers'
+import { ServerErrorSchema, createSchema, formatZodError } from '@play-money/api-helpers'
 import { NextResponse } from 'next/server'
-import * as z from 'zod'
+import z from 'zod'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,11 +15,11 @@ export const schema = createSchema({
     response: {
       201: _UserModel.pick({ id: true, email: true }),
       409: {
-        content: z.object({ error: z.string() }),
+        content: ServerErrorSchema,
         description: 'User already exists with that email address',
       },
-      422: z.object({ error: z.string() }),
-      500: z.object({ error: z.string() }),
+      422: ServerErrorSchema,
+      500: ServerErrorSchema,
     },
   },
 })

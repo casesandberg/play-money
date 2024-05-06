@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import * as z from 'zod'
+import z from 'zod'
 import { _UserModel } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
 import { Alert, AlertDescription } from '@play-money/ui/alert'
