@@ -1,22 +1,33 @@
 import { _UserModel } from '@play-money/database'
 import { UserExistsError } from '@play-money/auth/lib/exceptions'
 import { registerUser } from '@play-money/auth/lib/registerUser'
-import { formatZodError } from '@play-money/api-helpers/lib/formatZodError'
+import { createSchema, formatZodError } from '@play-money/api-helpers'
 import { NextResponse } from 'next/server'
 import * as z from 'zod'
 
 export const dynamic = 'force-dynamic'
 
-const RequestBody = _UserModel.pick({ email: true, password: true })
-type RequestBody = z.infer<typeof RequestBody>
+export const schema = createSchema({
+  POST: {
+    request: {
+      body: _UserModel.pick({ email: true, password: true }),
+    },
+    response: {
+      201: _UserModel.pick({ id: true, email: true }),
+      409: {
+        content: z.object({ error: z.string() }),
+        description: 'User already exists with that email address',
+      },
+      422: z.object({ error: z.string() }),
+      500: z.object({ error: z.string() }),
+    },
+  },
+})
 
-const ResponseBody = z.union([_UserModel.pick({ id: true, email: true }), z.object({ error: z.string() })])
-type ResponseBody = z.infer<typeof ResponseBody>
-
-export async function POST(req: Request): Promise<NextResponse<ResponseBody>> {
+export async function POST(req: Request): Promise<NextResponse<typeof schema.POST.response>> {
   try {
     const body = await req.json()
-    const { email, password } = RequestBody.parse(body)
+    const { email, password } = schema.POST.request.body.parse(body)
 
     const user = await registerUser({ email, password })
 
