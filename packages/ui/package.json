@@ -9,6 +9,7 @@
     "./utils": "./src/lib/utils.ts",
     "./alert": "./src/components/ui/alert.tsx",
     "./button": "./src/components/ui/button.tsx",
+    "./card": "./src/components/ui/card.tsx",
     "./form": "./src/components/ui/form.tsx",
     "./input": "./src/components/ui/input.tsx",
     "./label": "./src/components/ui/label.tsx",

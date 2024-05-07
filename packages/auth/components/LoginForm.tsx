@@ -11,7 +11,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@play-money/ui/input'
 import { toast } from '@play-money/ui/use-toast'
 import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import { Sparkles } from 'lucide-react'
 
 const FormSchema = _UserModel.pick({ email: true })
@@ -20,7 +19,6 @@ type FormData = z.infer<typeof FormSchema>
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -33,14 +31,7 @@ export function LoginForm() {
 
     try {
       setIsLoading(true)
-      const response = await signIn('resend', { email, redirect: false })
-
-      console.log(response)
-      if (response?.error) {
-        throw new Error()
-      }
-
-      router.push('/')
+      await signIn('resend', { email, callbackUrl: '/' })
     } catch (error: any) {
       console.error('Login Failed:', error)
       toast({ title: 'There was an issue signing you in', description: 'Please try again later' })
