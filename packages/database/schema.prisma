@@ -19,6 +19,7 @@ model User {
   email         String    @unique /// @zod.min(1, "Email is required").email()
   username      String    @unique
   password      String /// @zod.min(8, "Password must be at least 8 characters").max(32, "Password may only be a max of 32 characters")
+  avatarUrl     String?
   emailVerified DateTime?
   accounts      Account[]
   sessions      Session[]
