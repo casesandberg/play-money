@@ -1,5 +1,5 @@
 {
-  "extends": "@play-money/typescript-config/react-library.json",
+  "extends": "@play-money/config/typescript/react-library.json",
   "include": ["."],
   "exclude": ["dist", "build", "node_modules"]
 }
