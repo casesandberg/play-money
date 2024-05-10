@@ -1,3 +1,3 @@
 module.exports = {
-  extends: ['@play-money/eslint-config/react.js'],
+  extends: ['@play-money/config/eslint/react.js'],
 }

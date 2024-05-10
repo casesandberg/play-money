@@ -35,7 +35,7 @@
     "react": "^18.2.0"
   },
   "devDependencies": {
-    "@play-money/eslint-config": "*",
+    "@play-money/config": "*",
     "@play-money/tailwind-config": "*",
     "@play-money/typescript-config": "*",
     "@types/react": "^18.2.61",
