@@ -22,7 +22,6 @@
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.1.1",
     "@play-money/config": "*",
-    "@play-money/tailwind-config": "*",
     "@play-money/typescript-config": "*",
     "@types/lodash": "^4.17.1",
     "@types/node": "^20.11.24",
