@@ -20,6 +20,7 @@ model User {
   username      String    @unique
   password      String /// @zod.min(8, "Password must be at least 8 characters").max(32, "Password may only be a max of 32 characters")
   avatarUrl     String?
+  bio           String?
   emailVerified DateTime?
   accounts      Account[]
   sessions      Session[]

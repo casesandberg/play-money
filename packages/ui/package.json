@@ -15,10 +15,14 @@
     "./form": "./src/components/ui/form.tsx",
     "./input": "./src/components/ui/input.tsx",
     "./label": "./src/components/ui/label.tsx",
+    "./select": "./src/components/ui/select.tsx",
+    "./separator": "./src/components/ui/separator.tsx",
     "./tabs": "./src/components/ui/tabs.tsx",
+    "./textarea": "./src/components/ui/textarea.tsx",
     "./toast": "./src/components/ui/toast.tsx",
     "./toaster": "./src/components/ui/toaster.tsx",
-    "./use-toast": "./src/components/ui/use-toast.ts"
+    "./use-toast": "./src/components/ui/use-toast.ts",
+    ".": "./src/index.ts"
   },
   "license": "MIT",
   "scripts": {
@@ -46,6 +50,8 @@
     "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-separator": "^1.0.3",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-toast": "^1.1.5",

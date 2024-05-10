@@ -8,6 +8,7 @@ export const _UserModel = z.object({
   username: z.string(),
   password: z.string().min(8, "Password must be at least 8 characters").max(32, "Password may only be a max of 32 characters"),
   avatarUrl: z.string().nullish(),
+  bio: z.string().nullish(),
   emailVerified: z.date().nullish(),
   createdAt: z.date(),
   updatedAt: z.date(),

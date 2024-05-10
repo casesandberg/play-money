@@ -1,8 +1,6 @@
 import NextAuth from 'next-auth'
-import Credentials from 'next-auth/providers/credentials'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import db, { _UserModel } from '@play-money/database'
-import bcrypt from 'bcryptjs'
 import Resend from 'next-auth/providers/resend'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -11,6 +9,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: '/login',
     error: '/login',
     verifyRequest: '/check-email',
+  },
+  session: {
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
 
   providers: [

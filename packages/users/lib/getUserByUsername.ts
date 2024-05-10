@@ -17,5 +17,6 @@ export async function getUserByUsername({ username }: { username: string }) {
     email: user.email, // TODO dont leak emails
     username: user.username,
     avatarUrl: user.avatarUrl || `https://api.dicebear.com/8.x/initials/svg?seed=${user.username}&scale=75`,
+    bio: user.bio,
   }
 }
