@@ -24,6 +24,7 @@
     "@play-money/eslint-config": "*",
     "@play-money/tailwind-config": "*",
     "@play-money/typescript-config": "*",
+    "@types/lodash": "^4.17.1",
     "@types/node": "^20.11.24",
     "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",

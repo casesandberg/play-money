@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState } from 'react'
 
-// TODO: Sync this with user profile model
+// TODO: @casesandberg Sync this with user profile model
 interface User {
   id: string
   email: string

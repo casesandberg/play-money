@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 
 export const schema = createSchema({
   GET: {
-    // TODO: Fix typescript to allow for no request data
+    // TODO: @casesandberg Fix typescript to allow for no request data
     request: {
       body: UpdateSchema,
     },

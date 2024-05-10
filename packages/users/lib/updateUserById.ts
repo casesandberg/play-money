@@ -11,7 +11,7 @@ export const UpdateSchema = z.object({
 })
 
 export async function updateUserById({ id, ...data }: { id: string } & z.infer<typeof UpdateSchema>) {
-  // TODO: Figure out a cleaner way to strip undefined/nulls
+  // TODO: @casesandberg Figure out a cleaner way to strip undefined/nulls
   const { username, bio, avatarUrl } = UpdateSchema.transform((data) => {
     return Object.fromEntries(Object.entries(data).filter(([_, value]) => value != null))
   }).parse(data)

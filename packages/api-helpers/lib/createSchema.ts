@@ -27,7 +27,7 @@ type Schema<Req extends RequestIsh, Res extends z.ZodObject<{}>, M extends Metho
   }
 }
 
-// TODO: Use to extrapolate by creating a plugin similar to next-swagger-doc
+// TODO: @casesandberg Use to extrapolate by creating a plugin similar to next-swagger-doc
 
 export function createSchema<Req extends RequestIsh, Res extends z.ZodObject<{}>, K extends Keys, M extends Method>(
   options: Record<M, Option<Req, Res, K>>

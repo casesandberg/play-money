@@ -16,7 +16,8 @@ import { useUser } from '../context/UserContext'
 const profileFormSchema = _UserModel.pick({ username: true, bio: true, avatarUrl: true })
 type ProfileFormValues = z.infer<typeof profileFormSchema>
 
-async function checkUsernameAvailability(username): Promise<{ available: boolean; message?: string }> {
+// TODO: @casesandberg Generate this from OpenAPI schema
+async function checkUsernameAvailability(username: string): Promise<{ available: boolean; message?: string }> {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/users/check-username?username=${encodeURIComponent(username)}`
   )
@@ -81,7 +82,7 @@ export function SettingsProfileForm() {
               <FormDescription>
                 This is your public display name. It can be your real name or a pseudonym.
               </FormDescription>
-              <FormMessage /> {/* TODO: Figure out why the validate error isnt being displayed */}
+              <FormMessage /> {/* TODO: @casesandberg Figure out why the validate error isnt being displayed */}
             </FormItem>
           )}
         />
