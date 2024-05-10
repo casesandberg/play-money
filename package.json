@@ -9,7 +9,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@play-money/prettier-config": "*",
+    "@play-money/config": "*",
     "@play-money/typescript-config": "*",
     "dotenv-cli": "^7.4.1",
     "eslint": "^8.57.0",
