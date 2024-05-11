@@ -1,5 +1,4 @@
 import db, { _UserModel } from '@play-money/database'
-import { UserNotFoundError } from './exceptions'
 import { z } from 'zod'
 import { checkUsername } from './checkUsername'
 import { getUserById } from './getUserById'
@@ -16,11 +15,11 @@ export async function updateUserById({ id, ...data }: { id: string } & z.infer<t
     return Object.fromEntries(Object.entries(data).filter(([_, value]) => value != null))
   }).parse(data)
 
-  getUserById({ id }) // Ensure user exists
+  const user = await getUserById({ id })
 
   const updatedData: z.infer<typeof UpdateSchema> = {}
 
-  if (username) {
+  if (username && user.username !== username) {
     const { available, message } = await checkUsername({ username })
     if (!available) {
       throw new Error(message)

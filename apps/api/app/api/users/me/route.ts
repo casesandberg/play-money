@@ -57,7 +57,10 @@ export async function PATCH(req: Request): Promise<NextResponse<typeof schema.PA
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const user = await updateUserById({ id: session.user.id })
+    const body = await req.json()
+    const updateData = schema.PATCH.request.body.parse(body)
+
+    const user = await updateUserById({ id: session.user.id, ...updateData })
 
     return NextResponse.json(user)
   } catch (error: any) {

@@ -3,7 +3,9 @@ import { UserNotFoundError } from '../lib/exceptions'
 
 // TODO: @casesandberg Generate this from OpenAPI schema
 async function getUserProfile({ username }: { username: string }) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/username/${username}`)
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/username/${username}`, {
+    credentials: 'include',
+  })
   if (!res.ok) {
     if (res.status === 404) {
       // TODO: @casesandberg Figure out how to pass around errors for next error boundaries
