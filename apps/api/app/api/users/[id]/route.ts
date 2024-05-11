@@ -6,7 +6,8 @@ import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 
-export const schema = createSchema({
+// TODO: Next doesnt like us exporting this schema...
+const schema = createSchema({
   GET: {
     request: {
       params: _UserModel.pick({ id: true }),

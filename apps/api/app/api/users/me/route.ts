@@ -7,7 +7,8 @@ import { auth } from '@play-money/auth'
 
 export const dynamic = 'force-dynamic'
 
-export const schema = createSchema({
+// TODO: Next doesnt like us exporting this schema...
+const schema = createSchema({
   GET: {
     // TODO: @casesandberg Fix typescript to allow for no request data
     request: {
