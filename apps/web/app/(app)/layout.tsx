@@ -20,6 +20,9 @@ function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
       <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
         Markets
       </Link>
+      <Link href="/create-post" className="text-sm font-medium transition-colors hover:text-primary">
+        Create Market
+      </Link>
     </nav>
   )
 }
