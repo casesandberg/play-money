@@ -24,6 +24,7 @@ model User {
   emailVerified DateTime?
   accounts      Account[]
   sessions      Session[]
+  markets       Market[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -65,4 +66,19 @@ model VerificationToken {
   expires    DateTime
 
   @@id([identifier, token])
+}
+
+model Market {
+  id          String    @id @default(cuid())
+  question    String /// @zod.min(1, "Question is required")
+  description String
+  slug        String    @unique /// @zod.min(1, "Slug is required")
+  closeDate   DateTime?
+  resolvedAt  DateTime?
+
+  createdBy String
+  user      User   @relation(fields: [createdBy], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

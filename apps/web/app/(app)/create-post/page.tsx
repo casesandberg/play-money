@@ -3,12 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
- 
+import { _MarketModel } from '@play-money/database'
+import moment from "moment"
+
 import { Button } from "@play-money/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -16,20 +17,9 @@ import {
 } from "@play-money/ui/form"
 import { Input } from "@play-money/ui/input"
 import { Textarea } from "@play-money/ui/textarea"
-import { toast } from "@play-money/ui/use-toast"
  
-const FormSchema = z.object({
-  question: z.string().min(1, "Question is required"),
-  description: z.string(),
-  closeDate: z.string().regex(
-    /^\d{4}-\d{2}-\d{2}$/,
-    "Invalid date format"
-  ),
-  closeTime: z.string().regex(
-    /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/,
-    "Invalid time format"
-  ),
-})
+const marketCreateFormSchema = _MarketModel.pick({ question: true, description: true, closeDate: true })
+type marketCreateFormValues = z.infer<typeof marketCreateFormSchema>
  
 export default function CreatePost() {
   return (
@@ -41,17 +31,16 @@ function CreateBinaryMarketForm() {
   
   const tzName = new Date().toString().match(/\(([A-Za-z\s].*)\)/)?.[1] || "(unknown)";
 
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+  const form = useForm<marketCreateFormValues>({
+    resolver: zodResolver(marketCreateFormSchema),
     defaultValues: {
       question: "",
       description: "",
-      closeDate: "",
-      closeTime: "12:00",
+      closeDate: moment().add(1, "month").endOf("day").toDate(),
     },
   })
  
-  function onSubmit(data: z.infer<typeof FormSchema>) {
+  function onSubmit(data: marketCreateFormValues) {
     console.log(data)
   }
  
@@ -84,34 +73,24 @@ function CreateBinaryMarketForm() {
             </FormItem>
           )}
         />
-        <div className="flex w-full max-w-sm items-center space-x-2">
-          <FormField
-            control={form.control}
-            name="closeDate"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Close Date</FormLabel>
-                <FormControl>
-                  <Input type="date" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="closeTime"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Close Time</FormLabel>
-                <FormControl>
-                  <Input type="time" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="closeDate"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Close Date</FormLabel>
+              <FormControl>
+                <Input
+                  type="datetime-local"
+                  {...field}
+                  value={field.value ? moment(field.value).format("YYYY-MM-DDTHH:mm") : ""}
+                  onChange={(e) => field.onChange(new Date(e.target.value))}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <p className="text-sm text-muted-foreground">
           Trading will stop at this time in your local timezone ({tzName}).
         </p>
