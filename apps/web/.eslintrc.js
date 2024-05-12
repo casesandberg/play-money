@@ -1,3 +1,3 @@
 module.exports = {
-  extends: ['@play-money/config/eslint/next.js'],
+  extends: ['../../packages/config/eslint/next.js'],
 }
