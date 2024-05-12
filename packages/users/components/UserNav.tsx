@@ -1,5 +1,8 @@
 'use client'
 
+import { CircleUser } from 'lucide-react'
+import { signOut, signIn } from 'next-auth/react'
+import Link from 'next/link'
 import React from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
 import { Button } from '@play-money/ui/button'
@@ -13,9 +16,6 @@ import {
   DropdownMenuTrigger,
 } from '@play-money/ui/dropdown-menu'
 import { useUser } from '@play-money/users/context/UserContext'
-import Link from 'next/link'
-import { signOut, signIn } from 'next-auth/react'
-import { CircleUser } from 'lucide-react'
 
 export function UserNav() {
   const { user } = useUser()
@@ -51,7 +51,7 @@ export function UserNav() {
       </DropdownMenuContent>
     </DropdownMenu>
   ) : (
-    <Button variant="secondary" className="relative px-3 rounded-full" onClick={() => signIn()}>
+    <Button variant="secondary" className="relative rounded-full px-3" onClick={() => signIn()}>
       <CircleUser className="h-4 w-4" />
     </Button>
   )

@@ -1,13 +1,13 @@
 'use client'
 
+import { useSession } from 'next-auth/react'
+import Image from 'next/image'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import React from 'react'
-import { useSession } from 'next-auth/react'
 import { buttonVariants } from '@play-money/ui/button'
 import { cn } from '@play-money/ui/utils'
 import { RegisterForm } from '../components/RegisterForm'
-import Image from 'next/image'
-import Link from 'next/link'
 
 export function RegisterPage() {
   const { data: session } = useSession()
@@ -17,7 +17,7 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="w-full h-screen lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
+    <div className="h-screen w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
       <Link
         href="/login"
         className={cn(buttonVariants({ variant: 'ghost' }), 'absolute right-4 top-4 md:right-8 md:top-8')}
@@ -25,7 +25,7 @@ export function RegisterPage() {
         Login
       </Link>
 
-      <div className="hidden lg:block bg-primary">
+      <div className="hidden bg-primary lg:block">
         {/* <Image
           src="/placeholder.svg"
           alt="Image"

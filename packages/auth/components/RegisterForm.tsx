@@ -1,7 +1,8 @@
 'use client'
 
-import React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'next/navigation'
+import React from 'react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
 import { _UserModel } from '@play-money/database'
@@ -9,7 +10,6 @@ import { Button } from '@play-money/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
 import { toast } from '@play-money/ui/use-toast'
-import { useRouter } from 'next/navigation'
 
 const FormSchema = _UserModel.pick({ email: true, password: true })
 

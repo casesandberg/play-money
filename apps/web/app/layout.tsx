@@ -1,12 +1,12 @@
-import { auth } from '@play-money/auth'
-import { SessionProvider } from '@play-money/auth/components/SessionProvider'
-import { getUserById } from '@play-money/users/lib/getUserById'
-import { UserProvider } from '@play-money/users/context/UserContext'
-import './globals.css'
-import '@play-money/ui/styles.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { auth } from '@play-money/auth'
+import { SessionProvider } from '@play-money/auth/components/SessionProvider'
+import '@play-money/ui/styles.css'
 import { Toaster } from '@play-money/ui/toaster'
+import { UserProvider } from '@play-money/users/context/UserContext'
+import { getUserById } from '@play-money/users/lib/getUserById'
+import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 

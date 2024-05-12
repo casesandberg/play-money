@@ -1,7 +1,7 @@
 'use client'
 
-import { UserNotFoundError } from '@play-money/users/lib/exceptions'
 import { useEffect } from 'react'
+import { UserNotFoundError } from '@play-money/users/lib/exceptions'
 
 export default function Error({ error }: { error: Error & { digest?: string; code?: string } }) {
   useEffect(() => {

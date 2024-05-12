@@ -1,6 +1,6 @@
-import db from '@play-money/database'
 import bcrypt from 'bcryptjs'
 import { generateFromEmail } from 'unique-username-generator'
+import db from '@play-money/database'
 import { UserExistsError } from './exceptions'
 
 export async function registerUser({ email, password }: { email: string; password: string }) {

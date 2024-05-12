@@ -1,7 +1,7 @@
+import { NextResponse } from 'next/server'
 import { _UserModel } from '@play-money/database'
 import { UserNotFoundError } from '@play-money/users/lib/exceptions'
 import { getUserByUsername } from '@play-money/users/lib/getUserByUsername'
-import { NextResponse } from 'next/server'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'

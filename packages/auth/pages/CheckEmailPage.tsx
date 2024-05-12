@@ -1,9 +1,9 @@
 'use client'
 
-import React from 'react'
-import { Card, CardDescription, CardHeader, CardTitle } from '@play-money/ui/card'
 import { useSession } from 'next-auth/react'
 import { redirect } from 'next/navigation'
+import React from 'react'
+import { Card, CardDescription, CardHeader, CardTitle } from '@play-money/ui/card'
 
 export function CheckEmailPage() {
   const { data: session } = useSession()
@@ -12,8 +12,8 @@ export function CheckEmailPage() {
     redirect('/')
   }
   return (
-    <div className="w-full h-screen bg-primary flex flex-col justify-center">
-      <Card className="mx-auto max-w-xs flex flex-col items-center justify-center text-center p-6 text-balance">
+    <div className="flex h-screen w-full flex-col justify-center bg-primary">
+      <Card className="mx-auto flex max-w-xs flex-col items-center justify-center text-balance p-6 text-center">
         <CardHeader className="space-y-8">
           <CardTitle>Check your email</CardTitle>
           <CardDescription>

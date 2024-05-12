@@ -1,8 +1,8 @@
-import NextAuth from 'next-auth'
 import { PrismaAdapter } from '@auth/prisma-adapter'
-import db, { _UserModel } from '@play-money/database'
+import NextAuth from 'next-auth'
 import Resend from 'next-auth/providers/resend'
 import { generateFromEmail } from 'unique-username-generator'
+import db, { _UserModel } from '@play-money/database'
 
 const prismaAdapter = PrismaAdapter(db)
 

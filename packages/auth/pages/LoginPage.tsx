@@ -1,12 +1,11 @@
-import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import React from 'react'
-
 import { LoginForm } from '../components/LoginForm'
 
 export function LoginPage() {
   return (
-    <div className="w-full h-screen lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
+    <div className="h-screen w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
       <div className="flex items-center justify-center py-12">
         <div className="mx-auto grid w-[350px] gap-8 px-4">
           <div className="grid gap-2 text-center">
@@ -28,7 +27,7 @@ export function LoginPage() {
           </p>
         </div>
       </div>
-      <div className="hidden lg:block bg-primary">
+      <div className="hidden bg-primary lg:block">
         {/* <Image
           src="/placeholder.svg"
           alt="Image"

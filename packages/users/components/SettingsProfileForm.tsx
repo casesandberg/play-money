@@ -1,16 +1,15 @@
 'use client'
 
+import { debounce } from 'lodash'
+import React from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import React from 'react'
-import { debounce } from 'lodash'
-
+import { _UserModel } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
 import { Textarea } from '@play-money/ui/textarea'
 import { toast } from '@play-money/ui/use-toast'
-import { _UserModel } from '@play-money/database'
 import { useUser } from '../context/UserContext'
 
 const profileFormSchema = _UserModel.pick({ username: true, bio: true, avatarUrl: true })

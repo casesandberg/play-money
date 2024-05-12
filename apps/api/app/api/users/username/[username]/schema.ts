@@ -1,5 +1,5 @@
-import { _UserModel } from '@play-money/database'
 import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
+import { _UserModel } from '@play-money/database'
 
 export default createSchema({
   GET: {

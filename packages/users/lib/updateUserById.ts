@@ -1,5 +1,5 @@
-import db, { _UserModel } from '@play-money/database'
 import { z } from 'zod'
+import db, { _UserModel } from '@play-money/database'
 import { checkUsername } from './checkUsername'
 import { getUserById } from './getUserById'
 

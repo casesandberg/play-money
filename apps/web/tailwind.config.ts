@@ -1,5 +1,4 @@
 // tailwind config is required for editor support
-
 import type { Config } from 'tailwindcss'
 import sharedConfig from '@play-money/config/tailwind/tailwind.config'
 

@@ -1,6 +1,6 @@
+import { NextResponse } from 'next/server'
 import { _UserModel } from '@play-money/database'
 import { checkUsername } from '@play-money/users/lib/checkUsername'
-import { NextResponse } from 'next/server'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'

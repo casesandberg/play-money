@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@vercel/style-guide": "^5.2.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-turbo": "^1.12.4",
