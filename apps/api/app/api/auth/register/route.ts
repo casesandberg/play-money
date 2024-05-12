@@ -1,29 +1,12 @@
 import { _UserModel } from '@play-money/database'
 import { UserExistsError } from '@play-money/auth/lib/exceptions'
 import { registerUser } from '@play-money/auth/lib/registerUser'
-import { ServerErrorSchema, createSchema, formatZodError } from '@play-money/api-helpers'
+import { formatZodError } from '@play-money/api-helpers'
 import { NextResponse } from 'next/server'
 import z from 'zod'
+import schema from './schema'
 
 export const dynamic = 'force-dynamic'
-
-// TODO: Next doesnt like us exporting this schema...
-const schema = createSchema({
-  POST: {
-    request: {
-      body: _UserModel.pick({ email: true, password: true }),
-    },
-    response: {
-      201: _UserModel.pick({ id: true, email: true }),
-      409: {
-        content: ServerErrorSchema,
-        description: 'User already exists with that email address',
-      },
-      422: ServerErrorSchema,
-      500: ServerErrorSchema,
-    },
-  },
-})
 
 export async function POST(req: Request): Promise<NextResponse<typeof schema.POST.response>> {
   try {
