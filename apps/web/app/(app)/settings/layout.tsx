@@ -1,8 +1,5 @@
-import { Metadata } from 'next'
-import Image from 'next/image'
-
 import { Separator } from '@play-money/ui/separator'
-import { SidebarNav } from '@play-money/ui'
+import { SettingsSidebarNav } from '@play-money/users/components/SettingsSidebarNav'
 
 const sidebarNavItems = [
   {
@@ -25,7 +22,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
       <Separator className="my-6" />
       <div className="grid lg:grid-cols-5 space-y-8 lg:space-x-12 lg:space-y-0">
         <aside className="-mx-4 lg:col-span-1">
-          <SidebarNav items={sidebarNavItems} />
+          <SettingsSidebarNav items={sidebarNavItems} />
         </aside>
         <div className="flex-1 lg:col-span-3">{children}</div>
       </div>

@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 
 export default function Error({ error }: { error: Error & { digest?: string; code?: string } }) {
   useEffect(() => {
-    console.dir(error) // Log the error to an error reporting service
+    console.dir(error) // eslint-disable-line -- Log the error to an error reporting service
   }, [error])
 
   if (error.message === UserNotFoundError.code) {

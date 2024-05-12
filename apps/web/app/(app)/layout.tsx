@@ -1,9 +1,5 @@
-import Image from 'next/image'
-
 import Link from 'next/link'
 import { cn } from '@play-money/ui/utils'
-import { Input } from '@play-money/ui/input'
-
 import { UserNav } from '@play-money/users/components/UserNav'
 
 // export function Search() {
@@ -17,7 +13,7 @@ import { UserNav } from '@play-money/users/components/UserNav'
 function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
   return (
     <nav className={cn('flex items-center space-x-4 lg:space-x-6', className)} {...props}>
-      <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
+      <Link className="text-sm font-medium transition-colors hover:text-primary" href="/">
         Markets
       </Link>
     </nav>

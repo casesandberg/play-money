@@ -1,6 +1,6 @@
 import { _UserModel } from '@play-money/database'
 import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
-import z from 'zod'
+import zod from 'zod'
 
 export default createSchema({
   GET: {
@@ -8,7 +8,7 @@ export default createSchema({
       params: _UserModel.pick({ username: true }),
     },
     response: {
-      200: z.object({ available: z.boolean(), message: z.string().optional() }),
+      200: zod.object({ available: zod.boolean(), message: zod.string().optional() }),
       500: ServerErrorSchema,
     },
   },
