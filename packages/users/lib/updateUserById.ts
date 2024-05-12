@@ -43,6 +43,7 @@ export async function updateUserById({ id, ...data }: { id: string } & z.infer<t
     id: updatedUser.id,
     email: updatedUser.email, // TODO dont leak emails
     username: updatedUser.username,
+    displayName: user.displayName,
     avatarUrl:
       updatedUser.avatarUrl || `https://api.dicebear.com/8.x/initials/svg?seed=${updatedUser.username}&scale=75`,
     bio: updatedUser.bio,
