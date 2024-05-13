@@ -1,5 +1,5 @@
 import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
-import { _UserModel } from '@play-money/database'
+import { UserProfileModel } from '@play-money/users/lib/sanitizeUser'
 import { UpdateSchema } from '@play-money/users/lib/updateUserById'
 
 export default createSchema({
@@ -9,7 +9,7 @@ export default createSchema({
       body: UpdateSchema,
     },
     response: {
-      200: _UserModel.pick({ id: true, username: true }),
+      200: UserProfileModel,
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },
@@ -19,7 +19,7 @@ export default createSchema({
       body: UpdateSchema,
     },
     response: {
-      200: _UserModel.pick({ id: true, username: true }),
+      200: UserProfileModel,
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },
