@@ -32,9 +32,6 @@ module.exports = {
                     console.log('Variable is initialized with an await on a function call.')
                   }
 
-                  console.log('+++')
-                  console.log(init.argument.arguments[0].properties)
-
                   if (init.argument && init.argument.arguments[0] && init.argument.arguments[0].properties) {
                     init.argument.arguments[0].properties.forEach((prop) => {
                       if (prop.key && prop.key.name === 'email') {
@@ -48,8 +45,6 @@ module.exports = {
                 }
 
                 if (init.type === 'ObjectExpression') {
-                  console.log('===')
-                  console.log(init.properties)
                   // It's an object literal, check properties
                   init.properties.forEach((prop) => {
                     if (prop.key.name === 'email') {

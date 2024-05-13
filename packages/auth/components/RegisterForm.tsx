@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@play-money/ui/input'
 import { toast } from '@play-money/ui/use-toast'
 
-const FormSchema = _UserModel.pick({ email: true, password: true })
+const FormSchema = _UserModel.pick({ email: true })
 
 type FormData = z.infer<typeof FormSchema>
 
@@ -26,11 +26,11 @@ export function RegisterForm() {
   })
 
   const onSubmit = async (data: FormData) => {
-    const { email, password } = data
+    const { email } = data
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/auth/register`, {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email }),
       })
 
       if (!response.ok) {
