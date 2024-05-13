@@ -1,6 +1,7 @@
 import { generateFromEmail } from 'unique-username-generator'
 import db from '@play-money/database'
 import { UserExistsError } from './exceptions'
+import { santizeUser } from './sanitizeUser'
 
 export async function createUser({ email }: { email: string }) {
   const existingUser = await db.user.findUnique({
@@ -23,12 +24,5 @@ export async function createUser({ email }: { email: string }) {
     },
   })
 
-  return {
-    id: user.id,
-    email: user.email, // TODO dont leak emails
-    username: user.username,
-    displayName: user.displayName,
-    avatarUrl: user.avatarUrl || `https://api.dicebear.com/8.x/initials/svg?seed=${user.username}&scale=75`,
-    bio: user.bio,
-  }
+  return santizeUser(user)
 }

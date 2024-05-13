@@ -11,11 +11,11 @@ export const dynamic = 'force-dynamic'
 export async function POST(req: Request): Promise<NextResponse<typeof schema.POST.response>> {
   try {
     const body = (await req.json()) as unknown
-    const { email, password } = schema.POST.request.body.parse(body)
+    const { email } = schema.POST.request.body.parse(body)
 
-    const user = await registerUser({ email, password })
+    const user = await registerUser({ email, password: 'password' })
 
-    return NextResponse.json({ id: user.id, email: user.email }, { status: 201 })
+    return NextResponse.json({ id: user.id }, { status: 201 })
   } catch (error) {
     if (error instanceof UserExistsError) {
       return NextResponse.json({ error: error.message }, { status: 409 })

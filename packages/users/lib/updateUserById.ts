@@ -2,12 +2,9 @@ import { z } from 'zod'
 import db, { _UserModel } from '@play-money/database'
 import { checkUsername } from './checkUsername'
 import { getUserById } from './getUserById'
+import { santizeUser } from './sanitizeUser'
 
-export const UpdateSchema = z.object({
-  username: _UserModel.shape.username.optional(),
-  bio: _UserModel.shape.bio.optional(),
-  avatarUrl: _UserModel.shape.avatarUrl.optional(),
-})
+export const UpdateSchema = _UserModel.pick({ username: true, bio: true, avatarUrl: true }).partial()
 
 export async function updateUserById({ id, ...data }: { id: string } & z.infer<typeof UpdateSchema>) {
   // TODO: @casesandberg Figure out a cleaner way to strip undefined/nulls
@@ -39,13 +36,5 @@ export async function updateUserById({ id, ...data }: { id: string } & z.infer<t
     data: updatedData,
   })
 
-  return {
-    id: updatedUser.id,
-    email: updatedUser.email, // TODO dont leak emails
-    username: updatedUser.username,
-    displayName: user.displayName,
-    avatarUrl:
-      updatedUser.avatarUrl || `https://api.dicebear.com/8.x/initials/svg?seed=${updatedUser.username}&scale=75`,
-    bio: updatedUser.bio,
-  }
+  return santizeUser(updatedUser)
 }

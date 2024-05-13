@@ -23,6 +23,7 @@ module.exports = {
     ].map(require.resolve),
     'plugin:prettier/recommended',
   ],
+  plugins: ['eslint-plugin-local-rules'],
   parserOptions: {
     project,
   },
@@ -45,5 +46,6 @@ module.exports = {
   rules: {
     'import/no-default-export': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
+    'local-rules/enforce-protection-of-sensitive-fields': 'error',
   },
 }

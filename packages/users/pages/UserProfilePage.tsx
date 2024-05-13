@@ -144,7 +144,7 @@ export async function UserProfilePage({ username }: { username: string }) {
                   <TableRow>
                     <TableHead>Market</TableHead>
                     <TableHead className="hidden w-[150px] sm:table-cell">Resolves</TableHead>
-                    <TableHead className="hidden sm:table-cell">Participants</TableHead>
+                    <TableHead className="hidden sm:table-cell">Traders</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

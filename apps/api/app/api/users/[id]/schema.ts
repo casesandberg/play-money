@@ -1,13 +1,13 @@
 import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
-import { _UserModel } from '@play-money/database'
+import { UserProfileModel } from '@play-money/users/lib/sanitizeUser'
 
 export default createSchema({
   GET: {
     request: {
-      params: _UserModel.pick({ id: true }),
+      params: UserProfileModel.pick({ id: true }),
     },
     response: {
-      200: _UserModel.pick({ id: true, username: true }),
+      200: UserProfileModel,
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },
