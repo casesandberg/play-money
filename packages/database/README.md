@@ -49,7 +49,14 @@ The **Play Money** database package manages the platform's database interactions
      npx prisma migrate dev
      ```
 
-3. **Developing with Prisma**:
+3. **Seed the DB**:
+
+   - If you would like to seed your database with sample data, run:
+     ```bash
+     npx prisma db seed
+     ```
+
+4. **Developing with Prisma**:
 
    - Make schema changes in the `schema.prisma` file.
    - Use Prisma Studio to visually manage your data:
