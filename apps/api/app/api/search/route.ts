@@ -17,7 +17,6 @@ export async function GET(req: Request): Promise<NextResponse<typeof schema.GET.
 
     return NextResponse.json({ users })
   } catch (error) {
-    console.log(error)
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 })
   }
 }
