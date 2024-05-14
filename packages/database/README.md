@@ -44,15 +44,21 @@ The **Play Money** database package manages the platform's database interactions
 
 2. **Run Migrations**:
 
-   - To create a new migration after modifying your Prisma schema, run:
+   - To set you your database with the existing schema and migrations, run:
      ```bash
-     npx prisma migrate dev --name migration_name
+     npx prisma migrate dev
      ```
 
 3. **Developing with Prisma**:
+
    - Make schema changes in the `schema.prisma` file.
    - Use Prisma Studio to visually manage your data:
      ```bash
      npx prisma studio
      ```
    - Access Prisma Studio at [localhost:5555](http://localhost:5555).
+
+   - To create a new migration after modifying your Prisma schema, run:
+     ```bash
+      npx prisma migrate dev --name migration_name
+     ```
