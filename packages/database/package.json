@@ -15,6 +15,13 @@
     "unique-username-generator": "^1.3.0",
     "zod-prisma": "^0.5.4"
   },
+  "prisma": {
+    "seed": "tsx seed.ts"
+  },
   "main": "./index.ts",
-  "types": "./index.ts"
+  "types": "./index.ts",
+  "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "tsx": "^4.10.2"
+  }
 }
