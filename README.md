@@ -24,12 +24,26 @@
    ```bash
    npm install
    ```
-3. **Set up environment variables**:
+3. **Set up postgres database**:
+
+   - Follow the [Installation instructions](https://www.prisma.io/dataguide/postgresql/setting-up-a-local-postgresql-database).
+   - Set a password during installation and accept default settings for other options.
+   - Open a terminal and run:
+     ```bash
+     psql -U postgres
+     ```
+   - Enter the password you set during installation.
+   - Create a new database for local development:
+     ```sql
+     CREATE DATABASE playmoney;
+     ```
+
+4. **Set up environment variables**:
 
    - Create a `.env` file based on the `.env.example` file provided.
    - (Reach out to @casesandberg to get the shared dev env if you wish)
 
-4. **Start development servers**:
+5. **Start development servers**:
    ```bash
    npm run dev
    ```
