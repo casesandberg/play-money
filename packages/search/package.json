@@ -1,0 +1,9 @@
+{
+  "name": "@play-money/search",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@play-money/database": "*",
+    "@play-money/users": "*"
+  }
+}
