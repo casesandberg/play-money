@@ -1,10 +1,19 @@
-import NextAuth from 'next-auth'
 import { PrismaAdapter } from '@auth/prisma-adapter'
-import db, { _UserModel } from '@play-money/database'
+import NextAuth from 'next-auth'
 import Resend from 'next-auth/providers/resend'
+import { generateFromEmail } from 'unique-username-generator'
+import db, { _UserModel } from '@play-money/database'
+
+const prismaAdapter = PrismaAdapter(db)
+
+// Override prisma adapter to add required fields to user creation
+prismaAdapter.createUser = ({ id: _id, ...data }) => {
+  const identifier = generateFromEmail(data.email, 4)
+  return prisma.user.create({ data: { ...data, username: identifier, displayName: identifier } })
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(db),
+  adapter: prismaAdapter,
   pages: {
     signIn: '/login',
     error: '/login',

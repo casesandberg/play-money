@@ -1,23 +1,12 @@
-import Image from 'next/image'
-
 import Link from 'next/link'
+import { GlobalSearchTrigger } from '@play-money/search/components/GlobalSearchTrigger'
 import { cn } from '@play-money/ui/utils'
-import { Input } from '@play-money/ui/input'
-
 import { UserNav } from '@play-money/users/components/UserNav'
-
-// export function Search() {
-//   return (
-//     <div>
-//       <Input type="search" placeholder="Search..." className="md:w-[100px] lg:w-[300px]" />
-//     </div>
-//   )
-// }
 
 function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
   return (
     <nav className={cn('flex items-center space-x-4 lg:space-x-6', className)} {...props}>
-      <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
+      <Link className="text-sm font-medium transition-colors hover:text-primary" href="/">
         Markets
       </Link>
       <Link href="/create-post" className="text-sm font-medium transition-colors hover:text-primary">
@@ -35,7 +24,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <Link href="/">PlayMoney</Link>
           <MainNav className="mx-6" />
           <div className="ml-auto flex items-center space-x-4">
-            {/* <Search /> */}
+            <GlobalSearchTrigger />
             <UserNav />
           </div>
         </div>

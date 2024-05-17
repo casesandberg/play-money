@@ -1,43 +1,27 @@
-import { _UserModel } from '@play-money/database'
+import { NextResponse } from 'next/server'
+import zod from 'zod'
+import { formatZodError } from '@play-money/api-helpers'
 import { UserExistsError } from '@play-money/auth/lib/exceptions'
 import { registerUser } from '@play-money/auth/lib/registerUser'
-import { ServerErrorSchema, createSchema, formatZodError } from '@play-money/api-helpers'
-import { NextResponse } from 'next/server'
-import z from 'zod'
+import { _UserModel } from '@play-money/database'
+import schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
-export const schema = createSchema({
-  POST: {
-    request: {
-      body: _UserModel.pick({ email: true, password: true }),
-    },
-    response: {
-      201: _UserModel.pick({ id: true, email: true }),
-      409: {
-        content: ServerErrorSchema,
-        description: 'User already exists with that email address',
-      },
-      422: ServerErrorSchema,
-      500: ServerErrorSchema,
-    },
-  },
-})
-
 export async function POST(req: Request): Promise<NextResponse<typeof schema.POST.response>> {
   try {
-    const body = await req.json()
-    const { email, password } = schema.POST.request.body.parse(body)
+    const body = (await req.json()) as unknown
+    const { email } = schema.POST.request.body.parse(body)
 
-    const user = await registerUser({ email, password })
+    const user = await registerUser({ email, password: 'password' })
 
-    return NextResponse.json({ id: user.id, email: user.email }, { status: 201 })
+    return NextResponse.json({ id: user.id }, { status: 201 })
   } catch (error) {
     if (error instanceof UserExistsError) {
       return NextResponse.json({ error: error.message }, { status: 409 })
     }
 
-    if (error instanceof z.ZodError) {
+    if (error instanceof zod.ZodError) {
       return NextResponse.json({ error: formatZodError(error) }, { status: 422 })
     }
 

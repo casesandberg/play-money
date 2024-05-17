@@ -1,16 +1,15 @@
 'use client'
 
+import { debounce } from 'lodash'
+import React from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import React from 'react'
-import { debounce } from 'lodash'
-
+import { _UserModel } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
 import { Textarea } from '@play-money/ui/textarea'
 import { toast } from '@play-money/ui/use-toast'
-import { _UserModel } from '@play-money/database'
 import { useUser } from '../context/UserContext'
 
 const profileFormSchema = _UserModel.pick({ username: true, bio: true, avatarUrl: true })
@@ -19,13 +18,14 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>
 // TODO: @casesandberg Generate this from OpenAPI schema
 async function checkUsernameAvailability(username: string): Promise<{ available: boolean; message?: string }> {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/v1/users/check-username?username=${encodeURIComponent(username)}`
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/users/check-username?username=${encodeURIComponent(username)}`,
+    { credentials: 'include' }
   )
   return await response.json()
 }
 
 export function SettingsProfileForm() {
-  const { user } = useUser()
+  const { user, setUser } = useUser()
   const form = useForm<ProfileFormValues>({
     defaultValues: {
       username: user?.username ?? '',
@@ -41,6 +41,7 @@ export function SettingsProfileForm() {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me`, {
       method: 'PATCH',
       body: JSON.stringify(data),
+      credentials: 'include',
     })
 
     if (!response.ok || response.status >= 400) {
@@ -52,6 +53,9 @@ export function SettingsProfileForm() {
       return
     }
 
+    const user = await response.json()
+
+    setUser(user)
     toast({
       title: 'Your profile has been updated',
     })
@@ -66,6 +70,9 @@ export function SettingsProfileForm() {
           rules={{
             validate: debounce(
               async (value: string) => {
+                if (user?.username === value) {
+                  return true
+                }
                 const { available, message } = await checkUsernameAvailability(value)
                 return available || message || 'There is an error with that username'
               },

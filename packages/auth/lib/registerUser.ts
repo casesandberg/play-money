@@ -1,6 +1,6 @@
-import db from '@play-money/database'
 import bcrypt from 'bcryptjs'
 import { generateFromEmail } from 'unique-username-generator'
+import db from '@play-money/database'
 import { UserExistsError } from './exceptions'
 
 export async function registerUser({ email, password }: { email: string; password: string }) {
@@ -16,12 +16,14 @@ export async function registerUser({ email, password }: { email: string; passwor
 
   const salt = bcrypt.genSaltSync(10)
   const hashedPassword = bcrypt.hashSync(password, salt)
+  const name = generateFromEmail(email, 3)
 
   const user = await db.user.create({
     data: {
       email: email,
-      password: hashedPassword,
-      username: generateFromEmail(email, 3),
+      // password: hashedPassword,
+      username: name,
+      displayName: name,
     },
   })
 

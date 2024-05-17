@@ -13,10 +13,9 @@ const project = resolve(process.cwd(), 'tsconfig.json')
 
 module.exports = {
   extends: [
-    '@vercel/style-guide/eslint/node',
-    '@vercel/style-guide/eslint/typescript',
+    ...['@vercel/style-guide/eslint/node', '@vercel/style-guide/eslint/typescript'].map(require.resolve),
     'plugin:prettier/recommended',
-  ].map(require.resolve),
+  ],
   parserOptions: {
     project,
   },
@@ -35,4 +34,7 @@ module.exports = {
     },
   },
   ignorePatterns: ['node_modules/', 'dist/'],
+  rules: {
+    '@typescript-eslint/explicit-function-return-type': 'off',
+  },
 }

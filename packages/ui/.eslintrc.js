@@ -1,3 +1,6 @@
 module.exports = {
-  extends: ['@play-money/config/eslint/react.js'],
+  extends: ['../config/eslint/react.js'],
+  rules: {
+    'jsx-a11y/heading-has-content': 'off',
+  },
 }

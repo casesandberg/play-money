@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "@play-money/auth": "*",
-    "@play-money/markets": "^0.0.0",
+    "@play-money/markets": "*",
+    "@play-money/search": "*",
     "@play-money/ui": "*",
     "@play-money/users": "*",
     "lodash": "^4.17.21",

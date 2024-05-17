@@ -1,11 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextIndex"]
 }
 
 generator zod {
@@ -13,13 +8,22 @@ generator zod {
   relationModel = "default"
 }
 
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
 model User {
   id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique /// @zod.min(1, "Email is required").email()
+  /// @zod.min(1, "Email is required").email()
+  email         String    @unique
   username      String    @unique
-  password      String /// @zod.min(8, "Password must be at least 8 characters").max(32, "Password may only be a max of 32 characters")
+  displayName   String
   avatarUrl     String?
+  twitterHandle String?
+  discordHandle String?
+  website       String?
   bio           String?
   emailVerified DateTime?
   accounts      Account[]
@@ -27,6 +31,8 @@ model User {
   markets       Market[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
 }
 
 model Account {
@@ -41,11 +47,9 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([provider, providerAccountId])
 }
@@ -54,10 +58,9 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model VerificationToken {

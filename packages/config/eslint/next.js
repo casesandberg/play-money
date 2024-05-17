@@ -13,14 +13,17 @@ const project = resolve(process.cwd(), 'tsconfig.json')
 
 module.exports = {
   extends: [
-    '@vercel/style-guide/eslint/node',
-    '@vercel/style-guide/eslint/typescript',
-    '@vercel/style-guide/eslint/browser',
-    '@vercel/style-guide/eslint/react',
-    '@vercel/style-guide/eslint/next',
-    'eslint-config-turbo',
+    ...[
+      '@vercel/style-guide/eslint/node',
+      '@vercel/style-guide/eslint/typescript',
+      '@vercel/style-guide/eslint/browser',
+      '@vercel/style-guide/eslint/react',
+      '@vercel/style-guide/eslint/next',
+      'eslint-config-turbo',
+    ].map(require.resolve),
     'plugin:prettier/recommended',
-  ].map(require.resolve),
+  ],
+  plugins: ['eslint-plugin-local-rules'],
   parserOptions: {
     project,
   },
@@ -42,5 +45,7 @@ module.exports = {
   // add rules configurations here
   rules: {
     'import/no-default-export': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    'local-rules/enforce-protection-of-sensitive-fields': 'error',
   },
 }

@@ -21,7 +21,8 @@
     "node": ">=18"
   },
   "prisma": {
-    "schema": "packages/prisma/schema.prisma"
+    "schema": "packages/database/schema.prisma",
+    "seed": "tsx packages/database/seed.ts"
   },
   "packageManager": "npm@10.5.0",
   "workspaces": [
