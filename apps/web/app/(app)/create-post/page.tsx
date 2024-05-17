@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { _MarketModel } from '@play-money/database'
 import moment from "moment"
+import { toast } from '@play-money/ui/use-toast'
 
 import { Button } from "@play-money/ui/button"
 import {
@@ -40,8 +41,24 @@ function CreateBinaryMarketForm() {
     },
   })
  
-  function onSubmit(data: marketCreateFormValues) {
-    console.log(data)
+  async function onSubmit(data: marketCreateFormValues) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/market`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+
+    if (!response.ok || response.status >= 400) {
+      const { message } = await response.json()
+      toast({
+        title: 'There was an error creating your market',
+        description: message,
+      })
+      return
+    }
+
+    toast({
+      title: 'Your market has been created',
+    })
   }
  
   return (

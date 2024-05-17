@@ -1,15 +1,12 @@
-import * as z from 'zod'
-import { CompleteAccount, AccountModel, CompleteSession, SessionModel } from './index'
+import * as z from "zod"
+import { CompleteAccount, AccountModel, CompleteSession, SessionModel, CompleteMarket, MarketModel } from "./index"
 
 export const _UserModel = z.object({
   id: z.string(),
   name: z.string().nullish(),
-  email: z.string().min(1, 'Email is required').email(),
+  email: z.string().min(1, "Email is required").email(),
   username: z.string(),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .max(32, 'Password may only be a max of 32 characters'),
+  password: z.string().min(8, "Password must be at least 8 characters").max(32, "Password may only be a max of 32 characters"),
   avatarUrl: z.string().nullish(),
   bio: z.string().nullish(),
   emailVerified: z.date().nullish(),
@@ -20,6 +17,7 @@ export const _UserModel = z.object({
 export interface CompleteUser extends z.infer<typeof _UserModel> {
   accounts: CompleteAccount[]
   sessions: CompleteSession[]
+  markets: CompleteMarket[]
 }
 
 /**
@@ -27,9 +25,8 @@ export interface CompleteUser extends z.infer<typeof _UserModel> {
  *
  * NOTE: Lazy required in case of potential circular dependencies within schema
  */
-export const UserModel: z.ZodSchema<CompleteUser> = z.lazy(() =>
-  _UserModel.extend({
-    accounts: AccountModel.array(),
-    sessions: SessionModel.array(),
-  })
-)
+export const UserModel: z.ZodSchema<CompleteUser> = z.lazy(() => _UserModel.extend({
+  accounts: AccountModel.array(),
+  sessions: SessionModel.array(),
+  markets: MarketModel.array(),
+}))
