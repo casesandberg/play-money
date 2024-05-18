@@ -1,24 +1,10 @@
-import { _MarketModel } from '@play-money/database'
 import { createMarket } from '@play-money/markets/lib/createMarket'
-import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
 import { NextResponse } from 'next/server'
 import { auth } from '@play-money/auth'
-import { z } from "zod"
+import type { z } from "zod"
+import schema from './schema'
 
 export const dynamic = 'force-dynamic'
-
-export const schema = createSchema({
-    POST: {
-        request: {
-            body: _MarketModel.omit({ id: true, resolvedAt: true, createdAt: true, updatedAt: true, createdBy: true, slug: true }),
-        },
-        response: {
-            200: _MarketModel,
-            404: ServerErrorSchema,
-            500: ServerErrorSchema,
-        },
-    },
-})
 
 export async function POST(
     req: Request,
