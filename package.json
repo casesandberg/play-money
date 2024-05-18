@@ -6,7 +6,8 @@
     "lint": "dotenv -- turbo lint",
     "type-check": "dotenv -- turbo type-check",
     "clean": "dotenv -- turbo clean",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "db:push": "dotenv -- turbo db:push"
   },
   "devDependencies": {
     "@play-money/config": "*",
