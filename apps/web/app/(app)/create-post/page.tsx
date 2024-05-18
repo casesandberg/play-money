@@ -45,13 +45,14 @@ function CreateBinaryMarketForm() {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/market`, {
       method: 'POST',
       body: JSON.stringify(data),
+      credentials: 'include',
     })
 
     if (!response.ok || response.status >= 400) {
-      const { message } = await response.json()
+      const { error } = await response.json()
       toast({
         title: 'There was an error creating your market',
-        description: message,
+        description: error,
       })
       return
     }
