@@ -15,21 +15,23 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id               String            @id @default(cuid())
   /// @zod.min(1, "Email is required").email()
-  email         String    @unique
-  username      String    @unique
-  displayName   String
-  avatarUrl     String?
-  twitterHandle String?
-  discordHandle String?
-  website       String?
-  bio           String?
-  emailVerified DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  sessions      Session[]
+  email            String            @unique
+  username         String            @unique
+  displayName      String
+  avatarUrl        String?
+  twitterHandle    String?
+  discordHandle    String?
+  website          String?
+  bio              String?
+  emailVerified    DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  accounts         Account[]
+  sessions         Session[]
+  comments         Comment[]
+  commentReactions CommentReaction[]
 }
 
 model Account {
@@ -66,4 +68,34 @@ model VerificationToken {
   expires    DateTime
 
   @@id([identifier, token])
+}
+
+enum CommentEntityType {
+  MARKET
+}
+
+model Comment {
+  id         String            @id @default(cuid())
+  content    String /// @zod.min(1).max(5000)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime?         @updatedAt
+  edited     Boolean           @default(false)
+  author     User              @relation(fields: [authorId], references: [id])
+  authorId   String
+  parentId   String?
+  parent     Comment?          @relation("CommentReplies", fields: [parentId], references: [id])
+  replies    Comment[]         @relation("CommentReplies")
+  reactions  CommentReaction[]
+  hidden     Boolean           @default(false)
+  entityType CommentEntityType
+  entityId   String
+}
+
+model CommentReaction {
+  id        String  @id @default(cuid())
+  emoji     String
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId String
 }
