@@ -1,7 +1,7 @@
 import { generateFromEmail } from 'unique-username-generator'
 import db from '@play-money/database'
 import { UserExistsError } from './exceptions'
-import { santizeUser } from './sanitizeUser'
+import { sanitizeUser } from './sanitizeUser'
 
 export async function createUser({ email }: { email: string }) {
   const existingUser = await db.user.findUnique({
@@ -24,5 +24,5 @@ export async function createUser({ email }: { email: string }) {
     },
   })
 
-  return santizeUser(user)
+  return sanitizeUser(user)
 }
