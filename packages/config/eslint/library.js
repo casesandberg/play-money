@@ -36,5 +36,9 @@ module.exports = {
   ignorePatterns: ['node_modules/', 'dist/'],
   rules: {
     '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/array-type': ['warn', { default: 'generic' }],
+    '@typescript-eslint/consistent-type-definitions': ['warn', 'type'],
+    'no-prototype-builtins': 'off',
+    'import/no-named-as-default': 'off',
   },
 }
