@@ -1,7 +1,7 @@
 import zod from 'zod'
 import db from '@play-money/database'
 import { _UserModel } from '@play-money/database'
-import { UserProfile, santizeUser } from '@play-money/users/lib/sanitizeUser'
+import { UserProfile, sanitizeUser } from '@play-money/users/lib/sanitizeUser'
 
 export async function search({ query = '' }: { query?: string }): Promise<{ users: Array<UserProfile> }> {
   let users
@@ -24,5 +24,5 @@ export async function search({ query = '' }: { query?: string }): Promise<{ user
     `
   }
 
-  return { users: users.map(santizeUser) }
+  return { users: users.map(sanitizeUser) }
 }

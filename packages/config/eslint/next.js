@@ -47,5 +47,9 @@ module.exports = {
     'import/no-default-export': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     'local-rules/enforce-protection-of-sensitive-fields': 'error',
+    '@typescript-eslint/array-type': ['error', { default: 'generic' }],
+    '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+    'no-prototype-builtins': 'off',
+    'import/no-named-as-default': 'off',
   },
 }
