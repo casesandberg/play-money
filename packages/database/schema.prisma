@@ -4,8 +4,12 @@ generator client {
 }
 
 generator zod {
-  provider      = "zod-prisma"
-  relationModel = "default"
+  provider          = "zod-prisma-types"
+  relationModel     = "default"
+  output            = "./zod"
+  useMultipleFiles  = true
+  createInputTypes  = false
+  createOutputTypes = false
 }
 
 datasource db {
@@ -15,23 +19,23 @@ datasource db {
 }
 
 model User {
-  id               String            @id @default(cuid())
-  /// @zod.min(1, "Email is required").email()
-  email            String            @unique
-  username         String            @unique
-  displayName      String
-  avatarUrl        String?
-  twitterHandle    String?
-  discordHandle    String?
-  website          String?
-  bio              String?
-  emailVerified    DateTime?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  accounts         Account[]
-  sessions         Session[]
+  id            String    @id @default(cuid())
+  /// @zod.string.min(1, { message: "Email is required" }).email()
+  email         String    @unique
+  username      String    @unique
+  displayName   String
+  avatarUrl     String?
+  twitterHandle String?
+  discordHandle String?
+  website       String?
+  bio           String?
+  emailVerified DateTime?
+  accounts      Account[]
+  sessions      Session[]
   comments         Comment[]
   commentReactions CommentReaction[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model Account {

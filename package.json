@@ -7,7 +7,8 @@
     "type-check": "dotenv -- turbo type-check",
     "clean": "dotenv -- turbo clean",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "db:push": "dotenv -- turbo db:push"
+    "db:push": "dotenv -- turbo db:push",
+    "db:generate": "dotenv -- turbo db:generate"
   },
   "devDependencies": {
     "@play-money/config": "*",
