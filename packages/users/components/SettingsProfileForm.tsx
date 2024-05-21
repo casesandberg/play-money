@@ -4,7 +4,7 @@ import { debounce } from 'lodash'
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { _UserModel } from '@play-money/database'
+import { UserSchema } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
@@ -12,7 +12,7 @@ import { Textarea } from '@play-money/ui/textarea'
 import { toast } from '@play-money/ui/use-toast'
 import { useUser } from '../context/UserContext'
 
-const profileFormSchema = _UserModel.pick({ username: true, bio: true, avatarUrl: true })
+const profileFormSchema = UserSchema.pick({ username: true, bio: true, avatarUrl: true })
 type ProfileFormValues = z.infer<typeof profileFormSchema>
 
 // TODO: @casesandberg Generate this from OpenAPI schema

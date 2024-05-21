@@ -2,13 +2,13 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { _CommentModel } from '@play-money/database'
+import { CommentSchema } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
 import { Card } from '@play-money/ui/card'
 import { Editor } from '@play-money/ui/editor'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@play-money/ui/form'
 
-const FormSchema = _CommentModel.pick({ content: true })
+const FormSchema = CommentSchema.pick({ content: true })
 
 type FormData = z.infer<typeof FormSchema>
 

@@ -4,7 +4,6 @@ import { formatDistance } from 'date-fns'
 import { Ellipsis, Reply } from 'lucide-react'
 import React, { useState } from 'react'
 import { z } from 'zod'
-import { _CommentModel, _CommentReactionModel, _UserModel } from '@play-money/database'
 import {
   AlertDialog,
   AlertDialogTrigger,

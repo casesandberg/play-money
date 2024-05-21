@@ -19,23 +19,23 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id               String            @id @default(cuid())
   /// @zod.string.min(1, { message: "Email is required" }).email()
-  email         String    @unique
-  username      String    @unique
-  displayName   String
-  avatarUrl     String?
-  twitterHandle String?
-  discordHandle String?
-  website       String?
-  bio           String?
-  emailVerified DateTime?
-  accounts      Account[]
-  sessions      Session[]
+  email            String            @unique
+  username         String            @unique
+  displayName      String
+  avatarUrl        String?
+  twitterHandle    String?
+  discordHandle    String?
+  website          String?
+  bio              String?
+  emailVerified    DateTime?
+  accounts         Account[]
+  sessions         Session[]
   comments         Comment[]
   commentReactions CommentReaction[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 }
 
 model Account {
@@ -80,7 +80,7 @@ enum CommentEntityType {
 
 model Comment {
   id         String            @id @default(cuid())
-  content    String /// @zod.min(1).max(5000)
+  content    String /// @zod.string.min(1).max(5000)
   createdAt  DateTime          @default(now())
   updatedAt  DateTime?         @updatedAt
   edited     Boolean           @default(false)

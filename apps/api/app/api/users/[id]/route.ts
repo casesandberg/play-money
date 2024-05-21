@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { _UserModel } from '@play-money/database'
 import { UserNotFoundError } from '@play-money/users/lib/exceptions'
 import { getUserById } from '@play-money/users/lib/getUserById'
 import schema from './schema'

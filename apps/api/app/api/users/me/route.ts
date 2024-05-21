@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@play-money/auth'
-import { _UserModel } from '@play-money/database'
 import { getUserById } from '@play-money/users/lib/getUserById'
 import { updateUserById } from '@play-money/users/lib/updateUserById'
 import schema from './schema'
