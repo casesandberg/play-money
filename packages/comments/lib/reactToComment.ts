@@ -1,7 +1,7 @@
 import { z } from 'zod'
-import db, { _CommentModel, _CommentReactionModel, _UserModel } from '@play-money/database'
+import db, { CommentReactionSchema } from '@play-money/database'
 
-export const CreateSchema = _CommentReactionModel.pick({
+export const CreateSchema = CommentReactionSchema.pick({
   emoji: true,
   userId: true,
   commentId: true,

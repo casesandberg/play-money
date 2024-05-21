@@ -3,7 +3,7 @@
 import _ from 'lodash'
 import React, { useState, useEffect } from 'react'
 import { z } from 'zod'
-import { _CommentModel } from '@play-money/database'
+import { CommentSchema } from '@play-money/database'
 import { useUser } from '@play-money/users/context/UserContext'
 import { flattenReplies } from '../lib/flattenReplies'
 import { MarketCommentSchema } from '../lib/getCommentsOnMarket'

@@ -4,7 +4,6 @@ import { deleteComment } from '@play-money/comments/lib/deleteComment'
 import { CommentNotFoundError } from '@play-money/comments/lib/exceptions'
 import { getComment } from '@play-money/comments/lib/getComment'
 import { updateComment } from '@play-money/comments/lib/updateComment'
-import { _UserModel } from '@play-money/database'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'

@@ -1,9 +1,9 @@
 import { z } from 'zod'
-import { _CommentModel, _UserModel } from '@play-money/database'
+import { CommentSchema } from '@play-money/database'
 import { createComment } from './createComment'
 import { getComment } from './getComment'
 
-export const CreateSchema = _CommentModel.pick({
+export const CreateSchema = CommentSchema.pick({
   content: true,
   authorId: true,
   parentId: true,

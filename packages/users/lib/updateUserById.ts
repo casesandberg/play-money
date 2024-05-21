@@ -1,10 +1,10 @@
 import { z } from 'zod'
-import db, { _UserModel } from '@play-money/database'
+import db, { UserSchema } from '@play-money/database'
 import { checkUsername } from './checkUsername'
 import { getUserById } from './getUserById'
 import { sanitizeUser } from './sanitizeUser'
 
-export const UpdateSchema = _UserModel.pick({ username: true, bio: true, avatarUrl: true }).partial()
+export const UpdateSchema = UserSchema.pick({ username: true, bio: true, avatarUrl: true }).partial()
 
 export async function updateUserById({ id, ...data }: { id: string } & z.infer<typeof UpdateSchema>) {
   // TODO: @casesandberg Figure out a cleaner way to strip undefined/nulls

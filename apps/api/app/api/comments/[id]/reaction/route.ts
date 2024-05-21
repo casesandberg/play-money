@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@play-money/auth'
 import { reactToComment } from '@play-money/comments/lib/reactToComment'
-import { _UserModel } from '@play-money/database'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'

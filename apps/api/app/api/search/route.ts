@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { _UserModel } from '@play-money/database'
 import { search } from '@play-money/search/lib/search'
 import schema from './schema'
 

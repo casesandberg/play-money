@@ -1,6 +1,6 @@
 import zod from 'zod'
 import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
-import { _CommentModel } from '@play-money/database'
+import { CommentSchema } from '@play-money/database'
 
 export default createSchema({
   GET: {
@@ -8,7 +8,7 @@ export default createSchema({
       params: zod.object({ id: zod.string() }),
     },
     response: {
-      200: zod.object({ comments: zod.array(_CommentModel) }),
+      200: zod.object({ comments: zod.array(CommentSchema) }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },
