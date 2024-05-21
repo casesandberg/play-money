@@ -8,7 +8,7 @@ export const UserProfileModel = _UserModel.omit({
 
 export type UserProfile = zod.infer<typeof UserProfileModel>
 
-export function santizeUser(user: zod.infer<typeof _UserModel>): UserProfile {
+export function sanitizeUser(user: zod.infer<typeof _UserModel>): UserProfile {
   const data = UserProfileModel.safeParse(user).data as UserProfile
 
   return {

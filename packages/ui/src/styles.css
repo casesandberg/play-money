@@ -57,3 +57,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Tiptap placeholder style */
+.tiptap p.is-editor-empty:first-child::before {
+  @apply text-slate-400;
+  @apply content-[attr(data-placeholder)];
+  @apply float-left;
+  @apply pointer-events-none;
+  @apply h-0;
+}

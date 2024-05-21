@@ -1,6 +1,6 @@
 import db from '@play-money/database'
 import { UserNotFoundError } from './exceptions'
-import { santizeUser } from './sanitizeUser'
+import { sanitizeUser } from './sanitizeUser'
 
 export async function getUserByUsername({ username }: { username: string }) {
   const user = await db.user.findUnique({
@@ -13,5 +13,5 @@ export async function getUserByUsername({ username }: { username: string }) {
     throw new UserNotFoundError(`User with username "${username}" not found`)
   }
 
-  return santizeUser(user)
+  return sanitizeUser(user)
 }

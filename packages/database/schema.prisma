@@ -15,7 +15,7 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id               String            @id @default(cuid())
   /// @zod.min(1, "Email is required").email()
   email         String    @unique
   username      String    @unique
@@ -26,11 +26,13 @@ model User {
   website       String?
   bio           String?
   emailVerified DateTime?
-  accounts      Account[]
-  sessions      Session[]
-  markets       Market[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  comments         Comment[]
+  commentReactions CommentReaction[]
+  markets       Market[]
 }
 
 model Account {
@@ -67,19 +69,4 @@ model VerificationToken {
   expires    DateTime
 
   @@id([identifier, token])
-}
-
-model Market {
-  id          String    @id @default(cuid())
-  question    String /// @zod.min(1, "Question is required")
-  description String
-  slug        String    @unique /// @zod.min(1, "Slug is required")
-  closeDate   DateTime?
-  resolvedAt  DateTime?
-
-  createdBy String
-  user      User   @relation(fields: [createdBy], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }

@@ -41,6 +41,10 @@ module.exports = {
   rules: {
     'import/no-default-export': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/array-type': ['error', { default: 'generic' }],
+    '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+    'no-prototype-builtins': 'off',
+    'import/no-named-as-default': 'off',
   },
   overrides: [
     {

@@ -12,6 +12,7 @@
   "dependencies": {
     "@play-money/auth": "*",
     "@play-money/markets": "*",
+    "@play-money/comments": "*",
     "@play-money/search": "*",
     "@play-money/ui": "*",
     "@play-money/users": "*",
