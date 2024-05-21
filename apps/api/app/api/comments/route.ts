@@ -14,7 +14,6 @@ export async function POST(req: Request): Promise<NextResponse<typeof schema.POS
     }
 
     const body = (await req.json()) as unknown
-    console.log(body) 
     const data = schema.POST.request.body.parse(body)
 
     const comment = await createComment({ ...data, authorId: session.user.id })
