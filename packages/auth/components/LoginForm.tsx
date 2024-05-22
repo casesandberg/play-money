@@ -6,14 +6,14 @@ import { signIn } from 'next-auth/react'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
-import { _UserModel } from '@play-money/database'
+import { UserSchema } from '@play-money/database'
 import { Alert, AlertDescription } from '@play-money/ui/alert'
 import { Button } from '@play-money/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
 import { toast } from '@play-money/ui/use-toast'
 
-const FormSchema = _UserModel.pick({ email: true })
+const FormSchema = UserSchema.pick({ email: true })
 
 type FormData = z.infer<typeof FormSchema>
 

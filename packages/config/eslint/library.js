@@ -40,5 +40,6 @@ module.exports = {
     '@typescript-eslint/consistent-type-definitions': ['warn', 'type'],
     'no-prototype-builtins': 'off',
     'import/no-named-as-default': 'off',
+    'prettier/prettier': ['error', { endOfLine: 'auto' }],
   },
 }

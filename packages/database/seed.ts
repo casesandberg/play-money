@@ -2,9 +2,9 @@ import { faker } from '@faker-js/faker'
 import _ from 'lodash'
 import zod from 'zod'
 import db from './prisma'
-import { _UserModel } from './zod'
+import { UserSchema } from './zod'
 
-function fakerUser(): zod.infer<typeof _UserModel> {
+function fakerUser(): zod.infer<typeof UserSchema> {
   const firstName = faker.person.firstName()
   const lastName = faker.person.lastName()
   return {

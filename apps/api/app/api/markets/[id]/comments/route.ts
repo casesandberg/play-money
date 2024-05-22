@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { CommentNotFoundError } from '@play-money/comments/lib/exceptions'
 import { getCommentsOnMarket } from '@play-money/comments/lib/getCommentsOnMarket'
-import { _UserModel } from '@play-money/database'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'

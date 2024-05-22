@@ -1,4 +1,4 @@
-import db, { _CommentModel } from '@play-money/database'
+import db, { CommentSchema } from '@play-money/database'
 
 export async function deleteComment({ id }: { id: string }) {
   await db.comment.delete({

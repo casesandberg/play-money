@@ -3,7 +3,6 @@ import zod from 'zod'
 import { formatZodError } from '@play-money/api-helpers'
 import { UserExistsError } from '@play-money/auth/lib/exceptions'
 import { registerUser } from '@play-money/auth/lib/registerUser'
-import { _UserModel } from '@play-money/database'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'

@@ -1,12 +1,12 @@
 import { z } from 'zod'
-import db, { CommentEntityType, _CommentModel, _CommentReactionModel, _UserModel } from '@play-money/database'
+import db, { CommentEntityType, CommentSchema, CommentReactionSchema, UserSchema } from '@play-money/database'
 import { sanitizeUser } from '@play-money/users/lib/sanitizeUser'
 
-export const MarketCommentSchema = _CommentModel.extend({
-  author: _UserModel,
+export const MarketCommentSchema = CommentSchema.extend({
+  author: UserSchema,
   reactions: z.array(
-    _CommentReactionModel.extend({
-      user: _UserModel,
+    CommentReactionSchema.extend({
+      user: UserSchema,
     })
   ),
 })
