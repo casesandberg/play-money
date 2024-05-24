@@ -6,7 +6,7 @@ import { UserNav } from '@play-money/users/components/UserNav'
 function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
   return (
     <nav className={cn('flex items-center space-x-4 lg:space-x-6', className)} {...props}>
-      <Link className="text-sm font-medium transition-colors hover:text-primary" href="/">
+      <Link className="text-sm font-medium transition-colors hover:text-primary" href="/questions">
         Markets
       </Link>
       <Link className="text-sm font-medium transition-colors hover:text-primary" href="/create-post">

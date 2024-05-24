@@ -6,9 +6,9 @@ import { useForm } from 'react-hook-form'
 import type { z } from 'zod'
 import { MarketSchema } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
+import { Editor } from '@play-money/ui/editor'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
-import { Textarea } from '@play-money/ui/textarea'
 import { toast } from '@play-money/ui/use-toast'
 
 const marketCreateFormSchema = MarketSchema.pick({ question: true, description: true, closeDate: true })
@@ -76,7 +76,11 @@ function CreateBinaryMarketForm() {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea placeholder="Provide a detailed description of the question" {...field} />
+                <Editor
+                  inputClassName="border"
+                  placeholder="Provide a detailed description of the question"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

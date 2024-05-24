@@ -5,8 +5,23 @@ import Placeholder from '@tiptap/extension-placeholder'
 import type { KeyboardShortcutCommand } from '@tiptap/react'
 import { EditorContent, Extension, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import React, { useEffect, useState } from 'react'
+import { ChevronDown, ChevronUp } from 'lucide-react'
+import React, { useEffect, useState, useRef } from 'react'
 import { cn } from '../../lib/utils'
+import { Button } from './button'
+
+export type EditorProps = {
+  value?: string
+  disabled?: boolean
+  className?: string
+  inputClassName?: string
+  placeholder?: string
+  focusOnRender?: boolean
+  shortcuts?: Record<string, KeyboardShortcutCommand>
+  onBlur?: () => void
+  onChange?: (value: string) => void
+  onRendered?: () => void
+}
 
 function Editor({
   value,
@@ -18,17 +33,8 @@ function Editor({
   shortcuts,
   onBlur,
   onChange,
-}: {
-  value?: string
-  disabled?: boolean
-  className?: string
-  inputClassName?: string
-  placeholder?: string
-  focusOnRender?: boolean
-  shortcuts?: Record<string, KeyboardShortcutCommand>
-  onBlur?: () => void
-  onChange?: (value: string) => void
-}) {
+  onRendered,
+}: EditorProps) {
   const [isEditorRendered, setIsEditorRendered] = useState(false)
   const editor = useEditor({
     content: value,
@@ -61,6 +67,7 @@ function Editor({
     ],
     onCreate() {
       setIsEditorRendered(true)
+      onRendered?.()
     },
     onUpdate({ editor: innerEditor }) {
       onChange?.(innerEditor.getHTML())
@@ -92,4 +99,64 @@ function Editor({
   return <EditorContent className={cn('flex flex-col', className)} editor={editor} />
 }
 
-export { Editor }
+function ReadMoreEditor({ value, maxLines }: { value: string; maxLines: number }) {
+  const [isRendered, setIsRendered] = useState(false)
+  const [canOverflow, setCanOverflow] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+  const editorRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const checkOverflow = () => {
+      const element = editorRef.current
+      if (element) {
+        const lineHeight = parseInt(window.getComputedStyle(element).lineHeight, 10)
+        const maxHeight = lineHeight * maxLines
+        setCanOverflow(element.scrollHeight > maxHeight)
+      }
+    }
+
+    checkOverflow()
+    window.addEventListener('resize', checkOverflow)
+
+    return () => {
+      window.removeEventListener('resize', checkOverflow)
+    }
+  }, [isRendered, value, maxLines])
+
+  return (
+    <div>
+      <div
+        ref={editorRef}
+        style={{
+          maxHeight: isOpen ? 'unset' : `${maxLines * 1.5}em`,
+          overflow: 'hidden',
+          position: 'relative',
+        }}
+      >
+        <Editor
+          disabled
+          onRendered={() => {
+            setIsRendered(true)
+          }}
+          value={value}
+        />
+
+        {canOverflow ? (
+          <Button
+            className="absolute -bottom-3 right-0 ml-auto bg-background"
+            onClick={() => {
+              setIsOpen(!isOpen)
+            }}
+            size="sm"
+            variant="link"
+          >
+            {isOpen ? 'Read less' : 'Read more'}
+            {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
+        ) : null}
+      </div>
+    </div>
+  )
+}
+
+export { Editor, ReadMoreEditor }

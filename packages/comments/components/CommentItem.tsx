@@ -85,7 +85,7 @@ export function CommentItem({
       id={comment.id}
       className={cn(
         isHighlighted && 'bg-primary/10 ring-2 ring-primary ring-offset-2',
-        'group flex flex-row gap-4 rounded-md px-4 py-2 hover:bg-muted/50',
+        'group flex flex-row gap-4 rounded-md px-6 py-2 hover:bg-muted/50',
         (isReplyOpen || isPortalOpen) && 'bg-muted/50'
       )}
     >

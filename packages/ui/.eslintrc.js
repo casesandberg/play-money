@@ -4,5 +4,6 @@ module.exports = {
     'jsx-a11y/heading-has-content': 'off',
     '@typescript-eslint/consistent-type-definitions': 'off',
     'import/no-named-as-default-member': 'off',
+    'unicorn/filename-case': 'off',
   },
 }

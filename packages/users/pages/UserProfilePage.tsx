@@ -27,8 +27,8 @@ export async function UserProfilePage({ username }: { username: string }) {
   const data = await getUserProfile({ username })
 
   return (
-    <>
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
+    <div className="flex flex-col gap-4">
+      {/* <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
         <Card className="sm:col-span-2" x-chunk="dashboard-05-chunk-0">
           <CardHeader className="pb-3">
             <CardTitle>Will Manifold have regular public stand-ups again in 2024?</CardTitle>
@@ -53,7 +53,7 @@ export async function UserProfilePage({ username }: { username: string }) {
             <div className="text-xs text-muted-foreground">+10% from last month</div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       <Tabs defaultValue="trades">
         <div className="flex items-center">
@@ -76,15 +76,15 @@ export async function UserProfilePage({ username }: { username: string }) {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="hidden w-[100px] sm:table-cell">Trade</TableHead>
+                    <TableHead className="table-cell w-[100px]">Trade</TableHead>
                     <TableHead>Market</TableHead>
-                    <TableHead className="hidden w-[150px] sm:table-cell">Date</TableHead>
-                    <TableHead className="hidden sm:table-cell">Profit</TableHead>
+                    <TableHead className="table-cell w-[150px]">Date</TableHead>
+                    <TableHead className="sm:table-cell">Profit</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   <TableRow>
-                    <TableCell className="hidden sm:table-cell">
+                    <TableCell className="sm:table-cell">
                       <div className="font-semibold text-green-600">Buy Yes</div>
                       <div>$500</div>
                     </TableCell>
@@ -93,14 +93,14 @@ export async function UserProfilePage({ username }: { username: string }) {
                         FDA legalizes magic mushrooms/psilocybin/etc. for clinical use by 2025
                       </div>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell">Mar 31, 2024</TableCell>
-                    <TableCell className="hidden md:table-cell">
+                    <TableCell className="table-cell">Mar 31, 2024</TableCell>
+                    <TableCell className="table-cell">
                       <div className="font-semibold text-green-600">58%</div>
                     </TableCell>
                   </TableRow>
 
                   <TableRow>
-                    <TableCell className="hidden sm:table-cell">
+                    <TableCell className="sm:table-cell">
                       <div className="font-semibold text-green-600">Buy Yes</div>
                       <div>$10</div>
                     </TableCell>
@@ -109,14 +109,14 @@ export async function UserProfilePage({ username }: { username: string }) {
                         Will it take more energy to cool and heat my hot tub, or keep it hot?
                       </div>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell">Mar 23, 2024</TableCell>
-                    <TableCell className="hidden md:table-cell">
+                    <TableCell className="table-cell">Mar 23, 2024</TableCell>
+                    <TableCell className="table-cell">
                       <div className="font-semibold text-red-600">-5%</div>
                     </TableCell>
                   </TableRow>
 
                   <TableRow>
-                    <TableCell className="hidden sm:table-cell">
+                    <TableCell className="sm:table-cell">
                       <div className="font-semibold text-red-600">Sell No</div>
                       <div>$50</div>
                     </TableCell>
@@ -125,8 +125,8 @@ export async function UserProfilePage({ username }: { username: string }) {
                         Will it be possible to send mana to another user on 5th October 2024?
                       </div>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell">Mar 23, 2024</TableCell>
-                    <TableCell className="hidden md:table-cell">
+                    <TableCell className="table-cell">Mar 23, 2024</TableCell>
+                    <TableCell className="table-cell">
                       <div className="font-semibold text-green-600">15%</div>
                     </TableCell>
                   </TableRow>
@@ -183,6 +183,6 @@ export async function UserProfilePage({ username }: { username: string }) {
           </Card>
         </TabsContent>
       </Tabs>
-    </>
+    </div>
   )
 }
