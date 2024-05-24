@@ -5,6 +5,7 @@
   "pipeline": {
     "build": {
       "dependsOn": ["^build", "^db:generate"],
+      "env": ["NEXT_PUBLIC_API_URL"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "lint": {},
