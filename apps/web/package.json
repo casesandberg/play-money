@@ -10,16 +10,22 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.4.2",
     "@play-money/auth": "*",
     "@play-money/comments": "*",
+    "@play-money/database": "^0.0.0",
+    "@play-money/markets": "*",
     "@play-money/search": "*",
     "@play-money/ui": "*",
     "@play-money/users": "*",
     "lodash": "^4.17.21",
     "lucide-react": "^0.378.0",
+    "moment": "^2.30.1",
     "next": "^14.1.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.51.5",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.1.1",

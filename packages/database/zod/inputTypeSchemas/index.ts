@@ -2,6 +2,7 @@ export { TransactionIsolationLevelSchema } from './TransactionIsolationLevelSche
 export { UserScalarFieldEnumSchema } from './UserScalarFieldEnumSchema';
 export { AccountScalarFieldEnumSchema } from './AccountScalarFieldEnumSchema';
 export { SessionScalarFieldEnumSchema } from './SessionScalarFieldEnumSchema';
+export { MarketScalarFieldEnumSchema } from './MarketScalarFieldEnumSchema';
 export { VerificationTokenScalarFieldEnumSchema } from './VerificationTokenScalarFieldEnumSchema';
 export { CommentScalarFieldEnumSchema } from './CommentScalarFieldEnumSchema';
 export { CommentReactionScalarFieldEnumSchema } from './CommentReactionScalarFieldEnumSchema';
