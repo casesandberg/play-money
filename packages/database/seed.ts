@@ -5,6 +5,7 @@ import db from './prisma'
 import { UserSchema, MarketSchema } from './zod'
 
 function fakerUser(): zod.infer<typeof UserSchema> {
+function fakerUser(): zod.infer<typeof UserSchema> {
   const firstName = faker.person.firstName()
   const lastName = faker.person.lastName()
   return {
