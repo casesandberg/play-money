@@ -68,7 +68,7 @@ model Session {
 }
 
 model Market {
-  id          String    @id @default(cuid())
+  id          Int    @id @default(autoincrement())
   question    String /// @zod.string.min(1, { message: "Question is required" })
   description String
   slug        String    @unique /// @zod.string.min(1, { message: "Slug is required" })

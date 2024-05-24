@@ -3,8 +3,7 @@
     "version": "0.0.0",
     "private": true,
     "dependencies": {
-      "@play-money/database": "*",
-      "zod": "^3.23.5"
+        "@play-money/database": "*",
+        "zod": "^3.23.5"
     }
-  }
-  
+}

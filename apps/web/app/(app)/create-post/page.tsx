@@ -1,55 +1,44 @@
-"use client"
+'use client'
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { _MarketModel } from '@play-money/database'
-import moment from "moment"
+import { zodResolver } from '@hookform/resolvers/zod'
+import moment from 'moment'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { MarketSchema } from '@play-money/database'
+import { Button } from '@play-money/ui/button'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
+import { Input } from '@play-money/ui/input'
+import { Textarea } from '@play-money/ui/textarea'
 import { toast } from '@play-money/ui/use-toast'
 
-import { Button } from "@play-money/ui/button"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@play-money/ui/form"
-import { Input } from "@play-money/ui/input"
-import { Textarea } from "@play-money/ui/textarea"
- 
-const marketCreateFormSchema = _MarketModel.pick({ question: true, description: true, closeDate: true })
-type marketCreateFormValues = z.infer<typeof marketCreateFormSchema>
- 
+const marketCreateFormSchema = MarketSchema.pick({ question: true, description: true, closeDate: true })
+type MarketCreateFormValues = z.infer<typeof marketCreateFormSchema>
+
 export default function CreatePost() {
-  return (
-    <CreateBinaryMarketForm />
-  );
+  return <CreateBinaryMarketForm />
 }
 
 function CreateBinaryMarketForm() {
-  
-  const tzName = new Date().toString().match(/\(([A-Za-z\s].*)\)/)?.[1] || "(unknown)";
+  const tzName = new Date().toString().match(/\((?<tz>[A-Za-z\s].*)\)/)?.groups?.tz ?? null
 
-  const form = useForm<marketCreateFormValues>({
+  const form = useForm<MarketCreateFormValues>({
     resolver: zodResolver(marketCreateFormSchema),
     defaultValues: {
-      question: "",
-      description: "",
-      closeDate: moment().add(1, "month").endOf("day").toDate(),
+      question: '',
+      description: '',
+      closeDate: moment().add(1, 'month').endOf('day').toDate(),
     },
   })
- 
-  async function onSubmit(data: marketCreateFormValues) {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/market`, {
+
+  async function onSubmit(market: MarketCreateFormValues) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets`, {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify(market),
       credentials: 'include',
     })
 
     if (!response.ok || response.status >= 400) {
-      const { error } = await response.json()
+      const { error } = (await response.json()) as { error: string }
       toast({
         title: 'There was an error creating your market',
         description: error,
@@ -61,10 +50,10 @@ function CreateBinaryMarketForm() {
       title: 'Your market has been created',
     })
   }
- 
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
+      <form autoComplete="off" className="w-2/3 space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="question"
@@ -101,8 +90,10 @@ function CreateBinaryMarketForm() {
                 <Input
                   type="datetime-local"
                   {...field}
-                  value={field.value ? moment(field.value).format("YYYY-MM-DDTHH:mm") : ""}
-                  onChange={(e) => field.onChange(new Date(e.target.value))}
+                  onChange={(e) => {
+                    field.onChange(new Date(e.target.value))
+                  }}
+                  value={field.value ? moment(field.value).format('YYYY-MM-DDTHH:mm') : ''}
                 />
               </FormControl>
               <FormMessage />
@@ -110,7 +101,7 @@ function CreateBinaryMarketForm() {
           )}
         />
         <p className="text-sm text-muted-foreground">
-          Trading will stop at this time in your local timezone ({tzName}).
+          Trading will stop at this time in your local timezone {tzName === null ? '' : `(${tzName})`}
         </p>
         <Button type="submit">Create</Button>
       </form>
