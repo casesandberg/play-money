@@ -42,112 +42,110 @@ export async function UserProfileLayout({
   const profile = await getUserProfile({ username })
 
   return (
-    <main className="mx-auto grid max-w-screen-xl flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 lg:grid-cols-3 xl:grid-cols-3">
-      <div>
-        <Card className="overflow-hidden">
-          <CardHeader className="flex flex-row items-start gap-4 bg-muted/50">
-            <Avatar className="h-16 w-16">
-              <AvatarImage src={profile.avatarUrl} alt={`@${profile.username}`} />
-              <AvatarFallback>{profile.username.toUpperCase().slice(0, 2)}</AvatarFallback>
-            </Avatar>
+    <main className="mx-auto flex max-w-screen-xl flex-1 flex-row items-start gap-6 p-4 sm:px-6 sm:py-0 md:gap-8">
+      <Card className="max-w-80">
+        <CardHeader className="flex flex-row items-start gap-4 bg-muted/50">
+          <Avatar className="h-16 w-16">
+            <AvatarImage src={profile.avatarUrl} alt={`@${profile.username}`} />
+            <AvatarFallback>{profile.username.toUpperCase().slice(0, 2)}</AvatarFallback>
+          </Avatar>
 
-            <div>
-              <CardTitle className="text-lg">{profile.username}</CardTitle>
-              <CardDescription>@{profile.username}</CardDescription>
-            </div>
-            <div className="ml-auto flex items-center gap-1">
-              <EditOrFollowUserButton userId={profile.id} />
-            </div>
-          </CardHeader>
-          <CardContent className="p-6 text-sm">
-            <div className="grid gap-3">
-              {profile.bio ? <div>{profile.bio}</div> : null}
+          <div>
+            <CardTitle className="text-lg">{profile.username}</CardTitle>
+            <CardDescription>@{profile.username}</CardDescription>
+          </div>
+          <div className="ml-auto flex items-center gap-1">
+            <EditOrFollowUserButton userId={profile.id} />
+          </div>
+        </CardHeader>
+        <CardContent className="p-6 text-sm">
+          <div className="grid gap-3">
+            {profile.bio ? <div>{profile.bio}</div> : null}
 
-              {profile.twitterHandle || profile.discordHandle || profile.website ? (
-                <div className="flex min-w-0 flex-row gap-4">
-                  {profile.twitterHandle ? (
-                    <a
-                      href={`https://twitter.com/${profile.twitterHandle}`}
-                      target="_blank"
-                      className="flex min-w-0 items-center gap-2 text-muted-foreground hover:text-foreground hover:underline"
-                    >
-                      <TwitterIcon className="h-4 w-4" />
-                      <span className="truncate">{profile.twitterHandle}</span>
-                    </a>
-                  ) : null}
+            {profile.twitterHandle || profile.discordHandle || profile.website ? (
+              <div className="flex min-w-0 flex-row gap-4">
+                {profile.twitterHandle ? (
+                  <a
+                    href={`https://twitter.com/${profile.twitterHandle}`}
+                    target="_blank"
+                    className="flex min-w-0 items-center gap-2 text-muted-foreground hover:text-foreground hover:underline"
+                  >
+                    <TwitterIcon className="h-4 w-4" />
+                    <span className="truncate">{profile.twitterHandle}</span>
+                  </a>
+                ) : null}
 
-                  {profile.discordHandle ? (
-                    <a
-                      href={`https://discordapp.com/users/${profile.discordHandle}`}
-                      target="_blank"
-                      className="flex min-w-0 items-center gap-2 text-muted-foreground hover:text-foreground hover:underline"
-                    >
-                      <DiscordIcon className="h-4 w-4" />
-                      <span className="truncate">{profile.discordHandle}</span>
-                    </a>
-                  ) : null}
+                {profile.discordHandle ? (
+                  <a
+                    href={`https://discordapp.com/users/${profile.discordHandle}`}
+                    target="_blank"
+                    className="flex min-w-0 items-center gap-2 text-muted-foreground hover:text-foreground hover:underline"
+                  >
+                    <DiscordIcon className="h-4 w-4" />
+                    <span className="truncate">{profile.discordHandle}</span>
+                  </a>
+                ) : null}
 
-                  {profile.website ? (
-                    <a
-                      href={profile.website}
-                      target="_blank"
-                      className="flex min-w-0 items-center gap-2 text-muted-foreground hover:text-foreground hover:underline"
-                    >
-                      <DiscordIcon className="h-4 w-4" />
-                      <span className="truncate">{profile.website}</span>
-                    </a>
-                  ) : null}
-                </div>
-              ) : null}
-
-              <div className="flex flex-row gap-4">
-                <Link
-                  href={`/${profile.username}/followers`}
-                  className="flex items-center gap-1 text-muted-foreground hover:text-foreground hover:underline"
-                >
-                  <span className="font-semibold text-foreground">{profile.followingCount || 0}</span>
-                  <span>Following</span>
-                </Link>
-                <Link
-                  href={`/${profile.username}/followers`}
-                  className="flex items-center gap-1 text-muted-foreground hover:text-foreground hover:underline"
-                >
-                  <span className="font-semibold text-foreground">{profile.followersCount || 0}</span>
-                  <span>Followers</span>
-                </Link>
+                {profile.website ? (
+                  <a
+                    href={profile.website}
+                    target="_blank"
+                    className="flex min-w-0 items-center gap-2 text-muted-foreground hover:text-foreground hover:underline"
+                  >
+                    <DiscordIcon className="h-4 w-4" />
+                    <span className="truncate">{profile.website}</span>
+                  </a>
+                ) : null}
               </div>
-            </div>
+            ) : null}
 
-            <Separator className="my-4" />
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <div className="font-semibold">$104.36K</div>
-                <div className="text-muted-foreground">Net worth</div>
-              </div>
-              <div className="text-center">
-                <div className="font-semibold">$50K</div>
-                <div className="text-muted-foreground">Trading volume</div>
-              </div>
-              <div className="text-center">
-                <div className="font-semibold">145</div>
-                <div className="text-muted-foreground">Total markets</div>
-              </div>
-              <div className="text-center">
-                <div className="font-semibold">2024-03-04</div>
-                <div className="text-muted-foreground">Last traded</div>
-              </div>
+            <div className="flex flex-row gap-4">
+              <Link
+                href={`/${profile.username}/followers`}
+                className="flex items-center gap-1 text-muted-foreground hover:text-foreground hover:underline"
+              >
+                <span className="font-semibold text-foreground">{profile.followingCount || 0}</span>
+                <span>Following</span>
+              </Link>
+              <Link
+                href={`/${profile.username}/followers`}
+                className="flex items-center gap-1 text-muted-foreground hover:text-foreground hover:underline"
+              >
+                <span className="font-semibold text-foreground">{profile.followersCount || 0}</span>
+                <span>Followers</span>
+              </Link>
             </div>
-          </CardContent>
-          <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">
-            <div className="text-xs text-muted-foreground">
-              Joined <time dateTime="2023-11-23">November 23, 2023</time>
-            </div>
-          </CardFooter>
-        </Card>
-      </div>
+          </div>
 
-      <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">{children}</div>
+          <Separator className="my-4" />
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center">
+              <div className="font-semibold">$104.36K</div>
+              <div className="text-muted-foreground">Net worth</div>
+            </div>
+            <div className="text-center">
+              <div className="font-semibold">$50K</div>
+              <div className="text-muted-foreground">Trading volume</div>
+            </div>
+            <div className="text-center">
+              <div className="font-semibold">145</div>
+              <div className="text-muted-foreground">Total markets</div>
+            </div>
+            <div className="text-center">
+              <div className="font-semibold">2024-03-04</div>
+              <div className="text-muted-foreground">Last traded</div>
+            </div>
+          </div>
+        </CardContent>
+        <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">
+          <div className="text-xs text-muted-foreground">
+            Joined <time dateTime="2023-11-23">November 23, 2023</time>
+          </div>
+        </CardFooter>
+      </Card>
+
+      <div className="flex-1">{children}</div>
     </main>
   )
 }
