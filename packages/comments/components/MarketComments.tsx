@@ -26,9 +26,5 @@ export async function MarketComments({ marketId }: { marketId: string }) {
     revalidateTag('comments')
   }
 
-  return (
-    <Card>
-      <CommentsList comments={comments} entity={{ type: 'MARKET', id: marketId }} onRevalidate={handleRevalidate} />
-    </Card>
-  )
+  return <CommentsList comments={comments} entity={{ type: 'MARKET', id: marketId }} onRevalidate={handleRevalidate} />
 }

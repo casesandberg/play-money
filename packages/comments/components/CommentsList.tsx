@@ -85,7 +85,7 @@ export function CommentsList({
 
   return (
     <div>
-      <div className="p-4">
+      <div className="px-6 py-4">
         <CreateCommentForm onSubmit={handleCreateReply()} />
       </div>
       {nestedComments.map((comment) => (
