@@ -9,7 +9,7 @@ function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
       <Link className="text-sm font-medium transition-colors hover:text-primary" href="/">
         Markets
       </Link>
-      <Link href="/create-post" className="text-sm font-medium transition-colors hover:text-primary">
+      <Link className="text-sm font-medium transition-colors hover:text-primary" href="/create-post">
         Create Market
       </Link>
     </nav>

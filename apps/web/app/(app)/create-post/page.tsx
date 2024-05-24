@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import moment from 'moment'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import type { z } from 'zod'
 import { MarketSchema } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
@@ -19,7 +19,7 @@ export default function CreatePost() {
 }
 
 function CreateBinaryMarketForm() {
-  const tzName = new Date().toString().match(/\((?<tz>[A-Za-z\s].*)\)/)?.groups?.tz ?? null
+  const tzName = /\((?<tz>[A-Za-z\s].*)\)/.exec(new Date().toString())?.groups?.tz ?? null
 
   const form = useForm<MarketCreateFormValues>({
     resolver: zodResolver(marketCreateFormSchema),
@@ -51,9 +51,11 @@ function CreateBinaryMarketForm() {
     })
   }
 
+  const handleSubmit = form.handleSubmit(onSubmit)
+
   return (
     <Form {...form}>
-      <form autoComplete="off" className="w-2/3 space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+      <form autoComplete="off" className="w-2/3 space-y-6" onSubmit={(e) => void handleSubmit(e)}>
         <FormField
           control={form.control}
           name="question"
