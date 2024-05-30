@@ -119,3 +119,13 @@ model CommentReaction {
   comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
   commentId String
 }
+
+model Currency {
+  id        String   @id @default(cuid())
+  name      String
+  symbol    String
+  code      String   @unique
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

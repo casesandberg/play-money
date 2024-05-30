@@ -13,6 +13,7 @@
     "@hookform/resolvers": "^3.4.2",
     "@play-money/auth": "*",
     "@play-money/comments": "*",
+    "@play-money/currencies": "*",
     "@play-money/database": "^0.0.0",
     "@play-money/markets": "*",
     "@play-money/search": "*",

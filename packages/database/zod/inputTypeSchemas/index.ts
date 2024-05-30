@@ -6,6 +6,7 @@ export { MarketScalarFieldEnumSchema } from './MarketScalarFieldEnumSchema';
 export { VerificationTokenScalarFieldEnumSchema } from './VerificationTokenScalarFieldEnumSchema';
 export { CommentScalarFieldEnumSchema } from './CommentScalarFieldEnumSchema';
 export { CommentReactionScalarFieldEnumSchema } from './CommentReactionScalarFieldEnumSchema';
+export { CurrencyScalarFieldEnumSchema } from './CurrencyScalarFieldEnumSchema';
 export { SortOrderSchema } from './SortOrderSchema';
 export { QueryModeSchema } from './QueryModeSchema';
 export { NullsOrderSchema } from './NullsOrderSchema';
