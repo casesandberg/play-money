@@ -40,16 +40,68 @@ function fakerMarket(userIds: string[]): zod.infer<typeof MarketSchema> {
 }
 
 async function main() {
+  await prisma.currency.upsert({
+    where: { code: 'PRIMARY' },
+    update: {},
+    create: {
+      name: 'Dollars',
+      symbol: '$',
+      code: 'PRIMARY',
+      imageUrl: './images/dollars.svg',
+      createdAt: faker.date.past(),
+      updatedAt: faker.date.recent(),
+    },
+  })
+
+  await prisma.currency.upsert({
+    where: { code: 'YES' },
+    update: {},
+    create: {
+      name: 'Yes Shares',
+      symbol: 'Y',
+      code: 'YES',
+      imageUrl: './images/yes-shares.svg',
+      createdAt: faker.date.past(),
+      updatedAt: faker.date.recent(),
+    },
+  })
+
+  await prisma.currency.upsert({
+    where: { code: 'NO' },
+    update: {},
+    create: {
+      name: 'No Shares',
+      symbol: 'N',
+      code: 'NO',
+      imageUrl: './images/no-shares.svg',
+      createdAt: faker.date.past(),
+      updatedAt: faker.date.recent(),
+    },
+  })
+
+  await prisma.currency.upsert({
+    where: { code: 'LPB' },
+    update: {},
+    create: {
+      name: 'LP Bonuses',
+      symbol: 'LPB',
+      code: 'LPB',
+      imageUrl: './images/lp-bonuses.svg',
+      createdAt: faker.date.past(),
+      updatedAt: faker.date.recent(),
+    },
+  })
+
   let user_ids = await Promise.all(
     _.times(10, async () => {
       let data = fakerUser()
-      await prisma.user.create({ data })
+      await db.user.create({ data })
       return data.id
     })
   )
   await Promise.all(
     _.times(5, async () => {
-      await prisma.market.create({ data: fakerMarket(user_ids) })
+      await db.market.create({ data: fakerMarket(user_ids) })
     })
   )
 }
