@@ -7,6 +7,8 @@ export { VerificationTokenScalarFieldEnumSchema } from './VerificationTokenScala
 export { CommentScalarFieldEnumSchema } from './CommentScalarFieldEnumSchema';
 export { CommentReactionScalarFieldEnumSchema } from './CommentReactionScalarFieldEnumSchema';
 export { CurrencyScalarFieldEnumSchema } from './CurrencyScalarFieldEnumSchema';
+export { TransactionScalarFieldEnumSchema } from './TransactionScalarFieldEnumSchema';
+export { TransactionItemScalarFieldEnumSchema } from './TransactionItemScalarFieldEnumSchema';
 export { SortOrderSchema } from './SortOrderSchema';
 export { QueryModeSchema } from './QueryModeSchema';
 export { NullsOrderSchema } from './NullsOrderSchema';

@@ -17,6 +17,7 @@ function fakerUser(): zod.infer<typeof UserSchema> {
     twitterHandle: faker.helpers.maybe(faker.internet.userName, { probability: 0.3 }) ?? null,
     discordHandle: faker.helpers.maybe(faker.internet.userName, { probability: 0.3 }) ?? null,
     website: faker.helpers.maybe(faker.internet.domainName, { probability: 0.3 }) ?? null,
+    emailVerified: faker.date.past(),
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
   }
@@ -40,7 +41,7 @@ function fakerMarket(userIds: string[]): zod.infer<typeof MarketSchema> {
 }
 
 async function main() {
-  await prisma.currency.upsert({
+  await db.currency.upsert({
     where: { code: 'PRIMARY' },
     update: {},
     create: {
@@ -53,7 +54,7 @@ async function main() {
     },
   })
 
-  await prisma.currency.upsert({
+  await db.currency.upsert({
     where: { code: 'YES' },
     update: {},
     create: {
@@ -66,7 +67,7 @@ async function main() {
     },
   })
 
-  await prisma.currency.upsert({
+  await db.currency.upsert({
     where: { code: 'NO' },
     update: {},
     create: {
@@ -79,7 +80,7 @@ async function main() {
     },
   })
 
-  await prisma.currency.upsert({
+  await db.currency.upsert({
     where: { code: 'LPB' },
     update: {},
     create: {
@@ -89,6 +90,16 @@ async function main() {
       imageUrl: './images/lp-bonuses.svg',
       createdAt: faker.date.past(),
       updatedAt: faker.date.recent(),
+    },
+  })
+
+  const userHouse = await db.user.upsert({
+    where: { email: 'house@playmoney.com' },
+    update: {},
+    create: {
+      email: 'house@playmoney.com',
+      displayName: 'House',
+      username: 'house',
     },
   })
 
