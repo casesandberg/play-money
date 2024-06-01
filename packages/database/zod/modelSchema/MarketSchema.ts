@@ -12,6 +12,7 @@ export const MarketSchema = z.object({
   closeDate: z.coerce.date().nullable(),
   resolvedAt: z.coerce.date().nullable(),
   createdBy: z.string(),
+  ammId: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

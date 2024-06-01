@@ -1,4 +1,5 @@
 import db from '@play-money/database'
+import { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/CurrencyCodeSchema'
 
 export async function getUserBalances(userId: string) {
   const transactionItems = await db.transactionItem.findMany({
@@ -19,9 +20,13 @@ export async function getUserBalances(userId: string) {
   return balances
 }
 
-export async function checkUserBalance(userId: string, currencyId: string, amount: number): Promise<boolean> {
+export async function checkUserBalance(
+  userId: string,
+  currencyCode: CurrencyCodeType,
+  amount: number
+): Promise<boolean> {
   const transactionItems = await db.transactionItem.findMany({
-    where: { userId, currencyId },
+    where: { userId, currencyCode },
   })
 
   const balance = transactionItems.reduce((sum, item) => sum + item.amount, 0)

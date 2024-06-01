@@ -1,5 +1,5 @@
 import { z } from 'zod';
 
-export const TransactionItemScalarFieldEnumSchema = z.enum(['id','userId','currencyId','transactionId','amount','createdAt']);
+export const TransactionItemScalarFieldEnumSchema = z.enum(['id','userId','currencyCode','transactionId','amount','createdAt']);
 
 export default TransactionItemScalarFieldEnumSchema;

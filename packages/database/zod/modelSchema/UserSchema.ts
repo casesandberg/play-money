@@ -15,6 +15,7 @@ export const UserSchema = z.object({
   website: z.string().nullable(),
   bio: z.string().nullable(),
   emailVerified: z.coerce.date().nullable(),
+  isAMM: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

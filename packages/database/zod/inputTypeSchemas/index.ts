@@ -13,3 +13,4 @@ export { SortOrderSchema } from './SortOrderSchema';
 export { QueryModeSchema } from './QueryModeSchema';
 export { NullsOrderSchema } from './NullsOrderSchema';
 export { CommentEntityTypeSchema } from './CommentEntityTypeSchema';
+export { CurrencyCodeSchema } from './CurrencyCodeSchema';

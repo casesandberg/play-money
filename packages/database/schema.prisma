@@ -34,8 +34,11 @@ model User {
   sessions         Session[]
   comments         Comment[]
   commentReactions CommentReaction[]
-  markets          Market[]
+  markets          Market[]          @relation(name: "UserMarkets")
+  parent           Market?           @relation(name: "AMM")
   transactionItems TransactionItem[]
+  transactions     Transaction[]
+  isAMM            Boolean           @default(false)
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 }
@@ -77,7 +80,9 @@ model Market {
   resolvedAt   DateTime?
   transactions Transaction[]
   createdBy    String
-  user         User          @relation(fields: [createdBy], references: [id])
+  user         User          @relation(name: "UserMarkets", fields: [createdBy], references: [id])
+  ammId        String        @unique()
+  amm          User          @relation(name: "AMM", fields: [ammId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -121,11 +126,18 @@ model CommentReaction {
   commentId String
 }
 
+enum CurrencyCode {
+  PRIMARY
+  YES
+  NO
+  LPB
+}
+
 model Currency {
   id               String            @id @default(cuid())
   name             String
   symbol           String
-  code             String            @unique
+  code             CurrencyCode      @unique
   imageUrl         String?
   transactionItems TransactionItem[]
   createdAt        DateTime          @default(now())
@@ -134,22 +146,25 @@ model Currency {
 
 model Transaction {
   id               String            @id @default(cuid())
+  type             String
   description      String?
   marketId         String?
   market           Market?           @relation(fields: [marketId], references: [id])
   transactionItems TransactionItem[]
+  creatorId        String
+  creator          User              @relation(fields: [creatorId], references: [id])
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @default(now())
 }
 
 model TransactionItem {
-  id            String      @id @default(cuid())
+  id            String       @id @default(cuid())
   userId        String
-  user          User        @relation(fields: [userId], references: [id])
-  currencyId    String
-  currency      Currency    @relation(fields: [currencyId], references: [id])
+  user          User         @relation(fields: [userId], references: [id])
+  currencyCode  CurrencyCode
+  currency      Currency     @relation(fields: [currencyCode], references: [code])
   transactionId String
-  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  transaction   Transaction  @relation(fields: [transactionId], references: [id])
   amount        Float
-  createdAt     DateTime    @default(now())
+  createdAt     DateTime     @default(now())
 }
