@@ -4,7 +4,7 @@
   "globalDotEnv": [".env"],
   "pipeline": {
     "build": {
-      "dependsOn": ["^build", "^db:generate"],
+      "dependsOn": ["^test", "^build", "^db:generate"],
       "env": ["NEXT_PUBLIC_API_URL"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
@@ -22,6 +22,10 @@
       "cache": false
     },
     "db:push": {
+      "cache": false
+    },
+    "test": {},
+    "test:watch": {
       "cache": false
     }
   }
