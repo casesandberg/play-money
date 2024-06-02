@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
 /////////////////////////////////////////
-// ACCOUNT SCHEMA
+// AUTH ACCOUNT SCHEMA
 /////////////////////////////////////////
 
-export const AccountSchema = z.object({
+export const AuthAccountSchema = z.object({
   userId: z.string(),
   type: z.string(),
   provider: z.string(),
@@ -20,6 +20,6 @@ export const AccountSchema = z.object({
   updatedAt: z.coerce.date(),
 })
 
-export type Account = z.infer<typeof AccountSchema>
+export type AuthAccount = z.infer<typeof AuthAccountSchema>
 
-export default AccountSchema;
+export default AuthAccountSchema;

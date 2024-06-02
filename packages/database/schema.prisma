@@ -30,7 +30,7 @@ model User {
   website          String?
   bio              String?
   emailVerified    DateTime?
-  accounts         Account[]
+  authAccounts     AuthAccount[]
   sessions         Session[]
   comments         Comment[]
   commentReactions CommentReaction[]
@@ -43,7 +43,7 @@ model User {
   updatedAt        DateTime          @updatedAt
 }
 
-model Account {
+model AuthAccount {
   userId            String
   type              String
   provider          String

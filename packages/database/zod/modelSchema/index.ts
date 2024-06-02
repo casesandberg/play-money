@@ -1,5 +1,5 @@
 export * from './UserSchema';
-export * from './AccountSchema';
+export * from './AuthAccountSchema';
 export * from './SessionSchema';
 export * from './MarketSchema';
 export * from './VerificationTokenSchema';
