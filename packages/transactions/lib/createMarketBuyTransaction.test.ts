@@ -83,6 +83,26 @@ describe('createMarketBuyTransaction', () => {
           {
             amount: 50,
             currencyCode: 'YES',
+            accountId: 'user-1-account',
+          },
+          {
+            amount: 50,
+            currencyCode: 'NO',
+            accountId: 'user-1-account',
+          },
+          {
+            amount: -50,
+            currencyCode: 'YES',
+            accountId: 'user-1-account',
+          },
+          {
+            amount: -50,
+            currencyCode: 'NO',
+            accountId: 'user-1-account',
+          },
+          {
+            amount: 50,
+            currencyCode: 'YES',
             accountId: 'amm-1-account',
           },
           {

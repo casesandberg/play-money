@@ -1,47 +1,61 @@
 import { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/CurrencyCodeSchema'
 import { TransactionItemInput } from '@play-money/transactions/lib/createTransaction'
-import { convertPrimaryToMarketShares } from '@play-money/transactions/lib/exchanger'
-import { getUserById } from '@play-money/users/lib/getUserById'
 
 export async function buy({
   fromAccountId,
-  toAccountId,
+  ammAccountId,
   currencyCode,
-  maxAmount,
-  maxProbability,
+  amount,
 }: {
   fromAccountId: string
-  toAccountId: string
+  ammAccountId: string
   currencyCode: CurrencyCodeType
-  maxAmount: number
-  maxProbability?: number
+  amount: number
 }): Promise<Array<TransactionItemInput>> {
-  function costToHitProbability({ maxAmount }: { probability: number; maxAmount: number }) {
-    return maxAmount
-  }
-
-  const amountToBuy = maxProbability ? costToHitProbability({ probability: maxProbability, maxAmount }) : maxAmount
-
-  const exchangerTransactions = await convertPrimaryToMarketShares({
-    fromAccount: fromAccountId,
-    amount: amountToBuy,
-    toAccount: toAccountId,
-  })
+  const oppositeCurrencyCode: CurrencyCodeType = currencyCode === 'YES' ? 'NO' : 'YES'
 
   // TODO: Implement AMM.
 
   const ammTransactions = [
+    // Giving the shares to the AMM.
     {
-      accountId: toAccountId,
+      accountId: fromAccountId,
       currencyCode: currencyCode,
-      amount: -amountToBuy,
+      amount: -amount,
+    },
+    {
+      accountId: fromAccountId,
+      currencyCode: oppositeCurrencyCode,
+      amount: -amount,
+    },
+    {
+      accountId: ammAccountId,
+      currencyCode: currencyCode,
+      amount: amount,
+    },
+    {
+      accountId: ammAccountId,
+      currencyCode: oppositeCurrencyCode,
+      amount: amount,
+    },
+
+    // Returning purchased shares to the user.
+    {
+      accountId: ammAccountId,
+      currencyCode: currencyCode,
+      amount: -amount,
     },
     {
       accountId: fromAccountId,
       currencyCode: currencyCode,
-      amount: amountToBuy,
+      amount: amount,
     },
   ]
 
-  return [...exchangerTransactions, ...ammTransactions]
+  return ammTransactions
+}
+
+export async function costToHitProbability({ maxAmount }: { probability: number; maxAmount: number }) {
+  // TODO: Calculate given shares in AMM pool.
+  return maxAmount
 }
