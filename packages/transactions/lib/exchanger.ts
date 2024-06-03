@@ -1,20 +1,20 @@
+import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import { TransactionItemInput } from './createTransaction'
-import { checkUserBalance } from './getUserBalances'
 
 export async function convertPrimaryToMarketShares({
-  from,
+  fromAccount,
   amount,
-  to,
+  toAccount,
 }: {
-  from: string
+  fromAccount: string
   amount: number
-  to: string
+  toAccount: string
 }): Promise<Array<TransactionItemInput>> {
   if (amount <= 0) {
     throw new Error('Exchange amount must be greater than 0')
   }
 
-  const hasEnoughBalance = await checkUserBalance(from, 'PRIMARY', amount)
+  const hasEnoughBalance = await checkAccountBalance(fromAccount, 'PRIMARY', amount)
   if (!hasEnoughBalance) {
     throw new Error('User does not have enough balance to exchange.')
   }
@@ -23,32 +23,32 @@ export async function convertPrimaryToMarketShares({
 
   return [
     {
-      userId: from,
+      accountId: fromAccount,
       currencyCode: 'PRIMARY',
       amount: -amount,
     },
     {
-      userId: 'EXCHANGER',
+      accountId: 'EXCHANGER',
       currencyCode: 'PRIMARY',
       amount: amount,
     },
     {
-      userId: 'EXCHANGER',
+      accountId: 'EXCHANGER',
       currencyCode: 'YES',
       amount: -sharesToCreate,
     },
     {
-      userId: 'EXCHANGER',
+      accountId: 'EXCHANGER',
       currencyCode: 'NO',
       amount: -sharesToCreate,
     },
     {
-      userId: to,
+      accountId: toAccount,
       currencyCode: 'YES',
       amount: sharesToCreate,
     },
     {
-      userId: to,
+      accountId: toAccount,
       currencyCode: 'NO',
       amount: sharesToCreate,
     },

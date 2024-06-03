@@ -34,11 +34,8 @@ model User {
   sessions         Session[]
   comments         Comment[]
   commentReactions CommentReaction[]
-  markets          Market[]          @relation(name: "UserMarkets")
-  parent           Market?           @relation(name: "AMM")
-  transactionItems TransactionItem[]
-  transactions     Transaction[]
-  isAMM            Boolean           @default(false)
+  markets          Market[]          @relation()
+  accounts         Account[]         @relation()
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 }
@@ -80,12 +77,10 @@ model Market {
   resolvedAt   DateTime?
   transactions Transaction[]
   createdBy    String
-  user         User          @relation(name: "UserMarkets", fields: [createdBy], references: [id])
-  ammId        String        @unique()
-  amm          User          @relation(name: "AMM", fields: [ammId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  user         User          @relation(fields: [createdBy], references: [id])
+  accounts     Account[]     @relation()
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model VerificationToken {
@@ -152,19 +147,32 @@ model Transaction {
   market           Market?           @relation(fields: [marketId], references: [id])
   transactionItems TransactionItem[]
   creatorId        String
-  creator          User              @relation(fields: [creatorId], references: [id])
+  creator          Account           @relation(fields: [creatorId], references: [id])
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @default(now())
 }
 
 model TransactionItem {
   id            String       @id @default(cuid())
-  userId        String
-  user          User         @relation(fields: [userId], references: [id])
+  accountId     String
+  account       Account      @relation(fields: [accountId], references: [id])
   currencyCode  CurrencyCode
   currency      Currency     @relation(fields: [currencyCode], references: [code])
   transactionId String
   transaction   Transaction  @relation(fields: [transactionId], references: [id])
   amount        Float
   createdAt     DateTime     @default(now())
+}
+
+model Account {
+  id               String            @id @default(cuid())
+  internalType     String?           @unique
+  userId           String?
+  user             User?             @relation(fields: [userId], references: [id])
+  marketId         String?
+  market           Market?           @relation(fields: [marketId], references: [id])
+  transactionItems TransactionItem[]
+  transactions     Transaction[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @default(now())
 }

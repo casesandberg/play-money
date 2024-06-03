@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker'
 import _ from 'lodash'
-import { Market, User } from './zod'
+import { Market, User, Account } from './zod'
 
 export function mockUser(overrides?: Partial<User>): User {
   const firstName = faker.person.firstName()
@@ -18,7 +18,6 @@ export function mockUser(overrides?: Partial<User>): User {
     emailVerified: faker.date.past(),
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
-    isAMM: false,
     ...overrides,
   }
 }
@@ -35,7 +34,18 @@ export function mockMarket(overrides?: Partial<Market>): Market {
     closeDate,
     resolvedAt: faker.helpers.maybe(faker.date.past, { probability: 0.3 }) ?? null,
     createdBy: faker.string.uuid(),
-    ammId: faker.string.uuid(),
+    createdAt: faker.date.past(),
+    updatedAt: faker.date.recent(),
+    ...overrides,
+  }
+}
+
+export function mockAccount(overrides?: Partial<Account>): Account {
+  return {
+    id: faker.string.uuid(),
+    userId: null,
+    marketId: null,
+    internalType: null,
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
     ...overrides,

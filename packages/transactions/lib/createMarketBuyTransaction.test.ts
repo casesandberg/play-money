@@ -1,22 +1,28 @@
-import { mockMarket } from '@play-money/database/mocks'
-import { getMarket } from '@play-money/markets/lib/getMarket'
+import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
+import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
+import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
+import { mockAccount } from '@play-money/database/mocks'
 import { getUserById } from '@play-money/users/lib/getUserById'
 import { createMarketBuyTransaction } from './createMarketBuyTransaction'
 import { createTransaction } from './createTransaction'
-import { checkUserBalance } from './getUserBalances'
 
 // TODO: Cleanup mocks in this file
+// TODO: Create accounts for Exchanger
 
-jest.mock('@play-money/markets/lib/getMarket', () => ({
-  getMarket: jest.fn(),
+jest.mock('@play-money/accounts/lib/getAmmAccount', () => ({
+  getAmmAccount: jest.fn(),
+}))
+
+jest.mock('@play-money/accounts/lib/getUserAccount', () => ({
+  getUserAccount: jest.fn(),
 }))
 
 jest.mock('@play-money/users/lib/getUserById', () => ({
   getUserById: jest.fn(),
 }))
 
-jest.mock('./getUserBalances', () => ({
-  checkUserBalance: jest.fn(),
+jest.mock('@play-money/accounts/lib/checkAccountBalance', () => ({
+  checkAccountBalance: jest.fn(),
 }))
 
 jest.mock('./createTransaction', () => ({
@@ -29,13 +35,18 @@ describe('createMarketBuyTransaction', () => {
   })
 
   it('should call createTransaction with approperate transactionItems', async () => {
-    jest.mocked(checkUserBalance).mockResolvedValue(true)
+    jest.mocked(checkAccountBalance).mockResolvedValue(true)
     jest.mocked(getUserById).mockResolvedValue({} as any)
 
-    jest.mocked(getMarket).mockResolvedValue(
-      mockMarket({
-        id: 'market-1',
-        ammId: 'amm-1',
+    jest.mocked(getUserAccount).mockResolvedValue(
+      mockAccount({
+        id: 'user-1-account',
+      })
+    )
+
+    jest.mocked(getAmmAccount).mockResolvedValue(
+      mockAccount({
+        id: 'amm-1-account',
       })
     )
 
@@ -52,42 +63,42 @@ describe('createMarketBuyTransaction', () => {
           {
             amount: -50,
             currencyCode: 'PRIMARY',
-            userId: 'user-1',
+            accountId: 'user-1-account',
           },
           {
             amount: 50,
             currencyCode: 'PRIMARY',
-            userId: 'EXCHANGER',
+            accountId: 'EXCHANGER',
           },
           {
             amount: -50,
             currencyCode: 'YES',
-            userId: 'EXCHANGER',
+            accountId: 'EXCHANGER',
           },
           {
             amount: -50,
             currencyCode: 'NO',
-            userId: 'EXCHANGER',
+            accountId: 'EXCHANGER',
           },
           {
             amount: 50,
             currencyCode: 'YES',
-            userId: 'amm-1',
+            accountId: 'amm-1-account',
           },
           {
             amount: 50,
             currencyCode: 'NO',
-            userId: 'amm-1',
+            accountId: 'amm-1-account',
           },
           {
             amount: 50,
             currencyCode: 'YES',
-            userId: 'user-1',
+            accountId: 'user-1-account',
           },
           {
             amount: -50,
             currencyCode: 'YES',
-            userId: 'amm-1',
+            accountId: 'amm-1-account',
           },
         ]),
       })

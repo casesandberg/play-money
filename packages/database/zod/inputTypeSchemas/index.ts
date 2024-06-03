@@ -9,6 +9,7 @@ export { CommentReactionScalarFieldEnumSchema } from './CommentReactionScalarFie
 export { CurrencyScalarFieldEnumSchema } from './CurrencyScalarFieldEnumSchema';
 export { TransactionScalarFieldEnumSchema } from './TransactionScalarFieldEnumSchema';
 export { TransactionItemScalarFieldEnumSchema } from './TransactionItemScalarFieldEnumSchema';
+export { AccountScalarFieldEnumSchema } from './AccountScalarFieldEnumSchema';
 export { SortOrderSchema } from './SortOrderSchema';
 export { QueryModeSchema } from './QueryModeSchema';
 export { NullsOrderSchema } from './NullsOrderSchema';

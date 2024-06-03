@@ -1,7 +1,7 @@
+import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import db, { TransactionItem, Transaction } from '@play-money/database'
-import { checkUserBalance } from './getUserBalances'
 
-export type TransactionItemInput = Pick<TransactionItem, 'userId' | 'currencyCode' | 'amount'>
+export type TransactionItemInput = Pick<TransactionItem, 'accountId' | 'currencyCode' | 'amount'>
 
 export type TransactionInput = Pick<Transaction, 'description' | 'marketId' | 'type' | 'creatorId'> & {
   transactionItems: Array<TransactionItemInput>
@@ -33,10 +33,10 @@ export async function createTransaction({
   await Promise.all(
     transactionItems.map(async (item) => {
       if (item.amount < 0) {
-        const hasEnoughBalance = await checkUserBalance(item.userId, item.currencyCode, item.amount)
+        const hasEnoughBalance = await checkAccountBalance(item.accountId, item.currencyCode, item.amount)
 
         if (!hasEnoughBalance) {
-          throw new Error(`User ${item.userId} does not have enough balance for currencyCode ${item.currencyCode}`)
+          console.log(`User ${item.accountId} does not have enough balance for currencyCode ${item.currencyCode}`)
         }
       }
     })
@@ -52,7 +52,7 @@ export async function createTransaction({
       marketId,
       transactionItems: {
         create: transactionItems.map((item) => ({
-          userId: item.userId,
+          accountId: item.accountId,
           currencyCode: item.currencyCode,
           amount: item.amount,
         })),

@@ -56,50 +56,46 @@ async function main() {
     },
   })
 
-  const houseUser = await db.user.upsert({
-    where: { email: 'house@playmoney.com' },
+  await db.account.upsert({
+    where: { internalType: 'HOUSE' },
     update: {},
     create: {
-      email: 'house@playmoney.com',
-      displayName: 'House',
-      username: 'house',
+      internalType: 'HOUSE',
     },
   })
 
-  const exchangerUser = await db.user.upsert({
-    where: { email: 'exchanger@playmoney.com' },
+  await db.account.upsert({
+    where: { internalType: 'EXCHANGER' },
     update: {},
     create: {
-      email: 'exchanger@playmoney.com',
-      displayName: 'Exchanger',
-      username: 'exchanger',
+      internalType: 'EXCHANGER',
     },
   })
 
   let user_ids = await Promise.all(
     _.times(10, async () => {
       let data = mockUser()
-      await db.user.create({ data })
+      await db.user.create({
+        data: {
+          ...data,
+          accounts: {
+            create: {},
+          },
+        },
+      })
       return data.id
     })
   )
   await Promise.all(
     _.times(5, async () => {
-      const ammId = faker.string.uuid()
-      let data = mockUser({
-        username: `amm-${ammId}`,
-        displayName: 'amm',
-        email: `amm-${ammId}@playmoney.com`,
-        isAMM: true,
-      })
-      const amm = await db.user.create({ data })
-
       await db.market.create({
         data: {
           ...mockMarket({
             createdBy: faker.helpers.arrayElement(user_ids),
           }),
-          ammId: amm.id,
+          accounts: {
+            create: {},
+          },
         },
       })
     })

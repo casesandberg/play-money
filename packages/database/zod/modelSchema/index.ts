@@ -8,3 +8,4 @@ export * from './CommentReactionSchema';
 export * from './CurrencySchema';
 export * from './TransactionSchema';
 export * from './TransactionItemSchema';
+export * from './AccountSchema';

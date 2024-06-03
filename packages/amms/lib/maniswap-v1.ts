@@ -4,23 +4,18 @@ import { convertPrimaryToMarketShares } from '@play-money/transactions/lib/excha
 import { getUserById } from '@play-money/users/lib/getUserById'
 
 export async function buy({
-  fromId,
-  toId,
+  fromAccountId,
+  toAccountId,
   currencyCode,
   maxAmount,
   maxProbability,
 }: {
-  fromId: string
-  toId: string
+  fromAccountId: string
+  toAccountId: string
   currencyCode: CurrencyCodeType
   maxAmount: number
   maxProbability?: number
 }): Promise<Array<TransactionItemInput>> {
-  const amm = await getUserById({ id: toId })
-  if (!amm) {
-    throw new Error('AMM not found')
-  }
-
   function costToHitProbability({ maxAmount }: { probability: number; maxAmount: number }) {
     return maxAmount
   }
@@ -28,21 +23,21 @@ export async function buy({
   const amountToBuy = maxProbability ? costToHitProbability({ probability: maxProbability, maxAmount }) : maxAmount
 
   const exchangerTransactions = await convertPrimaryToMarketShares({
-    from: fromId,
+    fromAccount: fromAccountId,
     amount: amountToBuy,
-    to: toId,
+    toAccount: toAccountId,
   })
 
   // TODO: Implement AMM.
 
   const ammTransactions = [
     {
-      userId: toId,
+      accountId: toAccountId,
       currencyCode: currencyCode,
       amount: -amountToBuy,
     },
     {
-      userId: fromId,
+      accountId: fromAccountId,
       currencyCode: currencyCode,
       amount: amountToBuy,
     },

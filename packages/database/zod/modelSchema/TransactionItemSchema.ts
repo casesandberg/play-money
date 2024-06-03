@@ -8,7 +8,7 @@ import { CurrencyCodeSchema } from '../inputTypeSchemas/CurrencyCodeSchema'
 export const TransactionItemSchema = z.object({
   currencyCode: CurrencyCodeSchema,
   id: z.string().cuid(),
-  userId: z.string(),
+  accountId: z.string(),
   transactionId: z.string(),
   amount: z.number(),
   createdAt: z.coerce.date(),

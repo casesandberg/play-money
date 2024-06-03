@@ -1,8 +1,9 @@
 import _ from 'lodash'
+import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
+import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
+import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import { buy } from '@play-money/amms/lib/maniswap-v1'
-import { getMarket } from '@play-money/markets/lib/getMarket'
 import { TransactionItemInput, createTransaction } from './createTransaction'
-import { checkUserBalance } from './getUserBalances'
 
 interface MarketBuyTransactionInput {
   userId: string
@@ -17,9 +18,10 @@ export async function createMarketBuyTransaction({
   amount,
   purchaseCurrencyCode,
 }: MarketBuyTransactionInput) {
-  const market = await getMarket({ id: marketId })
+  const userAccount = await getUserAccount({ id: userId })
+  const ammAccount = await getAmmAccount({ marketId })
 
-  const hasEnoughBalance = await checkUserBalance(userId, 'PRIMARY', amount)
+  const hasEnoughBalance = await checkAccountBalance(userAccount.id, 'PRIMARY', amount)
   if (!hasEnoughBalance) {
     throw new Error('User does not have enough balance to make this purchase.')
   }
@@ -31,8 +33,8 @@ export async function createMarketBuyTransaction({
     let closestLimitOrder = {} as any // TODO: Implement limit order matching
 
     const ammTransactions = await buy({
-      fromId: userId,
-      toId: market.ammId,
+      fromAccountId: userAccount.id,
+      toAccountId: ammAccount.id,
       currencyCode: purchaseCurrencyCode,
       maxAmount: amountToPurchase,
       maxProbability: closestLimitOrder?.probability,
@@ -40,7 +42,7 @@ export async function createMarketBuyTransaction({
 
     accumulatedTransactionItems.push(...ammTransactions)
     amountToPurchase += _.sumBy(ammTransactions, (item) =>
-      item.currencyCode === 'PRIMARY' && item.userId === userId ? item.amount : 0
+      item.currencyCode === 'PRIMARY' && item.accountId === userAccount.id ? item.amount : 0
     )
   }
 
@@ -48,7 +50,7 @@ export async function createMarketBuyTransaction({
     creatorId: userId,
     type: 'MARKET_BUY',
     description: `Purchase ${amount} dollars worth of ${purchaseCurrencyCode} shares in market ${marketId}`,
-    marketId: market.id,
+    marketId,
     transactionItems: accumulatedTransactionItems,
   })
 
