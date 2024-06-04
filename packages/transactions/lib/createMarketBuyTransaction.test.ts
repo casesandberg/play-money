@@ -1,4 +1,5 @@
 import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
+import { getAccountBalance } from '@play-money/accounts/lib/getAccountBalance'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import { mockAccount } from '@play-money/database/mocks'
@@ -21,6 +22,10 @@ jest.mock('@play-money/users/lib/getUserById', () => ({
   getUserById: jest.fn(),
 }))
 
+jest.mock('@play-money/accounts/lib/getAccountBalance', () => ({
+  getAccountBalance: jest.fn(),
+}))
+
 jest.mock('@play-money/accounts/lib/checkAccountBalance', () => ({
   checkAccountBalance: jest.fn(),
 }))
@@ -35,6 +40,12 @@ describe('createMarketBuyTransaction', () => {
   })
 
   it('should call createTransaction with approperate transactionItems', async () => {
+    jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
+      if (currencyCode === 'YES') return 100
+      if (currencyCode === 'NO') return 300
+      return 0
+    })
+
     jest.mocked(checkAccountBalance).mockResolvedValue(true)
     jest.mocked(getUserById).mockResolvedValue({} as any)
 
@@ -111,14 +122,14 @@ describe('createMarketBuyTransaction', () => {
             accountId: 'amm-1-account',
           },
           {
-            amount: 50,
-            currencyCode: 'YES',
-            accountId: 'user-1-account',
-          },
-          {
-            amount: -50,
+            amount: expect.closeTo(-64.29, 2),
             currencyCode: 'YES',
             accountId: 'amm-1-account',
+          },
+          {
+            amount: expect.closeTo(64.29, 2),
+            currencyCode: 'YES',
+            accountId: 'user-1-account',
           },
         ]),
       })
