@@ -4,15 +4,18 @@ import { buy, costToHitProbability } from './maniswap-v1'
 
 expect.extend({ toBeDeepCloseTo, toMatchCloseTo })
 
-jest.mock('@play-money/accounts/lib/getAccountBalance')
+jest.mock('@play-money/accounts/lib/getAccountBalance', () => ({
+  getAccountBalance: jest.fn(),
+}))
 
 describe('maniswap-v1', () => {
   describe('buy', () => {
     it('should return correct transactions for buying YES', async () => {
       // Current probability = 0.75
-      ;(getAccountBalance as jest.Mock).mockImplementation((accountId, currencyCode) => {
+      jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
         if (currencyCode === 'YES') return 100
         if (currencyCode === 'NO') return 300
+        return 0
       })
 
       const transactions = await buy({
@@ -37,9 +40,10 @@ describe('maniswap-v1', () => {
 
     it('should return correct transactions for buying NO', async () => {
       // Current probability = 0.75
-      ;(getAccountBalance as jest.Mock).mockImplementation((accountId, currencyCode) => {
+      jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
         if (currencyCode === 'YES') return 100
         if (currencyCode === 'NO') return 300
+        return 0
       })
 
       const transactions = await buy({
@@ -63,9 +67,10 @@ describe('maniswap-v1', () => {
   describe('costToHitProbability', () => {
     it('should return zero cost and returnedShares for same probability', async () => {
       // Current probability = 0.75
-      ;(getAccountBalance as jest.Mock).mockImplementation((accountId, currencyCode) => {
+      jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
         if (currencyCode === 'YES') return 100
         if (currencyCode === 'NO') return 300
+        return 0
       })
 
       const result = await costToHitProbability({
@@ -82,9 +87,10 @@ describe('maniswap-v1', () => {
 
     it('should return correct cost and returnedShares for increasing probability', async () => {
       // Current probability = 0.75
-      ;(getAccountBalance as jest.Mock).mockImplementation((accountId, currencyCode) => {
+      jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
         if (currencyCode === 'YES') return 100
         if (currencyCode === 'NO') return 300
+        return 0
       })
 
       const result = await costToHitProbability({
@@ -104,9 +110,10 @@ describe('maniswap-v1', () => {
 
     it('should return correct cost and returnedShares for increasing probability to max', async () => {
       // Current probability = 0.75
-      ;(getAccountBalance as jest.Mock).mockImplementation((accountId, currencyCode) => {
+      jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
         if (currencyCode === 'YES') return 100
         if (currencyCode === 'NO') return 300
+        return 0
       })
 
       const result = await costToHitProbability({
@@ -126,9 +133,10 @@ describe('maniswap-v1', () => {
 
     it('should return correct cost and returnedShares for decreasing probability', async () => {
       // Current probability = 0.75
-      ;(getAccountBalance as jest.Mock).mockImplementation((accountId, currencyCode) => {
+      jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
         if (currencyCode === 'YES') return 100
         if (currencyCode === 'NO') return 300
+        return 0
       })
 
       const result = await costToHitProbability({
@@ -148,9 +156,10 @@ describe('maniswap-v1', () => {
 
     it('should return correct cost and returnedShares for decreasing probability to max', async () => {
       // Current probability = 0.75
-      ;(getAccountBalance as jest.Mock).mockImplementation((accountId, currencyCode) => {
+      jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
         if (currencyCode === 'YES') return 100
         if (currencyCode === 'NO') return 300
+        return 0
       })
 
       const result = await costToHitProbability({
