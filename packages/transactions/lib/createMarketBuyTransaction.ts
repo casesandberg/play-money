@@ -1,10 +1,8 @@
 import _ from 'lodash'
-import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import { buy, costToHitProbability } from '@play-money/amms/lib/maniswap-v1'
-import { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/CurrencyCodeSchema'
-import { TransactionItemInput, createTransaction } from './createTransaction'
+import { createTransaction, TransactionItemInput } from './createTransaction'
 import { convertPrimaryToMarketShares } from './exchanger'
 
 interface MarketBuyTransactionInput {
@@ -37,10 +35,13 @@ export async function createMarketBuyTransaction({
     let closestLimitOrder = {} as any // TODO: Implement limit order matching
 
     const amountToBuy = closestLimitOrder?.probability
-      ? await costToHitProbability({
-          probability: closestLimitOrder?.probability,
-          maxAmount: oppositeOutstandingShares,
-        })
+      ? (
+          await costToHitProbability({
+            ammAccountId: ammAccount.id,
+            probability: closestLimitOrder?.probability,
+            maxAmount: oppositeOutstandingShares,
+          })
+        ).cost
       : oppositeOutstandingShares
 
     const ammTransactions = await buy({
