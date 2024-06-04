@@ -3,7 +3,7 @@ import db, { MarketSchema } from '@play-money/database'
 
 export async function createMarket(question: string, description: string, closeDate: Date | null, createdBy: string) {
   let slug = slugify(question)
-  const marketData = MarketSchema.omit({id: true}).parse({
+  const marketData = MarketSchema.omit({ id: true }).parse({
     question,
     description,
     closeDate,
