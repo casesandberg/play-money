@@ -26,10 +26,13 @@ export async function createMarketBuyTransaction({
     amount,
   })
 
-  let maximumSaneLoops = 100
-  let accumulatedTransactionItems: Array<TransactionItemInput> = [...exchangerTransactions]
-  let oppositeCurrencyCode = purchaseCurrencyCode === 'YES' ? 'NO' : 'YES'
+  // When buying shares, the opposite shares will decrease when filling amm/limit orders.
+  // Any amount of opposite shares left means the entire amount has not yet been been filled.
   let oppositeOutstandingShares = amount
+  let oppositeCurrencyCode = purchaseCurrencyCode === 'YES' ? 'NO' : 'YES'
+  let accumulatedTransactionItems: Array<TransactionItemInput> = [...exchangerTransactions]
+  // To account for floating point errors, we will limit the number of loops to a sane number.
+  let maximumSaneLoops = 100
 
   while (oppositeOutstandingShares > 0 && maximumSaneLoops > 0) {
     let closestLimitOrder = {} as any // TODO: Implement limit order matching
