@@ -8,15 +8,20 @@
     "clean": "dotenv -- turbo clean",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "db:push": "dotenv -- turbo db:push",
-    "db:generate": "dotenv -- turbo db:generate"
+    "db:generate": "dotenv -- turbo db:generate",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch"
   },
   "devDependencies": {
     "@play-money/config": "*",
+    "@types/jest": "^29.5.12",
     "cross-env": "^7.0.3",
     "dotenv-cli": "^7.4.1",
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.11",
+    "ts-jest": "^29.1.4",
+    "ts-node": "^10.9.2",
     "turbo": "latest"
   },
   "engines": {
