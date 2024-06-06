@@ -74,6 +74,59 @@ export async function buy({
   return ammTransactions
 }
 
+export async function sell({
+  fromAccountId,
+  ammAccountId,
+  currencyCode,
+  amount,
+}: {
+  fromAccountId: string
+  ammAccountId: string
+  currencyCode: CurrencyCodeType
+  amount: number
+}): Promise<Array<TransactionItemInput>> {
+  const buyingYes = currencyCode === 'YES'
+  const oppositeCurrencyCode: CurrencyCodeType = buyingYes ? 'NO' : 'YES'
+
+  // TODO: This is just a stub which returns an equal amount of YES and NO shares.
+
+  return [
+    // Giving the shares to the AMM.
+    {
+      accountId: fromAccountId,
+      currencyCode: currencyCode,
+      amount: -amount,
+    },
+    {
+      accountId: ammAccountId,
+      currencyCode: currencyCode,
+      amount: amount,
+    },
+
+    // Returning purchased shares to the user.
+    {
+      accountId: fromAccountId,
+      currencyCode: currencyCode,
+      amount: amount,
+    },
+    {
+      accountId: fromAccountId,
+      currencyCode: oppositeCurrencyCode,
+      amount: amount,
+    },
+    {
+      accountId: ammAccountId,
+      currencyCode: currencyCode,
+      amount: -amount,
+    },
+    {
+      accountId: ammAccountId,
+      currencyCode: oppositeCurrencyCode,
+      amount: -amount,
+    },
+  ]
+}
+
 export async function costToHitProbability({
   ammAccountId,
   probability,
