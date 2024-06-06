@@ -2,6 +2,9 @@
   "name": "@play-money/auth",
   "version": "0.0.0",
   "private": true,
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
   "main": "./index.ts",
   "types": "./index.ts",
   "dependencies": {

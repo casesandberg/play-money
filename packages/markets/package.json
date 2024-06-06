@@ -1,9 +1,12 @@
 {
-    "name": "@play-money/markets",
-    "version": "0.0.0",
-    "private": true,
-    "dependencies": {
-        "@play-money/database": "*",
-        "zod": "^3.23.5"
-    }
+  "name": "@play-money/markets",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@play-money/database": "*",
+    "zod": "^3.23.5"
+  }
 }

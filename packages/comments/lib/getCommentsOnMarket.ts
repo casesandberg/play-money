@@ -2,7 +2,7 @@ import db, { CommentEntityType, Comment, User, CommentReaction } from '@play-mon
 import { sanitizeUser } from '@play-money/users/lib/sanitizeUser'
 
 export type MarketComment = Comment & {
-  user: User
+  author: User
   reactions: Array<
     CommentReaction & {
       user: User

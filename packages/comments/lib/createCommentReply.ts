@@ -1,5 +1,4 @@
-import { z } from 'zod'
-import { Comment, CommentSchema } from '@play-money/database'
+import { Comment } from '@play-money/database'
 import { createComment } from './createComment'
 import { getComment } from './getComment'
 
