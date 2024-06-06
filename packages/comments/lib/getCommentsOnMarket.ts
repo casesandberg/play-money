@@ -1,15 +1,14 @@
-import { z } from 'zod'
-import db, { CommentEntityType, CommentSchema, CommentReactionSchema, UserSchema } from '@play-money/database'
+import db, { CommentEntityType, Comment, User, CommentReaction } from '@play-money/database'
 import { sanitizeUser } from '@play-money/users/lib/sanitizeUser'
 
-export const MarketCommentSchema = CommentSchema.extend({
-  author: UserSchema,
-  reactions: z.array(
-    CommentReactionSchema.extend({
-      user: UserSchema,
-    })
-  ),
-})
+export type MarketComment = Comment & {
+  user: User
+  reactions: Array<
+    CommentReaction & {
+      user: User
+    }
+  >
+}
 
 export async function getCommentsOnMarket({ marketId }: { marketId: string }) {
   const comments = await db.comment.findMany({
