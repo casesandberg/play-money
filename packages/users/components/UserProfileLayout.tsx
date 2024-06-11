@@ -3,7 +3,7 @@ import React from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@play-money/ui/card'
 import { Separator } from '@play-money/ui/separator'
-import { getUserProfile } from '../pages/UserProfilePage'
+import { getUserProfile } from '../components/UserProfilePage'
 import { EditOrFollowUserButton } from './EditOrFollowUserButton'
 
 const DiscordIcon = ({ className }: { className: string }) => (
