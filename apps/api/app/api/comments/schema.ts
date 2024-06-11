@@ -4,10 +4,8 @@ import { CommentSchema } from '@play-money/database'
 
 export default createSchema({
   POST: {
-    request: {
-      body: CreateSchema.omit({ authorId: true }),
-    },
-    response: {
+    requestBody: CreateSchema.omit({ authorId: true }),
+    responses: {
       200: CommentSchema,
       404: ServerErrorSchema,
       500: ServerErrorSchema,

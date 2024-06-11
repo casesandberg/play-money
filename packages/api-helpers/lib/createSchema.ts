@@ -1,53 +1,46 @@
+import { NextResponse } from 'next/server'
 import z from 'zod'
 
-export const dynamic = 'force-dynamic'
+export type SchemaResponse<Res extends z.ZodObject<any>> = NextResponse<z.infer<Res>>
 
-type Keys = 'request' | 'response'
-type Method = 'POST' | 'GET' | 'PUT' | 'DELETE' | 'PATCH'
-
-type RequestIsh =
-  | {
-      body: z.ZodObject<{}>
+type SwaggerPathSpec = {
+  [key: string]: {
+    parameters?: z.ZodObject<any>
+    requestBody?: z.ZodObject<any>
+    responses: {
+      [key: number]: z.ZodObject<any> | Array<z.ZodObject<any>>
     }
-  | {
-      params: z.ZodObject<{}>
-    }
-  | undefined
-
-type Option<Req extends RequestIsh, Res, K extends Keys> = {
-  [F in Keys]: F extends 'request'
-    ? { [P in keyof Req]: Req[P] }
-    : Record<number, Res | { content: Res; description: string }>
-}
-
-type Schema<Req extends RequestIsh, Res extends z.ZodObject<{}>, M extends Method, K extends Keys> = {
-  [key in M]: {
-    [F in Keys]: F extends 'request' ? { [P in keyof Req]: Req[P] } : z.infer<Res>
   }
 }
 
-// TODO: @casesandberg Use to extrapolate by creating a plugin similar to next-swagger-doc
+type Flatten<T> = T extends Array<infer U> ? (U extends Array<any> ? Flatten<U> : U) : T
 
-export function createSchema<Req extends RequestIsh, Res extends z.ZodObject<{}>, K extends Keys, M extends Method>(
-  options: Record<M, Option<Req, Res, K>>
-): Schema<Req, Res, M, K> {
-  const schema = <Schema<Req, Res, M, K>>{}
+type TransformResType<Spec> = {
+  [Method in keyof Spec]: Spec[Method] extends {
+    responses: infer Res extends { [key: number]: z.ZodObject<any> | Array<z.ZodObject<any>> }
+  }
+    ? { [Key in Exclude<keyof Spec[Method], 'responses'>]: Spec[Method][Key] } & {
+        responses: Flatten<Res[keyof Res] extends Array<infer V> ? V : [Res[keyof Res]]>
+      }
+    : Spec[Method]
+}
 
-  const methods = Object.keys(options) as M[]
-  for (const method of methods) {
-    const option = options[method]
-    if (option) {
-      const responseSchemas = Object.values(option.response).map((schema) =>
-        'content' in schema ? schema.content : schema
-      )
-      const responseUnion = z.union(responseSchemas as [Res, Res, ...Res[]])
+function flattenToArray<Res extends { [key: number]: z.ZodObject<any> | Array<z.ZodObject<any>> }>(res: Res) {
+  return Object.values(res).flatMap((response) => (Array.isArray(response) ? response : [response]))
+}
 
-      schema[method] = {
-        request: option.request,
-        response: responseUnion as z.infer<typeof responseUnion>,
+export function createSchema<Spec extends SwaggerPathSpec>(spec: Spec): TransformResType<Spec> {
+  const result: any = {}
+
+  for (const method in spec) {
+    if (spec.hasOwnProperty(method)) {
+      const { responses, ...rest } = spec[method]
+      result[method] = {
+        ...rest,
+        responses: flattenToArray(responses),
       }
     }
   }
 
-  return schema
+  return result
 }

@@ -1,37 +1,29 @@
+import { z } from 'zod'
 import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
 import { CommentSchema } from '@play-money/database'
 
 export default createSchema({
   GET: {
-    request: {
-      params: CommentSchema.pick({ id: true }),
-      body: CommentSchema.pick({ content: true }),
-    },
-    response: {
+    parameters: CommentSchema.pick({ id: true }),
+    responses: {
       200: CommentSchema,
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },
   },
   PATCH: {
-    request: {
-      params: CommentSchema.pick({ id: true }),
-      body: CommentSchema.pick({ content: true }),
-    },
-    response: {
+    parameters: CommentSchema.pick({ id: true }),
+    requestBody: CommentSchema.pick({ content: true }),
+    responses: {
       200: CommentSchema,
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },
   },
   DELETE: {
-    request: {
-      params: CommentSchema.pick({ id: true }),
-      body: CommentSchema.pick({ content: true }),
-    },
-    // TODO: @casesandberg Fix mixed response types
-    response: {
-      200: CommentSchema, // zod.object({ message: zod.string() }),
+    parameters: CommentSchema.pick({ id: true }),
+    responses: {
+      200: z.object({ message: z.string() }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },

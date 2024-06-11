@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import type { SchemaResponse } from '@play-money/api-helpers'
 import { CommentNotFoundError } from '@play-money/comments/lib/exceptions'
 import { getCommentsOnMarket } from '@play-money/comments/lib/getCommentsOnMarket'
 import schema from './schema'
@@ -8,9 +9,9 @@ export const dynamic = 'force-dynamic'
 export async function GET(
   _req: Request,
   { params }: { params: unknown }
-): Promise<NextResponse<typeof schema.GET.response>> {
+): Promise<SchemaResponse<typeof schema.GET.responses>> {
   try {
-    const { id } = schema.GET.request.params.parse(params)
+    const { id } = schema.GET.parameters.parse(params)
 
     const comments = await getCommentsOnMarket({ marketId: id })
 

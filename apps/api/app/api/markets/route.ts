@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server'
+import type { SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
 import { createMarket } from '@play-money/markets/lib/createMarket'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
-export async function POST(req: Request): Promise<NextResponse<typeof schema.POST.response>> {
+export async function POST(req: Request): Promise<SchemaResponse<typeof schema.POST.responses>> {
   try {
     const session = await auth()
 
@@ -14,7 +15,7 @@ export async function POST(req: Request): Promise<NextResponse<typeof schema.POS
     }
 
     const body = (await req.json()) as unknown
-    const basicMarket = schema.POST.request.body.parse(body)
+    const basicMarket = schema.POST.requestBody.parse(body)
     const newMarket = await createMarket(
       basicMarket.question,
       basicMarket.description,

@@ -4,10 +4,7 @@ import { CurrencySchema } from '@play-money/database'
 
 export default createSchema({
   GET: {
-    request: {
-      params: zod.object({}),
-    },
-    response: {
+    responses: {
       200: zod.object({ currencies: zod.array(CurrencySchema) }),
       500: ServerErrorSchema,
     },

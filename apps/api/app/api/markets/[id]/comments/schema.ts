@@ -4,10 +4,8 @@ import { CommentSchema } from '@play-money/database'
 
 export default createSchema({
   GET: {
-    request: {
-      params: zod.object({ id: zod.string() }),
-    },
-    response: {
+    parameters: zod.object({ id: zod.string() }),
+    responses: {
       200: zod.object({ comments: zod.array(CommentSchema) }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,

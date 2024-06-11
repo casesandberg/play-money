@@ -4,10 +4,8 @@ import { UserProfileModel } from '@play-money/users/lib/sanitizeUser'
 
 export default createSchema({
   GET: {
-    request: {
-      params: UserProfileModel.pick({ username: true }),
-    },
-    response: {
+    parameters: UserProfileModel.pick({ username: true }),
+    responses: {
       200: zod.object({ available: zod.boolean(), message: zod.string().optional() }),
       500: ServerErrorSchema,
     },
