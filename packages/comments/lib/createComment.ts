@@ -1,13 +1,12 @@
 import { z } from 'zod'
-import db, { CommentEntityType, CommentSchema, UserSchema } from '@play-money/database'
+import db, { CommentSchema } from '@play-money/database'
 
 export const CreateSchema = CommentSchema.pick({
   content: true,
   authorId: true,
   parentId: true,
+  entityType: true,
   entityId: true,
-}).extend({
-  entityType: z.nativeEnum(CommentEntityType), // TODO: @casesandberg Errors when we try to pick this out of the model. Look into fix.
 })
 
 export async function createComment({

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import type { SchemaResponse } from '@play-money/api-helpers'
 import { UserNotFoundError } from '@play-money/users/lib/exceptions'
 import { getUserByUsername } from '@play-money/users/lib/getUserByUsername'
 import schema from './schema'
@@ -8,9 +9,9 @@ export const dynamic = 'force-dynamic'
 export async function GET(
   _req: Request,
   { params }: { params: unknown }
-): Promise<NextResponse<typeof schema.GET.response>> {
+): Promise<SchemaResponse<typeof schema.GET.responses>> {
   try {
-    const { username } = schema.GET.request.params.parse(params)
+    const { username } = schema.GET.parameters.parse(params)
 
     const user = await getUserByUsername({ username })
 

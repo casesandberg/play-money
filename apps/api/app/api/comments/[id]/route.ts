@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import type { SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
 import { deleteComment } from '@play-money/comments/lib/deleteComment'
 import { CommentNotFoundError } from '@play-money/comments/lib/exceptions'
@@ -11,9 +12,9 @@ export const dynamic = 'force-dynamic'
 export async function GET(
   _req: Request,
   { params }: { params: unknown }
-): Promise<NextResponse<typeof schema.GET.response>> {
+): Promise<SchemaResponse<typeof schema.GET.responses>> {
   try {
-    const { id } = schema.GET.request.params.parse(params)
+    const { id } = schema.GET.parameters.parse(params)
 
     const comment = await getComment({ id })
 
@@ -31,7 +32,7 @@ export async function GET(
 export async function PATCH(
   req: Request,
   { params }: { params: unknown }
-): Promise<NextResponse<typeof schema.PATCH.response>> {
+): Promise<SchemaResponse<typeof schema.PATCH.responses>> {
   try {
     const session = await auth()
 
@@ -39,9 +40,9 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = schema.PATCH.request.params.parse(params)
+    const { id } = schema.PATCH.parameters.parse(params)
     const body = (await req.json()) as unknown
-    const { content } = schema.PATCH.request.body.parse(body)
+    const { content } = schema.PATCH.requestBody.parse(body)
 
     const comment = await getComment({ id })
     if (comment.authorId !== session.user.id) {
@@ -64,7 +65,7 @@ export async function PATCH(
 export async function DELETE(
   _req: Request,
   { params }: { params: unknown }
-): Promise<NextResponse<{ message: string } | { error: string }>> {
+): Promise<SchemaResponse<typeof schema.DELETE.responses>> {
   try {
     const session = await auth()
 
@@ -72,7 +73,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = schema.DELETE.request.params.parse(params)
+    const { id } = schema.DELETE.parameters.parse(params)
 
     const comment = await getComment({ id })
     if (comment.authorId !== session.user.id) {

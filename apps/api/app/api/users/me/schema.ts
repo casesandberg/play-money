@@ -4,21 +4,15 @@ import { UpdateSchema } from '@play-money/users/lib/updateUserById'
 
 export default createSchema({
   GET: {
-    // TODO: @casesandberg Fix typescript to allow for no request data
-    request: {
-      body: UpdateSchema,
-    },
-    response: {
+    responses: {
       200: UserProfileModel,
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },
   },
   PATCH: {
-    request: {
-      body: UpdateSchema,
-    },
-    response: {
+    requestBody: UpdateSchema,
+    responses: {
       200: UserProfileModel,
       404: ServerErrorSchema,
       500: ServerErrorSchema,

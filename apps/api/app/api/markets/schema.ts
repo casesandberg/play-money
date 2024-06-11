@@ -3,14 +3,12 @@ import { MarketSchema } from '@play-money/database'
 
 export default createSchema({
   POST: {
-    request: {
-      body: MarketSchema.pick({
-        question: true,
-        description: true,
-        closeDate: true,
-      }),
-    },
-    response: {
+    requestBody: MarketSchema.pick({
+      question: true,
+      description: true,
+      closeDate: true,
+    }),
+    responses: {
       200: MarketSchema,
       404: ServerErrorSchema,
       500: ServerErrorSchema,

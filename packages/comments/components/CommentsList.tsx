@@ -2,11 +2,9 @@
 
 import _ from 'lodash'
 import React, { useState, useEffect } from 'react'
-import { z } from 'zod'
-import { CommentSchema } from '@play-money/database'
 import { useUser } from '@play-money/users/context/UserContext'
 import { flattenReplies } from '../lib/flattenReplies'
-import { MarketCommentSchema } from '../lib/getCommentsOnMarket'
+import { MarketComment } from '../lib/getCommentsOnMarket'
 import { CommentItem } from './CommentItem'
 import { CreateCommentForm } from './CreateCommentForm'
 
@@ -15,7 +13,7 @@ export function CommentsList({
   entity,
   onRevalidate,
 }: {
-  comments: Array<z.infer<typeof MarketCommentSchema>>
+  comments: Array<MarketComment>
   entity: { type: string; id: string }
   onRevalidate: () => void
 }) {

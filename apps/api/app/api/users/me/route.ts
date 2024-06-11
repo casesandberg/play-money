@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import type { SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
 import { getUserById } from '@play-money/users/lib/getUserById'
 import { updateUserById } from '@play-money/users/lib/updateUserById'
@@ -6,7 +7,7 @@ import schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(_req: Request): Promise<NextResponse<typeof schema.GET.response>> {
+export async function GET(_req: Request): Promise<SchemaResponse<typeof schema.GET.responses>> {
   try {
     const session = await auth()
 
@@ -22,7 +23,7 @@ export async function GET(_req: Request): Promise<NextResponse<typeof schema.GET
   }
 }
 
-export async function PATCH(req: Request): Promise<NextResponse<typeof schema.PATCH.response>> {
+export async function PATCH(req: Request): Promise<SchemaResponse<typeof schema.PATCH.responses>> {
   try {
     const session = await auth()
 
@@ -31,7 +32,7 @@ export async function PATCH(req: Request): Promise<NextResponse<typeof schema.PA
     }
 
     const body = (await req.json()) as unknown
-    const updateData = schema.PATCH.request.body.parse(body)
+    const updateData = schema.PATCH.requestBody.parse(body)
 
     const user = await updateUserById({ id: session.user.id, ...updateData })
 

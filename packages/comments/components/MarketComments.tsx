@@ -1,16 +1,23 @@
+import 'next'
 import { revalidateTag } from 'next/cache'
 import React from 'react'
-import { z } from 'zod'
-import { Card } from '@play-money/ui/card'
-import { MarketCommentSchema } from '../lib/getCommentsOnMarket'
+import { MarketComment } from '../lib/getCommentsOnMarket'
 import { CommentsList } from './CommentsList'
 
+declare module 'next' {
+  interface NextFetchRequestConfig {
+    tags?: Array<string>
+  }
+}
+
+declare global {
+  interface RequestInit {
+    next?: NextFetchRequestConfig
+  }
+}
+
 // TODO: @casesandberg Generate this from OpenAPI schema
-async function getMarketComments({
-  marketId,
-}: {
-  marketId: string
-}): Promise<{ comments: Array<z.infer<typeof MarketCommentSchema>> }> {
+async function getMarketComments({ marketId }: { marketId: string }): Promise<{ comments: Array<MarketComment> }> {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/comments`, {
     credentials: 'include',
     next: { tags: ['comments'] },

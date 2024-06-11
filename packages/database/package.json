@@ -5,7 +5,8 @@
   "scripts": {
     "db:generate": "prisma generate && prisma format",
     "db:push": "prisma db push --skip-generate",
-    "dev": "cross-env BROWSER=none prisma studio"
+    "dev": "cross-env BROWSER=none prisma studio",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@prisma/client": "^5.13.0",
