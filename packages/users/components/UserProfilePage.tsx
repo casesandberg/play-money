@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@play-money/ui/card'
+import { Card, CardContent } from '@play-money/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@play-money/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@play-money/ui/tabs'
 import { UserNotFoundError } from '../lib/exceptions'
@@ -28,33 +28,6 @@ export async function UserProfilePage({ username }: { username: string }) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
-        <Card className="sm:col-span-2" x-chunk="dashboard-05-chunk-0">
-          <CardHeader className="pb-3">
-            <CardTitle>Will Manifold have regular public stand-ups again in 2024?</CardTitle>
-            <CardDescription className="max-w-lg text-balance leading-relaxed">5 traders. 3.9k volume.</CardDescription>
-          </CardHeader>
-        </Card>
-        <Card x-chunk="dashboard-05-chunk-1">
-          <CardHeader className="pb-2">
-            <CardDescription>This Week</CardDescription>
-            <CardTitle className="text-4xl">$1,329</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xs text-muted-foreground">+25% from last week</div>
-          </CardContent>
-        </Card>
-        <Card x-chunk="dashboard-05-chunk-2">
-          <CardHeader className="pb-2">
-            <CardDescription>This Month</CardDescription>
-            <CardTitle className="text-4xl">$5,329</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xs text-muted-foreground">+10% from last month</div>
-          </CardContent>
-        </Card>
-      </div> */}
-
       <Tabs defaultValue="trades">
         <div className="flex items-center">
           <TabsList>

@@ -1,6 +1,4 @@
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
-import React from 'react'
 import { LoginForm } from '../components/LoginForm'
 
 export function LoginPage() {
@@ -27,15 +25,7 @@ export function LoginPage() {
           </p>
         </div>
       </div>
-      <div className="hidden bg-primary lg:block">
-        {/* <Image
-          src="/placeholder.svg"
-          alt="Image"
-          width="1920"
-          height="1080"
-          className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-        /> */}
-      </div>
+      <div className="hidden bg-primary lg:block"></div>
     </div>
   )
 }
