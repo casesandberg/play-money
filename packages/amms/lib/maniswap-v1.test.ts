@@ -7,7 +7,7 @@ import { buy, costToHitProbability, sell } from './maniswap-v1'
 declare global {
   namespace jest {
     interface Expect {
-      closeToDecimal(expected: string | number, precision?: string | number): void
+      closeToDecimal(expected: string | number, precision?: string | number): CustomMatcherResult
     }
   }
 }
