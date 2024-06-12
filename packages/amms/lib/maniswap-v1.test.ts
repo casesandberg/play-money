@@ -3,15 +3,6 @@ import { toBeDeepCloseTo, toMatchCloseTo } from 'jest-matcher-deep-close-to'
 import { getAccountBalance } from '@play-money/accounts/lib/getAccountBalance'
 import { buy, costToHitProbability, sell } from './maniswap-v1'
 
-// TODO: Move to global d.ts file
-declare global {
-  namespace jest {
-    interface Expect {
-      closeToDecimal(expected: string | number, precision?: string | number): CustomMatcherResult
-    }
-  }
-}
-
 expect.extend({ toBeDeepCloseTo, toMatchCloseTo })
 
 jest.mock('@play-money/accounts/lib/getAccountBalance', () => ({
@@ -75,16 +66,16 @@ describe('maniswap-v1', () => {
   it('should return correct transactions for selling YES', async () => {
     // Current probability ~= 0.80
     jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
-      if (currencyCode === 'YES') return 85.71
-      if (currencyCode === 'NO') return 350
-      return 0
+      if (currencyCode === 'YES') return new Decimal(85.71)
+      if (currencyCode === 'NO') return new Decimal(350)
+      return new Decimal(0)
     })
 
     const transactions = await sell({
       fromAccountId: 'user1',
       ammAccountId: 'amm1',
       currencyCode: 'YES',
-      amount: 64.29,
+      amount: new Decimal(64.29),
     })
 
     expect(transactions).toMatchCloseTo(
@@ -104,16 +95,16 @@ describe('maniswap-v1', () => {
   it('should return correct transactions for selling NO', async () => {
     // Current probability ~= 0.57
     jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
-      if (currencyCode === 'YES') return 150
-      if (currencyCode === 'NO') return 200
-      return 0
+      if (currencyCode === 'YES') return new Decimal(150)
+      if (currencyCode === 'NO') return new Decimal(200)
+      return new Decimal(0)
     })
 
     const transactions = await sell({
       fromAccountId: 'user1',
       ammAccountId: 'amm1',
       currencyCode: 'NO',
-      amount: 150,
+      amount: new Decimal(150),
     })
 
     expect(transactions).toMatchCloseTo(

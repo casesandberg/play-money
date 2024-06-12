@@ -3,19 +3,11 @@ import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalanc
 import { getAccountBalance } from '@play-money/accounts/lib/getAccountBalance'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
+import '@play-money/config/jest/jest-setup'
 import { mockAccount } from '@play-money/database/mocks'
 import { getUserById } from '@play-money/users/lib/getUserById'
 import { createMarketBuyTransaction } from './createMarketBuyTransaction'
 import { createTransaction } from './createTransaction'
-
-// TODO: Move to global d.ts file
-declare global {
-  namespace jest {
-    interface Expect {
-      closeToDecimal(expected: string | number, precision?: string | number): CustomMatcherResult
-    }
-  }
-}
 
 // TODO: Cleanup mocks in this file
 // TODO: Create accounts for Exchanger

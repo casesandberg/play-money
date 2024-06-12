@@ -1,5 +1,5 @@
 {
-  "extends": "@play-money/config/typescript/react-library.json",
-  "include": ["."],
+  "extends": "@play-money/config/typescript/nextjs.json",
+  "include": [".", "../config/typescript/*.d.ts"],
   "exclude": ["dist", "build", "node_modules"]
 }
