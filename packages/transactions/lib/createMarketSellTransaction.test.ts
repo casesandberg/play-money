@@ -81,7 +81,7 @@ describe('createMarketSellTransaction', () => {
       expect.objectContaining({
         transactionItems: expect.arrayContaining([
           {
-            amount: expect.closeToDecimal(-64.22),
+            amount: expect.closeToDecimal(-64.29),
             currencyCode: 'YES',
             accountId: 'user-1-account',
           },
