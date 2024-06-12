@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js'
 import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import { getAccountBalance } from '@play-money/accounts/lib/getAccountBalance'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
@@ -6,6 +7,15 @@ import { mockAccount } from '@play-money/database/mocks'
 import { getUserById } from '@play-money/users/lib/getUserById'
 import { createMarketBuyTransaction } from './createMarketBuyTransaction'
 import { createTransaction } from './createTransaction'
+
+// TODO: Move to global d.ts file
+declare global {
+  namespace jest {
+    interface Expect {
+      closeToDecimal(expected: string | number, precision?: string | number): void
+    }
+  }
+}
 
 // TODO: Cleanup mocks in this file
 // TODO: Create accounts for Exchanger
@@ -40,10 +50,10 @@ describe('createMarketBuyTransaction', () => {
   })
 
   it('should call createTransaction with approperate transactionItems', async () => {
-    jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
-      if (currencyCode === 'YES') return 100
-      if (currencyCode === 'NO') return 300
-      return 0
+    jest.mocked(getAccountBalance).mockImplementation(async (_accountId, currencyCode) => {
+      if (currencyCode === 'YES') return new Decimal(100)
+      if (currencyCode === 'NO') return new Decimal(300)
+      return new Decimal(0)
     })
 
     jest.mocked(checkAccountBalance).mockResolvedValue(true)
@@ -63,7 +73,7 @@ describe('createMarketBuyTransaction', () => {
 
     await createMarketBuyTransaction({
       userId: 'user-1',
-      amount: 50,
+      amount: new Decimal(50),
       purchaseCurrencyCode: 'YES',
       marketId: 'market-1',
     })
@@ -72,62 +82,62 @@ describe('createMarketBuyTransaction', () => {
       expect.objectContaining({
         transactionItems: expect.arrayContaining([
           {
-            amount: -50,
+            amount: new Decimal(-50),
             currencyCode: 'PRIMARY',
             accountId: 'user-1-account',
           },
           {
-            amount: 50,
+            amount: new Decimal(50),
             currencyCode: 'PRIMARY',
             accountId: 'EXCHANGER',
           },
           {
-            amount: -50,
+            amount: new Decimal(-50),
             currencyCode: 'YES',
             accountId: 'EXCHANGER',
           },
           {
-            amount: -50,
+            amount: new Decimal(-50),
             currencyCode: 'NO',
             accountId: 'EXCHANGER',
           },
           {
-            amount: 50,
+            amount: new Decimal(50),
             currencyCode: 'YES',
             accountId: 'user-1-account',
           },
           {
-            amount: 50,
+            amount: new Decimal(50),
             currencyCode: 'NO',
             accountId: 'user-1-account',
           },
           {
-            amount: -50,
+            amount: new Decimal(-50),
             currencyCode: 'YES',
             accountId: 'user-1-account',
           },
           {
-            amount: -50,
+            amount: new Decimal(-50),
             currencyCode: 'NO',
             accountId: 'user-1-account',
           },
           {
-            amount: 50,
+            amount: new Decimal(50),
             currencyCode: 'YES',
             accountId: 'amm-1-account',
           },
           {
-            amount: 50,
+            amount: new Decimal(50),
             currencyCode: 'NO',
             accountId: 'amm-1-account',
           },
           {
-            amount: expect.closeTo(-64.29, 2),
+            amount: expect.closeToDecimal(-64.29),
             currencyCode: 'YES',
             accountId: 'amm-1-account',
           },
           {
-            amount: expect.closeTo(64.29, 2),
+            amount: expect.closeToDecimal(64.29),
             currencyCode: 'YES',
             accountId: 'user-1-account',
           },

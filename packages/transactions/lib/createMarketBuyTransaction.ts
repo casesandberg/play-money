@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
@@ -7,7 +8,7 @@ import { convertPrimaryToMarketShares } from './exchanger'
 
 interface MarketBuyTransactionInput {
   userId: string
-  amount: number // in dollars
+  amount: Decimal // in dollars
   purchaseCurrencyCode: 'YES' | 'NO'
   marketId: string
 }
@@ -34,7 +35,7 @@ export async function createMarketBuyTransaction({
   // To account for floating point errors, we will limit the number of loops to a sane number.
   let maximumSaneLoops = 100
 
-  while (oppositeOutstandingShares > 0 && maximumSaneLoops > 0) {
+  while (oppositeOutstandingShares.greaterThan(0) && maximumSaneLoops > 0) {
     let closestLimitOrder = {} as any // TODO: Implement limit order matching
 
     const amountToBuy = closestLimitOrder?.probability
@@ -55,9 +56,14 @@ export async function createMarketBuyTransaction({
     })
 
     accumulatedTransactionItems.push(...ammTransactions)
-    oppositeOutstandingShares += _.sumBy(ammTransactions, (item) =>
-      item.currencyCode === oppositeCurrencyCode && item.accountId === userAccount.id ? item.amount : 0
+
+    const transactionsByUserOfAlternateCurrency = ammTransactions.filter(
+      (item) => item.currencyCode === oppositeCurrencyCode && item.accountId === userAccount.id
     )
+    oppositeOutstandingShares = oppositeOutstandingShares.add(
+      transactionsByUserOfAlternateCurrency.reduce((sum, item) => sum.plus(item.amount), new Decimal(0))
+    )
+
     maximumSaneLoops -= 1
   }
 

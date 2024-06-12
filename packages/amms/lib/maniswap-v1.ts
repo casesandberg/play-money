@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js'
 import { getAccountBalance } from '@play-money/accounts/lib/getAccountBalance'
 import { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/CurrencyCodeSchema'
 import { TransactionItemInput } from '@play-money/transactions/lib/createTransaction'
@@ -18,7 +19,7 @@ export async function buy({
   fromAccountId: string
   ammAccountId: string
   currencyCode: CurrencyCodeType
-  amount: number
+  amount: Decimal
 }): Promise<Array<TransactionItemInput>> {
   const buyingYes = currencyCode === 'YES'
   const oppositeCurrencyCode: CurrencyCodeType = buyingYes ? 'NO' : 'YES'
@@ -26,13 +27,13 @@ export async function buy({
   const y = await getAccountBalance(ammAccountId, 'YES')
   const n = await getAccountBalance(ammAccountId, 'NO')
 
-  let toReturn: number
+  let toReturn: Decimal
   if (buyingYes) {
     // We will solve (y + amount - toReturn) * (n + amount) = k = y * n for toReturn
-    toReturn = (amount * (amount + n + y)) / (amount + n)
+    toReturn = amount.times(amount.add(n).add(y)).div(amount.add(n))
   } else {
     // We will solve (y + amount) * (n + amount - toReturn) = k = y * n for toReturn
-    toReturn = (amount * (amount + n + y)) / (amount + y)
+    toReturn = amount.times(amount.add(n).add(y)).div(amount.add(y))
   }
 
   const ammTransactions = [
@@ -40,12 +41,12 @@ export async function buy({
     {
       accountId: fromAccountId,
       currencyCode: currencyCode,
-      amount: -amount,
+      amount: amount.neg(),
     },
     {
       accountId: fromAccountId,
       currencyCode: oppositeCurrencyCode,
-      amount: -amount,
+      amount: amount.neg(),
     },
     {
       accountId: ammAccountId,
@@ -62,7 +63,7 @@ export async function buy({
     {
       accountId: ammAccountId,
       currencyCode: currencyCode,
-      amount: -toReturn,
+      amount: toReturn.neg(),
     },
     {
       accountId: fromAccountId,
@@ -83,7 +84,7 @@ export async function sell({
   fromAccountId: string
   ammAccountId: string
   currencyCode: CurrencyCodeType
-  amount: number
+  amount: Decimal
 }): Promise<Array<TransactionItemInput>> {
   const sellingYes = currencyCode === 'YES'
   const oppositeCurrencyCode: CurrencyCodeType = sellingYes ? 'NO' : 'YES'
@@ -91,13 +92,17 @@ export async function sell({
   const y = await getAccountBalance(ammAccountId, 'YES')
   const n = await getAccountBalance(ammAccountId, 'NO')
 
-  let toReturn: number
+  let toReturn: Decimal
   if (sellingYes) {
+    toReturn = amount.times(amount.add(n).add(y)).div(amount.add(n))
+
     // We will solve (y + amount - toReturn) * (n - toReturn) = k = y * n for toReturn
-    toReturn = 0.5 * (n + y + amount - Math.sqrt(Math.pow(n + amount + y, 2) - 4 * n * amount))
+    let totalShares = n.add(y).add(amount)
+    toReturn = totalShares.sub(Decimal.sqrt(totalShares.pow(2).sub(n.times(4).times(amount)))).times(0.5)
   } else {
     // We will solve (y + amount - toReturn) * (n - toReturn) = k = y * n for toReturn
-    toReturn = 0.5 * (n + y + amount - Math.sqrt(Math.pow(n + amount + y, 2) - 4 * y * amount))
+    let totalShares = n.add(y).add(amount)
+    toReturn = totalShares.sub(Decimal.sqrt(totalShares.pow(2).sub(y.times(4).times(amount)))).times(0.5)
   }
 
   return [
@@ -105,7 +110,7 @@ export async function sell({
     {
       accountId: fromAccountId,
       currencyCode: currencyCode,
-      amount: -amount,
+      amount: amount.neg(),
     },
     {
       accountId: ammAccountId,
@@ -127,12 +132,12 @@ export async function sell({
     {
       accountId: ammAccountId,
       currencyCode: currencyCode,
-      amount: -toReturn,
+      amount: toReturn.neg(),
     },
     {
       accountId: ammAccountId,
       currencyCode: oppositeCurrencyCode,
-      amount: -toReturn,
+      amount: toReturn.neg(),
     },
   ]
 }
@@ -143,17 +148,17 @@ export async function costToHitProbability({
   maxAmount,
 }: {
   ammAccountId: string
-  probability: number
-  maxAmount: number
+  probability: Decimal
+  maxAmount: Decimal
 }) {
   const y = await getAccountBalance(ammAccountId, 'YES')
   const n = await getAccountBalance(ammAccountId, 'NO')
 
-  const currentProbability = n / (y + n)
+  const currentProbability = n.div(y.add(n))
 
-  let cost: number
-  let returnedShares: number
-  if (currentProbability < probability) {
+  let cost: Decimal
+  let returnedShares: Decimal
+  if (currentProbability.lt(probability)) {
     // Buying YES, so NO shares will increase, and YES shares will decrease, to maintain the AMM constraint.
     // The amount of added NO shares will be the cost, since that's the number of shares that need to be created.
 
@@ -162,13 +167,13 @@ export async function costToHitProbability({
     // y * n = k = (y - removedYes) * (n + cost)
 
     // Per WolframAlpha, this gives us:
-    cost = Math.sqrt(-(n * y * probability) / (probability - 1)) - n
-    const removedYes = y - (n * y) / (cost + n)
-    returnedShares = removedYes + cost
+    cost = Decimal.sqrt(n.times(y).times(probability).neg().div(probability.sub(1))).sub(n)
+    const removedYes = y.sub(n.times(y).div(cost.add(n)))
+    returnedShares = removedYes.add(cost)
 
-    if (cost > maxAmount) {
+    if (cost.gt(maxAmount)) {
       cost = maxAmount
-      returnedShares = (cost * (cost + n + y)) / (cost + n)
+      returnedShares = cost.times(cost.add(n).add(y)).div(cost.add(n))
     }
   } else {
     // Buying NO, so YES shares will increase, and NO shares will decrease, to maintain the AMM constraint.
@@ -179,13 +184,13 @@ export async function costToHitProbability({
     // y * n = k = (n - removedNo) * (y + cost)
 
     // Per WolframAlpha, this gives us:
-    cost = Math.sqrt(-(n * y * (probability - 1)) / probability) - y
-    const removedNo = n - (n * y) / (cost + y)
-    returnedShares = removedNo + cost
+    cost = Decimal.sqrt(n.times(y).times(probability.sub(1)).neg().div(probability)).sub(y)
+    const removedNo = n.sub(n.times(y).div(cost.add(y)))
+    returnedShares = removedNo.add(cost)
 
-    if (cost > maxAmount) {
+    if (cost.gt(maxAmount)) {
       cost = maxAmount
-      returnedShares = (cost * (cost + n + y)) / (cost + y)
+      returnedShares = cost.times(cost.add(n).add(y)).div(cost.add(y))
     }
   }
 

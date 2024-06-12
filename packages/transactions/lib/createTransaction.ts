@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js'
 import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import db, { TransactionItem, Transaction } from '@play-money/database'
 
@@ -14,25 +15,25 @@ export async function createTransaction({
   type,
   creatorId,
 }: TransactionInput) {
-  const currencySums: { [currencyCode: string]: number } = {}
+  const currencySums: { [currencyCode: string]: Decimal } = {}
 
   transactionItems.forEach((item) => {
     if (!currencySums[item.currencyCode]) {
-      currencySums[item.currencyCode] = 0
+      currencySums[item.currencyCode] = new Decimal(0)
     }
 
-    currencySums[item.currencyCode] += item.amount
+    currencySums[item.currencyCode] = currencySums[item.currencyCode].plus(item.amount)
   })
 
   Object.entries(currencySums).forEach(([currencyCode, sum]) => {
-    if (sum !== 0) {
+    if (!sum.equals(0)) {
       throw new Error(`TransactionItems do not balance for currencyCode ${currencyCode}`)
     }
   })
 
   await Promise.all(
     transactionItems.map(async (item) => {
-      if (item.amount < 0) {
+      if (item.amount.lessThan(0)) {
         const hasEnoughBalance = await checkAccountBalance(item.accountId, item.currencyCode, item.amount)
 
         if (!hasEnoughBalance) {
