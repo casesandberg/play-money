@@ -1,6 +1,6 @@
 import { toBeDeepCloseTo, toMatchCloseTo } from 'jest-matcher-deep-close-to'
 import { getAccountBalance } from '@play-money/accounts/lib/getAccountBalance'
-import { buy, costToHitProbability } from './maniswap-v1'
+import { buy, costToHitProbability, sell } from './maniswap-v1'
 
 expect.extend({ toBeDeepCloseTo, toMatchCloseTo })
 
@@ -62,6 +62,64 @@ describe('maniswap-v1', () => {
         { accountId: 'user1', currencyCode: 'NO', amount: 150 },
       ])
     })
+  })
+
+  // This is the inverse of the test for buying YES
+  it('should return correct transactions for selling YES', async () => {
+    // Current probability ~= 0.80
+    jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
+      if (currencyCode === 'YES') return 85.71
+      if (currencyCode === 'NO') return 350
+      return 0
+    })
+
+    const transactions = await sell({
+      fromAccountId: 'user1',
+      ammAccountId: 'amm1',
+      currencyCode: 'YES',
+      amount: 64.29,
+    })
+
+    expect(transactions).toMatchCloseTo(
+      [
+        { accountId: 'user1', currencyCode: 'YES', amount: -64.29 },
+        { accountId: 'amm1', currencyCode: 'YES', amount: 64.29 },
+        { accountId: 'user1', currencyCode: 'YES', amount: 50 },
+        { accountId: 'user1', currencyCode: 'NO', amount: 50 },
+        { accountId: 'amm1', currencyCode: 'YES', amount: -50 },
+        { accountId: 'amm1', currencyCode: 'NO', amount: -50 },
+      ],
+      2
+    )
+  })
+
+  // This is the inverse of the test for buying NO
+  it('should return correct transactions for selling NO', async () => {
+    // Current probability ~= 0.57
+    jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
+      if (currencyCode === 'YES') return 150
+      if (currencyCode === 'NO') return 200
+      return 0
+    })
+
+    const transactions = await sell({
+      fromAccountId: 'user1',
+      ammAccountId: 'amm1',
+      currencyCode: 'NO',
+      amount: 150,
+    })
+
+    expect(transactions).toMatchCloseTo(
+      [
+        { accountId: 'user1', currencyCode: 'NO', amount: -150 },
+        { accountId: 'amm1', currencyCode: 'NO', amount: 150 },
+        { accountId: 'user1', currencyCode: 'NO', amount: 50 },
+        { accountId: 'user1', currencyCode: 'YES', amount: 50 },
+        { accountId: 'amm1', currencyCode: 'NO', amount: -50 },
+        { accountId: 'amm1', currencyCode: 'YES', amount: -50 },
+      ],
+      2
+    )
   })
 
   describe('costToHitProbability', () => {

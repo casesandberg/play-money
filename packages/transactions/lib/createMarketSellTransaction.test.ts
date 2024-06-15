@@ -41,8 +41,8 @@ describe('createMarketSellTransaction', () => {
 
   it('should call createTransaction with approperate transactionItems', async () => {
     jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
-      if (currencyCode === 'YES') return 100
-      if (currencyCode === 'NO') return 300
+      if (currencyCode === 'YES') return 85.71
+      if (currencyCode === 'NO') return 350
       return 0
     })
 
@@ -82,52 +82,52 @@ describe('createMarketSellTransaction', () => {
             accountId: 'amm-1-account',
           },
           {
-            amount: expect.closeTo(-64.29, 2), // TODO: update with real conversion value
+            amount: expect.closeTo(50, 2),
+            currencyCode: 'YES',
+            accountId: 'user-1-account',
+          },
+          {
+            amount: expect.closeTo(50, 2),
+            currencyCode: 'NO',
+            accountId: 'user-1-account',
+          },
+          {
+            amount: expect.closeTo(-50, 2),
             currencyCode: 'YES',
             accountId: 'amm-1-account',
           },
           {
-            amount: expect.closeTo(-64.29, 2), // TODO: update with real conversion value
+            amount: expect.closeTo(-50, 2),
             currencyCode: 'NO',
             accountId: 'amm-1-account',
           },
           {
-            amount: expect.closeTo(64.29, 2), // TODO: update with real conversion value
+            amount: expect.closeTo(-50, 2),
             currencyCode: 'YES',
             accountId: 'user-1-account',
           },
           {
-            amount: expect.closeTo(64.29, 2), // TODO: update with real conversion value
+            amount: expect.closeTo(-50, 2),
             currencyCode: 'NO',
             accountId: 'user-1-account',
           },
           {
-            amount: expect.closeTo(-64.29, 2), // TODO: update with real conversion value
-            currencyCode: 'YES',
-            accountId: 'user-1-account',
-          },
-          {
-            amount: expect.closeTo(-64.29, 2), // TODO: update with real conversion value
-            currencyCode: 'NO',
-            accountId: 'user-1-account',
-          },
-          {
-            amount: expect.closeTo(64.29, 2), // TODO: update with real conversion value
+            amount: expect.closeTo(50, 2),
             currencyCode: 'YES',
             accountId: 'EXCHANGER',
           },
           {
-            amount: expect.closeTo(64.29, 2), // TODO: update with real conversion value
+            amount: expect.closeTo(50, 2),
             currencyCode: 'NO',
             accountId: 'EXCHANGER',
           },
           {
-            amount: expect.closeTo(-64.29, 2), // TODO: update with real conversion value
+            amount: expect.closeTo(-50, 2),
             currencyCode: 'PRIMARY',
             accountId: 'EXCHANGER',
           },
           {
-            amount: expect.closeTo(64.29, 2), // TODO: update with real conversion value
+            amount: expect.closeTo(50, 2),
             currencyCode: 'PRIMARY',
             accountId: 'user-1-account',
           },

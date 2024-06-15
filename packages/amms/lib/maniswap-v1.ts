@@ -85,10 +85,20 @@ export async function sell({
   currencyCode: CurrencyCodeType
   amount: number
 }): Promise<Array<TransactionItemInput>> {
-  const buyingYes = currencyCode === 'YES'
-  const oppositeCurrencyCode: CurrencyCodeType = buyingYes ? 'NO' : 'YES'
+  const sellingYes = currencyCode === 'YES'
+  const oppositeCurrencyCode: CurrencyCodeType = sellingYes ? 'NO' : 'YES'
 
-  // TODO: This is just a stub which returns an equal amount of YES and NO shares.
+  const y = await getAccountBalance(ammAccountId, 'YES')
+  const n = await getAccountBalance(ammAccountId, 'NO')
+
+  let toReturn: number
+  if (sellingYes) {
+    // We will solve (y + amount - toReturn) * (n - toReturn) = k = y * n for toReturn
+    toReturn = 0.5 * (n + y + amount - Math.sqrt(Math.pow(n + amount + y, 2) - 4 * n * amount))
+  } else {
+    // We will solve (y + amount - toReturn) * (n - toReturn) = k = y * n for toReturn
+    toReturn = 0.5 * (n + y + amount - Math.sqrt(Math.pow(n + amount + y, 2) - 4 * y * amount))
+  }
 
   return [
     // Giving the shares to the AMM.
@@ -107,22 +117,22 @@ export async function sell({
     {
       accountId: fromAccountId,
       currencyCode: currencyCode,
-      amount: amount,
+      amount: toReturn,
     },
     {
       accountId: fromAccountId,
       currencyCode: oppositeCurrencyCode,
-      amount: amount,
+      amount: toReturn,
     },
     {
       accountId: ammAccountId,
       currencyCode: currencyCode,
-      amount: -amount,
+      amount: -toReturn,
     },
     {
       accountId: ammAccountId,
       currencyCode: oppositeCurrencyCode,
-      amount: -amount,
+      amount: -toReturn,
     },
   ]
 }
