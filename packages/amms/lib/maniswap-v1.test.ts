@@ -1,6 +1,7 @@
 import Decimal from 'decimal.js'
 import { toBeDeepCloseTo, toMatchCloseTo } from 'jest-matcher-deep-close-to'
 import { getAccountBalance } from '@play-money/accounts/lib/getAccountBalance'
+import '@play-money/config/jest/jest-setup'
 import { buy, costToHitProbability, sell } from './maniswap-v1'
 
 expect.extend({ toBeDeepCloseTo, toMatchCloseTo })
@@ -78,17 +79,14 @@ describe('maniswap-v1', () => {
       amount: new Decimal(64.29),
     })
 
-    expect(transactions).toMatchCloseTo(
-      [
-        { accountId: 'user1', currencyCode: 'YES', amount: -64.29 },
-        { accountId: 'amm1', currencyCode: 'YES', amount: 64.29 },
-        { accountId: 'user1', currencyCode: 'YES', amount: 50 },
-        { accountId: 'user1', currencyCode: 'NO', amount: 50 },
-        { accountId: 'amm1', currencyCode: 'YES', amount: -50 },
-        { accountId: 'amm1', currencyCode: 'NO', amount: -50 },
-      ],
-      2
-    )
+    expect(transactions).toEqual([
+      { accountId: 'user1', currencyCode: 'YES', amount: new Decimal(-64.29) },
+      { accountId: 'amm1', currencyCode: 'YES', amount: new Decimal(64.29) },
+      { accountId: 'user1', currencyCode: 'YES', amount: expect.closeToDecimal(50) },
+      { accountId: 'user1', currencyCode: 'NO', amount: expect.closeToDecimal(50) },
+      { accountId: 'amm1', currencyCode: 'YES', amount: expect.closeToDecimal(-50) },
+      { accountId: 'amm1', currencyCode: 'NO', amount: expect.closeToDecimal(-50) },
+    ])
   })
 
   // This is the inverse of the test for buying NO
@@ -107,17 +105,14 @@ describe('maniswap-v1', () => {
       amount: new Decimal(150),
     })
 
-    expect(transactions).toMatchCloseTo(
-      [
-        { accountId: 'user1', currencyCode: 'NO', amount: -150 },
-        { accountId: 'amm1', currencyCode: 'NO', amount: 150 },
-        { accountId: 'user1', currencyCode: 'NO', amount: 50 },
-        { accountId: 'user1', currencyCode: 'YES', amount: 50 },
-        { accountId: 'amm1', currencyCode: 'NO', amount: -50 },
-        { accountId: 'amm1', currencyCode: 'YES', amount: -50 },
-      ],
-      2
-    )
+    expect(transactions).toEqual([
+      { accountId: 'user1', currencyCode: 'NO', amount: new Decimal(-150) },
+      { accountId: 'amm1', currencyCode: 'NO', amount: new Decimal(150) },
+      { accountId: 'user1', currencyCode: 'NO', amount: new Decimal(50) },
+      { accountId: 'user1', currencyCode: 'YES', amount: new Decimal(50) },
+      { accountId: 'amm1', currencyCode: 'NO', amount: new Decimal(-50) },
+      { accountId: 'amm1', currencyCode: 'YES', amount: new Decimal(-50) },
+    ])
   })
 
   describe('costToHitProbability', () => {

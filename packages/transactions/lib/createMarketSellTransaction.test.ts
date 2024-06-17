@@ -86,16 +86,6 @@ describe('createMarketSellTransaction', () => {
           {
             amount: expect.closeToDecimal(50),
             currencyCode: 'YES',
-            accountId: 'amm-1-account',
-          },
-          {
-            amount: expect.closeToDecimal(50),
-            currencyCode: 'NO',
-            accountId: 'amm-1-account',
-          },
-          {
-            amount: expect.closeToDecimal(50),
-            currencyCode: 'YES',
             accountId: 'user-1-account',
           },
           {
@@ -104,12 +94,22 @@ describe('createMarketSellTransaction', () => {
             accountId: 'user-1-account',
           },
           {
-            amount: expect.closeToDecimal(50),
+            amount: expect.closeToDecimal(-50),
+            currencyCode: 'YES',
+            accountId: 'amm-1-account',
+          },
+          {
+            amount: expect.closeToDecimal(-50),
+            currencyCode: 'NO',
+            accountId: 'amm-1-account',
+          },
+          {
+            amount: expect.closeToDecimal(-50),
             currencyCode: 'YES',
             accountId: 'user-1-account',
           },
           {
-            amount: expect.closeToDecimal(50),
+            amount: expect.closeToDecimal(-50),
             currencyCode: 'NO',
             accountId: 'user-1-account',
           },
@@ -124,7 +124,7 @@ describe('createMarketSellTransaction', () => {
             accountId: 'EXCHANGER',
           },
           {
-            amount: expect.closeToDecimal(50),
+            amount: expect.closeToDecimal(-50),
             currencyCode: 'PRIMARY',
             accountId: 'EXCHANGER',
           },
