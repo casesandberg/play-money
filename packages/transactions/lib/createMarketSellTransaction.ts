@@ -3,7 +3,7 @@ import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import { costToHitProbability, sell } from '@play-money/amms/lib/maniswap-v1'
 import { createTransaction, TransactionItemInput } from './createTransaction'
-import { convertMarketSharesToPrimary, convertPrimaryToMarketShares } from './exchanger'
+import { convertMarketSharesToPrimary } from './exchanger'
 
 type MarketSellTransactionInput = {
   userId: string
@@ -62,7 +62,7 @@ export async function createMarketSellTransaction({
 
   const exchangerTransactions = await convertMarketSharesToPrimary({
     fromAccountId: userAccount.id,
-    amount,
+    amount: outstandingShares,
   })
   accumulatedTransactionItems.push(...exchangerTransactions)
 
