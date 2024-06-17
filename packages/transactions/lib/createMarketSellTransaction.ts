@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
@@ -7,7 +8,7 @@ import { convertMarketSharesToPrimary } from './exchanger'
 
 type MarketSellTransactionInput = {
   userId: string
-  amount: number // in shares
+  amount: Decimal // in shares
   sellCurrencyCode: 'YES' | 'NO'
   marketId: string
 }
@@ -24,13 +25,13 @@ export async function createMarketSellTransaction({
   // When selling shares, the number of shares will decrease some by filling amm/limit orders.
   // We need an equilivant number of yes and no shares to get money back out of the exchanger.
   let outstandingShares = amount
-  let oppositeOutstandingShares = 0
+  let oppositeOutstandingShares = new Decimal(0)
   let oppositeCurrencyCode = sellCurrencyCode === 'YES' ? 'NO' : 'YES'
   let accumulatedTransactionItems: Array<TransactionItemInput> = []
   // To account for floating point errors, we will limit the number of loops to a sane number.
   let maximumSaneLoops = 100
 
-  while (outstandingShares !== oppositeOutstandingShares && maximumSaneLoops > 0) {
+  while (!outstandingShares.equals(oppositeOutstandingShares) && maximumSaneLoops > 0) {
     let closestLimitOrder = {} as any // TODO: Implement limit order matching
 
     const amountToSell = closestLimitOrder?.probability
@@ -51,11 +52,18 @@ export async function createMarketSellTransaction({
     })
 
     accumulatedTransactionItems.push(...ammTransactions)
-    outstandingShares += _.sumBy(ammTransactions, (item) =>
-      item.currencyCode === sellCurrencyCode && item.accountId === userAccount.id ? item.amount : 0
+    const transactionsByUserOfSellCurrency = ammTransactions.filter(
+      (item) => item.currencyCode === sellCurrencyCode && item.accountId === userAccount.id
     )
-    oppositeOutstandingShares += _.sumBy(ammTransactions, (item) =>
-      item.currencyCode === oppositeCurrencyCode && item.accountId === userAccount.id ? item.amount : 0
+    outstandingShares = outstandingShares.add(
+      transactionsByUserOfSellCurrency.reduce((sum, item) => sum.add(item.amount), new Decimal(0))
+    )
+
+    const transactionsByUserOfOppositeCurrency = ammTransactions.filter(
+      (item) => item.currencyCode === oppositeCurrencyCode && item.accountId === userAccount.id
+    )
+    oppositeOutstandingShares = oppositeOutstandingShares.add(
+      transactionsByUserOfOppositeCurrency.reduce((sum, item) => sum.add(item.amount), new Decimal(0))
     )
     maximumSaneLoops -= 1
   }

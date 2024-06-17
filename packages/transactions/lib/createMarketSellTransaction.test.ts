@@ -1,7 +1,9 @@
+import Decimal from 'decimal.js'
 import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import { getAccountBalance } from '@play-money/accounts/lib/getAccountBalance'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
+import '@play-money/config/jest/jest-setup'
 import { mockAccount } from '@play-money/database/mocks'
 import { getUserById } from '@play-money/users/lib/getUserById'
 import { createMarketSellTransaction } from './createMarketSellTransaction'
@@ -41,9 +43,9 @@ describe('createMarketSellTransaction', () => {
 
   it('should call createTransaction with approperate transactionItems', async () => {
     jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
-      if (currencyCode === 'YES') return 85.71
-      if (currencyCode === 'NO') return 350
-      return 0
+      if (currencyCode === 'YES') return new Decimal(85.71)
+      if (currencyCode === 'NO') return new Decimal(350)
+      return new Decimal(0)
     })
 
     jest.mocked(checkAccountBalance).mockResolvedValue(true)
@@ -63,7 +65,7 @@ describe('createMarketSellTransaction', () => {
 
     await createMarketSellTransaction({
       userId: 'user-1',
-      amount: 64.29,
+      amount: new Decimal(64.29),
       sellCurrencyCode: 'YES',
       marketId: 'market-1',
     })
@@ -72,62 +74,62 @@ describe('createMarketSellTransaction', () => {
       expect.objectContaining({
         transactionItems: expect.arrayContaining([
           {
-            amount: expect.closeTo(-64.29, 2),
+            amount: expect.closeToDecimal(-64.29),
             currencyCode: 'YES',
             accountId: 'user-1-account',
           },
           {
-            amount: expect.closeTo(64.29, 2),
-            currencyCode: 'YES',
-            accountId: 'amm-1-account',
-          },
-          {
-            amount: expect.closeTo(50, 2),
-            currencyCode: 'YES',
-            accountId: 'user-1-account',
-          },
-          {
-            amount: expect.closeTo(50, 2),
-            currencyCode: 'NO',
-            accountId: 'user-1-account',
-          },
-          {
-            amount: expect.closeTo(-50, 2),
+            amount: expect.closeToDecimal(64.29),
             currencyCode: 'YES',
             accountId: 'amm-1-account',
           },
           {
-            amount: expect.closeTo(-50, 2),
-            currencyCode: 'NO',
-            accountId: 'amm-1-account',
-          },
-          {
-            amount: expect.closeTo(-50, 2),
+            amount: expect.closeToDecimal(50),
             currencyCode: 'YES',
             accountId: 'user-1-account',
           },
           {
-            amount: expect.closeTo(-50, 2),
+            amount: expect.closeToDecimal(50),
             currencyCode: 'NO',
             accountId: 'user-1-account',
           },
           {
-            amount: expect.closeTo(50, 2),
+            amount: expect.closeToDecimal(-50),
+            currencyCode: 'YES',
+            accountId: 'amm-1-account',
+          },
+          {
+            amount: expect.closeToDecimal(-50),
+            currencyCode: 'NO',
+            accountId: 'amm-1-account',
+          },
+          {
+            amount: expect.closeToDecimal(-50),
+            currencyCode: 'YES',
+            accountId: 'user-1-account',
+          },
+          {
+            amount: expect.closeToDecimal(-50),
+            currencyCode: 'NO',
+            accountId: 'user-1-account',
+          },
+          {
+            amount: expect.closeToDecimal(50),
             currencyCode: 'YES',
             accountId: 'EXCHANGER',
           },
           {
-            amount: expect.closeTo(50, 2),
+            amount: expect.closeToDecimal(50),
             currencyCode: 'NO',
             accountId: 'EXCHANGER',
           },
           {
-            amount: expect.closeTo(-50, 2),
+            amount: expect.closeToDecimal(-50),
             currencyCode: 'PRIMARY',
             accountId: 'EXCHANGER',
           },
           {
-            amount: expect.closeTo(50, 2),
+            amount: expect.closeToDecimal(50),
             currencyCode: 'PRIMARY',
             accountId: 'user-1-account',
           },

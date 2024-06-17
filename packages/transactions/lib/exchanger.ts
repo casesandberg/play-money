@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js'
 import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import { TransactionItemInput } from './createTransaction'
 
@@ -6,9 +7,9 @@ export async function convertPrimaryToMarketShares({
   amount,
 }: {
   fromAccountId: string
-  amount: number
+  amount: Decimal
 }): Promise<Array<TransactionItemInput>> {
-  if (amount <= 0) {
+  if (amount.lte(0)) {
     throw new Error('Exchange amount must be greater than 0')
   }
 
@@ -23,7 +24,7 @@ export async function convertPrimaryToMarketShares({
     {
       accountId: fromAccountId,
       currencyCode: 'PRIMARY',
-      amount: -amount,
+      amount: amount.neg(),
     },
     {
       accountId: 'EXCHANGER',
@@ -33,12 +34,12 @@ export async function convertPrimaryToMarketShares({
     {
       accountId: 'EXCHANGER',
       currencyCode: 'YES',
-      amount: -sharesToCreate,
+      amount: sharesToCreate.neg(),
     },
     {
       accountId: 'EXCHANGER',
       currencyCode: 'NO',
-      amount: -sharesToCreate,
+      amount: sharesToCreate.neg(),
     },
     {
       accountId: fromAccountId,
@@ -58,9 +59,9 @@ export async function convertMarketSharesToPrimary({
   amount,
 }: {
   fromAccountId: string
-  amount: number
+  amount: Decimal
 }): Promise<Array<TransactionItemInput>> {
-  if (amount <= 0) {
+  if (amount.lte(0)) {
     throw new Error('Exchange amount must be greater than 0')
   }
 
@@ -74,12 +75,12 @@ export async function convertMarketSharesToPrimary({
     {
       accountId: fromAccountId,
       currencyCode: 'YES',
-      amount: -amount,
+      amount: amount.neg(),
     },
     {
       accountId: fromAccountId,
       currencyCode: 'NO',
-      amount: -amount,
+      amount: amount.neg(),
     },
     {
       accountId: 'EXCHANGER',
@@ -100,7 +101,7 @@ export async function convertMarketSharesToPrimary({
     {
       accountId: 'EXCHANGER',
       currencyCode: 'PRIMARY',
-      amount: -amount,
+      amount: amount.neg(),
     },
   ]
 }

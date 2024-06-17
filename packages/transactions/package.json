@@ -10,6 +10,7 @@
   "dependencies": {
     "@play-money/accounts": "*",
     "@play-money/amms": "*",
+    "decimal.js": "^10.4.3",
     "lodash": "^4.17.21",
     "zod": "^3.23.5"
   },

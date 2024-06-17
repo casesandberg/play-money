@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Prisma } from '@prisma/client'
 import { CurrencyCodeSchema } from '../inputTypeSchemas/CurrencyCodeSchema'
 
 /////////////////////////////////////////
@@ -10,7 +11,7 @@ export const TransactionItemSchema = z.object({
   id: z.string().cuid(),
   accountId: z.string(),
   transactionId: z.string(),
-  amount: z.number(),
+  amount: z.instanceof(Prisma.Decimal, { message: "Field 'amount' must be a Decimal. Location: ['Models', 'TransactionItem']"}),
   createdAt: z.coerce.date(),
 })
 

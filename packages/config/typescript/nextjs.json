@@ -3,6 +3,7 @@
   "display": "Next.js",
   "extends": "./base.json",
   "compilerOptions": {
+    "baseUrl": ".",
     "plugins": [{ "name": "next" }],
     "allowJs": true,
     "declaration": false,
@@ -15,6 +16,6 @@
     "strict": true,
     "target": "es5"
   },
-  "include": ["src", "next-env.d.ts"],
+  "include": ["src", "next-env.d.ts", "../config/typescript/*.d.ts"],
   "exclude": ["node_modules"]
 }

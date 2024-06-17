@@ -15,3 +15,5 @@ export { QueryModeSchema } from './QueryModeSchema';
 export { NullsOrderSchema } from './NullsOrderSchema';
 export { CommentEntityTypeSchema } from './CommentEntityTypeSchema';
 export { CurrencyCodeSchema } from './CurrencyCodeSchema';
+export { DecimalJsLikeSchema } from './DecimalJsLikeSchema';
+export { isValidDecimalInput } from './isValidDecimalInput';

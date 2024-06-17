@@ -160,7 +160,7 @@ model TransactionItem {
   currency      Currency     @relation(fields: [currencyCode], references: [code])
   transactionId String
   transaction   Transaction  @relation(fields: [transactionId], references: [id])
-  amount        Float
+  amount        Decimal
   createdAt     DateTime     @default(now())
 }
 
