@@ -51,5 +51,6 @@ module.exports = {
     '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
     'no-prototype-builtins': 'off',
     'import/no-named-as-default': 'off',
+    'unicorn/filename-case': 'off',
   },
 }

@@ -2,7 +2,7 @@ import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
 import { MarketSchema } from '@play-money/database'
 
 export default createSchema({
-  POST: {
+  post: {
     requestBody: MarketSchema.pick({
       question: true,
       description: true,

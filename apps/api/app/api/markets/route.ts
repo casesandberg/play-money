@@ -6,7 +6,7 @@ import schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
-export async function POST(req: Request): Promise<SchemaResponse<typeof schema.POST.responses>> {
+export async function POST(req: Request): Promise<SchemaResponse<typeof schema.post.responses>> {
   try {
     const session = await auth()
 
@@ -15,7 +15,7 @@ export async function POST(req: Request): Promise<SchemaResponse<typeof schema.P
     }
 
     const body = (await req.json()) as unknown
-    const basicMarket = schema.POST.requestBody.parse(body)
+    const basicMarket = schema.post.requestBody.parse(body)
     const newMarket = await createMarket(
       basicMarket.question,
       basicMarket.description,

@@ -12,9 +12,9 @@ export const dynamic = 'force-dynamic'
 export async function GET(
   _req: Request,
   { params }: { params: unknown }
-): Promise<SchemaResponse<typeof schema.GET.responses>> {
+): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
-    const { id } = schema.GET.parameters.parse(params)
+    const { id } = schema.get.parameters.parse(params)
 
     const comment = await getComment({ id })
 
@@ -32,7 +32,7 @@ export async function GET(
 export async function PATCH(
   req: Request,
   { params }: { params: unknown }
-): Promise<SchemaResponse<typeof schema.PATCH.responses>> {
+): Promise<SchemaResponse<typeof schema.patch.responses>> {
   try {
     const session = await auth()
 
@@ -40,9 +40,9 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = schema.PATCH.parameters.parse(params)
+    const { id } = schema.patch.parameters.parse(params)
     const body = (await req.json()) as unknown
-    const { content } = schema.PATCH.requestBody.parse(body)
+    const { content } = schema.patch.requestBody.parse(body)
 
     const comment = await getComment({ id })
     if (comment.authorId !== session.user.id) {
@@ -65,7 +65,7 @@ export async function PATCH(
 export async function DELETE(
   _req: Request,
   { params }: { params: unknown }
-): Promise<SchemaResponse<typeof schema.DELETE.responses>> {
+): Promise<SchemaResponse<typeof schema.delete.responses>> {
   try {
     const session = await auth()
 
@@ -73,7 +73,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = schema.DELETE.parameters.parse(params)
+    const { id } = schema.delete.parameters.parse(params)
 
     const comment = await getComment({ id })
     if (comment.authorId !== session.user.id) {

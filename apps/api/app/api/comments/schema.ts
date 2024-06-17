@@ -3,7 +3,7 @@ import { CreateSchema } from '@play-money/comments/lib/createComment'
 import { CommentSchema } from '@play-money/database'
 
 export default createSchema({
-  POST: {
+  post: {
     requestBody: CreateSchema.omit({ authorId: true }),
     responses: {
       200: CommentSchema,

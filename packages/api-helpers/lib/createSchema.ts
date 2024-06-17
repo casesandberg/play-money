@@ -3,7 +3,7 @@ import z from 'zod'
 
 export type SchemaResponse<Res extends z.ZodObject<any>> = NextResponse<z.infer<Res>>
 
-type SwaggerPathSpec = {
+export type SwaggerPathSpec = {
   [key: string]: {
     parameters?: z.ZodObject<any>
     requestBody?: z.ZodObject<any>
@@ -38,6 +38,7 @@ export function createSchema<Spec extends SwaggerPathSpec>(spec: Spec): Transfor
       result[method] = {
         ...rest,
         responses: flattenToArray(responses),
+        _originalResponses: responses,
       }
     }
   }

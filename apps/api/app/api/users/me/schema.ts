@@ -3,14 +3,14 @@ import { UserProfileModel } from '@play-money/users/lib/sanitizeUser'
 import { UpdateSchema } from '@play-money/users/lib/updateUserById'
 
 export default createSchema({
-  GET: {
+  get: {
     responses: {
       200: UserProfileModel,
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },
   },
-  PATCH: {
+  patch: {
     requestBody: UpdateSchema,
     responses: {
       200: UserProfileModel,

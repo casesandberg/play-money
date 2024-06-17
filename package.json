@@ -36,5 +36,9 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-react": "^5.17.14"
+  }
 }

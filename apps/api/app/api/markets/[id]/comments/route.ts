@@ -9,9 +9,9 @@ export const dynamic = 'force-dynamic'
 export async function GET(
   _req: Request,
   { params }: { params: unknown }
-): Promise<SchemaResponse<typeof schema.GET.responses>> {
+): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
-    const { id } = schema.GET.parameters.parse(params)
+    const { id } = schema.get.parameters.parse(params)
 
     const comments = await getCommentsOnMarket({ marketId: id })
 

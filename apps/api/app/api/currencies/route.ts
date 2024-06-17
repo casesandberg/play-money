@@ -5,7 +5,7 @@ import type schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(_req: Request): Promise<SchemaResponse<typeof schema.GET.responses>> {
+export async function GET(_req: Request): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
     const currencies = await getCurrencies()
 

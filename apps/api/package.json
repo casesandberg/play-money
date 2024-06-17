@@ -10,6 +10,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^7.0.0",
     "@play-money/api-helpers": "*",
     "@play-money/auth": "*",
     "@play-money/comments": "*",
@@ -19,9 +20,12 @@
     "@play-money/search": "*",
     "@play-money/users": "*",
     "bcryptjs": "^2.4.3",
+    "glob": "^10.4.1",
     "next": "^14.1.1",
+    "next-swagger-zod": "*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "swagger-ui-react": "^5.17.14",
     "unique-username-generator": "^1.3.0",
     "zod": "^3.23.8"
   },
@@ -31,6 +35,7 @@
     "@types/node": "^20.11.24",
     "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",
+    "@types/swagger-ui-react": "^4.18.3",
     "autoprefixer": "^10.4.18",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
