@@ -94,8 +94,6 @@ export async function sell({
 
   let toReturn: Decimal
   if (sellingYes) {
-    toReturn = amount.times(amount.add(n).add(y)).div(amount.add(n))
-
     // We will solve (y + amount - toReturn) * (n - toReturn) = k = y * n for toReturn
     let totalShares = n.add(y).add(amount)
     toReturn = totalShares.sub(Decimal.sqrt(totalShares.pow(2).sub(n.times(4).times(amount)))).times(0.5)
