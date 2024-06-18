@@ -5,9 +5,9 @@ import React from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
 import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
 import { Table, TableBody, TableRow, TableHeader, TableHead, TableCell } from '@play-money/ui/table'
-import { Market } from './MarketOverviewPage'
+import { ExtendedMarket } from './MarketOverviewPage'
 
-export function MarketPositionsPage({ market }: { market: Market }) {
+export function MarketPositionsPage({ market }: { market: ExtendedMarket }) {
   const simplyIfTwoOptions = market.options.length === 2
 
   return (

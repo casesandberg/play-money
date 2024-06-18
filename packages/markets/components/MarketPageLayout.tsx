@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader } from '@play-money/ui/card'
 import { Combobox } from '@play-money/ui/combobox'
 import { Input } from '@play-money/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@play-money/ui/tabs'
-import { Market } from './MarketOverviewPage'
+import { ExtendedMarket } from './MarketOverviewPage'
 
 // TODO: @casesandberg Extract and create form component
 
@@ -16,7 +16,7 @@ export function MarketPageLayout({
   children,
   activeOptionId,
 }: {
-  market: Market
+  market: ExtendedMarket
   children: React.ReactNode
   activeOptionId: string
 }) {

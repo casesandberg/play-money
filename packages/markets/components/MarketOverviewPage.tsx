@@ -4,8 +4,7 @@ import { format } from 'date-fns'
 import { PanelRightClose } from 'lucide-react'
 import React from 'react'
 import { LineChart, Line, ResponsiveContainer } from 'recharts'
-import { z } from 'zod'
-import { Market, MarketOption, MarketSchema } from '@play-money/database'
+import { Market, MarketOption } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
 import { ReadMoreEditor } from '@play-money/ui/editor'
@@ -52,24 +51,13 @@ const data = [
   },
 ]
 
-// TEMP
-const schema = MarketSchema.extend({
-  options: z.array(
-    z.object({
-      id: z.string().cuid(),
-      name: z.string(),
-      probability: z.number(),
-      volume: z.number(),
-      color: z.string(),
-    })
-  ),
-})
+export type ExtendedMarket = Market & { options: Array<MarketOption & { color: string }> }
 
 export function MarketOverviewPage({
   market,
   renderComments,
 }: {
-  market: Market & { options: Array<MarketOption & { color: string }> }
+  market: ExtendedMarket
   renderComments: React.ReactNode
 }) {
   const [option, setOption] = useSearchParam('option')
@@ -119,13 +107,13 @@ export function MarketOverviewPage({
                   <div className="font-semibold leading-none">{option.name}</div>
                   <div className="flex flex-row items-center gap-2">
                     <div className="text-xs font-semibold leading-none" style={{ color: option.color }}>
-                      {Math.round(option.probability * 100)}%
+                      {Math.round(0.5 * 100)}%
                     </div>
                     <Progress
                       className="h-2 max-w-[200px]"
                       data-color={option.color}
                       indicatorStyle={{ backgroundColor: option.color }}
-                      value={option.probability * 100}
+                      value={0.5 * 100}
                     />
                   </div>
                 </div>
