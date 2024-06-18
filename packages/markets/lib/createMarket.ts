@@ -1,7 +1,20 @@
-import { z } from 'zod'
-import db, { MarketSchema } from '@play-money/database'
+import db, { MarketSchema, MarketOption, MarketOptionSchema } from '@play-money/database'
 
-export async function createMarket(question: string, description: string, closeDate: Date | null, createdBy: string) {
+type PartialOptions = Pick<MarketOption, 'name' | 'currencyCode'>
+
+export async function createMarket({
+  question,
+  description,
+  closeDate,
+  createdBy,
+  options,
+}: {
+  question: string
+  description: string
+  closeDate: Date | null
+  createdBy: string
+  options?: Array<PartialOptions>
+}) {
   let slug = slugify(question)
   const marketData = MarketSchema.omit({ id: true }).parse({
     question,
@@ -13,8 +26,38 @@ export async function createMarket(question: string, description: string, closeD
     createdAt: new Date(),
     createdBy,
   })
+
+  let parsedOptions: Array<PartialOptions>
+
+  if (options?.length) {
+    parsedOptions = options.map((data) => MarketOptionSchema.pick({ name: true, currencyCode: true }).parse(data))
+  } else {
+    parsedOptions = [
+      {
+        name: 'Yes',
+        currencyCode: 'YES',
+      },
+      {
+        name: 'NO',
+        currencyCode: 'NO',
+      },
+    ]
+  }
+
   const createdMarket = await db.market.create({
-    data: marketData,
+    data: {
+      ...marketData,
+      options: {
+        createMany: {
+          data: parsedOptions.map((option) => ({
+            name: option.name,
+            currencyCode: option.currencyCode,
+            updatedAt: new Date(),
+            createdAt: new Date(),
+          })),
+        },
+      },
+    },
   })
 
   return createdMarket

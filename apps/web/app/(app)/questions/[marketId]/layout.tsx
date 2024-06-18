@@ -11,7 +11,7 @@ export default async function AppQuestionsLayout({
   searchParams?: { option: string }
 }) {
   const market = await getMarket({ id: params.marketId })
-  const activeOptionId = searchParams?.option || market.options[0].id
+  const activeOptionId = searchParams?.option || market.options[0]?.id || ''
 
   return (
     <MarketPageLayout activeOptionId={activeOptionId} market={market}>

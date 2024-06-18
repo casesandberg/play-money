@@ -22,7 +22,7 @@ export function MarketPageLayout({
 }) {
   const [option, setOption] = useSearchParam('option')
   return (
-    <main className="mx-auto flex max-w-screen-lg flex-row items-start gap-8 p-4 sm:px-6 sm:py-0 md:gap-8">
+    <main className="mx-auto flex max-w-screen-lg flex-1 flex-row items-start gap-8 p-4 sm:px-6 sm:py-0 md:gap-8">
       {children}
 
       <Card className="max-w-80 flex-1">

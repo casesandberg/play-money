@@ -1,5 +1,6 @@
+import { z } from 'zod'
 import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
-import { MarketSchema } from '@play-money/database'
+import { MarketOptionSchema, MarketSchema } from '@play-money/database'
 
 export default createSchema({
   POST: {
@@ -7,6 +8,13 @@ export default createSchema({
       question: true,
       description: true,
       closeDate: true,
+    }).extend({
+      options: z.array(
+        MarketOptionSchema.pick({
+          name: true,
+          currencyCode: true,
+        })
+      ),
     }),
     responses: {
       200: MarketSchema,
