@@ -4,8 +4,7 @@ import { format } from 'date-fns'
 import { PanelRightClose } from 'lucide-react'
 import React from 'react'
 import { LineChart, Line, ResponsiveContainer } from 'recharts'
-import { z } from 'zod'
-import { MarketSchema } from '@play-money/database'
+import { Market, MarketOption } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
 import { ReadMoreEditor } from '@play-money/ui/editor'
@@ -52,23 +51,17 @@ const data = [
   },
 ]
 
-// TEMP
-const schema = MarketSchema.extend({
-  options: z.array(
-    z.object({
-      id: z.string().cuid(),
-      name: z.string(),
-      probability: z.number(),
-      volume: z.number(),
-      color: z.string(),
-    })
-  ),
-})
-export type Market = z.infer<typeof schema>
+export type ExtendedMarket = Market & { options: Array<MarketOption & { color: string }> }
 
-export function MarketOverviewPage({ market, renderComments }: { market: Market; renderComments: React.ReactNode }) {
+export function MarketOverviewPage({
+  market,
+  renderComments,
+}: {
+  market: ExtendedMarket
+  renderComments: React.ReactNode
+}) {
   const [option, setOption] = useSearchParam('option')
-  const activeOptionId = option || market.options[0].id
+  const activeOptionId = option || market.options[0]?.id || ''
 
   return (
     <Card className="flex-1">
@@ -88,7 +81,7 @@ export function MarketOverviewPage({ market, renderComments }: { market: Market;
                 type="step"
                 dot={false}
                 dataKey="probability"
-                stroke={market.options[0].color}
+                stroke={market.options[0]?.color}
                 strokeWidth={2.5}
                 strokeLinejoin="round"
               />
@@ -96,44 +89,48 @@ export function MarketOverviewPage({ market, renderComments }: { market: Market;
           </ResponsiveContainer>
         </Card>
       </CardContent>
-      <CardContent>
-        <Card>
-          {market.options.map((option, i) => (
-            <div
-              className={cn(
-                'flex cursor-pointer flex-row items-center p-4 hover:bg-muted/50',
-                i > 0 && 'border-t',
-                option.id === activeOptionId && 'bg-muted/50'
-              )}
-              key={option.id}
-              onClick={() => setOption(option.id)}
-            >
-              <div className="flex flex-1 flex-col gap-2">
-                <div className="font-semibold leading-none">{option.name}</div>
-                <div className="flex flex-row items-center gap-2">
-                  <div className="text-xs font-semibold leading-none" style={{ color: option.color }}>
-                    {Math.round(option.probability * 100)}%
-                  </div>
-                  <Progress
-                    className="h-2 max-w-[200px]"
-                    data-color={option.color}
-                    indicatorStyle={{ backgroundColor: option.color }}
-                    value={option.probability * 100}
-                  />
-                </div>
-              </div>
 
-              {option.id !== activeOptionId ? (
-                <Button size="sm" variant="outline">
-                  Bet
-                </Button>
-              ) : (
-                <PanelRightClose className="h-6 w-6 text-muted-foreground" />
-              )}
-            </div>
-          ))}
-        </Card>
-      </CardContent>
+      {market.options.length ? (
+        <CardContent>
+          <Card>
+            {market.options.map((option, i) => (
+              <div
+                className={cn(
+                  'flex cursor-pointer flex-row items-center p-4 hover:bg-muted/50',
+                  i > 0 && 'border-t',
+                  option.id === activeOptionId && 'bg-muted/50'
+                )}
+                key={option.id}
+                onClick={() => setOption(option.id)}
+              >
+                <div className="flex flex-1 flex-col gap-2">
+                  <div className="font-semibold leading-none">{option.name}</div>
+                  <div className="flex flex-row items-center gap-2">
+                    <div className="text-xs font-semibold leading-none" style={{ color: option.color }}>
+                      {Math.round(0.5 * 100)}%
+                    </div>
+                    <Progress
+                      className="h-2 max-w-[200px]"
+                      data-color={option.color}
+                      indicatorStyle={{ backgroundColor: option.color }}
+                      value={0.5 * 100}
+                    />
+                  </div>
+                </div>
+
+                {option.id !== activeOptionId ? (
+                  <Button size="sm" variant="outline">
+                    Bet
+                  </Button>
+                ) : (
+                  <PanelRightClose className="h-6 w-6 text-muted-foreground" />
+                )}
+              </div>
+            ))}
+          </Card>
+        </CardContent>
+      ) : null}
+
       <CardContent>
         <ReadMoreEditor value={market.description} maxLines={6} />
       </CardContent>

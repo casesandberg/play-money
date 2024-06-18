@@ -8,6 +8,9 @@ export const getMarket = async ({ id }: { id: string }) => {
     where: {
       id,
     },
+    include: {
+      options: true,
+    },
   })
 
   if (!market) {
@@ -16,22 +19,10 @@ export const getMarket = async ({ id }: { id: string }) => {
 
   return {
     ...market,
-    options: [
-      {
-        id: '1',
-        name: 'Yes',
-        probability: 0.72,
-        volume: 1000,
-        color: '#3b82f6',
-      },
-      {
-        id: '2',
-        name: 'No',
-        probability: 0.28,
-        volume: 1000,
-        color: '#ec4899',
-      },
-    ],
+    options: market.options.map((option) => ({
+      ...option,
+      color: option.currencyCode === 'YES' ? '#3b82f6' : '#ec4899',
+    })),
   }
 }
 

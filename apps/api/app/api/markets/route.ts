@@ -16,15 +16,14 @@ export async function POST(req: Request): Promise<SchemaResponse<typeof schema.P
 
     const body = (await req.json()) as unknown
     const basicMarket = schema.POST.requestBody.parse(body)
-    const newMarket = await createMarket(
-      basicMarket.question,
-      basicMarket.description,
-      basicMarket.closeDate,
-      session.user.id
-    )
+    const newMarket = await createMarket({
+      ...basicMarket,
+      createdBy: session.user.id,
+    })
 
     return NextResponse.json(newMarket)
   } catch (error: unknown) {
+    console.log(error) // eslint-disable-line no-console -- Log error for debugging
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }

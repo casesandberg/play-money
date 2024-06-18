@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader } from '@play-money/ui/card'
 import { Combobox } from '@play-money/ui/combobox'
 import { Input } from '@play-money/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@play-money/ui/tabs'
-import { Market } from './MarketOverviewPage'
+import { ExtendedMarket } from './MarketOverviewPage'
 
 // TODO: @casesandberg Extract and create form component
 
@@ -16,13 +16,13 @@ export function MarketPageLayout({
   children,
   activeOptionId,
 }: {
-  market: Market
+  market: ExtendedMarket
   children: React.ReactNode
   activeOptionId: string
 }) {
   const [option, setOption] = useSearchParam('option')
   return (
-    <main className="mx-auto flex max-w-screen-lg flex-row items-start gap-8 p-4 sm:px-6 sm:py-0 md:gap-8">
+    <main className="mx-auto flex max-w-screen-lg flex-1 flex-row items-start gap-8 p-4 sm:px-6 sm:py-0 md:gap-8">
       {children}
 
       <Card className="max-w-80 flex-1">
