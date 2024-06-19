@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.4.2",
+    "@play-money/accounts": "*",
+    "@play-money/api-helpers": "*",
     "@play-money/auth": "*",
     "@play-money/comments": "*",
     "@play-money/currencies": "*",
@@ -27,6 +29,7 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.51.5",
     "recharts": "^2.12.7",
+    "swr": "^2.2.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {

@@ -3,7 +3,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import moment from 'moment'
 import { useFieldArray, useForm } from 'react-hook-form'
+import { useSWRConfig } from 'swr'
 import { z } from 'zod'
+import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
 import { MarketSchema, MarketOptionSchema } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
 import { Card } from '@play-money/ui/card'
@@ -23,6 +25,7 @@ export default function CreatePost() {
 }
 
 function CreateBinaryMarketForm() {
+  const { mutate } = useSWRConfig()
   const tzName = /\((?<tz>[A-Za-z\s].*)\)/.exec(new Date().toString())?.groups?.tz ?? null
 
   const form = useForm<MarketCreateFormValues>({
@@ -54,6 +57,7 @@ function CreateBinaryMarketForm() {
       return
     }
 
+    void mutate('/v1/users/me/balance')
     toast({
       title: 'Your market has been created',
     })
@@ -155,7 +159,9 @@ function CreateBinaryMarketForm() {
           <p className="text-sm text-muted-foreground">
             Trading will stop at this time in your local timezone {tzName === null ? '' : `(${tzName})`}
           </p>
-          <Button type="submit">Create</Button>
+          <Button type="submit">
+            Create for <CurrencyDisplay className="ml-2" currencyCode="PRIMARY" value={1000} />
+          </Button>
         </form>
       </Form>
     </Card>

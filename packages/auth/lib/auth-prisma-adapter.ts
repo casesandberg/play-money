@@ -9,7 +9,9 @@ export function PrismaAdapter(prisma: PrismaClient | ReturnType<PrismaClient['$e
     // We need to let Prisma generate the ID because our default UUID is incompatible with MongoDB
     createUser: ({ id: _id, ...data }) => {
       const identifier = generateFromEmail(data.email, 4)
-      return p.user.create({ data: { ...data, username: identifier, displayName: identifier } })
+      return p.user.create({
+        data: { ...data, username: identifier, displayName: identifier, accounts: { create: {} } },
+      })
     },
     getUser: (id) => p.user.findUnique({ where: { id } }),
     getUserByEmail: (email) => p.user.findUnique({ where: { email } }),

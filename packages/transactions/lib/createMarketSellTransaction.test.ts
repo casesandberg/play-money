@@ -2,6 +2,7 @@ import Decimal from 'decimal.js'
 import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import { getAccountBalance } from '@play-money/accounts/lib/getAccountBalance'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
+import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import '@play-money/config/jest/jest-setup'
 import { mockAccount } from '@play-money/database/mocks'
@@ -10,10 +11,13 @@ import { createMarketSellTransaction } from './createMarketSellTransaction'
 import { createTransaction } from './createTransaction'
 
 // TODO: Cleanup mocks in this file
-// TODO: Create accounts for Exchanger
 
 jest.mock('@play-money/accounts/lib/getAmmAccount', () => ({
   getAmmAccount: jest.fn(),
+}))
+
+jest.mock('@play-money/accounts/lib/getExchangerAccount', () => ({
+  getExchangerAccount: jest.fn(),
 }))
 
 jest.mock('@play-money/accounts/lib/getUserAccount', () => ({
@@ -54,6 +58,12 @@ describe('createMarketSellTransaction', () => {
     jest.mocked(getUserAccount).mockResolvedValue(
       mockAccount({
         id: 'user-1-account',
+      })
+    )
+
+    jest.mocked(getExchangerAccount).mockResolvedValue(
+      mockAccount({
+        id: 'EXCHANGER',
       })
     )
 

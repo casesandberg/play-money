@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { SWRProvider } from '@play-money/api-helpers/components/SWRProvider'
 import { auth } from '@play-money/auth'
 import { SessionProvider } from '@play-money/auth/components/SessionProvider'
 import { CurrencyProvider } from '@play-money/currencies/components/CurrencyProvider'
@@ -39,14 +40,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en">
       <body className={inter.className}>
-        <SessionProvider session={session}>
-          <UserProvider user={user}>
-            <CurrencyProvider currencies={currencies}>
-              <TooltipProvider>{children}</TooltipProvider>
-            </CurrencyProvider>
-          </UserProvider>
-        </SessionProvider>
-        <Toaster />
+        <SWRProvider>
+          <SessionProvider session={session}>
+            <UserProvider user={user}>
+              <CurrencyProvider currencies={currencies}>
+                <TooltipProvider>{children}</TooltipProvider>
+              </CurrencyProvider>
+            </UserProvider>
+          </SessionProvider>
+          <Toaster />
+        </SWRProvider>
       </body>
     </html>
   )

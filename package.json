@@ -9,6 +9,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "db:push": "dotenv -- turbo db:push",
     "db:generate": "dotenv -- turbo db:generate",
+    "db:script": "dotenv -- npm run script -w @play-money/database",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch"
   },
