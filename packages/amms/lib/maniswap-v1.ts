@@ -197,3 +197,49 @@ export async function costToHitProbability({
     returnedShares: returnedShares,
   }
 }
+
+export async function addLiquidity({
+  fromAccountId,
+  ammAccountId,
+  amount,
+}: {
+  fromAccountId: string
+  ammAccountId: string
+  amount: Decimal
+}): Promise<Array<TransactionItemInput>> {
+  return [
+    // Giving the shares to the AMM.
+    {
+      accountId: fromAccountId,
+      currencyCode: 'YES',
+      amount: amount.neg(),
+    },
+    {
+      accountId: ammAccountId,
+      currencyCode: 'YES',
+      amount: amount,
+    },
+    {
+      accountId: fromAccountId,
+      currencyCode: 'NO',
+      amount: amount.neg(),
+    },
+    {
+      accountId: ammAccountId,
+      currencyCode: 'NO',
+      amount: amount,
+    },
+
+    // Transfer LP bonus
+    {
+      accountId: ammAccountId,
+      currencyCode: 'LPB',
+      amount: amount.neg(),
+    },
+    {
+      accountId: fromAccountId,
+      currencyCode: 'LPB',
+      amount: amount,
+    },
+  ]
+}

@@ -53,7 +53,7 @@ export function CommentsList({
       method: 'POST',
       body: JSON.stringify({
         content,
-        parentId,
+        parentId: parentId ?? null,
         entityType: entity.type,
         entityId: entity.id,
       }),

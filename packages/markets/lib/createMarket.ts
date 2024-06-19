@@ -1,4 +1,9 @@
+import Decimal from 'decimal.js'
+import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
+import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import db, { MarketSchema, MarketOption, MarketOptionSchema } from '@play-money/database'
+import { createHouseUserGiftTransaction } from '@play-money/transactions/lib/createHouseUserGiftTransaction'
+import { createMarketLiquidityTransaction } from '@play-money/transactions/lib/createMarketLiquidityTransaction'
 
 type PartialOptions = Pick<MarketOption, 'name' | 'currencyCode'>
 
@@ -8,12 +13,14 @@ export async function createMarket({
   closeDate,
   createdBy,
   options,
+  subsidyAmount = new Decimal(1000),
 }: {
   question: string
   description: string
   closeDate: Date | null
   createdBy: string
   options?: Array<PartialOptions>
+  subsidyAmount?: Decimal
 }) {
   let slug = slugify(question)
   const marketData = MarketSchema.omit({ id: true }).parse({
@@ -44,6 +51,20 @@ export async function createMarket({
     ]
   }
 
+  // TODO: Move house gift to account creation.
+  await createHouseUserGiftTransaction({
+    userId: marketData.createdBy,
+    creatorId: marketData.createdBy,
+    amount: new Decimal(1100),
+  })
+
+  const userAccount = await getUserAccount({ id: marketData.createdBy })
+  const hasEnoughBalance = await checkAccountBalance(userAccount.id, 'PRIMARY', subsidyAmount)
+
+  if (!hasEnoughBalance) {
+    throw new Error('User does not have enough balance to create market')
+  }
+
   const createdMarket = await db.market.create({
     data: {
       ...marketData,
@@ -57,7 +78,16 @@ export async function createMarket({
           })),
         },
       },
+      accounts: {
+        create: {}, // Create AMM Account
+      },
     },
+  })
+
+  await createMarketLiquidityTransaction({
+    userId: marketData.createdBy,
+    amount: subsidyAmount,
+    marketId: createdMarket.id,
   })
 
   return createdMarket

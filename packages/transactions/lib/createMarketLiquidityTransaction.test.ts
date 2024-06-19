@@ -7,7 +7,7 @@ import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import '@play-money/config/jest/jest-setup'
 import { mockAccount } from '@play-money/database/mocks'
 import { getUserById } from '@play-money/users/lib/getUserById'
-import { createMarketBuyTransaction } from './createMarketBuyTransaction'
+import { createMarketLiquidityTransaction } from './createMarketLiquidityTransaction'
 import { createTransaction } from './createTransaction'
 
 // TODO: Cleanup mocks in this file
@@ -40,18 +40,12 @@ jest.mock('./createTransaction', () => ({
   createTransaction: jest.fn(),
 }))
 
-describe('createMarketBuyTransaction', () => {
+describe('createMarketLiquidityTransaction', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
   it('should call createTransaction with approperate transactionItems', async () => {
-    jest.mocked(getAccountBalance).mockImplementation(async (_accountId, currencyCode) => {
-      if (currencyCode === 'YES') return new Decimal(100)
-      if (currencyCode === 'NO') return new Decimal(300)
-      return new Decimal(0)
-    })
-
     jest.mocked(checkAccountBalance).mockResolvedValue(true)
     jest.mocked(getUserById).mockResolvedValue({} as any)
 
@@ -73,10 +67,9 @@ describe('createMarketBuyTransaction', () => {
       })
     )
 
-    await createMarketBuyTransaction({
+    await createMarketLiquidityTransaction({
       userId: 'user-1',
       amount: new Decimal(50),
-      purchaseCurrencyCode: 'YES',
       marketId: 'market-1',
     })
 
@@ -84,63 +77,63 @@ describe('createMarketBuyTransaction', () => {
       expect.objectContaining({
         transactionItems: expect.arrayContaining([
           {
-            amount: new Decimal(-50),
+            amount: expect.closeToDecimal(-50),
+            currencyCode: 'YES',
+            accountId: 'user-1-account',
+          },
+          {
+            amount: expect.closeToDecimal(-50),
+            currencyCode: 'NO',
+            accountId: 'user-1-account',
+          },
+          {
+            amount: expect.closeToDecimal(50),
+            currencyCode: 'YES',
+            accountId: 'amm-1-account',
+          },
+          {
+            amount: expect.closeToDecimal(50),
+            currencyCode: 'NO',
+            accountId: 'amm-1-account',
+          },
+          {
+            amount: expect.closeToDecimal(50),
+            currencyCode: 'YES',
+            accountId: 'user-1-account',
+          },
+          {
+            amount: expect.closeToDecimal(50),
+            currencyCode: 'NO',
+            accountId: 'user-1-account',
+          },
+          {
+            amount: expect.closeToDecimal(-50),
+            currencyCode: 'YES',
+            accountId: 'EXCHANGER',
+          },
+          {
+            amount: expect.closeToDecimal(-50),
+            currencyCode: 'NO',
+            accountId: 'EXCHANGER',
+          },
+          {
+            amount: expect.closeToDecimal(50),
+            currencyCode: 'PRIMARY',
+            accountId: 'EXCHANGER',
+          },
+          {
+            amount: expect.closeToDecimal(-50),
             currencyCode: 'PRIMARY',
             accountId: 'user-1-account',
           },
           {
-            amount: new Decimal(50),
-            currencyCode: 'PRIMARY',
-            accountId: 'EXCHANGER',
-          },
-          {
-            amount: new Decimal(-50),
-            currencyCode: 'YES',
-            accountId: 'EXCHANGER',
-          },
-          {
-            amount: new Decimal(-50),
-            currencyCode: 'NO',
-            accountId: 'EXCHANGER',
-          },
-          {
-            amount: new Decimal(50),
-            currencyCode: 'YES',
-            accountId: 'user-1-account',
-          },
-          {
-            amount: new Decimal(50),
-            currencyCode: 'NO',
-            accountId: 'user-1-account',
-          },
-          {
-            amount: new Decimal(-50),
-            currencyCode: 'YES',
-            accountId: 'user-1-account',
-          },
-          {
-            amount: new Decimal(-50),
-            currencyCode: 'NO',
-            accountId: 'user-1-account',
-          },
-          {
-            amount: new Decimal(50),
-            currencyCode: 'YES',
+            amount: expect.closeToDecimal(-50),
+            currencyCode: 'LPB',
             accountId: 'amm-1-account',
           },
           {
-            amount: new Decimal(50),
-            currencyCode: 'NO',
-            accountId: 'amm-1-account',
-          },
-          {
-            amount: expect.closeToDecimal(-64.29),
-            currencyCode: 'YES',
-            accountId: 'amm-1-account',
-          },
-          {
-            amount: expect.closeToDecimal(64.29),
-            currencyCode: 'YES',
+            amount: expect.closeToDecimal(50),
+            currencyCode: 'LPB',
             accountId: 'user-1-account',
           },
         ]),

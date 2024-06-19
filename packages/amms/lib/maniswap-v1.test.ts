@@ -2,7 +2,7 @@ import Decimal from 'decimal.js'
 import { toBeDeepCloseTo, toMatchCloseTo } from 'jest-matcher-deep-close-to'
 import { getAccountBalance } from '@play-money/accounts/lib/getAccountBalance'
 import '@play-money/config/jest/jest-setup'
-import { buy, costToHitProbability, sell } from './maniswap-v1'
+import { addLiquidity, buy, costToHitProbability, sell } from './maniswap-v1'
 
 expect.extend({ toBeDeepCloseTo, toMatchCloseTo })
 
@@ -214,6 +214,27 @@ describe('maniswap-v1', () => {
         cost: expect.closeToDecimal(100),
         returnedShares: expect.closeToDecimal(250),
       })
+    })
+  })
+
+  describe('addLiquidity', () => {
+    it('should return correct transactions for adding liquidity', async () => {
+      const transactions = await addLiquidity({
+        fromAccountId: 'user1',
+        ammAccountId: 'amm1',
+        amount: new Decimal(50),
+      })
+
+      expect(transactions).toEqual(
+        expect.arrayContaining([
+          { accountId: 'user1', currencyCode: 'YES', amount: new Decimal(-50) },
+          { accountId: 'user1', currencyCode: 'NO', amount: new Decimal(-50) },
+          { accountId: 'amm1', currencyCode: 'YES', amount: new Decimal(50) },
+          { accountId: 'amm1', currencyCode: 'NO', amount: new Decimal(50) },
+          { accountId: 'amm1', currencyCode: 'LPB', amount: new Decimal(-50) },
+          { accountId: 'user1', currencyCode: 'LPB', amount: new Decimal(50) },
+        ])
+      )
     })
   })
 })

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
+import { ActiveUserBalance } from '@play-money/accounts/components/ActiveUserBalance'
 import { GlobalSearchTrigger } from '@play-money/search/components/GlobalSearchTrigger'
 import { cn } from '@play-money/ui/utils'
 import { UserNav } from '@play-money/users/components/UserNav'
@@ -25,7 +25,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <Link href="/">PlayMoney</Link>
           <MainNav className="mx-6" />
           <div className="ml-auto flex items-center space-x-4">
-            <CurrencyDisplay currencyCode="PRIMARY" value={12452.12} />
+            <ActiveUserBalance />
             <GlobalSearchTrigger />
             <UserNav />
           </div>

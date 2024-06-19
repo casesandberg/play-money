@@ -10,6 +10,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@play-money/accounts": "*",
     "@play-money/api-helpers": "*",
     "@play-money/auth": "*",
     "@play-money/comments": "*",
