@@ -36,7 +36,7 @@ export function MarketBuyForm({
 
   const onSubmit = async (data: FormData) => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/buy`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/buy`, {
         method: 'POST',
         body: JSON.stringify({
           optionId: option.id,
@@ -44,13 +44,23 @@ export function MarketBuyForm({
         }),
         credentials: 'include',
       })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.message)
+      }
+
       toast({ title: 'Bet placed successfully' })
-      form.reset()
+      form.reset({ amount: 0 })
       setQuote(null)
       onComplete?.()
     } catch (error: any) {
       console.error('Failed to place bet:', error)
-      toast({ title: 'There was an issue placing your bet', description: 'Please try again later' })
+      toast({
+        title: 'There was an issue placing your bet',
+        description: 'Please try again later',
+        variant: 'destructive',
+      })
     }
   }
 
@@ -62,9 +72,14 @@ export function MarketBuyForm({
         credentials: 'include',
       })
       const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message)
+      }
+
       setQuote(data)
     } catch (error) {
-      console.error('Failed to fetch new probability and return:', error)
+      console.error('Failed to fetch quote:', error)
     }
   }
 
@@ -109,36 +124,47 @@ export function MarketBuyForm({
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount</FormLabel>
+              <FormLabel className="flex items-center justify-between">
+                Amount
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    type="button"
+                    variant="secondary"
+                    className="h-6 px-2"
+                    onClick={() => field.onChange((field.value || 0) + 100)}
+                  >
+                    +100
+                  </Button>
+                  <Button
+                    size="sm"
+                    type="button"
+                    variant="secondary"
+                    className="h-6 px-2"
+                    onClick={() => field.onChange((field.value || 0) + 500)}
+                  >
+                    +500
+                  </Button>
+                  <Button
+                    size="sm"
+                    type="button"
+                    variant="secondary"
+                    className="h-6 px-2"
+                    onClick={() => field.onChange((field.value || 0) + 5000)}
+                  >
+                    +5k
+                  </Button>
+                </div>
+              </FormLabel>
               <FormControl>
                 <div className="space-y-2">
-                  <div className="flex gap-1">
-                    <Button
-                      size="sm"
-                      type="button"
-                      variant={String(field.value) === '100' ? 'default' : 'outline'}
-                      onClick={() => field.onChange(100)}
-                    >
-                      100
-                    </Button>
-                    <Button
-                      size="sm"
-                      type="button"
-                      variant={String(field.value) === '500' ? 'default' : 'outline'}
-                      onClick={() => field.onChange(500)}
-                    >
-                      500
-                    </Button>
-                    <Button
-                      size="sm"
-                      type="button"
-                      variant={String(field.value) === '5000' ? 'default' : 'outline'}
-                      onClick={() => field.onChange(5000)}
-                    >
-                      5,000
-                    </Button>
-                  </div>
-                  {/* <Input type="number" placeholder="Custom" {...field} className="h-9" /> */}
+                  <Input
+                    type="number"
+                    placeholder="100"
+                    {...field}
+                    onChange={(e) => field.onChange(e.currentTarget.valueAsNumber)}
+                    className="h-9"
+                  />
                 </div>
               </FormControl>
               <FormMessage />
@@ -147,7 +173,7 @@ export function MarketBuyForm({
         />
 
         <Button type="submit" className="w-full truncate">
-          Bet on {_.truncate(option.name, { length: 20 })}
+          Bet {_.truncate(option.name, { length: 20 })}
         </Button>
 
         <ul className="grid gap-1 text-sm">
