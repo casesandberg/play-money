@@ -86,7 +86,7 @@ export function MarketOverviewPage({
 
               {change.difference !== 0 ? (
                 <div>
-                  {change.difference > 0 ? '+' : '-'}
+                  {change.difference > 0 ? '+' : ''}
                   {Math.round(change.difference * 100)}% this week
                 </div>
               ) : null}
@@ -131,7 +131,10 @@ export function MarketOverviewPage({
                     option.id === activeOptionId && 'bg-muted/50'
                   )}
                   key={option.id}
-                  onClick={() => setOption(option.id)}
+                  onClick={() => {
+                    setOption(option.id)
+                    triggerEffect()
+                  }}
                 >
                   <div className="flex flex-1 flex-col gap-2">
                     <div className="font-semibold leading-none">{option.name}</div>
@@ -148,11 +151,7 @@ export function MarketOverviewPage({
                     </div>
                   </div>
 
-                  <Button
-                    size="sm"
-                    variant={option.id === activeOptionId ? 'black' : 'outline'}
-                    onClick={triggerEffect}
-                  >
+                  <Button size="sm" variant={option.id === activeOptionId ? 'black' : 'outline'}>
                     Bet
                   </Button>
                 </div>

@@ -140,6 +140,43 @@ export async function sell({
   ]
 }
 
+export async function quote({
+  ammAccountId,
+  currencyCode,
+  amount,
+}: {
+  ammAccountId: string
+  currencyCode: CurrencyCodeType
+  amount: Decimal
+}): Promise<{ probability: Decimal; shares: Decimal }> {
+  const buyingYes = currencyCode === 'YES'
+
+  const y = await getAccountBalance(ammAccountId, 'YES')
+  const n = await getAccountBalance(ammAccountId, 'NO')
+
+  if (buyingYes) {
+    const shares = amount.times(amount.add(n).add(y)).div(amount.add(n))
+    const newY = y.add(amount).minus(shares)
+    const newN = n.add(amount)
+    const newProbability = newN.div(newY.add(newN))
+
+    return {
+      probability: newProbability,
+      shares: shares,
+    }
+  } else {
+    const shares = amount.times(amount.add(n).add(y)).div(amount.add(y))
+    const newN = n.add(amount).minus(shares)
+    const newY = y.add(amount)
+    const newProbability = newN.div(newY.add(newN))
+
+    return {
+      probability: newProbability,
+      shares: shares,
+    }
+  }
+}
+
 export async function costToHitProbability({
   ammAccountId,
   probability,
