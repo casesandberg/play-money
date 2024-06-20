@@ -9,9 +9,9 @@ export const dynamic = 'force-dynamic'
 export async function GET(
   _req: Request,
   { params }: { params: unknown }
-): Promise<SchemaResponse<typeof schema.GET.responses>> {
+): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
-    const { id } = schema.GET.parameters.parse(params)
+    const { id } = schema.get.parameters.parse(params)
 
     const ammAccount = await getAmmAccount({ marketId: id })
     const y = await getAccountBalance(ammAccount.id, 'YES')
@@ -21,11 +21,12 @@ export async function GET(
       YES: y.toNumber(),
       NO: n.toNumber(),
       probability: {
-        YES: y.div(y.add(n)).toNumber(),
-        NO: n.div(y.add(n)).toNumber(),
+        YES: n.div(y.add(n)).toNumber(),
+        NO: y.div(y.add(n)).toNumber(),
       },
     })
   } catch (error) {
+    console.log(error) // eslint-disable-line no-console -- Log error for debugging
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 })
   }
 }

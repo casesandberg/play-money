@@ -2,17 +2,11 @@ import { z } from 'zod'
 import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
 
 export default createSchema({
-  get: {
+  post: {
     parameters: z.object({ id: z.string() }),
+    requestBody: z.object({ optionId: z.string(), amount: z.number() }),
     responses: {
-      200: z.object({
-        YES: z.number(),
-        NO: z.number(),
-        probability: z.object({
-          YES: z.number(),
-          NO: z.number(),
-        }),
-      }),
+      200: z.object({}),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },

@@ -89,8 +89,7 @@ export async function getMarketTransactionsTimeSeries({
     })
 
     const totalShares = bucket.yShares.plus(bucket.nShares)
-    console.log({ totalShares })
-    bucket.probability = totalShares.isZero() ? 0 : bucket.yShares.div(totalShares).toNumber()
+    bucket.probability = totalShares.isZero() ? 0 : bucket.nShares.div(totalShares).toNumber()
   })
 
   const timeSeriesData = buckets.map((bucket) => ({

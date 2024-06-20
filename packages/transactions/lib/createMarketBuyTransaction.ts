@@ -72,7 +72,7 @@ export async function createMarketBuyTransaction({
   }
 
   const transaction = await createTransaction({
-    creatorId: userId,
+    creatorId: userAccount.id,
     type: 'MARKET_BUY',
     description: `Purchase ${amount} dollars worth of ${purchaseCurrencyCode} shares in market ${marketId}`,
     marketId,
