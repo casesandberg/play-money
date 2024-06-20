@@ -18,6 +18,7 @@
     "@play-money/database": "*",
     "@play-money/markets": "*",
     "@play-money/search": "*",
+    "@play-money/transactions": "*",
     "@play-money/users": "*",
     "bcryptjs": "^2.4.3",
     "next": "^14.1.1",
