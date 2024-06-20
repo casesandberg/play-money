@@ -36,17 +36,15 @@ function getProbabilityChange(data: Array<{ endAt: Date; startAt: Date; probabil
     latestProbability = data[data.length - 1].probability
   }
 
-  for (const [i, item] of data.entries()) {
+  for (const item of data) {
     if (item.endAt <= oneWeekAgo) {
       oneWeekAgoProbability = item.probability
       break
     }
   }
 
-  const difference = latestProbability - oneWeekAgoProbability
-
   return {
-    latestProbability: latestProbability,
+    latestProbability,
     difference: latestProbability - oneWeekAgoProbability,
   }
 }

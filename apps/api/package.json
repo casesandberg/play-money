@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@play-money/accounts": "*",
+    "@play-money/amms": "*",
     "@play-money/api-helpers": "*",
     "@play-money/auth": "*",
     "@play-money/comments": "*",
