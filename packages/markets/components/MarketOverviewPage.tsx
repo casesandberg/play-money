@@ -162,7 +162,7 @@ export function MarketOverviewPage({
                   </div>
 
                   <Button size="sm" variant={option.id === activeOptionId ? 'black' : 'outline'}>
-                    Bet
+                    Select
                   </Button>
                 </div>
               )

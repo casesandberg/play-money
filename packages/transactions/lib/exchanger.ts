@@ -64,6 +64,8 @@ export async function convertMarketSharesToPrimary({
   fromAccountId: string
   amount: Decimal
 }): Promise<Array<TransactionItemInput>> {
+  const exchangerAccount = await getExchangerAccount()
+
   if (amount.lte(0)) {
     throw new Error('Exchange amount must be greater than 0')
   }
@@ -86,12 +88,12 @@ export async function convertMarketSharesToPrimary({
       amount: amount.neg(),
     },
     {
-      accountId: 'EXCHANGER',
+      accountId: exchangerAccount.id,
       currencyCode: 'YES',
       amount: amount,
     },
     {
-      accountId: 'EXCHANGER',
+      accountId: exchangerAccount.id,
       currencyCode: 'NO',
       amount: amount,
     },
@@ -102,7 +104,7 @@ export async function convertMarketSharesToPrimary({
       amount: amount,
     },
     {
-      accountId: 'EXCHANGER',
+      accountId: exchangerAccount.id,
       currencyCode: 'PRIMARY',
       amount: amount.neg(),
     },

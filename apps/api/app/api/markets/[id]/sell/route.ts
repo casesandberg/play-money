@@ -1,14 +1,13 @@
 import Decimal from 'decimal.js'
 import { NextResponse } from 'next/server'
-import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
-import { quote } from '@play-money/amms/lib/maniswap-v1'
 import type { SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
 import db from '@play-money/database'
 import type { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/CurrencyCodeSchema'
+import { createMarketSellTransaction } from '@play-money/transactions/lib/createMarketSellTransaction'
 import schema from './schema'
 
-function isPurchasableCurrency(currency: CurrencyCodeType): currency is 'YES' | 'NO' {
+function isSellableCurrency(currency: CurrencyCodeType): currency is 'YES' | 'NO' {
   return ['YES', 'NO'].includes(currency)
 }
 
@@ -28,7 +27,7 @@ export async function POST(
     const { id } = schema.post.parameters.parse(params)
 
     const body = (await req.json()) as unknown
-    const { optionId, amount, isBuy = true } = schema.post.requestBody.parse(body)
+    const { optionId, amount } = schema.post.requestBody.parse(body)
 
     const marketOption = await db.marketOption.findFirst({
       where: { id: optionId, marketId: id },
@@ -38,26 +37,18 @@ export async function POST(
       throw new Error('Invalid optionId')
     }
 
-    if (!isPurchasableCurrency(marketOption.currencyCode)) {
+    if (!isSellableCurrency(marketOption.currencyCode)) {
       throw new Error('Invalid option currency code')
     }
 
-    const ammAccount = await getAmmAccount({ marketId: id })
-
-    const decimalAmount = new Decimal(amount)
-
-    // TODO: Change to multi-step quote to account for limit orders
-    const { probability, shares } = await quote({
-      ammAccountId: ammAccount.id,
-      currencyCode: marketOption.currencyCode,
-      amount: decimalAmount,
-      isBuy,
+    await createMarketSellTransaction({
+      userId: session.user.id,
+      marketId: id,
+      amount: new Decimal(amount),
+      sellCurrencyCode: marketOption.currencyCode,
     })
 
-    return NextResponse.json({
-      newProbability: probability.toNumber(),
-      potentialReturn: shares.toNumber(),
-    })
+    return NextResponse.json({})
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 })

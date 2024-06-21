@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@play-money/ui/tabs'
 import { cn } from '@play-money/ui/utils'
 import { MarketBuyForm } from './MarketBuyForm'
 import { ExtendedMarket } from './MarketOverviewPage'
+import { MarketSellForm } from './MarketSellForm'
 import { useSidebar } from './SidebarContext'
 
 // TODO: @casesandberg Extract and create form component
@@ -27,7 +28,7 @@ export function MarketPageSidebar({ market, activeOptionId }: { market: Extended
 
   return (
     <Card className={cn(effect && 'animate-slide-in-right')} onAnimationEnd={resetEffect}>
-      <Tabs defaultValue="buy">
+      <Tabs defaultValue="sell">
         <CardHeader className="flex items-start bg-muted p-3">
           <Combobox
             buttonClassName="bg-muted w-full text-lg border-none"
@@ -47,7 +48,11 @@ export function MarketPageSidebar({ market, activeOptionId }: { market: Extended
               <MarketBuyForm marketId={market.id} option={activeOption} onComplete={handleRefresh} />
             ) : null}
           </TabsContent>
-          <TabsContent value="sell">Sell panel</TabsContent>
+          <TabsContent value="sell">
+            {activeOption ? (
+              <MarketSellForm marketId={market.id} option={activeOption} onComplete={handleRefresh} />
+            ) : null}
+          </TabsContent>
         </CardContent>
       </Tabs>
     </Card>

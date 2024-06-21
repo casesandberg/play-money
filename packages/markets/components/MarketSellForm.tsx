@@ -8,6 +8,7 @@ import z from 'zod'
 import { Button } from '@play-money/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
+import { Slider } from '@play-money/ui/slider'
 import { toast } from '@play-money/ui/use-toast'
 import { cn } from '@play-money/ui/utils'
 import { ExtendedMarket } from './MarketOverviewPage'
@@ -18,7 +19,7 @@ const FormSchema = z.object({
 
 type FormData = z.infer<typeof FormSchema>
 
-export function MarketBuyForm({
+export function MarketSellForm({
   marketId,
   option,
   hasOutcome,
@@ -29,14 +30,21 @@ export function MarketBuyForm({
   hasOutcome?: boolean
   onComplete?: () => void
 }) {
+  const [max, setMax] = useState(0)
   const [quote, setQuote] = useState<{ newProbability: number; potentialReturn: number } | null>(null)
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
   })
 
+  useEffect(() => {
+    const shares = 150
+    setMax(shares)
+    form.setValue('amount', shares / 2)
+  }, [option.id])
+
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/buy`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/sell`, {
         method: 'POST',
         body: JSON.stringify({
           optionId: option.id,
@@ -50,14 +58,14 @@ export function MarketBuyForm({
         throw new Error(data.message)
       }
 
-      toast({ title: 'Bet placed successfully' })
+      toast({ title: 'Shares sold successfully' })
       form.reset({ amount: 0 })
       setQuote(null)
       onComplete?.()
     } catch (error: any) {
       console.error('Failed to place bet:', error)
       toast({
-        title: 'There was an issue placing your bet',
+        title: 'There was an issue selling shares',
         description: 'Please try again later',
         variant: 'destructive',
       })
@@ -68,7 +76,7 @@ export function MarketBuyForm({
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/quote`, {
         method: 'POST',
-        body: JSON.stringify({ optionId, amount }),
+        body: JSON.stringify({ optionId, amount, isBuy: false }),
         credentials: 'include',
       })
       const data = await response.json()
@@ -100,71 +108,34 @@ export function MarketBuyForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {hasOutcome ? (
-          <FormField
-            control={form.control}
-            name="amount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Outcome</FormLabel>
-                <FormControl>
-                  <Button className="flex-1">Yes</Button>
-                  <Button className="flex-1" variant="secondary">
-                    No
-                  </Button>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        ) : null}
-
         <FormField
           control={form.control}
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="flex items-center justify-between">
-                Amount
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    type="button"
-                    variant="secondary"
-                    className="h-6 px-2"
-                    onClick={() => field.onChange((field.value || 0) + 100)}
-                  >
-                    +100
-                  </Button>
-                  <Button
-                    size="sm"
-                    type="button"
-                    variant="secondary"
-                    className="h-6 px-2"
-                    onClick={() => field.onChange((field.value || 0) + 500)}
-                  >
-                    +500
-                  </Button>
-                  <Button
-                    size="sm"
-                    type="button"
-                    variant="secondary"
-                    className="h-6 px-2"
-                    onClick={() => field.onChange((field.value || 0) + 5000)}
-                  >
-                    +5k
-                  </Button>
-                </div>
-              </FormLabel>
+              <FormLabel className="flex items-center justify-between">Amount</FormLabel>
               <FormControl>
-                <div className="space-y-2">
-                  <Input
-                    type="number"
-                    placeholder="100"
-                    {...field}
-                    onChange={(e) => field.onChange(e.currentTarget.valueAsNumber)}
-                    className="h-9"
+                <div>
+                  <Slider
+                    className="my-4"
+                    min={1}
+                    max={max}
+                    value={[field.value]}
+                    onValueChange={(value) => field.onChange(value[0])}
                   />
+                  <div className="flex gap-2">
+                    <Input
+                      type="number"
+                      placeholder="100"
+                      {...field}
+                      onChange={(e) => field.onChange(e.currentTarget.valueAsNumber)}
+                      className="h-9"
+                    />
+
+                    <Button size="sm" type="button" variant="secondary" onClick={() => field.onChange(max)}>
+                      MAX
+                    </Button>
+                  </div>
                 </div>
               </FormControl>
               <FormMessage />
@@ -173,13 +144,13 @@ export function MarketBuyForm({
         />
 
         <Button type="submit" className="w-full truncate">
-          Bet {_.truncate(option.name, { length: 20 })}
+          Sell {_.truncate(option.name, { length: 20 })}
         </Button>
 
         <ul className="grid gap-1 text-sm">
           <li className="flex items-center justify-between">
-            <span className="text-muted-foreground">Potential return</span>
-            <span className={cn('font-semibold', quote?.potentialReturn ? 'text-green-500' : 'text-muted-foreground')}>
+            <span className="text-muted-foreground">Value</span>
+            <span className={cn('font-semibold', quote?.potentialReturn ? 'text-red-500' : 'text-muted-foreground')}>
               {quote?.potentialReturn
                 ? `$${Math.round(quote?.potentialReturn)} (${Math.round(((quote?.potentialReturn - form.getValues('amount')) / form.getValues('amount')) * 100)}%)`
                 : '—'}
