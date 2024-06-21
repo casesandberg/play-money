@@ -1,9 +1,10 @@
 'use client'
 
 import React from 'react'
-import { useSWRConfig } from 'swr'
+import useSWR, { useSWRConfig } from 'swr'
+import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
 import { useSearchParam } from '@play-money/ui'
-import { Card, CardContent, CardHeader } from '@play-money/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
 import { Combobox } from '@play-money/ui/combobox'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@play-money/ui/tabs'
 import { cn } from '@play-money/ui/utils'
@@ -15,6 +16,7 @@ import { useSidebar } from './SidebarContext'
 // TODO: @casesandberg Extract and create form component
 
 export function MarketPageSidebar({ market, activeOptionId }: { market: ExtendedMarket; activeOptionId: string }) {
+  const { data: balance } = useSWR(`/v1/markets/${market.id}/balance`, { refreshInterval: 1000 * 60 }) // 60 seconds
   const { mutate } = useSWRConfig()
   const [option, setOption] = useSearchParam('option')
   const { effect, resetEffect } = useSidebar()
@@ -27,34 +29,60 @@ export function MarketPageSidebar({ market, activeOptionId }: { market: Extended
   }
 
   return (
-    <Card className={cn(effect && 'animate-slide-in-right')} onAnimationEnd={resetEffect}>
-      <Tabs defaultValue="sell">
-        <CardHeader className="flex items-start bg-muted p-3">
-          <Combobox
-            buttonClassName="bg-muted w-full text-lg border-none"
-            value={option || activeOptionId}
-            onChange={(value) => setOption(value)}
-            items={market.options.map((option) => ({ value: option.id, label: option.name }))}
-          />
-          <TabsList className="ml-3 p-0">
-            <TabsTrigger value="buy">Buy</TabsTrigger>
-            <TabsTrigger value="sell">Sell</TabsTrigger>
-          </TabsList>
-        </CardHeader>
+    <>
+      <Card className={cn(effect && 'animate-slide-in-right')} onAnimationEnd={resetEffect}>
+        <Tabs defaultValue="buy">
+          <CardHeader className="flex items-start bg-muted p-3">
+            <Combobox
+              buttonClassName="bg-muted w-full text-lg border-none"
+              value={option || activeOptionId}
+              onChange={(value) => setOption(value)}
+              items={market.options.map((option) => ({ value: option.id, label: option.name }))}
+            />
+            <TabsList className="ml-3 p-0">
+              <TabsTrigger value="buy">Buy</TabsTrigger>
+              <TabsTrigger value="sell">Sell</TabsTrigger>
+            </TabsList>
+          </CardHeader>
 
-        <CardContent className="mt-4">
-          <TabsContent className="space-y-4" value="buy">
-            {activeOption ? (
-              <MarketBuyForm marketId={market.id} option={activeOption} onComplete={handleRefresh} />
-            ) : null}
-          </TabsContent>
-          <TabsContent value="sell">
-            {activeOption ? (
-              <MarketSellForm marketId={market.id} option={activeOption} onComplete={handleRefresh} />
-            ) : null}
-          </TabsContent>
-        </CardContent>
-      </Tabs>
-    </Card>
+          <CardContent className="mt-4">
+            <TabsContent className="space-y-4" value="buy">
+              {activeOption ? (
+                <MarketBuyForm marketId={market.id} option={activeOption} onComplete={handleRefresh} />
+              ) : null}
+            </TabsContent>
+            <TabsContent value="sell">
+              {activeOption ? (
+                <MarketSellForm
+                  marketId={market.id}
+                  option={activeOption}
+                  onComplete={handleRefresh}
+                  max={balance?.holdings[activeOption.currencyCode]}
+                />
+              ) : null}
+            </TabsContent>
+          </CardContent>
+        </Tabs>
+      </Card>
+      {balance?.holdings.YES > 0 || balance?.holdings.NO > 0 ? (
+        <Card className="mt-4">
+          <CardContent className="flex gap-2 p-3 text-sm">
+            <span className="text-muted-foreground">Holdings:</span>
+            {market.options.map((option) => {
+              if (balance?.holdings[option.currencyCode] > 0) {
+                return (
+                  <span key={option.id} className="font-semibold" style={{ color: option.color }}>
+                    <span>${Math.round(balance?.holdings[option.currencyCode])} </span>
+                    <span>{option.name}</span>
+                  </span>
+                )
+              }
+
+              return null
+            })}
+          </CardContent>
+        </Card>
+      ) : null}
+    </>
   )
 }

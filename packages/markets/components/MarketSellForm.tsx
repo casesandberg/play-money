@@ -22,25 +22,28 @@ type FormData = z.infer<typeof FormSchema>
 export function MarketSellForm({
   marketId,
   option,
-  hasOutcome,
+  max: initialMax,
   onComplete,
 }: {
   marketId: string
   option: ExtendedMarket['options'][0]
-  hasOutcome?: boolean
+  max?: number
   onComplete?: () => void
 }) {
-  const [max, setMax] = useState(0)
+  const [max, setMax] = useState(initialMax)
   const [quote, setQuote] = useState<{ newProbability: number; potentialReturn: number } | null>(null)
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
   })
 
   useEffect(() => {
-    const shares = 150
-    setMax(shares)
-    form.setValue('amount', shares / 2)
-  }, [option.id])
+    if (initialMax) {
+      setMax(initialMax)
+      form.setValue('amount', Math.round(initialMax / 2))
+    } else {
+      form.setValue('amount', 0)
+    }
+  }, [option.id, initialMax])
 
   const onSubmit = async (data: FormData) => {
     try {

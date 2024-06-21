@@ -12,6 +12,10 @@ export default createSchema({
           YES: z.number(),
           NO: z.number(),
         }),
+        holdings: z.object({
+          YES: z.number().optional(),
+          NO: z.number().optional(),
+        }),
       }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
