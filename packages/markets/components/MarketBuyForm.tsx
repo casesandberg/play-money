@@ -177,28 +177,58 @@ export function MarketBuyForm({
         </Button>
 
         <ul className="grid gap-1 text-sm">
-          <li className="flex items-center justify-between">
-            <span className="text-muted-foreground">Potential return</span>
-            <span className={cn('font-semibold', quote?.potentialReturn ? 'text-green-500' : 'text-muted-foreground')}>
-              {quote?.potentialReturn
-                ? `$${Math.round(quote?.potentialReturn)} (${Math.round(((quote?.potentialReturn - form.getValues('amount')) / form.getValues('amount')) * 100)}%)`
-                : '—'}
-            </span>
-          </li>
-
-          <li className="flex items-center justify-between">
-            <span className="text-muted-foreground">New probability</span>
-            <span
-              className={cn(
-                'font-semibold',
-                quote?.potentialReturn ? 'text-primary-foreground' : 'text-muted-foreground'
-              )}
-            >
-              {quote?.newProbability ? `${Math.round(quote?.newProbability * 100)}%` : '—'}
-            </span>
-          </li>
+          <QuoteItem
+            label="Potential return"
+            value={quote?.potentialReturn}
+            formatter={formatCurrency}
+            percent={calculateReturnPercentage(quote?.potentialReturn, form.getValues('amount'))}
+          />
+          <QuoteItem label="New probability" value={quote?.newProbability} formatter={formatPercentage} />
         </ul>
       </form>
     </Form>
   )
 }
+
+// TODO: Create format components and using existing currency component
+export const formatCurrency = (value: number) => `$${Math.round(value)}`
+
+export const formatPercentage = (value: number) => `${Math.round(value * 100)}%`
+
+export const calculateReturnPercentage = (potentialReturn = 0, amount = 0) => {
+  return ((potentialReturn - amount) / amount) * 100
+}
+
+export const QuoteItem = ({
+  label,
+  value,
+  percent,
+  formatter = (value) => value.toString(),
+  className,
+}: {
+  label: string
+  value?: number
+  percent?: number
+  formatter?: (value: number) => string
+  className?: string
+}) => (
+  <li className="flex items-center justify-between">
+    <span className="text-muted-foreground">{label}</span>
+    <span
+      className={cn(
+        'font-semibold',
+        value
+          ? percent
+            ? percent > 0
+              ? 'text-green-500'
+              : percent < 0
+                ? 'text-red-500'
+                : 'text-primary-foreground'
+            : 'text-primary-foreground'
+          : 'text-muted-foreground'
+      )}
+    >
+      {value ? (percent ? `${formatter(value)} (${Math.round(percent)}%)` : formatter(value)) : '—'}
+    </span>
+  </li>
+)

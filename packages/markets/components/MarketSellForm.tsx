@@ -11,6 +11,7 @@ import { Input } from '@play-money/ui/input'
 import { Slider } from '@play-money/ui/slider'
 import { toast } from '@play-money/ui/use-toast'
 import { cn } from '@play-money/ui/utils'
+import { QuoteItem, calculateReturnPercentage, formatCurrency, formatPercentage } from './MarketBuyForm'
 import { ExtendedMarket } from './MarketOverviewPage'
 
 const FormSchema = z.object({
@@ -151,26 +152,13 @@ export function MarketSellForm({
         </Button>
 
         <ul className="grid gap-1 text-sm">
-          <li className="flex items-center justify-between">
-            <span className="text-muted-foreground">Value</span>
-            <span className={cn('font-semibold', quote?.potentialReturn ? 'text-red-500' : 'text-muted-foreground')}>
-              {quote?.potentialReturn
-                ? `$${Math.round(quote?.potentialReturn)} (${Math.round(((quote?.potentialReturn - form.getValues('amount')) / form.getValues('amount')) * 100)}%)`
-                : '—'}
-            </span>
-          </li>
-
-          <li className="flex items-center justify-between">
-            <span className="text-muted-foreground">New probability</span>
-            <span
-              className={cn(
-                'font-semibold',
-                quote?.potentialReturn ? 'text-primary-foreground' : 'text-muted-foreground'
-              )}
-            >
-              {quote?.newProbability ? `${Math.round(quote?.newProbability * 100)}%` : '—'}
-            </span>
-          </li>
+          <QuoteItem
+            label="Potential return"
+            value={quote?.potentialReturn}
+            formatter={formatCurrency}
+            percent={calculateReturnPercentage(quote?.potentialReturn, form.getValues('amount'))}
+          />
+          <QuoteItem label="New probability" value={quote?.newProbability} formatter={formatPercentage} />
         </ul>
       </form>
     </Form>

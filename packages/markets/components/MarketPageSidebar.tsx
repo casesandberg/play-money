@@ -2,9 +2,8 @@
 
 import React from 'react'
 import useSWR, { useSWRConfig } from 'swr'
-import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
 import { useSearchParam } from '@play-money/ui'
-import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
+import { Card, CardContent, CardHeader } from '@play-money/ui/card'
 import { Combobox } from '@play-money/ui/combobox'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@play-money/ui/tabs'
 import { cn } from '@play-money/ui/utils'
@@ -12,8 +11,6 @@ import { MarketBuyForm } from './MarketBuyForm'
 import { ExtendedMarket } from './MarketOverviewPage'
 import { MarketSellForm } from './MarketSellForm'
 import { useSidebar } from './SidebarContext'
-
-// TODO: @casesandberg Extract and create form component
 
 export function MarketPageSidebar({ market, activeOptionId }: { market: ExtendedMarket; activeOptionId: string }) {
   const { data: balance } = useSWR(`/v1/markets/${market.id}/balance`, { refreshInterval: 1000 * 60 }) // 60 seconds
@@ -69,16 +66,13 @@ export function MarketPageSidebar({ market, activeOptionId }: { market: Extended
           <CardContent className="flex gap-2 p-3 text-sm">
             <span className="text-muted-foreground">Holdings:</span>
             {market.options.map((option) => {
-              if (balance?.holdings[option.currencyCode] > 0) {
-                return (
-                  <span key={option.id} className="font-semibold" style={{ color: option.color }}>
-                    <span>${Math.round(balance?.holdings[option.currencyCode])} </span>
-                    <span>{option.name}</span>
-                  </span>
-                )
-              }
-
-              return null
+              const shares = balance?.holdings[option.currencyCode]
+              return shares ? (
+                <div key={option.id} className="font-semibold" style={{ color: option.color }}>
+                  <span>${Math.round(balance?.holdings[option.currencyCode])} </span>
+                  <span>{option.name}</span>
+                </div>
+              ) : null
             })}
           </CardContent>
         </Card>
