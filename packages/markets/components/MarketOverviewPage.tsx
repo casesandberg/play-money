@@ -1,9 +1,8 @@
 'use client'
 
 import { format } from 'date-fns'
-import { PanelRightClose } from 'lucide-react'
 import React from 'react'
-import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts'
+import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip } from 'recharts'
 import useSWR from 'swr'
 import { Market, MarketOption } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
@@ -100,6 +99,19 @@ export function MarketOverviewPage({
           {graph?.data ? (
             <ResponsiveContainer width="100%" height="100%">
               <LineChart width={300} height={128} data={graph.data}>
+                <Tooltip
+                  content={({ payload }) => {
+                    const data = payload?.[0]?.payload
+                    if (data) {
+                      return (
+                        <Card className="p-1 text-sm">
+                          {format(data.startAt, 'MMM d, yyyy')} · {Math.round(data.probability * 100)}%
+                        </Card>
+                      )
+                    }
+                    return null
+                  }}
+                />
                 <YAxis type="number" domain={[0, 1]} hide />
                 <Line
                   type="step"
