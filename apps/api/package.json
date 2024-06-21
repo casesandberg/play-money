@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@play-money/accounts": "*",
+    "@play-money/amms": "*",
     "@play-money/api-helpers": "*",
     "@play-money/auth": "*",
     "@play-money/comments": "*",
@@ -18,8 +19,10 @@
     "@play-money/database": "*",
     "@play-money/markets": "*",
     "@play-money/search": "*",
+    "@play-money/transactions": "*",
     "@play-money/users": "*",
     "bcryptjs": "^2.4.3",
+    "decimal.js": "^10.4.3",
     "next": "^14.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

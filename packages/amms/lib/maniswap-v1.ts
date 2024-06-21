@@ -10,6 +10,19 @@ import { TransactionItemInput } from '@play-money/transactions/lib/createTransac
 
  For more information, see https://manifoldmarkets.notion.site/Maniswap-ce406e1e897d417cbd491071ea8a0c39
 */
+function calculateBuyShares(amount: Decimal, y: Decimal, n: Decimal): Decimal {
+  return amount.times(amount.add(n).add(y)).div(amount.add(n))
+}
+
+function calculateSellShares(amount: Decimal, y: Decimal, n: Decimal): Decimal {
+  const totalShares = n.add(y).add(amount)
+  return totalShares.sub(Decimal.sqrt(totalShares.pow(2).sub(n.times(4).times(amount)))).times(0.5)
+}
+
+function calculateNewProbability(y: Decimal, n: Decimal): Decimal {
+  return n.div(y.add(n))
+}
+
 export async function buy({
   fromAccountId,
   ammAccountId,
@@ -27,49 +40,18 @@ export async function buy({
   const y = await getAccountBalance(ammAccountId, 'YES')
   const n = await getAccountBalance(ammAccountId, 'NO')
 
-  let toReturn: Decimal
-  if (buyingYes) {
-    // We will solve (y + amount - toReturn) * (n + amount) = k = y * n for toReturn
-    toReturn = amount.times(amount.add(n).add(y)).div(amount.add(n))
-  } else {
-    // We will solve (y + amount) * (n + amount - toReturn) = k = y * n for toReturn
-    toReturn = amount.times(amount.add(n).add(y)).div(amount.add(y))
-  }
+  const toReturn = buyingYes ? calculateBuyShares(amount, y, n) : calculateBuyShares(amount, n, y)
 
   const ammTransactions = [
     // Giving the shares to the AMM.
-    {
-      accountId: fromAccountId,
-      currencyCode: currencyCode,
-      amount: amount.neg(),
-    },
-    {
-      accountId: fromAccountId,
-      currencyCode: oppositeCurrencyCode,
-      amount: amount.neg(),
-    },
-    {
-      accountId: ammAccountId,
-      currencyCode: currencyCode,
-      amount: amount,
-    },
-    {
-      accountId: ammAccountId,
-      currencyCode: oppositeCurrencyCode,
-      amount: amount,
-    },
+    { accountId: fromAccountId, currencyCode: currencyCode, amount: amount.neg() },
+    { accountId: fromAccountId, currencyCode: oppositeCurrencyCode, amount: amount.neg() },
+    { accountId: ammAccountId, currencyCode: currencyCode, amount: amount },
+    { accountId: ammAccountId, currencyCode: oppositeCurrencyCode, amount: amount },
 
     // Returning purchased shares to the user.
-    {
-      accountId: ammAccountId,
-      currencyCode: currencyCode,
-      amount: toReturn.neg(),
-    },
-    {
-      accountId: fromAccountId,
-      currencyCode: currencyCode,
-      amount: toReturn,
-    },
+    { accountId: ammAccountId, currencyCode: currencyCode, amount: toReturn.neg() },
+    { accountId: fromAccountId, currencyCode: currencyCode, amount: toReturn },
   ]
 
   return ammTransactions
@@ -92,52 +74,65 @@ export async function sell({
   const y = await getAccountBalance(ammAccountId, 'YES')
   const n = await getAccountBalance(ammAccountId, 'NO')
 
-  let toReturn: Decimal
-  if (sellingYes) {
-    // We will solve (y + amount - toReturn) * (n - toReturn) = k = y * n for toReturn
-    let totalShares = n.add(y).add(amount)
-    toReturn = totalShares.sub(Decimal.sqrt(totalShares.pow(2).sub(n.times(4).times(amount)))).times(0.5)
-  } else {
-    // We will solve (y + amount - toReturn) * (n - toReturn) = k = y * n for toReturn
-    let totalShares = n.add(y).add(amount)
-    toReturn = totalShares.sub(Decimal.sqrt(totalShares.pow(2).sub(y.times(4).times(amount)))).times(0.5)
-  }
+  const toReturn = sellingYes ? calculateSellShares(amount, y, n) : calculateSellShares(amount, n, y)
 
   return [
     // Giving the shares to the AMM.
-    {
-      accountId: fromAccountId,
-      currencyCode: currencyCode,
-      amount: amount.neg(),
-    },
-    {
-      accountId: ammAccountId,
-      currencyCode: currencyCode,
-      amount: amount,
-    },
+    { accountId: fromAccountId, currencyCode: currencyCode, amount: amount.neg() },
+    { accountId: ammAccountId, currencyCode: currencyCode, amount: amount },
 
     // Returning purchased shares to the user.
-    {
-      accountId: fromAccountId,
-      currencyCode: currencyCode,
-      amount: toReturn,
-    },
-    {
-      accountId: fromAccountId,
-      currencyCode: oppositeCurrencyCode,
-      amount: toReturn,
-    },
-    {
-      accountId: ammAccountId,
-      currencyCode: currencyCode,
-      amount: toReturn.neg(),
-    },
-    {
-      accountId: ammAccountId,
-      currencyCode: oppositeCurrencyCode,
-      amount: toReturn.neg(),
-    },
+    { accountId: fromAccountId, currencyCode: currencyCode, amount: toReturn },
+    { accountId: fromAccountId, currencyCode: oppositeCurrencyCode, amount: toReturn },
+    { accountId: ammAccountId, currencyCode: currencyCode, amount: toReturn.neg() },
+    { accountId: ammAccountId, currencyCode: oppositeCurrencyCode, amount: toReturn.neg() },
   ]
+}
+
+export async function quote({
+  ammAccountId,
+  currencyCode,
+  amount,
+  isBuy,
+}: {
+  ammAccountId: string
+  currencyCode: CurrencyCodeType
+  amount: Decimal
+  isBuy: boolean
+}): Promise<{ probability: Decimal; shares: Decimal }> {
+  const y = await getAccountBalance(ammAccountId, 'YES')
+  const n = await getAccountBalance(ammAccountId, 'NO')
+
+  let shares: Decimal
+  let newY: Decimal
+  let newN: Decimal
+
+  if (isBuy) {
+    if (currencyCode === 'YES') {
+      shares = calculateBuyShares(amount, y, n)
+      newY = y.add(amount).minus(shares)
+      newN = n.add(amount)
+    } else {
+      shares = calculateBuyShares(amount, n, y)
+      newN = n.add(amount).minus(shares)
+      newY = y.add(amount)
+    }
+  } else {
+    if (currencyCode === 'YES') {
+      shares = calculateSellShares(amount, y, n)
+      newY = y.add(amount)
+      newN = n.sub(shares)
+    } else {
+      shares = calculateSellShares(amount, n, y)
+      newN = n.add(amount)
+      newY = y.sub(shares)
+    }
+  }
+
+  return {
+    probability: calculateNewProbability(newY, newN),
+    shares,
+  }
 }
 
 export async function costToHitProbability({
