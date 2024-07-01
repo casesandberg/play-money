@@ -51,8 +51,6 @@ export function UserNav() {
       </DropdownMenuContent>
     </DropdownMenu>
   ) : (
-    <Button variant="secondary" className="relative rounded-full px-3" onClick={() => signIn()}>
-      <CircleUser className="h-4 w-4" />
-    </Button>
+    <Button onClick={() => signIn()}>Sign in</Button>
   )
 }
