@@ -2,7 +2,6 @@ import Decimal from 'decimal.js'
 import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import db, { MarketSchema, MarketOption, MarketOptionSchema } from '@play-money/database'
-import { createHouseUserGiftTransaction } from '@play-money/transactions/lib/createHouseUserGiftTransaction'
 import { createMarketLiquidityTransaction } from '@play-money/transactions/lib/createMarketLiquidityTransaction'
 
 type PartialOptions = Pick<MarketOption, 'name' | 'currencyCode'>
@@ -45,18 +44,11 @@ export async function createMarket({
         currencyCode: 'YES',
       },
       {
-        name: 'NO',
+        name: 'No',
         currencyCode: 'NO',
       },
     ]
   }
-
-  // TODO: Move house gift to account creation.
-  await createHouseUserGiftTransaction({
-    userId: marketData.createdBy,
-    creatorId: marketData.createdBy,
-    amount: new Decimal(1100),
-  })
 
   const userAccount = await getUserAccount({ id: marketData.createdBy })
   const hasEnoughBalance = await checkAccountBalance(userAccount.id, 'PRIMARY', subsidyAmount)
@@ -81,6 +73,9 @@ export async function createMarket({
       accounts: {
         create: {}, // Create AMM Account
       },
+    },
+    include: {
+      options: true,
     },
   })
 

@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker'
+import { CurrencyCode, MarketOption } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import _ from 'lodash'
 import { Market, User, Account, TransactionItem } from './zod'
@@ -61,6 +62,19 @@ export function mockTransactionItem(overrides?: Partial<TransactionItem>): Trans
     accountId: faker.string.uuid(),
     transactionId: faker.string.uuid(),
     amount: new Decimal(faker.finance.amount()),
+    ...overrides,
+  }
+}
+
+export function mockMarketOption(overrides?: Partial<MarketOption>): MarketOption {
+  const currencyCode = faker.helpers.arrayElement(['YES', 'NO']) as CurrencyCode
+  return {
+    id: faker.string.uuid(),
+    name: currencyCode === 'YES' ? 'Yes' : 'No',
+    currencyCode,
+    marketId: faker.string.uuid(),
+    createdAt: faker.date.past(),
+    updatedAt: faker.date.past(),
     ...overrides,
   }
 }

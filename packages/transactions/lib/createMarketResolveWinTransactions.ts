@@ -32,37 +32,39 @@ export async function createMarketResolveWinTransactions({
 
   // Transfer winning shares back to the AMM and convert to primary currency
   for (const [accountId, amount] of Object.entries(summedWinningShares)) {
-    await createTransaction({
-      creatorId: ammAccount.id,
-      type: 'MARKET_RESOLVE_WIN',
-      description: `Returning winning shares for market ${marketId} and converting to primary currency`,
-      marketId,
-      transactionItems: [
-        {
-          accountId: accountId,
-          currencyCode: winningCurrencyCode,
-          amount: amount.negated(),
-        },
-        {
-          accountId: ammAccount.id,
-          currencyCode: winningCurrencyCode,
-          amount,
-        },
-        ...(await convertMarketSharesToPrimary({
-          fromAccountId: ammAccount.id,
-          amount,
-        })),
-        {
-          accountId: ammAccount.id,
-          currencyCode: 'PRIMARY',
-          amount: amount.negated(),
-        },
-        {
-          accountId: accountId,
-          currencyCode: 'PRIMARY',
-          amount: amount,
-        },
-      ],
-    })
+    if (amount.gt(0)) {
+      await createTransaction({
+        creatorId: ammAccount.id,
+        type: 'MARKET_RESOLVE_WIN',
+        description: `Returning winning shares for market ${marketId} and converting to primary currency`,
+        marketId,
+        transactionItems: [
+          {
+            accountId: accountId,
+            currencyCode: winningCurrencyCode,
+            amount: amount.negated(),
+          },
+          {
+            accountId: ammAccount.id,
+            currencyCode: winningCurrencyCode,
+            amount,
+          },
+          ...(await convertMarketSharesToPrimary({
+            fromAccountId: ammAccount.id,
+            amount,
+          })),
+          {
+            accountId: ammAccount.id,
+            currencyCode: 'PRIMARY',
+            amount: amount.negated(),
+          },
+          {
+            accountId: accountId,
+            currencyCode: 'PRIMARY',
+            amount: amount,
+          },
+        ],
+      })
+    }
   }
 }

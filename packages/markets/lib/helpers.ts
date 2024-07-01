@@ -1,4 +1,5 @@
 import { Market } from '@play-money/database'
+import { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/CurrencyCodeSchema'
 import { ExtendedMarket } from '../components/MarketOverviewPage'
 
 export function canResolveMarket({ market, userId }: { market: Market; userId?: string }) {
@@ -12,4 +13,8 @@ export function isMarketTradable(market: Market): boolean {
 
 export function isMarketResolved(market: ExtendedMarket): boolean {
   return Boolean(market.marketResolution)
+}
+
+export function isPurchasableCurrency(currency: CurrencyCodeType): currency is 'YES' | 'NO' {
+  return ['YES', 'NO'].includes(currency)
 }

@@ -14,6 +14,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@play-money
 import { ReadMoreEditor } from '@play-money/ui/editor'
 import { UserProfile } from '@play-money/users/lib/sanitizeUser'
 import { useSearchParam } from '../../ui/src/hooks/useSearchParam'
+import { MarketLikelyOption } from './MarketLikelyOption'
 import { MarketOptionRow } from './MarketOptionRow'
 import { MarketToolbar } from './MarketToolbar'
 import { useSidebar } from './SidebarContext'
@@ -35,39 +36,6 @@ function getTextContrast(hex: string): string {
   return luminance > 0.5 ? '#000' : '#FFF'
 }
 
-function getProbabilityChange(data: Array<{ endAt: Date; startAt: Date; probability: number }>) {
-  data.forEach((point) => {
-    point.endAt = new Date(point.endAt)
-    point.startAt = new Date(point.startAt)
-  })
-
-  data.sort((a, b) => a.endAt.getTime() - b.endAt.getTime())
-
-  const now = new Date()
-  const oneWeekAgo = new Date(now)
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
-
-  let latestProbability = 0.5
-  let oneWeekAgoProbability = 0.5
-
-  // Find the latest probability
-  if (data.length > 0) {
-    latestProbability = data[data.length - 1].probability
-  }
-
-  for (const item of data) {
-    if (item.endAt <= oneWeekAgo) {
-      oneWeekAgoProbability = item.probability
-      break
-    }
-  }
-
-  return {
-    latestProbability,
-    difference: latestProbability - oneWeekAgoProbability,
-  }
-}
-
 export function MarketOverviewPage({
   market,
   renderComments,
@@ -81,15 +49,6 @@ export function MarketOverviewPage({
   const [option, setOption] = useSearchParam('option')
   const activeOptionId = option || market.options[0]?.id || ''
 
-  const mostLikelyProbability = Math.max(
-    ...market.options.map((option) => balance?.probability[option.currencyCode] || 0)
-  )
-  const mostLikelyOption = market.options.find(
-    (option) => balance?.probability[option.currencyCode] === mostLikelyProbability
-  )
-
-  const change = getProbabilityChange(graph?.data || [])
-
   return (
     <Card className="flex-1">
       <MarketToolbar market={market} />
@@ -97,20 +56,8 @@ export function MarketOverviewPage({
       <CardHeader className="px-7 pt-0">
         <CardTitle className="leading-relaxed">{market.question}</CardTitle>
         <div className="flex flex-row gap-4 text-sm text-muted-foreground">
-          {mostLikelyOption && !market.marketResolution ? (
-            <>
-              <div style={{ color: mostLikelyOption.color }} className="font-semibold">
-                {Math.round(mostLikelyProbability * 100)}% {mostLikelyOption.name}
-              </div>
+          {!market.marketResolution ? <MarketLikelyOption market={market} /> : null}
 
-              {change.difference !== 0 ? (
-                <div>
-                  {change.difference > 0 ? '+' : ''}
-                  {Math.round(change.difference * 100)}% this week
-                </div>
-              ) : null}
-            </>
-          ) : null}
           {market.closeDate ? (
             <div>
               {isPast(market.closeDate) ? 'Ended' : 'Ending'} {format(market.closeDate, 'MMM d, yyyy')}
@@ -198,6 +145,7 @@ export function MarketOverviewPage({
                   <Card>
                     {market.options.map((option, i) => (
                       <MarketOptionRow
+                        key={option.id}
                         option={option}
                         active={option.id === activeOptionId}
                         probability={balance?.probability[option.currencyCode] || 0}
@@ -217,6 +165,7 @@ export function MarketOverviewPage({
           <Card>
             {market.options.map((option, i) => (
               <MarketOptionRow
+                key={option.id}
                 option={option}
                 active={option.id === activeOptionId}
                 probability={balance?.probability[option.currencyCode] || 0}

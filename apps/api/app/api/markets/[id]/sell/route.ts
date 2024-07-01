@@ -2,16 +2,8 @@ import Decimal from 'decimal.js'
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
-import db from '@play-money/database'
-import type { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/CurrencyCodeSchema'
-import { getMarket } from '@play-money/markets/lib/getMarket'
-import { isMarketTradable } from '@play-money/markets/lib/helpers'
-import { createMarketSellTransaction } from '@play-money/transactions/lib/createMarketSellTransaction'
+import { marketSell } from '@play-money/markets/lib/marketSell'
 import schema from './schema'
-
-function isSellableCurrency(currency: CurrencyCodeType): currency is 'YES' | 'NO' {
-  return ['YES', 'NO'].includes(currency)
-}
 
 export const dynamic = 'force-dynamic'
 
@@ -31,28 +23,11 @@ export async function POST(
     const body = (await req.json()) as unknown
     const { optionId, amount } = schema.post.requestBody.parse(body)
 
-    const market = await getMarket({ id })
-    if (!isMarketTradable(market)) {
-      throw new Error('Market is closed')
-    }
-
-    const marketOption = await db.marketOption.findFirst({
-      where: { id: optionId, marketId: id },
-    })
-
-    if (!marketOption) {
-      throw new Error('Invalid optionId')
-    }
-
-    if (!isSellableCurrency(marketOption.currencyCode)) {
-      throw new Error('Invalid option currency code')
-    }
-
-    await createMarketSellTransaction({
-      userId: session.user.id,
+    await marketSell({
       marketId: id,
+      optionId,
+      creatorId: session.user.id,
       amount: new Decimal(amount),
-      sellCurrencyCode: marketOption.currencyCode,
     })
 
     return NextResponse.json({})
