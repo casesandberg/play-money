@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker'
+import { Decimal } from '@prisma/client/runtime/library'
 import _ from 'lodash'
-import { Market, User, Account } from './zod'
+import { Market, User, Account, TransactionItem } from './zod'
 
 export function mockUser(overrides?: Partial<User>): User {
   const firstName = faker.person.firstName()
@@ -48,6 +49,18 @@ export function mockAccount(overrides?: Partial<Account>): Account {
     internalType: null,
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
+    ...overrides,
+  }
+}
+
+export function mockTransactionItem(overrides?: Partial<TransactionItem>): TransactionItem {
+  return {
+    id: faker.string.uuid(),
+    createdAt: faker.date.past(),
+    currencyCode: faker.helpers.arrayElement(['YES', 'NO']),
+    accountId: faker.string.uuid(),
+    transactionId: faker.string.uuid(),
+    amount: new Decimal(faker.finance.amount()),
     ...overrides,
   }
 }

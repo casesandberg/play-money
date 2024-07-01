@@ -1,15 +1,23 @@
 import { MarketComments } from '@play-money/comments/components/MarketComments'
 import db from '@play-money/database'
+import type { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
 import { MarketOverviewPage } from '@play-money/markets/components/MarketOverviewPage'
+import { sanitizeUser } from '@play-money/users/lib/sanitizeUser'
 
 // TODO: @casesandberg Extract to API call
-export const getMarket = async ({ id }: { id: string }) => {
+export const getMarket = async ({ id }: { id: string }): Promise<ExtendedMarket> => {
   const market = await db.market.findUnique({
     where: {
       id,
     },
     include: {
       options: true,
+      marketResolution: {
+        include: {
+          resolution: true,
+          resolvedBy: true,
+        },
+      },
     },
   })
 
@@ -23,6 +31,16 @@ export const getMarket = async ({ id }: { id: string }) => {
       ...option,
       color: option.currencyCode === 'YES' ? '#3b82f6' : '#ec4899',
     })),
+    marketResolution: market.marketResolution
+      ? {
+          ...market.marketResolution,
+          resolvedBy: sanitizeUser(market.marketResolution.resolvedBy),
+          resolution: {
+            ...market.marketResolution.resolution,
+            color: market.marketResolution.resolution.currencyCode === 'YES' ? '#3b82f6' : '#ec4899',
+          },
+        }
+      : undefined,
   }
 }
 

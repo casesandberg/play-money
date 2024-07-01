@@ -5,17 +5,23 @@ import { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/Curr
 export async function getAccountBalance(
   accountId: string,
   currencyCode: CurrencyCodeType,
-  marketId?: string
+  marketId?: string,
+  excludeTransactionTypes?: string[]
 ): Promise<Decimal> {
   const transactionItems = await db.transactionItem.findMany({
     where: {
       accountId,
       currencyCode,
-      transaction: marketId ? { marketId } : undefined,
+      transaction: {
+        marketId,
+        type: {
+          notIn: excludeTransactionTypes,
+        },
+      },
     },
     include: {
       transaction: {
-        select: { marketId: true },
+        select: { marketId: true, type: true },
       },
     },
   })

@@ -2,6 +2,7 @@ export * from './UserSchema';
 export * from './AuthAccountSchema';
 export * from './SessionSchema';
 export * from './MarketSchema';
+export * from './MarketResolutionSchema';
 export * from './MarketOptionSchema';
 export * from './VerificationTokenSchema';
 export * from './CommentSchema';

@@ -19,11 +19,13 @@ export async function getMarketTransactionsTimeSeries({
   startAt,
   endAt = new Date(),
   tickInterval = 24, // in hours
+  excludeTransactionTypes,
 }: {
   marketId: string
   startAt?: Date
   endAt?: Date
   tickInterval?: number
+  excludeTransactionTypes?: string[]
 }) {
   const market = await getMarket({ id: marketId })
   const ammAccount = await getAmmAccount({ marketId: marketId })
@@ -54,6 +56,9 @@ export async function getMarketTransactionsTimeSeries({
       createdAt: {
         gte: startAt,
         lte: endAt,
+      },
+      type: {
+        notIn: excludeTransactionTypes,
       },
     },
     include: {

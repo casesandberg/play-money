@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
+import { getMarket } from '@play-money/markets/lib/getMarket'
 import { getMarketTransactionsTimeSeries } from '@play-money/transactions/lib/getMarketTransactionsTimeSeries'
 import schema from './schema'
 
@@ -11,8 +12,14 @@ export async function GET(
 ): Promise<SchemaResponse<typeof schema.GET.responses>> {
   try {
     const { id } = schema.GET.parameters.parse(params)
+    const market = await getMarket({ id })
 
-    const data = await getMarketTransactionsTimeSeries({ marketId: id, tickInterval: 1 })
+    const data = await getMarketTransactionsTimeSeries({
+      marketId: id,
+      tickInterval: 1,
+      endAt: market.resolvedAt || new Date(),
+      excludeTransactionTypes: ['MARKET_RESOLVE_LOSS', 'MARKET_RESOLVE_WIN'],
+    })
 
     return NextResponse.json({
       data,

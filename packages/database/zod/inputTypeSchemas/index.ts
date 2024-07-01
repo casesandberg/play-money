@@ -3,6 +3,7 @@ export { UserScalarFieldEnumSchema } from './UserScalarFieldEnumSchema';
 export { AuthAccountScalarFieldEnumSchema } from './AuthAccountScalarFieldEnumSchema';
 export { SessionScalarFieldEnumSchema } from './SessionScalarFieldEnumSchema';
 export { MarketScalarFieldEnumSchema } from './MarketScalarFieldEnumSchema';
+export { MarketResolutionScalarFieldEnumSchema } from './MarketResolutionScalarFieldEnumSchema';
 export { MarketOptionScalarFieldEnumSchema } from './MarketOptionScalarFieldEnumSchema';
 export { VerificationTokenScalarFieldEnumSchema } from './VerificationTokenScalarFieldEnumSchema';
 export { CommentScalarFieldEnumSchema } from './CommentScalarFieldEnumSchema';
