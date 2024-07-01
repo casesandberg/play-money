@@ -13,9 +13,9 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.GE
 
     const { query } = schema.GET.parameters.parse(params)
 
-    const { users } = await search({ query })
+    const { users, markets } = await search({ query })
 
-    return NextResponse.json({ users })
+    return NextResponse.json({ users, markets })
   } catch (error) {
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 })
   }

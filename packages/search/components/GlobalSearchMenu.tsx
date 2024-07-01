@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import React, { useState, useEffect } from 'react'
+import { Market } from '@play-money/database'
 import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
 import {
   CommandDialog,
@@ -16,7 +17,7 @@ import { UserProfile } from '@play-money/users/lib/sanitizeUser'
 export function GlobalSearchMenu({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const router = useRouter()
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState<{ users: Array<UserProfile> } | null>(null)
+  const [results, setResults] = useState<{ users: Array<UserProfile>; markets: Array<Market> } | null>(null)
 
   useEffect(() => {
     async function search() {
@@ -45,6 +46,23 @@ export function GlobalSearchMenu({ open, onOpenChange }: { open: boolean; onOpen
       />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
+        {results?.markets.length ? (
+          <CommandGroup heading="Questions">
+            {results.markets.map((market) => (
+              <CommandItem
+                key={market.id}
+                value={market.id}
+                className="flex flex-row gap-2"
+                onSelect={() => {
+                  router.push(`/questions/${market.id}/${market.slug}`)
+                  onOpenChange(false)
+                }}
+              >
+                <div className="font-semibold">{market.question}</div>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        ) : null}
         {results?.users.length ? (
           <CommandGroup heading="Users">
             {results.users.map((user) => (
