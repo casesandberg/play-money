@@ -13,6 +13,6 @@ export function sanitizeUser(user: zod.infer<typeof UserSchema>): UserProfile {
 
   return {
     ...data,
-    avatarUrl: data?.avatarUrl || `https://api.dicebear.com/8.x/initials/svg?seed=${data?.username}&scale=75`,
+    avatarUrl: data.avatarUrl || `https://api.dicebear.com/8.x/initials/svg?seed=${data.username}&scale=75`,
   }
 }
