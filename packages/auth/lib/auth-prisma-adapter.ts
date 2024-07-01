@@ -1,17 +1,14 @@
 // Copied and modified from: https://github.com/nextauthjs/next-auth/blob/main/packages/adapter-prisma/src/index.ts
 import type { Adapter, AdapterAccount, AdapterSession, AdapterUser } from '@auth/core/adapters'
 import type { PrismaClient, Prisma } from '@prisma/client'
-import { generateFromEmail } from 'unique-username-generator'
+import { createUser } from '@play-money/users/lib/createUser'
 
 export function PrismaAdapter(prisma: PrismaClient | ReturnType<PrismaClient['$extends']>): Adapter {
   const p = prisma as PrismaClient
   return {
     // We need to let Prisma generate the ID because our default UUID is incompatible with MongoDB
     createUser: ({ id: _id, ...data }) => {
-      const identifier = generateFromEmail(data.email, 4)
-      return p.user.create({
-        data: { ...data, username: identifier, displayName: identifier, accounts: { create: {} } },
-      })
+      return createUser({ email: data.email })
     },
     getUser: (id) => p.user.findUnique({ where: { id } }),
     getUserByEmail: (email) => p.user.findUnique({ where: { email } }),

@@ -1,13 +1,8 @@
 import db from '@play-money/database'
-import { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/CurrencyCodeSchema'
 import { createMarketResolveLossTransactions } from '@play-money/transactions/lib/createMarketResolveLossTransactions'
 import { createMarketResolveWinTransactions } from '@play-money/transactions/lib/createMarketResolveWinTransactions'
 import { getMarket } from './getMarket'
-import { canResolveMarket } from './helpers'
-
-function isPurchasableCurrency(currency: CurrencyCodeType): currency is 'YES' | 'NO' {
-  return ['YES', 'NO'].includes(currency)
-}
+import { canResolveMarket, isPurchasableCurrency } from './helpers'
 
 export async function resolveMarket({
   resolverId,

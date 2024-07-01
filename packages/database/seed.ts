@@ -1,7 +1,12 @@
 import { faker } from '@faker-js/faker'
+import Decimal from 'decimal.js'
 import _ from 'lodash'
 import db from '@play-money/database'
-import { mockMarket, mockUser } from './mocks'
+import { createMarket } from '@play-money/markets/lib/createMarket'
+import { marketBuy } from '@play-money/markets/lib/marketBuy'
+import { resolveMarket } from '@play-money/markets/lib/resolveMarket'
+import { createHouseUserGiftTransaction } from '@play-money/transactions/lib/createHouseUserGiftTransaction'
+import { mockUser } from './mocks'
 
 async function main() {
   await db.currency.upsert({
@@ -75,7 +80,7 @@ async function main() {
   let user_ids = await Promise.all(
     _.times(10, async () => {
       let data = mockUser()
-      await db.user.create({
+      const user = await db.user.create({
         data: {
           ...data,
           accounts: {
@@ -83,21 +88,49 @@ async function main() {
           },
         },
       })
+
+      await createHouseUserGiftTransaction({
+        userId: user.id,
+        creatorId: user.id,
+        amount: new Decimal(50000),
+      })
+
       return data.id
     })
   )
   await Promise.all(
-    _.times(5, async () => {
-      await db.market.create({
-        data: {
-          ...mockMarket({
-            createdBy: faker.helpers.arrayElement(user_ids),
-          }),
-          accounts: {
-            create: {},
-          },
-        },
+    _.times(10, async () => {
+      const market = await createMarket({
+        question: faker.lorem.sentence(),
+        description: `<p>${faker.lorem.paragraph()}</p>`,
+        closeDate: faker.date.future(),
+        createdBy: faker.helpers.arrayElement(user_ids),
       })
+
+      await Promise.all(
+        _.times(5, async () => {
+          return await marketBuy({
+            marketId: market.id,
+            optionId: market.options[faker.helpers.arrayElement([0, 1])].id,
+            creatorId: faker.helpers.arrayElement(user_ids),
+            amount: new Decimal(faker.string.numeric({ length: { min: 3, max: 4 } })),
+          })
+        })
+      )
+
+      faker.helpers.maybe(
+        async () => {
+          await resolveMarket({
+            resolverId: market.createdBy,
+            marketId: market.id,
+            optionId: market.options[faker.helpers.arrayElement([0, 1])].id,
+            supportingLink: faker.internet.url(),
+          })
+        },
+        { probability: 0.2 }
+      )
+
+      return market
     })
   )
 }

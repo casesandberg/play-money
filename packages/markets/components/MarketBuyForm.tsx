@@ -47,7 +47,7 @@ export function MarketBuyForm({
 
       if (!response.ok) {
         const data = await response.json()
-        throw new Error(data.message)
+        throw new Error(data.error)
       }
 
       toast({ title: 'Bet placed successfully' })
@@ -58,7 +58,7 @@ export function MarketBuyForm({
       console.error('Failed to place bet:', error)
       toast({
         title: 'There was an issue placing your bet',
-        description: 'Please try again later',
+        description: error.message || 'Please try again later',
         variant: 'destructive',
       })
     }

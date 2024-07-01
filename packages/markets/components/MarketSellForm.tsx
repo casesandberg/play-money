@@ -59,7 +59,7 @@ export function MarketSellForm({
 
       if (!response.ok) {
         const data = await response.json()
-        throw new Error(data.message)
+        throw new Error(data.error)
       }
 
       toast({ title: 'Shares sold successfully' })
@@ -70,7 +70,7 @@ export function MarketSellForm({
       console.error('Failed to place bet:', error)
       toast({
         title: 'There was an issue selling shares',
-        description: 'Please try again later',
+        description: error.message || 'Please try again later',
         variant: 'destructive',
       })
     }
