@@ -4,6 +4,8 @@ import type { SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
 import db from '@play-money/database'
 import type { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/CurrencyCodeSchema'
+import { getMarket } from '@play-money/markets/lib/getMarket'
+import { isMarketTradable } from '@play-money/markets/lib/helpers'
 import { createMarketBuyTransaction } from '@play-money/transactions/lib/createMarketBuyTransaction'
 import schema from './schema'
 
@@ -28,6 +30,11 @@ export async function POST(
 
     const body = (await req.json()) as unknown
     const { optionId, amount } = schema.post.requestBody.parse(body)
+
+    const market = await getMarket({ id })
+    if (!isMarketTradable(market)) {
+      throw new Error('Market is closed')
+    }
 
     const marketOption = await db.marketOption.findFirst({
       where: { id: optionId, marketId: id },

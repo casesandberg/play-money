@@ -99,7 +99,17 @@ function Editor({
   return <EditorContent className={cn('flex flex-col', className)} editor={editor} />
 }
 
-function ReadMoreEditor({ value, maxLines }: { value: string; maxLines: number }) {
+function ReadMoreEditor({
+  value,
+  maxLines,
+  className,
+  editorProps,
+}: {
+  value: string
+  maxLines: number
+  className?: string
+  editorProps?: Partial<EditorProps>
+}) {
   const [isRendered, setIsRendered] = useState(false)
   const [canOverflow, setCanOverflow] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
@@ -124,7 +134,7 @@ function ReadMoreEditor({ value, maxLines }: { value: string; maxLines: number }
   }, [isRendered, value, maxLines])
 
   return (
-    <div>
+    <div className={className}>
       <div
         ref={editorRef}
         style={{
@@ -139,6 +149,7 @@ function ReadMoreEditor({ value, maxLines }: { value: string; maxLines: number }
             setIsRendered(true)
           }}
           value={value}
+          {...editorProps}
         />
 
         {canOverflow ? (

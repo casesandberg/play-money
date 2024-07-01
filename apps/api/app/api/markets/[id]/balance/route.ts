@@ -16,8 +16,8 @@ export async function GET(
     const { id } = schema.get.parameters.parse(params)
 
     const ammAccount = await getAmmAccount({ marketId: id })
-    const y = await getAccountBalance(ammAccount.id, 'YES')
-    const n = await getAccountBalance(ammAccount.id, 'NO')
+    const y = await getAccountBalance(ammAccount.id, 'YES', id, ['MARKET_RESOLVE_LOSS', 'MARKET_RESOLVE_WIN'])
+    const n = await getAccountBalance(ammAccount.id, 'NO', id, ['MARKET_RESOLVE_LOSS', 'MARKET_RESOLVE_WIN'])
 
     let holdings = {}
     const session = await auth()

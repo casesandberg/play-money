@@ -19,10 +19,10 @@ datasource db {
 }
 
 model User {
-  id               String            @id @default(cuid())
+  id               String             @id @default(cuid())
   /// @zod.string.min(1, { message: "Email is required" }).email()
-  email            String            @unique
-  username         String            @unique
+  email            String             @unique
+  username         String             @unique
   displayName      String
   avatarUrl        String?
   twitterHandle    String?
@@ -34,10 +34,11 @@ model User {
   sessions         Session[]
   comments         Comment[]
   commentReactions CommentReaction[]
-  markets          Market[]          @relation()
-  accounts         Account[]         @relation()
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  resolvedMarkets  MarketResolution[]
+  markets          Market[]           @relation()
+  accounts         Account[]          @relation()
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 }
 
 model AuthAccount {
@@ -69,31 +70,46 @@ model Session {
 }
 
 model Market {
-  id           String         @id @default(cuid())
-  question     String /// @zod.string.min(1, { message: "Question is required" })
-  description  String
-  slug         String /// @zod.string.min(1, { message: "Slug is required" })
-  closeDate    DateTime?
-  resolvedAt   DateTime?
-  transactions Transaction[]
-  createdBy    String
-  user         User           @relation(fields: [createdBy], references: [id])
-  accounts     Account[]      @relation()
-  options      MarketOption[] @relation()
+  id               String            @id @default(cuid())
+  question         String /// @zod.string.min(1, { message: "Question is required" })
+  description      String
+  slug             String /// @zod.string.min(1, { message: "Slug is required" })
+  closeDate        DateTime?
+  resolvedAt       DateTime?
+  transactions     Transaction[]
+  createdBy        String
+  user             User              @relation(fields: [createdBy], references: [id])
+  accounts         Account[]         @relation()
+  options          MarketOption[]    @relation()
+  marketResolution MarketResolution?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+model MarketResolution {
+  id             String       @id @default(cuid())
+  marketId       String       @unique
+  market         Market       @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  resolvedById   String
+  resolvedBy     User         @relation(fields: [resolvedById], references: [id], onDelete: Cascade)
+  resolutionId   String
+  resolution     MarketOption @relation(fields: [resolutionId], references: [id], onDelete: Cascade)
+  supportingLink String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
 model MarketOption {
-  id           String       @id @default(cuid())
+  id           String             @id @default(cuid())
   name         String
   marketId     String
-  market       Market       @relation(fields: [marketId], references: [id])
+  market       Market             @relation(fields: [marketId], references: [id])
   currencyCode CurrencyCode
-  currency     Currency     @relation(fields: [currencyCode], references: [code])
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  currency     Currency           @relation(fields: [currencyCode], references: [code])
+  resolutions  MarketResolution[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
 }
 
 model VerificationToken {
