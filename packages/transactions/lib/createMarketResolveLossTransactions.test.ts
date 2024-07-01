@@ -36,7 +36,6 @@ describe('createMarketResolveLossTransactions', () => {
     jest.mocked(db.transactionItem.findMany).mockResolvedValue([])
 
     await createMarketResolveLossTransactions({
-      resolverId: 'resolver-1',
       marketId: 'market-1',
       losingCurrencyCode: 'NO',
     })
@@ -56,7 +55,6 @@ describe('createMarketResolveLossTransactions', () => {
       ])
 
     await createMarketResolveLossTransactions({
-      resolverId: 'resolver-1',
       marketId: 'market-1',
       losingCurrencyCode: 'NO',
     })
@@ -96,7 +94,6 @@ describe('createMarketResolveLossTransactions', () => {
       ])
 
     await createMarketResolveLossTransactions({
-      resolverId: 'resolver-1',
       marketId: 'market-1',
       losingCurrencyCode: 'NO',
     })

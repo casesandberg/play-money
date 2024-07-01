@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
-import { getMarket } from '@play-money/markets/lib/getMarket'
-import { canResolveMarket } from '@play-money/markets/lib/helpers'
 import { resolveMarket } from '@play-money/markets/lib/resolveMarket'
 import schema from './schema'
 
