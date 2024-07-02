@@ -66,7 +66,7 @@ async function getNetWorthByUser(userId: string) {
     },
   })
 
-  return netWorth._sum.amount?.toNumber()
+  return netWorth._sum.amount?.toNumber() ?? 0
 }
 
 async function getLastTradeByUser(userId: string) {

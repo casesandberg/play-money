@@ -10,7 +10,7 @@ export default createSchema({
         netWorth: z.number(),
         tradingVolume: z.number(),
         totalMarkets: z.number(),
-        lastTradeAt: z.date(),
+        lastTradeAt: z.date().optional(),
       }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
