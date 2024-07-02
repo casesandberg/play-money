@@ -3,9 +3,10 @@ import { Card, CardContent } from '@play-money/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@play-money/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@play-money/ui/tabs'
 import { UserNotFoundError } from '../lib/exceptions'
+import { UserProfile } from '../lib/sanitizeUser'
 
 // TODO: @casesandberg Generate this from OpenAPI schema
-export async function getUserProfile({ username }: { username: string }) {
+export async function getUserProfile({ username }: { username: string }): Promise<UserProfile> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/username/${username}`, {
     credentials: 'include',
   })
@@ -31,9 +32,9 @@ export async function UserProfilePage({ username }: { username: string }) {
       <Tabs defaultValue="trades">
         <div className="flex items-center">
           <TabsList>
-            <TabsTrigger value="net-worth">Net Worth</TabsTrigger>
+            {/* <TabsTrigger value="net-worth">Net Worth</TabsTrigger> */}
             <TabsTrigger value="trades">Trades</TabsTrigger>
-            <TabsTrigger value="markets">Markets</TabsTrigger>
+            {/* <TabsTrigger value="markets">Markets</TabsTrigger> */}
           </TabsList>
         </div>
         <TabsContent value="net-worth">
@@ -62,7 +63,7 @@ export async function UserProfilePage({ username }: { username: string }) {
                       <div>$500</div>
                     </TableCell>
                     <TableCell>
-                      <div className="line-clamp-2">
+                      <div className="line-clamp-2 font-medium">
                         FDA legalizes magic mushrooms/psilocybin/etc. for clinical use by 2025
                       </div>
                     </TableCell>

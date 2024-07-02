@@ -1,10 +1,10 @@
-import Link from 'next/link'
+import { format } from 'date-fns'
 import React from 'react'
+import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
 import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@play-money/ui/card'
 import { Separator } from '@play-money/ui/separator'
 import { getUserProfile } from '../components/UserProfilePage'
-import { EditOrFollowUserButton } from './EditOrFollowUserButton'
 
 const DiscordIcon = ({ className }: { className: string }) => (
   <svg viewBox="0 -28.5 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" className={className}>
@@ -32,6 +32,17 @@ c21.209-2.535,41.426-8.171,60.222-16.505C497.448,118.542,479.666,137.004,459.186
   </svg>
 )
 
+export async function getUserProfileStats({ userId }: { userId: string }) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/stats`, {
+    credentials: 'include',
+  })
+  if (!res.ok) {
+    throw new Error('There was an error fetching data')
+  }
+
+  return res.json()
+}
+
 export async function UserProfileLayout({
   params: { username },
   children,
@@ -40,13 +51,14 @@ export async function UserProfileLayout({
   children: React.ReactNode
 }) {
   const profile = await getUserProfile({ username })
+  const stats = await getUserProfileStats({ userId: profile.id })
 
   return (
     <main className="mx-auto flex max-w-screen-xl flex-1 flex-row items-start gap-6 p-4 sm:px-6 sm:py-0 md:gap-8">
       <Card className="max-w-80">
         <CardHeader className="flex flex-row items-start gap-4 bg-muted/50">
           <Avatar className="h-16 w-16">
-            <AvatarImage src={profile.avatarUrl} alt={`@${profile.username}`} />
+            <AvatarImage src={profile.avatarUrl ?? ''} alt={`@${profile.username}`} />
             <AvatarFallback>{profile.username.toUpperCase().slice(0, 2)}</AvatarFallback>
           </Avatar>
 
@@ -54,9 +66,9 @@ export async function UserProfileLayout({
             <CardTitle className="text-lg">{profile.username}</CardTitle>
             <CardDescription>@{profile.username}</CardDescription>
           </div>
-          <div className="ml-auto flex items-center gap-1">
+          {/* <div className="ml-auto flex items-center gap-1">
             <EditOrFollowUserButton userId={profile.id} />
-          </div>
+          </div> */}
         </CardHeader>
         <CardContent className="p-6 text-sm">
           <div className="grid gap-3">
@@ -99,7 +111,7 @@ export async function UserProfileLayout({
               </div>
             ) : null}
 
-            <div className="flex flex-row gap-4">
+            {/* <div className="flex flex-row gap-4">
               <Link
                 href={`/${profile.username}/followers`}
                 className="flex items-center gap-1 text-muted-foreground hover:text-foreground hover:underline"
@@ -114,33 +126,35 @@ export async function UserProfileLayout({
                 <span className="font-semibold text-foreground">{profile.followersCount || 0}</span>
                 <span>Followers</span>
               </Link>
-            </div>
+            </div> */}
           </div>
 
           <Separator className="my-4" />
 
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
-              <div className="font-semibold">$104.36K</div>
+              <div className="font-semibold">{formatNumber(stats.netWorth)}</div>
               <div className="text-muted-foreground">Net worth</div>
             </div>
             <div className="text-center">
-              <div className="font-semibold">$50K</div>
+              <div className="font-semibold">{formatNumber(stats.tradingVolume)}</div>
               <div className="text-muted-foreground">Trading volume</div>
             </div>
             <div className="text-center">
-              <div className="font-semibold">145</div>
+              <div className="font-semibold">{stats.totalMarkets}</div>
               <div className="text-muted-foreground">Total markets</div>
             </div>
             <div className="text-center">
-              <div className="font-semibold">2024-03-04</div>
+              <div className="font-semibold">
+                <time dateTime={stats.lastTradeAt.toString()}>{format(stats.lastTradeAt, 'MMM d, yyyy')}</time>
+              </div>
               <div className="text-muted-foreground">Last traded</div>
             </div>
           </div>
         </CardContent>
         <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">
           <div className="text-xs text-muted-foreground">
-            Joined <time dateTime="2023-11-23">November 23, 2023</time>
+            Joined <time dateTime={profile.createdAt.toString()}>{format(profile.createdAt, 'MMM d, yyyy')}</time>
           </div>
         </CardFooter>
       </Card>
