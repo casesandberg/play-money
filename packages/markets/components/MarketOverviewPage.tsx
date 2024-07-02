@@ -12,6 +12,7 @@ import { Button } from '@play-money/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@play-money/ui/collapsible'
 import { ReadMoreEditor } from '@play-money/ui/editor'
+import { UserLink } from '@play-money/users/components/UserLink'
 import { UserProfile } from '@play-money/users/lib/sanitizeUser'
 import { useSearchParam } from '../../ui/src/hooks/useSearchParam'
 import { MarketLikelyOption } from './MarketLikelyOption'
@@ -20,6 +21,7 @@ import { MarketToolbar } from './MarketToolbar'
 import { useSidebar } from './SidebarContext'
 
 export type ExtendedMarket = Market & {
+  user: UserProfile
   options: Array<MarketOption & { color: string }>
   marketResolution?: MarketResolution & {
     resolution: MarketOption & { color: string }
@@ -61,6 +63,11 @@ export function MarketOverviewPage({
           {market.closeDate ? (
             <div>
               {isPast(market.closeDate) ? 'Ended' : 'Ending'} {format(market.closeDate, 'MMM d, yyyy')}
+            </div>
+          ) : null}
+          {market.user ? (
+            <div>
+              <UserLink user={market.user} />
             </div>
           ) : null}
           {/* <div>15 Traders</div>
@@ -118,7 +125,7 @@ export function MarketOverviewPage({
                 </Badge>
               </AlertTitle>
               <AlertDescription className="text-muted-foreground">
-                By @{market.marketResolution.resolvedBy.username} on{' '}
+                By <UserLink user={market.marketResolution.resolvedBy} /> on{' '}
                 {format(market.marketResolution.updatedAt, 'MMM d, yyyy')}
               </AlertDescription>
               {market.marketResolution.supportingLink ? (

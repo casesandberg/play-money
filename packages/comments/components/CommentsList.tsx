@@ -2,6 +2,7 @@
 
 import _ from 'lodash'
 import React, { useState, useEffect } from 'react'
+import { toast } from '@play-money/ui/use-toast'
 import { useUser } from '@play-money/users/context/UserContext'
 import { flattenReplies } from '../lib/flattenReplies'
 import { MarketComment } from '../lib/getCommentsOnMarket'
@@ -49,7 +50,7 @@ export function CommentsList({
   }
 
   const handleCreateReply = (parentId?: string) => async (content: string) => {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/comments`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/comments`, {
       method: 'POST',
       body: JSON.stringify({
         content,
@@ -59,6 +60,16 @@ export function CommentsList({
       }),
       credentials: 'include',
     })
+
+    if (!response.ok || response.status >= 400) {
+      const { error } = (await response.json()) as { error: string }
+      toast({
+        title: 'There was an error creating your comment',
+        description: error,
+      })
+      return
+    }
+
     onRevalidate()
   }
 

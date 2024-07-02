@@ -14,6 +14,7 @@ export default async function AppQuestionsPage() {
       },
     ],
     include: {
+      user: true,
       options: true,
       marketResolution: {
         include: {

@@ -11,6 +11,7 @@ export const getMarket = async ({ id }: { id: string }): Promise<ExtendedMarket>
       id,
     },
     include: {
+      user: true,
       options: true,
       marketResolution: {
         include: {
