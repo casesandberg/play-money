@@ -28,6 +28,7 @@ import { Editor } from '@play-money/ui/editor'
 import { EmojiPicker, EmojiReactionList } from '@play-money/ui/emoji'
 import { toast } from '@play-money/ui/use-toast'
 import { cn } from '@play-money/ui/utils'
+import { UserLink } from '@play-money/users/components/UserLink'
 import { MarketComment } from '../lib/getCommentsOnMarket'
 import { CreateCommentForm } from './CreateCommentForm'
 
@@ -95,16 +96,15 @@ export function CommentItem({
 
       <Collapsible className="flex-1" open={isReplyOpen} onOpenChange={setIsReplyOpen}>
         <div className="flex flex-row items-center gap-4">
-          <div className="flex flex-row items-center gap-2">
-            <div className="font-semibold">{comment.author.displayName}</div>
-            <div className="text-sm text-muted-foreground">@{comment.author.username}</div>
+          <div className="flex flex-row items-center gap-2 truncate">
+            <UserLink user={comment.author} />
           </div>
 
-          <div className="text-sm text-muted-foreground">
+          <div className="flex-shrink-0 text-sm text-muted-foreground">
             {formatDistance(comment.createdAt, new Date(), { addSuffix: true })}
           </div>
 
-          {comment.edited && <div className="text-sm text-muted-foreground">(edited)</div>}
+          {comment.edited && <div className="flex-shrink-0 text-sm text-muted-foreground">(edited)</div>}
 
           <div
             className={cn(
