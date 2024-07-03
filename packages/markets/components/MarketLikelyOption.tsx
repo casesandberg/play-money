@@ -51,12 +51,12 @@ export function MarketLikelyOption({ market }: { market: ExtendedMarket }) {
 
   return mostLikelyOption ? (
     <>
-      <div style={{ color: mostLikelyOption.color }} className="font-medium">
+      <div style={{ color: mostLikelyOption.color }} className="flex-shrink-0 font-medium">
         {Math.round(mostLikelyProbability * 100)}% {mostLikelyOption.name}
       </div>
 
       {change.difference !== 0 ? (
-        <div>
+        <div className="flex-shrink-0">
           {change.difference > 0 ? '+' : ''}
           {Math.round(change.difference * 100)}% this week
         </div>

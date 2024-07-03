@@ -61,12 +61,12 @@ export function MarketOverviewPage({
           {!market.marketResolution ? <MarketLikelyOption market={market} /> : null}
 
           {market.closeDate ? (
-            <div>
+            <div className="flex-shrink-0">
               {isPast(market.closeDate) ? 'Ended' : 'Ending'} {format(market.closeDate, 'MMM d, yyyy')}
             </div>
           ) : null}
           {market.user ? (
-            <div>
+            <div className="truncate">
               <UserLink user={market.user} />
             </div>
           ) : null}

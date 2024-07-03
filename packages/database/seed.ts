@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker'
 import Decimal from 'decimal.js'
 import _ from 'lodash'
+import { createComment } from '@play-money/comments/lib/createComment'
 import db from '@play-money/database'
 import { createMarket } from '@play-money/markets/lib/createMarket'
 import { marketBuy } from '@play-money/markets/lib/marketBuy'
@@ -109,18 +110,40 @@ async function main() {
 
       await Promise.all(
         _.times(5, async () => {
-          return await marketBuy({
+          const creatorId = faker.helpers.arrayElement(user_ids)
+          await marketBuy({
             marketId: market.id,
             optionId: market.options[faker.helpers.arrayElement([0, 1])].id,
-            creatorId: faker.helpers.arrayElement(user_ids),
-            amount: new Decimal(faker.string.numeric({ length: { min: 3, max: 4 } })),
+            creatorId,
+            amount: new Decimal(faker.string.numeric({ length: { min: 3, max: 3 } })),
           })
+
+          await faker.helpers.maybe(
+            async () => {
+              return await createComment({
+                content: `<p>${faker.lorem.paragraph()}</p>`,
+                authorId: creatorId,
+                parentId: null,
+                entityType: 'MARKET',
+                entityId: market.id,
+              })
+            },
+            { probability: 0.5 }
+          )
         })
       )
 
-      faker.helpers.maybe(
+      await createComment({
+        content: `<p>${faker.lorem.paragraph()}</p>`,
+        authorId: faker.helpers.arrayElement(user_ids),
+        parentId: null,
+        entityType: 'MARKET',
+        entityId: market.id,
+      })
+
+      await faker.helpers.maybe(
         async () => {
-          await resolveMarket({
+          return await resolveMarket({
             resolverId: market.createdBy,
             marketId: market.id,
             optionId: market.options[faker.helpers.arrayElement([0, 1])].id,
