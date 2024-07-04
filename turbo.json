@@ -6,7 +6,8 @@
     "build": {
       "dependsOn": ["^test", "^build", "^db:generate"],
       "env": ["NEXT_PUBLIC_API_URL"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.stories.{tsx,jsx,mdx}"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "storybook-static/**"]
     },
     "lint": {},
     "type-check": {},
@@ -27,6 +28,7 @@
     "test": {},
     "test:watch": {
       "cache": false
-    }
+    },
+    "build:storybook": {}
   }
 }
