@@ -3,7 +3,7 @@ import cuid from 'cuid'
 import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
-import { Market, User, Account, TransactionItem, Currency, MarketOption } from './zod'
+import { Market, User, Account, TransactionItem, Currency, MarketOption, Comment } from './zod'
 
 export function mockUser(overrides?: Partial<User>): User {
   const firstName = faker.person.firstName()
@@ -104,6 +104,22 @@ export function mockMarketOption(overrides?: Partial<MarketOption>): MarketOptio
     name: currencyCode === 'YES' ? 'Yes' : 'No',
     currencyCode,
     marketId: faker.string.uuid(),
+    createdAt: faker.date.past(),
+    updatedAt: faker.date.past(),
+    ...overrides,
+  }
+}
+
+export function mockComment(overrides?: Partial<Comment>): Comment {
+  return {
+    id: faker.string.uuid(),
+    entityType: 'MARKET',
+    entityId: faker.string.uuid(),
+    content: `<p>${faker.lorem.paragraph()}</p>`,
+    edited: false,
+    authorId: faker.string.uuid(),
+    parentId: null,
+    hidden: false,
     createdAt: faker.date.past(),
     updatedAt: faker.date.past(),
     ...overrides,

@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker'
 import type { Preview } from '@storybook/react'
 import React from 'react'
 import { SWRProvider } from '@play-money/api-helpers/components/SWRProvider'
@@ -9,6 +10,8 @@ import { Toaster } from '@play-money/ui/toaster'
 import { TooltipProvider } from '@play-money/ui/tooltip'
 import { UserProvider } from '@play-money/users/context/UserContext'
 import '../../web/app/globals.css'
+
+faker.seed(10191)
 
 const preview: Preview = {
   parameters: {
