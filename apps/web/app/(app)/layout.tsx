@@ -1,4 +1,4 @@
-import { BriefcaseIcon, DollarSignIcon, HomeIcon, MailIcon, MenuIcon, UserIcon } from 'lucide-react'
+import { MenuIcon } from 'lucide-react'
 import Link from 'next/link'
 import { ActiveUserBalance } from '@play-money/accounts/components/ActiveUserBalance'
 import { GlobalSearchTrigger } from '@play-money/search/components/GlobalSearchTrigger'
