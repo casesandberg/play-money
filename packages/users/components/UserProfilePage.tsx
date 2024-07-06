@@ -74,7 +74,7 @@ export async function UserProfilePage({ username }: { username: string }) {
                   <TableRow>
                     <TableHead className="table-cell w-[100px]">Trade</TableHead>
                     <TableHead>Market</TableHead>
-                    <TableHead className="table-cell w-[150px]">Date</TableHead>
+                    <TableHead className="hidden w-[150px] md:table-cell">Date</TableHead>
                     {/* <TableHead className="sm:table-cell">Profit</TableHead> */}
                   </TableRow>
                 </TableHeader>
@@ -109,7 +109,9 @@ export async function UserProfilePage({ username }: { username: string }) {
                             <TableCell>
                               <div className="line-clamp-2 font-medium">{transaction.market.question}</div>
                             </TableCell>
-                            <TableCell className="table-cell">{format(transaction.createdAt, 'MMM d, yyyy')}</TableCell>
+                            <TableCell className="hidden md:table-cell">
+                              {format(transaction.createdAt, 'MMM d, yyyy')}
+                            </TableCell>
                             {/* <TableCell className="table-cell">
                             <div className="font-semibold text-green-600">58%</div>
                           </TableCell> */}

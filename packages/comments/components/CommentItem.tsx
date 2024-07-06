@@ -94,11 +94,9 @@ export function CommentItem({
         <AvatarFallback>{comment.author.username.toUpperCase().slice(0, 2)}</AvatarFallback>
       </Avatar>
 
-      <Collapsible className="flex-1" open={isReplyOpen} onOpenChange={setIsReplyOpen}>
+      <Collapsible open={isReplyOpen} onOpenChange={setIsReplyOpen}>
         <div className="flex flex-row items-center gap-4">
-          <div className="flex flex-row items-center gap-2 truncate">
-            <UserLink user={comment.author} />
-          </div>
+          <UserLink user={comment.author} className="truncate" />
 
           <div className="flex-shrink-0 text-sm text-muted-foreground">
             {formatDistance(comment.createdAt, new Date(), { addSuffix: true })}
@@ -109,7 +107,8 @@ export function CommentItem({
           <div
             className={cn(
               '-my-2 -mr-2 ml-auto flex flex-row items-center opacity-0 transition-opacity group-hover:opacity-100',
-              (isReplyOpen || isPortalOpen) && 'opacity-100'
+              (isReplyOpen || isPortalOpen) && 'opacity-100',
+              'hidden md:flex'
             )}
           >
             <EmojiPicker buttonProps={{ variant: 'ghost' }} onSelect={onEmojiSelect} onOpenChange={setIsPortalOpen} />
