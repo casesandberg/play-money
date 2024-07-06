@@ -3,7 +3,6 @@ import { generateFromEmail } from 'unique-username-generator'
 import db from '@play-money/database'
 import { createHouseUserGiftTransaction } from '@play-money/transactions/lib/createHouseUserGiftTransaction'
 import { UserExistsError } from './exceptions'
-import { sanitizeUser } from './sanitizeUser'
 
 export async function createUser({ email }: { email: string }) {
   const existingUser = await db.user.findUnique({

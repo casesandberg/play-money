@@ -1,16 +1,16 @@
-import db, { CommentEntityType, Comment, User, CommentReaction } from '@play-money/database'
-import { sanitizeUser } from '@play-money/users/lib/sanitizeUser'
+import db, { CommentEntityType, Comment, CommentReaction } from '@play-money/database'
+import { UserProfile, sanitizeUser } from '@play-money/users/lib/sanitizeUser'
 
 export type MarketComment = Comment & {
-  author: User
+  author: UserProfile
   reactions: Array<
     CommentReaction & {
-      user: User
+      user: UserProfile
     }
   >
 }
 
-export async function getCommentsOnMarket({ marketId }: { marketId: string }) {
+export async function getCommentsOnMarket({ marketId }: { marketId: string }): Promise<Array<MarketComment>> {
   const comments = await db.comment.findMany({
     where: {
       entityType: CommentEntityType.MARKET,

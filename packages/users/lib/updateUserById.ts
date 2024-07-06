@@ -1,20 +1,22 @@
-import { z } from 'zod'
-import db, { UserSchema } from '@play-money/database'
+import db, { User } from '@play-money/database'
 import { checkUsername } from './checkUsername'
 import { getUserById } from './getUserById'
 import { sanitizeUser } from './sanitizeUser'
 
-export const UpdateSchema = UserSchema.pick({ username: true, bio: true, avatarUrl: true }).partial()
-
-export async function updateUserById({ id, ...data }: { id: string } & z.infer<typeof UpdateSchema>) {
-  // TODO: @casesandberg Figure out a cleaner way to strip undefined/nulls
-  const { username, bio, avatarUrl } = UpdateSchema.transform((data) => {
-    return Object.fromEntries(Object.entries(data).filter(([_, value]) => value != null))
-  }).parse(data)
-
+export async function updateUserById({
+  id,
+  username,
+  bio,
+  avatarUrl,
+}: {
+  id: string
+  username?: string
+  bio?: string
+  avatarUrl?: string
+}) {
   const user = await getUserById({ id })
 
-  const updatedData: z.infer<typeof UpdateSchema> = {}
+  const updatedData: Partial<User> = {}
 
   if (username && user.username !== username) {
     const { available, message } = await checkUsername({ username })

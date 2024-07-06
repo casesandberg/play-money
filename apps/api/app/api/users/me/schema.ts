@@ -1,6 +1,6 @@
 import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
+import { UserSchema } from '@play-money/database'
 import { UserProfileModel } from '@play-money/users/lib/sanitizeUser'
-import { UpdateSchema } from '@play-money/users/lib/updateUserById'
 
 export default createSchema({
   GET: {
@@ -11,7 +11,7 @@ export default createSchema({
     },
   },
   PATCH: {
-    requestBody: UpdateSchema,
+    requestBody: UserSchema.pick({ username: true, bio: true, avatarUrl: true }).partial(),
     responses: {
       200: UserProfileModel,
       404: ServerErrorSchema,

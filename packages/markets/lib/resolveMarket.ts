@@ -33,29 +33,31 @@ export async function resolveMarket({
     throw new Error('Invalid option currency code')
   }
 
-  const now = new Date()
+  await db.$transaction(async (tx) => {
+    const now = new Date()
 
-  await db.marketResolution.upsert({
-    where: { marketId },
-    create: {
-      marketId,
-      resolutionId: optionId,
-      supportingLink,
-      resolvedById: resolverId,
-      createdAt: now,
-      updatedAt: now,
-    },
-    update: {
-      resolutionId: optionId,
-      supportingLink,
-      resolvedById: resolverId,
-      updatedAt: now,
-    },
-  })
+    await tx.marketResolution.upsert({
+      where: { marketId },
+      create: {
+        marketId,
+        resolutionId: optionId,
+        supportingLink,
+        resolvedById: resolverId,
+        createdAt: now,
+        updatedAt: now,
+      },
+      update: {
+        resolutionId: optionId,
+        supportingLink,
+        resolvedById: resolverId,
+        updatedAt: now,
+      },
+    })
 
-  await db.market.update({
-    where: { id: marketId },
-    data: { resolvedAt: now, closeDate: now },
+    await tx.market.update({
+      where: { id: marketId },
+      data: { resolvedAt: now, closeDate: now },
+    })
   })
 
   await createMarketResolveLossTransactions({
