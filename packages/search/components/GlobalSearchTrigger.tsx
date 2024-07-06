@@ -2,9 +2,10 @@
 
 import React from 'react'
 import { Button } from '@play-money/ui/button'
+import { cn } from '@play-money/ui/utils'
 import { GlobalSearchMenu } from './GlobalSearchMenu'
 
-export function GlobalSearchTrigger() {
+export function GlobalSearchTrigger({ className }: { className?: string }) {
   const [open, setOpen] = React.useState(false)
 
   React.useEffect(() => {
@@ -21,7 +22,7 @@ export function GlobalSearchTrigger() {
   return (
     <>
       <Button
-        className="justify-between gap-4 font-normal text-muted-foreground md:w-[200px]"
+        className={cn('justify-between gap-4 font-normal text-muted-foreground md:w-[200px]', className)}
         variant="outline"
         onClick={() => setOpen(true)}
       >

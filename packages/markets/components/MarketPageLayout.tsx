@@ -16,7 +16,7 @@ export function MarketPageLayout({
 }) {
   return (
     <SidebarProvider>
-      <main className="mx-auto flex max-w-screen-lg flex-1 flex-row items-start gap-8 p-4 sm:px-6 sm:py-0 md:gap-8">
+      <main className="mx-auto flex flex-col gap-8 md:flex-row">
         {children}
 
         <div className="max-w-80 flex-1">
