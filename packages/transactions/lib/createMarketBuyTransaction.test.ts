@@ -46,7 +46,7 @@ describe('createMarketBuyTransaction', () => {
   })
 
   it('should call createTransaction with approperate transactionItems', async () => {
-    jest.mocked(getAccountBalance).mockImplementation(async (_accountId, currencyCode) => {
+    jest.mocked(getAccountBalance).mockImplementation(async ({ currencyCode }) => {
       if (currencyCode === 'YES') return new Decimal(100)
       if (currencyCode === 'NO') return new Decimal(300)
       return new Decimal(0)

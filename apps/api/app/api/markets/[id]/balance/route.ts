@@ -16,16 +16,26 @@ export async function GET(
     const { id } = schema.get.parameters.parse(params)
 
     const ammAccount = await getAmmAccount({ marketId: id })
-    const y = await getAccountBalance(ammAccount.id, 'YES', id, ['MARKET_RESOLVE_LOSS', 'MARKET_RESOLVE_WIN'])
-    const n = await getAccountBalance(ammAccount.id, 'NO', id, ['MARKET_RESOLVE_LOSS', 'MARKET_RESOLVE_WIN'])
+    const y = await getAccountBalance({
+      accountId: ammAccount.id,
+      currencyCode: 'YES',
+      marketId: id,
+      excludeTransactionTypes: ['MARKET_RESOLVE_LOSS', 'MARKET_RESOLVE_WIN'],
+    })
+    const n = await getAccountBalance({
+      accountId: ammAccount.id,
+      currencyCode: 'NO',
+      marketId: id,
+      excludeTransactionTypes: ['MARKET_RESOLVE_LOSS', 'MARKET_RESOLVE_WIN'],
+    })
 
     let holdings = {}
     const session = await auth()
 
     if (session?.user?.id) {
       const userAccount = await getUserAccount({ id: session.user.id })
-      const yes = await getAccountBalance(userAccount.id, 'YES', id)
-      const no = await getAccountBalance(userAccount.id, 'NO', id)
+      const yes = await getAccountBalance({ accountId: userAccount.id, currencyCode: 'YES', marketId: id })
+      const no = await getAccountBalance({ accountId: userAccount.id, currencyCode: 'NO', marketId: id })
 
       holdings = {
         YES: yes.toNumber(),

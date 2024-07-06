@@ -16,7 +16,7 @@ export async function GET(_req: Request): Promise<SchemaResponse<typeof schema.G
     }
 
     const userAccount = await getUserAccount({ id: session.user.id })
-    const balance = await getAccountBalance(userAccount.id, 'PRIMARY')
+    const balance = await getAccountBalance({ accountId: userAccount.id, currencyCode: 'PRIMARY' })
 
     return NextResponse.json({ balance: balance.toNumber() })
   } catch (error) {

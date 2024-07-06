@@ -7,7 +7,7 @@ export async function checkAccountBalance(
   currencyCode: CurrencyCodeType,
   amount: Decimal
 ): Promise<boolean> {
-  const balance = await getAccountBalance(accountId, currencyCode)
+  const balance = await getAccountBalance({ accountId, currencyCode })
 
   return balance.gte(amount)
 }
