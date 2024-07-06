@@ -1,15 +1,10 @@
-import { z } from 'zod'
-import db, { CommentReactionSchema } from '@play-money/database'
+import db, { CommentReaction } from '@play-money/database'
 
-export const CreateSchema = CommentReactionSchema.pick({
-  emoji: true,
-  userId: true,
-  commentId: true,
-})
-
-export async function reactToComment(data: z.infer<typeof CreateSchema>) {
-  const { emoji, userId, commentId } = CreateSchema.parse(data)
-
+export async function reactToComment({
+  emoji,
+  userId,
+  commentId,
+}: Pick<CommentReaction, 'emoji' | 'userId' | 'commentId'>) {
   const existingReaction = await db.commentReaction.findFirst({
     where: {
       emoji,

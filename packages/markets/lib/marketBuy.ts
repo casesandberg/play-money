@@ -1,4 +1,6 @@
 import Decimal from 'decimal.js'
+import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
+import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import db from '@play-money/database'
 import { createMarketBuyTransaction } from '@play-money/transactions/lib/createMarketBuyTransaction'
 import { getMarket } from './getMarket'
@@ -30,6 +32,13 @@ export async function marketBuy({
 
   if (!isPurchasableCurrency(marketOption.currencyCode)) {
     throw new Error('Invalid option currency code')
+  }
+
+  const userAccount = await getUserAccount({ id: creatorId })
+  const hasEnoughBalance = await checkAccountBalance(userAccount.id, 'PRIMARY', amount)
+
+  if (!hasEnoughBalance) {
+    throw new Error('User does not have enough balance to purchase')
   }
 
   await createMarketBuyTransaction({

@@ -2,12 +2,17 @@ import Decimal from 'decimal.js'
 import db from '@play-money/database'
 import { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/CurrencyCodeSchema'
 
-export async function getAccountBalance(
-  accountId: string,
-  currencyCode: CurrencyCodeType,
-  marketId?: string,
+export async function getAccountBalance({
+  accountId,
+  currencyCode,
+  marketId,
+  excludeTransactionTypes,
+}: {
+  accountId: string
+  currencyCode: CurrencyCodeType
+  marketId?: string
   excludeTransactionTypes?: string[]
-): Promise<Decimal> {
+}): Promise<Decimal> {
   const transactionItems = await db.transactionItem.findMany({
     where: {
       accountId,

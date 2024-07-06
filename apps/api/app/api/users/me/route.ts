@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import type { SchemaResponse } from '@play-money/api-helpers'
+import { stripUndefined, type SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
 import { getUserById } from '@play-money/users/lib/getUserById'
 import { updateUserById } from '@play-money/users/lib/updateUserById'
@@ -32,7 +32,7 @@ export async function PATCH(req: Request): Promise<SchemaResponse<typeof schema.
     }
 
     const body = (await req.json()) as unknown
-    const updateData = schema.PATCH.requestBody.parse(body)
+    const updateData = schema.PATCH.requestBody.transform(stripUndefined).parse(body)
 
     const user = await updateUserById({ id: session.user.id, ...updateData })
 

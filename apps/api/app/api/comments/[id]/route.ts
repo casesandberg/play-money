@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import type { SchemaResponse } from '@play-money/api-helpers'
+import { stripUndefined, type SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
 import { deleteComment } from '@play-money/comments/lib/deleteComment'
 import { CommentNotFoundError } from '@play-money/comments/lib/exceptions'
@@ -42,7 +42,7 @@ export async function PATCH(
 
     const { id } = schema.PATCH.parameters.parse(params)
     const body = (await req.json()) as unknown
-    const { content } = schema.PATCH.requestBody.parse(body)
+    const { content } = schema.PATCH.requestBody.transform(stripUndefined).parse(body)
 
     const comment = await getComment({ id })
     if (comment.authorId !== session.user.id) {

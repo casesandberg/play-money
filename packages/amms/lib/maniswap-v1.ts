@@ -37,8 +37,8 @@ export async function buy({
   const buyingYes = currencyCode === 'YES'
   const oppositeCurrencyCode: CurrencyCodeType = buyingYes ? 'NO' : 'YES'
 
-  const y = await getAccountBalance(ammAccountId, 'YES')
-  const n = await getAccountBalance(ammAccountId, 'NO')
+  const y = await getAccountBalance({ accountId: ammAccountId, currencyCode: 'YES' })
+  const n = await getAccountBalance({ accountId: ammAccountId, currencyCode: 'NO' })
 
   const toReturn = buyingYes ? calculateBuyShares(amount, y, n) : calculateBuyShares(amount, n, y)
 
@@ -71,8 +71,8 @@ export async function sell({
   const sellingYes = currencyCode === 'YES'
   const oppositeCurrencyCode: CurrencyCodeType = sellingYes ? 'NO' : 'YES'
 
-  const y = await getAccountBalance(ammAccountId, 'YES')
-  const n = await getAccountBalance(ammAccountId, 'NO')
+  const y = await getAccountBalance({ accountId: ammAccountId, currencyCode: 'YES' })
+  const n = await getAccountBalance({ accountId: ammAccountId, currencyCode: 'NO' })
 
   const toReturn = sellingYes ? calculateSellShares(amount, y, n) : calculateSellShares(amount, n, y)
 
@@ -100,8 +100,8 @@ export async function quote({
   amount: Decimal
   isBuy: boolean
 }): Promise<{ probability: Decimal; shares: Decimal }> {
-  const y = await getAccountBalance(ammAccountId, 'YES')
-  const n = await getAccountBalance(ammAccountId, 'NO')
+  const y = await getAccountBalance({ accountId: ammAccountId, currencyCode: 'YES' })
+  const n = await getAccountBalance({ accountId: ammAccountId, currencyCode: 'NO' })
 
   let shares: Decimal
   let newY: Decimal
@@ -144,8 +144,8 @@ export async function costToHitProbability({
   probability: Decimal
   maxAmount: Decimal
 }) {
-  const y = await getAccountBalance(ammAccountId, 'YES')
-  const n = await getAccountBalance(ammAccountId, 'NO')
+  const y = await getAccountBalance({ accountId: ammAccountId, currencyCode: 'YES' })
+  const n = await getAccountBalance({ accountId: ammAccountId, currencyCode: 'NO' })
 
   const currentProbability = n.div(y.add(n))
 

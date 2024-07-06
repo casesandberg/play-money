@@ -1,13 +1,4 @@
-import { z } from 'zod'
-import db, { CommentSchema } from '@play-money/database'
-
-export const CreateSchema = CommentSchema.pick({
-  content: true,
-  authorId: true,
-  parentId: true,
-  entityType: true,
-  entityId: true,
-})
+import db, { Comment } from '@play-money/database'
 
 export async function createComment({
   content,
@@ -15,7 +6,7 @@ export async function createComment({
   parentId,
   entityType,
   entityId,
-}: z.infer<typeof CreateSchema>) {
+}: Pick<Comment, 'content' | 'authorId' | 'parentId' | 'entityType' | 'entityId'>) {
   const comment = await db.comment.create({
     data: {
       content,

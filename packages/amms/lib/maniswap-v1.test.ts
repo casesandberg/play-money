@@ -14,7 +14,7 @@ describe('maniswap-v1', () => {
   describe('buy', () => {
     it('should return correct transactions for buying YES', async () => {
       // Current probability = 0.75
-      jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
+      jest.mocked(getAccountBalance).mockImplementation(async ({ currencyCode }) => {
         if (currencyCode === 'YES') return new Decimal(100)
         if (currencyCode === 'NO') return new Decimal(300)
         return new Decimal(0)
@@ -39,7 +39,7 @@ describe('maniswap-v1', () => {
 
     it('should return correct transactions for buying NO', async () => {
       // Current probability = 0.75
-      jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
+      jest.mocked(getAccountBalance).mockImplementation(async ({ currencyCode }) => {
         if (currencyCode === 'YES') return new Decimal(100)
         if (currencyCode === 'NO') return new Decimal(300)
         return new Decimal(0)
@@ -66,7 +66,7 @@ describe('maniswap-v1', () => {
   // This is the inverse of the test for buying YES
   it('should return correct transactions for selling YES', async () => {
     // Current probability ~= 0.80
-    jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
+    jest.mocked(getAccountBalance).mockImplementation(async ({ currencyCode }) => {
       if (currencyCode === 'YES') return new Decimal(85.71)
       if (currencyCode === 'NO') return new Decimal(350)
       return new Decimal(0)
@@ -92,7 +92,7 @@ describe('maniswap-v1', () => {
   // This is the inverse of the test for buying NO
   it('should return correct transactions for selling NO', async () => {
     // Current probability ~= 0.57
-    jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
+    jest.mocked(getAccountBalance).mockImplementation(async ({ currencyCode }) => {
       if (currencyCode === 'YES') return new Decimal(150)
       if (currencyCode === 'NO') return new Decimal(200)
       return new Decimal(0)
@@ -118,7 +118,7 @@ describe('maniswap-v1', () => {
   describe('costToHitProbability', () => {
     it('should return zero cost and returnedShares for same probability', async () => {
       // Current probability = 0.75
-      jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
+      jest.mocked(getAccountBalance).mockImplementation(async ({ currencyCode }) => {
         if (currencyCode === 'YES') return new Decimal(100)
         if (currencyCode === 'NO') return new Decimal(300)
         return new Decimal(0)
@@ -138,7 +138,7 @@ describe('maniswap-v1', () => {
 
     it('should return correct cost and returnedShares for increasing probability', async () => {
       // Current probability = 0.75
-      jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
+      jest.mocked(getAccountBalance).mockImplementation(async ({ currencyCode }) => {
         if (currencyCode === 'YES') return new Decimal(100)
         if (currencyCode === 'NO') return new Decimal(300)
         return new Decimal(0)
@@ -158,7 +158,7 @@ describe('maniswap-v1', () => {
 
     it('should return correct cost and returnedShares for increasing probability to max', async () => {
       // Current probability = 0.75
-      jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
+      jest.mocked(getAccountBalance).mockImplementation(async ({ currencyCode }) => {
         if (currencyCode === 'YES') return new Decimal(100)
         if (currencyCode === 'NO') return new Decimal(300)
         return new Decimal(0)
@@ -178,7 +178,7 @@ describe('maniswap-v1', () => {
 
     it('should return correct cost and returnedShares for decreasing probability', async () => {
       // Current probability = 0.75
-      jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
+      jest.mocked(getAccountBalance).mockImplementation(async ({ currencyCode }) => {
         if (currencyCode === 'YES') return new Decimal(100)
         if (currencyCode === 'NO') return new Decimal(300)
         return new Decimal(0)
@@ -198,7 +198,7 @@ describe('maniswap-v1', () => {
 
     it('should return correct cost and returnedShares for decreasing probability to max', async () => {
       // Current probability = 0.75
-      jest.mocked(getAccountBalance).mockImplementation(async (accountId, currencyCode) => {
+      jest.mocked(getAccountBalance).mockImplementation(async ({ currencyCode }) => {
         if (currencyCode === 'YES') return new Decimal(100)
         if (currencyCode === 'NO') return new Decimal(300)
         return new Decimal(0)
