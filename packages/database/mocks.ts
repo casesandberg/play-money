@@ -1,9 +1,9 @@
 import { faker } from '@faker-js/faker'
-import { CurrencyCode, MarketOption } from '@prisma/client'
-import { Decimal } from '@prisma/client/runtime/library'
 import cuid from 'cuid'
+import Decimal from 'decimal.js'
 import _ from 'lodash'
-import { Market, User, Account, TransactionItem } from './zod'
+import { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
+import { Market, User, Account, TransactionItem, Currency, MarketOption, Comment } from './zod'
 
 export function mockUser(overrides?: Partial<User>): User {
   const firstName = faker.person.firstName()
@@ -43,12 +43,42 @@ export function mockMarket(overrides?: Partial<Market>): Market {
   }
 }
 
+export function mockExtendedMarket(overrides?: Partial<ExtendedMarket>): ExtendedMarket {
+  const user = mockUser()
+  const market = mockMarket({
+    createdBy: user.id,
+  })
+
+  return {
+    ...market,
+    options: [
+      { ...mockMarketOption({ id: '1', name: 'Yes', marketId: market.id }), color: 'green' },
+      { ...mockMarketOption({ id: '2', name: 'No', marketId: market.id }), color: 'red' },
+    ],
+    user,
+    ...overrides,
+  }
+}
+
 export function mockAccount(overrides?: Partial<Account>): Account {
   return {
     id: faker.string.uuid(),
     userId: null,
     marketId: null,
     internalType: null,
+    createdAt: faker.date.past(),
+    updatedAt: faker.date.recent(),
+    ...overrides,
+  }
+}
+
+export function mockCurrency(overrides?: Partial<Currency>): Currency {
+  return {
+    id: faker.string.uuid(),
+    symbol: faker.finance.currencySymbol(),
+    code: faker.helpers.arrayElement(['YES', 'NO']),
+    name: faker.finance.currencyName(),
+    imageUrl: null,
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
     ...overrides,
@@ -68,12 +98,28 @@ export function mockTransactionItem(overrides?: Partial<TransactionItem>): Trans
 }
 
 export function mockMarketOption(overrides?: Partial<MarketOption>): MarketOption {
-  const currencyCode = faker.helpers.arrayElement(['YES', 'NO']) as CurrencyCode
+  const currencyCode = faker.helpers.arrayElement(['YES', 'NO']) as Currency['code']
   return {
     id: faker.string.uuid(),
     name: currencyCode === 'YES' ? 'Yes' : 'No',
     currencyCode,
     marketId: faker.string.uuid(),
+    createdAt: faker.date.past(),
+    updatedAt: faker.date.past(),
+    ...overrides,
+  }
+}
+
+export function mockComment(overrides?: Partial<Comment>): Comment {
+  return {
+    id: faker.string.uuid(),
+    entityType: 'MARKET',
+    entityId: faker.string.uuid(),
+    content: `<p>${faker.lorem.paragraph()}</p>`,
+    edited: false,
+    authorId: faker.string.uuid(),
+    parentId: null,
+    hidden: false,
     createdAt: faker.date.past(),
     updatedAt: faker.date.past(),
     ...overrides,

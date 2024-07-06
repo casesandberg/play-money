@@ -44,3 +44,6 @@ dist/
 
 tsconfig.tsbuildinfo
 tmp/
+
+# storybook
+storybook-static

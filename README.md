@@ -53,6 +53,7 @@
      - **Web app**: [localhost:3000](http://localhost:3000)
      - **Backend server**: [localhost:3001](http://localhost:3001)
      - **Database viewer**: [localhost:5555](http://localhost:5555)
+     - **Storybook**: [localhost:6006](http://localhost:6006)
 
 ## Code Formatting and Linting
 

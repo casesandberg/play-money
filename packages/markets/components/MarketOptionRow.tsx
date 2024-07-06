@@ -42,7 +42,7 @@ export function MarketOptionRow({
         </div>
       </div>
 
-      <Button size="sm" variant={active ? 'black' : 'outline'}>
+      <Button size="sm" variant={active ? 'heavy' : 'outline'}>
         Select
       </Button>
     </div>
