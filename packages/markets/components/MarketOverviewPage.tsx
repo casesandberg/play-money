@@ -7,6 +7,7 @@ import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip } from 'recharts'
 import useSWR from 'swr'
 import { Market, MarketOption, MarketResolution } from '@play-money/database'
 import { Alert, AlertDescription, AlertTitle } from '@play-money/ui/alert'
+import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
 import { Badge } from '@play-money/ui/badge'
 import { Button } from '@play-money/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
@@ -66,8 +67,12 @@ export function MarketOverviewPage({
             </div>
           ) : null}
           {market.user ? (
-            <div className="truncate">
-              <UserLink user={market.user} />
+            <div className="flex items-center gap-1 truncate">
+              <Avatar className="h-4 w-4">
+                <AvatarImage alt={`@${market.user.username}`} src={market.user.avatarUrl ?? ''} />
+                <AvatarFallback>{market.user.username.toUpperCase().slice(0, 2)}</AvatarFallback>
+              </Avatar>
+              <UserLink user={market.user} hideUsername />
             </div>
           ) : null}
           {/* <div>15 Traders</div>
