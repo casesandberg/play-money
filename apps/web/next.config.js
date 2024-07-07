@@ -4,7 +4,7 @@ module.exports = {
   transpilePackages: ['@play-money/ui'],
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost:3001'],
+      allowedOrigins: [process.env.NEXT_PUBLIC_API_URL],
     },
   },
 }
