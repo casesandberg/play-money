@@ -15,6 +15,7 @@ import { UserProfile } from '../lib/sanitizeUser'
 export async function getUserProfile({ username }: { username: string }): Promise<UserProfile> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/username/${username}`, {
     credentials: 'include',
+    cache: 'no-store', // If a user updates their profile, we want to get non-cahced data. Likely we should bust the cache there in the future.
   })
   if (!res.ok) {
     if (res.status === 404) {
@@ -84,7 +85,11 @@ export async function UserProfilePage({ username }: { username: string }) {
                       const summary = summarizeTransaction(transaction)
                       const userSummary = summary[transaction.creatorId]
                       return (
-                        <Link href={`/questions/${transaction.market.id}/${transaction.market.slug}`} legacyBehavior>
+                        <Link
+                          href={`/questions/${transaction.market.id}/${transaction.market.slug}`}
+                          legacyBehavior
+                          key={transaction.id}
+                        >
                           <TableRow className="cursor-pointer">
                             <TableCell className="sm:table-cell">
                               <div
