@@ -21,7 +21,6 @@ module.exports = {
       '@vercel/style-guide/eslint/next',
       'eslint-config-turbo',
     ].map(require.resolve),
-    'plugin:prettier/recommended',
   ],
   plugins: ['eslint-plugin-local-rules'],
   parserOptions: {
@@ -51,5 +50,6 @@ module.exports = {
     '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
     'no-prototype-builtins': 'off',
     'import/no-named-as-default': 'off',
+    'import/no-cycle': ['error', { ignoreExternal: true }],
   },
 }

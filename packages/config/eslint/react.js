@@ -18,7 +18,6 @@ module.exports = {
       '@vercel/style-guide/eslint/typescript',
       '@vercel/style-guide/eslint/react',
     ].map(require.resolve),
-    'plugin:prettier/recommended',
   ],
   parserOptions: {
     project,
@@ -45,6 +44,7 @@ module.exports = {
     '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
     'no-prototype-builtins': 'off',
     'import/no-named-as-default': 'off',
+    'import/no-cycle': ['error', { ignoreExternal: true }],
   },
   overrides: [
     {
