@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import os from 'os'
+import os from 'node:os'
 import db from '@play-money/database'
 
 export async function GET() {
