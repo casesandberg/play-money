@@ -88,7 +88,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-screen-xl flex-1 space-y-4 p-4 md:p-8">{children}</div>
+      <div className="mx-auto flex w-full max-w-screen-xl flex-1 space-y-4 p-4 md:p-8">{children}</div>
+
       <div className="mx-auto flex gap-4 p-4 text-sm text-muted-foreground md:p-8">
         <a className="hover:underline" href="https://discord.gg/3vgjSYT3" rel="noreferrer" target="_blank">
           Join the discord
