@@ -31,7 +31,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         httpOnly: true,
         sameSite: 'lax',
         path: '/',
-        domain: '.' + isVercel ? 'vercel.app' : hostName,
+        domain: `.${isVercel ? 'vercel.app' : hostName}`,
         secure: useSecureCookies,
       },
     },
