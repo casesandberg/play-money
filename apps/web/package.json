@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "format": "prettier . --check",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

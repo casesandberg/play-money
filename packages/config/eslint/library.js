@@ -12,10 +12,7 @@ const project = resolve(process.cwd(), 'tsconfig.json')
  */
 
 module.exports = {
-  extends: [
-    ...['@vercel/style-guide/eslint/node', '@vercel/style-guide/eslint/typescript'].map(require.resolve),
-    'plugin:prettier/recommended',
-  ],
+  extends: [...['@vercel/style-guide/eslint/node', '@vercel/style-guide/eslint/typescript'].map(require.resolve)],
   parserOptions: {
     project,
   },
@@ -41,5 +38,6 @@ module.exports = {
     'no-prototype-builtins': 'off',
     'import/no-named-as-default': 'off',
     'prettier/prettier': ['error', { endOfLine: 'auto' }],
+    'import/no-cycle': ['error', { ignoreExternal: true }],
   },
 }

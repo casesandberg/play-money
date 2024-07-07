@@ -10,6 +10,7 @@
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "storybook-static/**"]
     },
     "lint": {},
+    "format": {},
     "type-check": {},
     "dev": {
       "dependsOn": ["^db:generate"],
