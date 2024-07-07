@@ -37,6 +37,9 @@ export async function getUserBalance(): Promise<{ balance: number }> {
     headers: { Cookie: cookies().toString() },
   })
   if (!res.ok) {
+    if (res.status === 401) {
+      return { balance: 0 } // User is not logged in
+    }
     throw new Error('There was an error fetching data')
   }
 
