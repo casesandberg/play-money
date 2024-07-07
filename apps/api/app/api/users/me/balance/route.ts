@@ -20,6 +20,8 @@ export async function GET(_req: Request): Promise<SchemaResponse<typeof schema.G
 
     return NextResponse.json({ balance: balance.toNumber() })
   } catch (error) {
+    console.log(error) // eslint-disable-line no-console -- Log error for debugging
+
     return NextResponse.json({ error: 'Failed to retrieve user session' }, { status: 500 })
   }
 }

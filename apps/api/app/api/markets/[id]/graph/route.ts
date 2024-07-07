@@ -25,6 +25,7 @@ export async function GET(
       data,
     })
   } catch (error) {
+    console.log(error) // eslint-disable-line no-console -- Log error for debugging
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 })
   }
 }

@@ -19,6 +19,8 @@ export async function GET(_req: Request): Promise<SchemaResponse<typeof schema.G
 
     return NextResponse.json(user)
   } catch (error) {
+    console.log(error) // eslint-disable-line no-console -- Log error for debugging
+
     return NextResponse.json({ error: 'Failed to retrieve user session' }, { status: 500 })
   }
 }
@@ -38,6 +40,8 @@ export async function PATCH(req: Request): Promise<SchemaResponse<typeof schema.
 
     return NextResponse.json(user)
   } catch (error: unknown) {
+    console.log(error) // eslint-disable-line no-console -- Log error for debugging
+
     return NextResponse.json({ error: 'Failed to update user' }, { status: 500 })
   }
 }
