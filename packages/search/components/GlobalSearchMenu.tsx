@@ -58,7 +58,7 @@ export function GlobalSearchMenu({ open, onOpenChange }: { open: boolean; onOpen
                   onOpenChange(false)
                 }}
               >
-                <div className="font-semibold">{market.question}</div>
+                <div className="line-clamp-2 font-semibold">{market.question}</div>
               </CommandItem>
             ))}
           </CommandGroup>

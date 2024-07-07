@@ -2,6 +2,8 @@ import Link from 'next/link'
 import React from 'react'
 import db from '@play-money/database'
 import { MarketLikelyOption } from '@play-money/markets/components/MarketLikelyOption'
+import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
+import { UserLink } from '@play-money/users/components/UserLink'
 import { sanitizeUser } from '@play-money/users/lib/sanitizeUser'
 
 export default async function AppQuestionsPage() {
@@ -28,6 +30,7 @@ export default async function AppQuestionsPage() {
   const markets = rawMarkets.map((market) => {
     return {
       ...market,
+      user: sanitizeUser(market.user),
       options: market.options.map((option) => ({
         ...option,
         color: option.currencyCode === 'YES' ? '#3b82f6' : '#ec4899',
@@ -46,16 +49,16 @@ export default async function AppQuestionsPage() {
   })
 
   return (
-    <div>
+    <div className="mx-auto max-w-screen-sm flex-1">
       <div className="space-y-4">
         {markets.map((market) => {
           return (
             <div className="border p-4" key={market.id}>
-              <Link className="block text-lg font-medium" href={`/questions/${market.id}/${market.slug}`}>
+              <Link className="line-clamp-2 text-lg font-medium" href={`/questions/${market.id}/${market.slug}`}>
                 {market.question}
               </Link>
 
-              <div className="flex gap-4 text-sm text-muted-foreground">
+              <div className="flex min-h-5 gap-4 text-sm text-muted-foreground">
                 {market.marketResolution ? (
                   <div className="font-medium" style={{ color: market.marketResolution.resolution.color }}>
                     Resolved {market.marketResolution.resolution.name}
@@ -63,6 +66,14 @@ export default async function AppQuestionsPage() {
                 ) : (
                   <MarketLikelyOption market={market} />
                 )}
+
+                <div className="ml-auto flex items-center gap-1">
+                  <Avatar className="h-4 w-4">
+                    <AvatarImage alt={`@${market.user.username}`} src={market.user.avatarUrl ?? ''} />
+                    <AvatarFallback>{market.user.username.toUpperCase().slice(0, 2)}</AvatarFallback>
+                  </Avatar>
+                  <UserLink hideUsername user={market.user} />
+                </div>
               </div>
             </div>
           )

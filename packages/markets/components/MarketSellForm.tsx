@@ -147,7 +147,7 @@ export function MarketSellForm({
           )}
         />
 
-        <Button type="submit" className="w-full truncate">
+        <Button type="submit" className="w-full truncate" loading={form.formState.isSubmitting}>
           Sell {_.truncate(option.name, { length: 20 })}
         </Button>
 

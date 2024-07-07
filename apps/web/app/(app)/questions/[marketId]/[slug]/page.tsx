@@ -28,6 +28,7 @@ export const getMarket = async ({ id }: { id: string }): Promise<ExtendedMarket>
 
   return {
     ...market,
+    user: sanitizeUser(market.user),
     options: market.options.map((option) => ({
       ...option,
       color: option.currencyCode === 'YES' ? '#3b82f6' : '#ec4899',

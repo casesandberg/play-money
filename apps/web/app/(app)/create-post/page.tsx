@@ -2,10 +2,12 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import moment from 'moment'
+import { useRouter } from 'next/navigation'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { useSWRConfig } from 'swr'
 import { z } from 'zod'
 import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
+import type { Market } from '@play-money/database'
 import { MarketSchema, MarketOptionSchema } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
 import { Card } from '@play-money/ui/card'
@@ -25,6 +27,7 @@ export default function CreatePost() {
 }
 
 function CreateBinaryMarketForm() {
+  const router = useRouter()
   const { mutate } = useSWRConfig()
   const tzName = /\((?<tz>[A-Za-z\s].*)\)/.exec(new Date().toString())?.groups?.tz ?? null
 
@@ -57,10 +60,13 @@ function CreateBinaryMarketForm() {
       return
     }
 
+    const newMarket = (await response.json()) as Market
+
     void mutate('/v1/users/me/balance')
     toast({
       title: 'Your market has been created',
     })
+    router.push(`/questions/${newMarket.id}/${newMarket.slug}`)
   }
 
   const handleSubmit = form.handleSubmit(onSubmit)
@@ -71,9 +77,9 @@ function CreateBinaryMarketForm() {
   })
 
   return (
-    <Card className="w-screen-xl mx-auto flex p-6">
+    <Card className="mx-auto flex max-w-screen-sm flex-1 p-6">
       <Form {...form}>
-        <form autoComplete="off" className="space-y-6" onSubmit={(e) => void handleSubmit(e)}>
+        <form autoComplete="off" className="flex-1 space-y-6" onSubmit={(e) => void handleSubmit(e)}>
           <FormField
             control={form.control}
             name="question"
@@ -159,7 +165,7 @@ function CreateBinaryMarketForm() {
           <p className="text-sm text-muted-foreground">
             Trading will stop at this time in your local timezone {tzName === null ? '' : `(${tzName})`}
           </p>
-          <Button type="submit">
+          <Button loading={form.formState.isSubmitting} type="submit">
             Create for <CurrencyDisplay className="ml-2" currencyCode="PRIMARY" value={1000} />
           </Button>
         </form>

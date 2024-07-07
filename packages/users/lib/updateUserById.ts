@@ -6,11 +6,13 @@ import { sanitizeUser } from './sanitizeUser'
 export async function updateUserById({
   id,
   username,
+  displayName,
   bio,
   avatarUrl,
 }: {
   id: string
   username?: string
+  displayName?: string
   bio?: string
   avatarUrl?: string
 }) {
@@ -31,6 +33,10 @@ export async function updateUserById({
   }
   if (avatarUrl) {
     updatedData.avatarUrl = avatarUrl
+  }
+
+  if (displayName) {
+    updatedData.displayName = displayName
   }
 
   const updatedUser = await db.user.update({

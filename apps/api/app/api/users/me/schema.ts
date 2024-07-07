@@ -11,7 +11,7 @@ export default createSchema({
     },
   },
   PATCH: {
-    requestBody: UserSchema.pick({ username: true, bio: true, avatarUrl: true }).partial(),
+    requestBody: UserSchema.pick({ username: true, bio: true, displayName: true, avatarUrl: true }).partial(),
     responses: {
       200: UserProfileModel,
       404: ServerErrorSchema,
