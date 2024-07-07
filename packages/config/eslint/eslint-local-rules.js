@@ -18,7 +18,7 @@ module.exports = {
           ) {
             let firstArg = node.arguments[0]
             if (firstArg && firstArg.type === 'Identifier') {
-              const variable = context.getScope().variables.find((v) => v.name === firstArg.name)
+              const variable = context.getScope().variables.find((v) => v && v.name === firstArg.name)
 
               if (variable && variable.defs && variable.defs[0].node.init) {
                 // Check the initialization of the variable
@@ -29,7 +29,7 @@ module.exports = {
                     // This would be true if the await is awaiting a function call.
                     // Further inspection can be added here to check the specifics of the call
                     // For simplicity, let's say we just print something:
-                    console.log('Variable is initialized with an await on a function call.')
+                    // console.log('Variable is initialized with an await on a function call.')
                   }
 
                   if (init.argument && init.argument.arguments[0] && init.argument.arguments[0].properties) {
@@ -47,7 +47,7 @@ module.exports = {
                 if (init.type === 'ObjectExpression') {
                   // It's an object literal, check properties
                   init.properties.forEach((prop) => {
-                    if (prop.key.name === 'email') {
+                    if (prop.key && prop.key.name === 'email') {
                       context.report({
                         node: prop,
                         message: "Sensitive field 'email' should not be returned in NextResponse.json",
@@ -59,7 +59,7 @@ module.exports = {
             }
             if (firstArg && firstArg.type === 'ObjectExpression') {
               firstArg.properties.forEach((prop) => {
-                if (prop.key.name === 'email') {
+                if (prop.key && prop.key.name === 'email') {
                   context.report({
                     node: prop,
                     message: "Sensitive field 'email' should not be returned in NextResponse.json",

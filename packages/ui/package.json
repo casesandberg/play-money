@@ -5,7 +5,7 @@
     "**/*.css"
   ],
   "exports": {
-    "./styles.css": "./dist/index.css",
+    "./styles.css": "./src/styles.css",
     "./utils": "./src/lib/utils.ts",
     "./alert-dialog": "./src/components/ui/alert-dialog.tsx",
     "./alert": "./src/components/ui/alert.tsx",
@@ -79,6 +79,7 @@
     "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-toast": "^1.1.5",
     "@radix-ui/react-tooltip": "^1.0.7",
+    "@storybook/react": "^8.1.11",
     "@tiptap/core": "^2.4.0",
     "@tiptap/extension-link": "^2.4.0",
     "@tiptap/extension-placeholder": "^2.4.0",
