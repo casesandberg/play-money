@@ -55,7 +55,7 @@ export default async function AppQuestionsPage() {
                 {market.question}
               </Link>
 
-              <div className="flex gap-4 text-sm text-muted-foreground">
+              <div className="flex min-h-5 gap-4 text-sm text-muted-foreground">
                 {market.marketResolution ? (
                   <div className="font-medium" style={{ color: market.marketResolution.resolution.color }}>
                     Resolved {market.marketResolution.resolution.name}
