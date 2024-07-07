@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "storybook dev -p 6006 --no-open",
-    "build:storybook": "storybook build"
+    "build:storybook": "storybook build",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "next": "14.2.4",
