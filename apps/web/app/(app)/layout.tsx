@@ -46,7 +46,7 @@ export async function getUserBalance(): Promise<{ balance: number }> {
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const { balance } = await getUserBalance()
   return (
-    <div>
+    <div className="flex min-h-screen flex-col">
       <header className="flex w-full flex-col justify-between border-b">
         <div className="flex h-16 items-center justify-between gap-4 px-4">
           <Sheet>

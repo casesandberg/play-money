@@ -1,5 +1,6 @@
 import { format } from 'date-fns'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import React from 'react'
 import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
 import { TransactionWithItems } from '@play-money/transactions/lib/getTransactions'
@@ -8,7 +9,6 @@ import { Card, CardContent } from '@play-money/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@play-money/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@play-money/ui/tabs'
 import { cn } from '@play-money/ui/utils'
-import { UserNotFoundError } from '../lib/exceptions'
 import { UserProfile } from '../lib/sanitizeUser'
 
 // TODO: @casesandberg Generate this from OpenAPI schema
@@ -22,7 +22,7 @@ export async function getUserProfile({ username }: { username: string }): Promis
       // TODO: @casesandberg Figure out how to pass around errors for next error boundaries
       // if (errorResponse?.error?.code === UserNotFoundError.code) {
       // throw new UserNotFoundError(errorResponse.error.message)
-      throw new Error(UserNotFoundError.code)
+      notFound()
     }
 
     throw new Error('There was an error fetching data')
