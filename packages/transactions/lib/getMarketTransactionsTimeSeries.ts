@@ -1,7 +1,6 @@
 import Decimal from 'decimal.js'
-import { get } from 'lodash'
-import { z } from 'zod'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
+import db from '@play-money/database'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import { MarketTransaction } from './getMarketTransactions'
 
@@ -50,7 +49,7 @@ export async function getMarketTransactionsTimeSeries({
       }) as Bucket
   )
 
-  const transactions = await prisma.transaction.findMany({
+  const transactions = await db.transaction.findMany({
     where: {
       marketId: marketId,
       createdAt: {
