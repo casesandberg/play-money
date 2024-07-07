@@ -12,7 +12,7 @@ import { Textarea } from '@play-money/ui/textarea'
 import { toast } from '@play-money/ui/use-toast'
 import { useUser } from '../context/UserContext'
 
-const profileFormSchema = UserSchema.pick({ username: true, bio: true, avatarUrl: true })
+const profileFormSchema = UserSchema.pick({ username: true, bio: true, avatarUrl: true, displayName: true })
 type ProfileFormValues = z.infer<typeof profileFormSchema>
 
 // TODO: @casesandberg Generate this from OpenAPI schema
@@ -30,6 +30,7 @@ export function SettingsProfileForm() {
     defaultValues: {
       username: user?.username ?? '',
       bio: user?.bio ?? '',
+      displayName: user?.displayName ?? '',
     },
   })
 
@@ -66,6 +67,22 @@ export function SettingsProfileForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
+          name="displayName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Display name</FormLabel>
+              <FormControl>
+                <Input placeholder="Display name" {...field} />
+              </FormControl>
+              <FormDescription>
+                This is your public display name. It can be your real name or a pseudonym.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="username"
           rules={{
             validate: debounce(
@@ -86,9 +103,7 @@ export function SettingsProfileForm() {
               <FormControl>
                 <Input placeholder="username" {...field} />
               </FormControl>
-              <FormDescription>
-                This is your public display name. It can be your real name or a pseudonym.
-              </FormDescription>
+              <FormDescription>This is your username. It is unique to you on the site.</FormDescription>
               <FormMessage /> {/* TODO: @casesandberg Figure out why the validate error isnt being displayed */}
             </FormItem>
           )}
