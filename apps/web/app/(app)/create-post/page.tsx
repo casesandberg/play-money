@@ -77,9 +77,9 @@ function CreateBinaryMarketForm() {
   })
 
   return (
-    <Card className="w-screen-xl mx-auto flex p-6">
+    <Card className="mx-auto flex max-w-screen-sm flex-1 p-6">
       <Form {...form}>
-        <form autoComplete="off" className="space-y-6" onSubmit={(e) => void handleSubmit(e)}>
+        <form autoComplete="off" className="flex-1 space-y-6" onSubmit={(e) => void handleSubmit(e)}>
           <FormField
             control={form.control}
             name="question"
