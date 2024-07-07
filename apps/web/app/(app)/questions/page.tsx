@@ -49,12 +49,12 @@ export default async function AppQuestionsPage() {
   })
 
   return (
-    <div>
+    <div className="mx-auto max-w-screen-sm flex-1">
       <div className="space-y-4">
         {markets.map((market) => {
           return (
             <div className="border p-4" key={market.id}>
-              <Link className="block text-lg font-medium" href={`/questions/${market.id}/${market.slug}`}>
+              <Link className="line-clamp-2 text-lg font-medium" href={`/questions/${market.id}/${market.slug}`}>
                 {market.question}
               </Link>
 
