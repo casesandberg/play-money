@@ -2,20 +2,30 @@ import { MenuIcon } from 'lucide-react'
 import Link from 'next/link'
 import { ActiveUserBalance } from '@play-money/accounts/components/ActiveUserBalance'
 import { GlobalSearchTrigger } from '@play-money/search/components/GlobalSearchTrigger'
+import { Badge } from '@play-money/ui/badge'
 import { Button } from '@play-money/ui/button'
-import { Sheet, SheetTrigger, SheetContent } from '@play-money/ui/sheet'
+import { Sheet, SheetTrigger, SheetContent, SheetClose } from '@play-money/ui/sheet'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@play-money/ui/tooltip'
 import { cn } from '@play-money/ui/utils'
 import { UserNav } from '@play-money/users/components/UserNav'
 
-function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
+function MainNav({
+  className,
+  renderItemWrap = (children) => children,
+  ...props
+}: React.HTMLAttributes<HTMLElement> & { renderItemWrap?: (children: React.ReactNode) => React.ReactNode }) {
   return (
     <nav className={cn('flex items-center text-sm', className)} {...props}>
-      <Link className="font-medium transition-colors hover:text-primary" href="/questions">
-        Markets
-      </Link>
-      <Link className="font-medium transition-colors hover:text-primary" href="/create-post">
-        Create Market
-      </Link>
+      {renderItemWrap(
+        <Link className="font-medium transition-colors hover:text-primary" href="/questions">
+          Markets
+        </Link>
+      )}
+      {renderItemWrap(
+        <Link className="font-medium transition-colors hover:text-primary" href="/create-post">
+          Create Market
+        </Link>
+      )}
     </nav>
   )
 }
@@ -34,17 +44,29 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </SheetTrigger>
             <SheetContent side="left">
               <div className="flex flex-col gap-4">
-                <div className="text-lg text-muted-foreground">Play Money</div>
+                <span className="text-lg font-bold tracking-tight text-muted-foreground">PlayMoney</span>
                 <GlobalSearchTrigger />
-                <MainNav className="flex flex-col items-start space-y-4 text-lg" />
+                <MainNav
+                  className="flex flex-col items-start space-y-4 text-lg"
+                  renderItemWrap={(child) => <SheetClose asChild>{child}</SheetClose>}
+                />
               </div>
             </SheetContent>
           </Sheet>
-          <Link className="flex items-center" href="/">
-            <span>Play Money</span>
+          <Link className="flex items-center gap-2" href="/">
+            <span className="text-lg font-bold tracking-tight text-muted-foreground">PlayMoney</span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge className="hidden md:block" variant="outline">
+                  ALPHA
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>All markets and balances are temporary</TooltipContent>
+            </Tooltip>
           </Link>
+          <MainNav className="hidden gap-6 md:flex" />
+
           <div className="ml-auto flex items-center space-x-4">
-            <MainNav className="hidden gap-6 md:flex" />
             <ActiveUserBalance />
             <GlobalSearchTrigger className="hidden md:flex" />
             <UserNav />
