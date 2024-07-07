@@ -5,7 +5,7 @@
     "**/*.css"
   ],
   "exports": {
-    "./styles.css": "./dist/index.css",
+    "./styles.css": "./src/styles.css",
     "./utils": "./src/lib/utils.ts",
     "./alert-dialog": "./src/components/ui/alert-dialog.tsx",
     "./alert": "./src/components/ui/alert.tsx",
