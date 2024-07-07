@@ -1,4 +1,5 @@
 import { MenuIcon } from 'lucide-react'
+import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { ActiveUserBalance } from '@play-money/accounts/components/ActiveUserBalance'
 import { GlobalSearchTrigger } from '@play-money/search/components/GlobalSearchTrigger'
@@ -30,7 +31,20 @@ function MainNav({
   )
 }
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+// TODO: @casesandberg Generate this from OpenAPI schema
+export async function getUserBalance(): Promise<{ balance: number }> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/balance`, {
+    headers: { Cookie: cookies().toString() },
+  })
+  if (!res.ok) {
+    throw new Error('There was an error fetching data')
+  }
+
+  return res.json() as Promise<{ balance: number }>
+}
+
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const { balance } = await getUserBalance()
   return (
     <div>
       <header className="flex w-full flex-col justify-between border-b">
@@ -67,7 +81,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <MainNav className="hidden gap-6 md:flex" />
 
           <div className="ml-auto flex items-center space-x-4">
-            <ActiveUserBalance />
+            <ActiveUserBalance initialBalance={balance} />
             <GlobalSearchTrigger className="hidden md:flex" />
             <UserNav />
           </div>
