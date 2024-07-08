@@ -61,7 +61,7 @@ export function MarketTradePanel({ market, activeOptionId }: { market: ExtendedM
           </CardContent>
         </Tabs>
       </Card>
-      {balance?.holdings.YES > 0 || balance?.holdings.NO > 0 ? (
+      {Math.round(balance?.holdings.YES) > 0 || Math.round(balance?.holdings.NO) > 0 ? (
         <Card className="mt-4">
           <CardContent className="flex gap-2 p-3 text-sm">
             <span className="text-muted-foreground">Holdings:</span>

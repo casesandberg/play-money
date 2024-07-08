@@ -60,9 +60,11 @@ export async function convertPrimaryToMarketShares({
 export async function convertMarketSharesToPrimary({
   fromAccountId,
   amount,
+  inflightTransactionItems,
 }: {
   fromAccountId: string
   amount: Decimal
+  inflightTransactionItems?: Array<TransactionItemInput>
 }): Promise<Array<TransactionItemInput>> {
   const exchangerAccount = await getExchangerAccount()
 
@@ -70,8 +72,18 @@ export async function convertMarketSharesToPrimary({
     throw new Error('Exchange amount must be greater than 0')
   }
 
-  const hasEnoughYesBalance = await checkAccountBalance({ accountId: fromAccountId, currencyCode: 'YES', amount })
-  const hasEnoughNoBalance = await checkAccountBalance({ accountId: fromAccountId, currencyCode: 'NO', amount })
+  const hasEnoughYesBalance = await checkAccountBalance({
+    accountId: fromAccountId,
+    currencyCode: 'YES',
+    amount,
+    inflightTransactionItems,
+  })
+  const hasEnoughNoBalance = await checkAccountBalance({
+    accountId: fromAccountId,
+    currencyCode: 'NO',
+    amount,
+    inflightTransactionItems,
+  })
   if (!hasEnoughYesBalance || !hasEnoughNoBalance) {
     throw new Error('User does not have enough shares.')
   }
