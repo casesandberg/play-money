@@ -51,7 +51,11 @@ export async function createMarket({
   }
 
   const userAccount = await getUserAccount({ id: marketData.createdBy })
-  const hasEnoughBalance = await checkAccountBalance(userAccount.id, 'PRIMARY', subsidyAmount)
+  const hasEnoughBalance = await checkAccountBalance({
+    accountId: userAccount.id,
+    currencyCode: 'PRIMARY',
+    amount: subsidyAmount,
+  })
 
   if (!hasEnoughBalance) {
     throw new Error('User does not have enough balance to create market')

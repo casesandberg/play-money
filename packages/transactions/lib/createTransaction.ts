@@ -34,7 +34,11 @@ export async function createTransaction({
   await Promise.all(
     transactionItems.map(async (item) => {
       if (item.amount.lessThan(0)) {
-        const hasEnoughBalance = await checkAccountBalance(item.accountId, item.currencyCode, item.amount)
+        const hasEnoughBalance = await checkAccountBalance({
+          accountId: item.accountId,
+          currencyCode: item.currencyCode,
+          amount: item.amount,
+        })
 
         if (!hasEnoughBalance) {
           // console.log(`User ${item.accountId} does not have enough balance for currencyCode ${item.currencyCode}`)

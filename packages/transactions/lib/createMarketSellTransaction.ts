@@ -71,6 +71,7 @@ export async function createMarketSellTransaction({
   const exchangerTransactions = await convertMarketSharesToPrimary({
     fromAccountId: userAccount.id,
     amount: outstandingShares,
+    inflightTransactionItems: accumulatedTransactionItems,
   })
   accumulatedTransactionItems.push(...exchangerTransactions)
 
