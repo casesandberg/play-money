@@ -21,5 +21,6 @@ export async function checkAccountBalance({
     .filter((item) => item.accountId === accountId && item.currencyCode === currencyCode)
     .reduce((sum, item) => sum.plus(item.amount), new Decimal(0))
 
-  return balance.plus(inflightSum).gte(amount)
+  // TODO: Implement decimal rounding backend-wide
+  return balance.plus(inflightSum).toDecimalPlaces(4).gte(amount.toDecimalPlaces(4))
 }
