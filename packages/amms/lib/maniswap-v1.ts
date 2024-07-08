@@ -130,7 +130,7 @@ export async function quote({
   }
 
   return {
-    probability: calculateNewProbability(newY, newN),
+    probability: currencyCode === 'YES' ? calculateNewProbability(newY, newN) : calculateNewProbability(newN, newY),
     shares,
   }
 }
