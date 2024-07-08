@@ -35,7 +35,7 @@ export async function marketBuy({
   }
 
   const userAccount = await getUserAccount({ id: creatorId })
-  const hasEnoughBalance = await checkAccountBalance(userAccount.id, 'PRIMARY', amount)
+  const hasEnoughBalance = await checkAccountBalance({ accountId: userAccount.id, currencyCode: 'PRIMARY', amount })
 
   if (!hasEnoughBalance) {
     throw new Error('User does not have enough balance to purchase')
