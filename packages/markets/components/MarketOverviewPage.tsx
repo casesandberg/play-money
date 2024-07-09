@@ -48,7 +48,7 @@ export function MarketOverviewPage({
 }: {
   market: ExtendedMarket
   renderComments: React.ReactNode
-  onRevalidate: () => void
+  onRevalidate: () => Promise<void>
 }) {
   const { user } = useUser()
   const { triggerEffect } = useSidebar()

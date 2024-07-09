@@ -1,4 +1,4 @@
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidateTag } from 'next/cache'
 import { MarketComments } from '@play-money/comments/components/MarketComments'
 import db from '@play-money/database'
 import type { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
