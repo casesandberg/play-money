@@ -6,14 +6,13 @@ import _ from 'lodash'
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
-import { MarketSchema } from '@play-money/database'
+import { MarketSchema, Market } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@play-money/ui/dialog'
 import { Editor } from '@play-money/ui/editor'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
 import { toast } from '@play-money/ui/use-toast'
-import { ExtendedMarket } from './MarketOverviewPage'
 
 const FormSchema = MarketSchema.pick({ question: true, description: true, closeDate: true })
 
@@ -48,7 +47,7 @@ export const EditMarketDialog = ({
   open: boolean
   onClose: () => void
   onSuccess?: () => void
-  market: ExtendedMarket
+  market: Market
 }) => {
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
