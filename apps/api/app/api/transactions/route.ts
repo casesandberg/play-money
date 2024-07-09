@@ -17,7 +17,7 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.GE
       params.transactionType = params.transactionType.split(',') as unknown as string
     }
 
-    const { marketId, userId, transactionType, currencyCode, limit } = schema.GET.parameters.parse(params) ?? {}
+    const { marketId, userId, transactionType, currencyCode } = schema.GET.parameters.parse(params) ?? {}
 
     const transactions = await getTransactions({ marketId, userId, transactionType, currencyCode })
 
