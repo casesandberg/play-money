@@ -84,7 +84,7 @@ export async function UserProfilePage({ username }: { username: string }) {
                     transactions.map((transaction) => {
                       const summary = summarizeTransaction(transaction)
                       const userSummary = summary[transaction.creatorId]
-                      return (
+                      return transaction.market ? (
                         <Link
                           href={`/questions/${transaction.market.id}/${transaction.market.slug}`}
                           legacyBehavior
@@ -122,7 +122,7 @@ export async function UserProfilePage({ username }: { username: string }) {
                           </TableCell> */}
                           </TableRow>
                         </Link>
-                      )
+                      ) : null
                     })
                   ) : (
                     <TableRow>
