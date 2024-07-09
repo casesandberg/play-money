@@ -20,7 +20,7 @@ export function MarketOptionRow({
   return (
     <div
       className={cn(
-        'flex cursor-pointer flex-row items-center p-4 hover:bg-muted/50',
+        'flex cursor-pointer flex-row items-center gap-4 p-4 hover:bg-muted/50',
         active && 'bg-muted/50',
         className
       )}
