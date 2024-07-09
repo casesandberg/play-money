@@ -49,7 +49,7 @@ export function MarketOverviewPage({
   const { triggerEffect } = useSidebar()
   const { data: balance } = useSWR(`/v1/markets/${market.id}/balance`, { refreshInterval: 1000 * 60 }) // 60 seconds
   const { data: graph } = useSWR(`/v1/markets/${market.id}/graph`, { refreshInterval: 1000 * 60 * 5 }) // 5 mins
-  const [option, setOption] = useSearchParam('option')
+  const [option, setOption] = useSearchParam('option', 'replace')
   const activeOptionId = option || market.options[0]?.id || ''
 
   return (

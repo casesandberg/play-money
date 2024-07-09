@@ -3,7 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback } from 'react'
 
-export function useSearchParam(key: string) {
+export function useSearchParam(key: string, method: 'replace' | 'push' = 'push') {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -21,9 +21,9 @@ export function useSearchParam(key: string) {
       const search = currentParams.toString()
       const query = search ? `?${search}` : ''
 
-      router.push(`${pathname}${query}`)
+      router[method](`${pathname}${query}`)
     },
-    [key, router, pathname, searchParams]
+    [key, router, pathname, searchParams, method]
   )
 
   return [searchParams.get(key), onChange] as const
