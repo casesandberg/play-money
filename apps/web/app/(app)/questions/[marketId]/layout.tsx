@@ -1,5 +1,5 @@
 import { MarketPageLayout } from '@play-money/markets/components/MarketPageLayout'
-import { getMarket } from './[slug]/page'
+import { getExtendedMarket } from './[slug]/page'
 
 export default async function AppQuestionsLayout({
   children,
@@ -10,7 +10,7 @@ export default async function AppQuestionsLayout({
   params: { marketId: string }
   searchParams?: { option: string }
 }) {
-  const market = await getMarket({ id: params.marketId })
+  const market = await getExtendedMarket({ marketId: params.marketId })
   const activeOptionId = searchParams?.option || market.options[0]?.id || ''
 
   return (
