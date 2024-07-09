@@ -2,6 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 import db from '@play-money/database'
 import { MarketLikelyOption } from '@play-money/markets/components/MarketLikelyOption'
+import { RecentTrades } from '@play-money/transactions/components/RecentTrades'
 import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
 import { UserLink } from '@play-money/users/components/UserLink'
 import { sanitizeUser } from '@play-money/users/lib/sanitizeUser'
@@ -49,8 +50,8 @@ export default async function AppQuestionsPage() {
   })
 
   return (
-    <div className="mx-auto max-w-screen-sm flex-1">
-      <div className="space-y-4">
+    <div className="mx-auto flex max-w-screen-lg flex-1 flex-col gap-8 md:flex-row">
+      <div className="flex-1 space-y-4">
         {markets.map((market) => {
           return (
             <div className="border p-4" key={market.id}>
@@ -78,6 +79,11 @@ export default async function AppQuestionsPage() {
             </div>
           )
         })}
+      </div>
+
+      <div className="md:w-80">
+        <div className="pb-2 text-xs font-semibold uppercase text-muted-foreground">Recent trades</div>
+        <RecentTrades />
       </div>
     </div>
   )
