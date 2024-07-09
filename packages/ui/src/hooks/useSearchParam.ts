@@ -9,7 +9,7 @@ export function useSearchParam(key: string, method: 'replace' | 'push' = 'push')
   const searchParams = useSearchParams()
 
   const onChange = useCallback(
-    (newValue: string) => {
+    (newValue?: string) => {
       const currentParams = new URLSearchParams(Array.from(searchParams.entries()))
 
       if (!newValue) {

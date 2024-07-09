@@ -1,6 +1,6 @@
 'use client'
 
-import { MoreVertical, Link } from 'lucide-react'
+import { MoreVertical, Link, Pencil } from 'lucide-react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import React, { useCallback } from 'react'
 import { Button } from '@play-money/ui/button'
@@ -40,7 +40,15 @@ function useQueryString(key: string) {
   return [searchParams.get(key), setQueryString] as const
 }
 
-export function MarketToolbar({ market }: { market: ExtendedMarket }) {
+export function MarketToolbar({
+  market,
+  canEdit,
+  onInitiateEdit,
+}: {
+  market: ExtendedMarket
+  canEdit: boolean
+  onInitiateEdit: () => void
+}) {
   const { user } = useUser()
   const [isResolving, setResolving] = useQueryString('resolve')
   const canResolve = canResolveMarket({ market, userId: user?.id })
@@ -56,6 +64,12 @@ export function MarketToolbar({ market }: { market: ExtendedMarket }) {
 
   return (
     <div className="flex items-center justify-end">
+      {canEdit ? (
+        <Button variant="ghost" size="sm" onClick={onInitiateEdit}>
+          <Pencil className="h-4 w-4" />
+          <span>Edit</span>
+        </Button>
+      ) : null}
       <Tooltip>
         <TooltipTrigger asChild>
           <Button variant="ghost" size="icon" onClick={handleCopyLink}>
@@ -84,6 +98,15 @@ export function MarketToolbar({ market }: { market: ExtendedMarket }) {
                 }}
               >
                 Resolve market
+              </DropdownMenuItem>
+            </>
+          ) : null}
+          {canEdit ? (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={onInitiateEdit}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit market
               </DropdownMenuItem>
             </>
           ) : null}

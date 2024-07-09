@@ -1,7 +1,7 @@
 'use client'
 
 import { format, isPast } from 'date-fns'
-import { CircleCheckBig, ChevronDown } from 'lucide-react'
+import { CircleCheckBig, ChevronDown, Pencil } from 'lucide-react'
 import React from 'react'
 import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip } from 'recharts'
 import useSWR from 'swr'
@@ -14,8 +14,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@play-money/ui/collapsible'
 import { ReadMoreEditor } from '@play-money/ui/editor'
 import { UserLink } from '@play-money/users/components/UserLink'
+import { useUser } from '@play-money/users/context/UserContext'
 import { UserProfile } from '@play-money/users/lib/sanitizeUser'
 import { useSearchParam } from '../../ui/src/hooks/useSearchParam'
+import { EditMarketDialog } from './EditMarketDialog'
 import { MarketLikelyOption } from './MarketLikelyOption'
 import { MarketOptionRow } from './MarketOptionRow'
 import { MarketToolbar } from './MarketToolbar'
@@ -42,19 +44,24 @@ function getTextContrast(hex: string): string {
 export function MarketOverviewPage({
   market,
   renderComments,
+  onRevalidate,
 }: {
   market: ExtendedMarket
   renderComments: React.ReactNode
+  onRevalidate: () => void
 }) {
+  const { user } = useUser()
   const { triggerEffect } = useSidebar()
   const { data: balance } = useSWR(`/v1/markets/${market.id}/balance`, { refreshInterval: 1000 * 60 }) // 60 seconds
   const { data: graph } = useSWR(`/v1/markets/${market.id}/graph`, { refreshInterval: 1000 * 60 * 5 }) // 5 mins
   const [option, setOption] = useSearchParam('option', 'replace')
+  const [isEditing, setIsEditing] = useSearchParam('edit')
   const activeOptionId = option || market.options[0]?.id || ''
+  const isCreator = user?.id === market.createdBy
 
   return (
     <Card className="flex-1">
-      <MarketToolbar market={market} />
+      <MarketToolbar market={market} canEdit={isCreator} onInitiateEdit={() => setIsEditing('true')} />
 
       <CardHeader className="px-7 pt-0">
         <CardTitle className="leading-relaxed">{market.question}</CardTitle>
@@ -198,6 +205,13 @@ export function MarketOverviewPage({
 
       <div className="px-6 text-lg font-semibold">Comments</div>
       {renderComments}
+
+      <EditMarketDialog
+        market={market}
+        open={isEditing === 'true'}
+        onClose={() => setIsEditing(undefined)}
+        onSuccess={onRevalidate}
+      />
     </Card>
   )
 }
