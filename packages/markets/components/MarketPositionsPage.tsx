@@ -1,27 +1,93 @@
 'use client'
 
-import { format } from 'date-fns'
+import { format, isPast, formatDistanceToNow } from 'date-fns'
+import Link from 'next/link'
 import React from 'react'
+import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
+import type { TransactionWithItems } from '@play-money/transactions/lib/getTransactions'
+import { summarizeTransaction } from '@play-money/transactions/lib/helpers'
 import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
 import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
 import { Table, TableBody, TableRow, TableHeader, TableHead, TableCell } from '@play-money/ui/table'
+import { UserLink } from '@play-money/users/components/UserLink'
+import { MarketLikelyOption } from './MarketLikelyOption'
 import { ExtendedMarket } from './MarketOverviewPage'
+import { MarketToolbar } from './MarketToolbar'
 
-export function MarketPositionsPage({ market }: { market: ExtendedMarket }) {
+export function MarketPositionsPage({
+  market,
+  transactions,
+}: {
+  market: ExtendedMarket
+  transactions: Array<TransactionWithItems>
+}) {
   const simplyIfTwoOptions = market.options.length === 2
 
   return (
     <Card className="flex-1">
-      <CardHeader className="px-7">
+      <MarketToolbar market={market} />
+
+      <CardHeader className="px-7 pt-0">
         <CardTitle className="leading-relaxed">{market.question}</CardTitle>
-        <div className="flex flex-row gap-4 text-muted-foreground">
-          {market.closeDate ? <div>Closes {format(market.closeDate, 'MMM d, yyyy')}</div> : null}
+        <div className="flex flex-row gap-4 text-sm text-muted-foreground">
+          {!market.marketResolution ? <MarketLikelyOption market={market} /> : null}
+
+          {market.closeDate ? (
+            <div className="flex-shrink-0">
+              {isPast(market.closeDate) ? 'Ended' : 'Ending'} {format(market.closeDate, 'MMM d, yyyy')}
+            </div>
+          ) : null}
+          {market.user ? (
+            <div className="flex items-center gap-1 truncate">
+              <Avatar className="h-4 w-4">
+                <AvatarImage alt={`@${market.user.username}`} src={market.user.avatarUrl ?? ''} />
+                <AvatarFallback>{market.user.username.toUpperCase().slice(0, 2)}</AvatarFallback>
+              </Avatar>
+              <UserLink user={market.user} hideUsername />
+            </div>
+          ) : null}
           {/* <div>15 Traders</div>
-          <div>$650 Volume</div> */}
+    <div>$650 Volume</div> */}
         </div>
       </CardHeader>
       <CardContent className="space-y-6 border-t pt-6">
-        {market.options.map((option, i) => (
+        <ul className="divide-y divide-muted">
+          {transactions.length ? (
+            transactions.map((transaction) => {
+              const summary = summarizeTransaction(transaction)
+              const userSummary = summary[transaction.creatorId]
+
+              return (
+                <li className="flex items-center gap-1 py-3" key={transaction.id}>
+                  {transaction.creator.user ? (
+                    <div className="inline-flex items-center gap-2">
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage
+                          alt={`@${transaction.creator.user.username}`}
+                          src={transaction.creator.user.avatarUrl ?? ''}
+                        />
+                        <AvatarFallback>{transaction.creator.user.username.toUpperCase().slice(0, 2)}</AvatarFallback>
+                      </Avatar>
+                      <UserLink hideUsername user={transaction.creator.user} />
+                    </div>
+                  ) : null}
+                  {transaction.type === 'MARKET_BUY' ? 'bought' : 'sold'}{' '}
+                  <span className="font-medium">
+                    ${formatNumber(Math.round(Math.abs(userSummary?.PRIMARY.toNumber())))}{' '}
+                    {!userSummary?.YES.eq(0) ? 'Yes' : 'No'}
+                  </span>{' '}
+                  <span className="ml-auto text-sm text-muted-foreground">
+                    {formatDistanceToNow(transaction.createdAt, { addSuffix: true })}
+                  </span>
+                </li>
+              )
+            })
+          ) : (
+            <li className="text-sm text-muted-foreground">No trades have been made yet.</li>
+          )}
+        </ul>
+
+        {/* {market.options.map((option, i) => (
           <div>
             <div style={{ color: option.color }}>{option.name} (15)</div>
 
@@ -116,7 +182,7 @@ export function MarketPositionsPage({ market }: { market: ExtendedMarket }) {
               )}
             </div>
           </div>
-        ))}
+        ))} */}
       </CardContent>
     </Card>
   )

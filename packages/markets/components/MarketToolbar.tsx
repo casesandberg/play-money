@@ -46,8 +46,8 @@ export function MarketToolbar({
   onInitiateEdit,
 }: {
   market: ExtendedMarket
-  canEdit: boolean
-  onInitiateEdit: () => void
+  canEdit?: boolean
+  onInitiateEdit?: () => void
 }) {
   const { user } = useUser()
   const [isResolving, setResolving] = useQueryString('resolve')

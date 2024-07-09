@@ -3,7 +3,8 @@ import cuid from 'cuid'
 import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
-import { Market, User, Account, TransactionItem, Currency, MarketOption, Comment } from './zod'
+import type { TransactionWithItems } from '@play-money/transactions/lib/getTransactions'
+import { Market, User, Account, TransactionItem, Currency, MarketOption, Comment, Transaction } from './zod'
 
 export function mockUser(overrides?: Partial<User>): User {
   const firstName = faker.person.firstName()
@@ -89,10 +90,33 @@ export function mockTransactionItem(overrides?: Partial<TransactionItem>): Trans
   return {
     id: faker.string.uuid(),
     createdAt: faker.date.past(),
-    currencyCode: faker.helpers.arrayElement(['YES', 'NO']),
+    currencyCode: faker.helpers.arrayElement(['YES', 'NO', 'PRIMARY']),
     accountId: faker.string.uuid(),
     transactionId: faker.string.uuid(),
     amount: new Decimal(faker.finance.amount()),
+    ...overrides,
+  }
+}
+
+export function mockTransactionWithItems(overrides?: Partial<TransactionWithItems>): TransactionWithItems {
+  const transactionId = faker.string.uuid()
+  const market = mockMarket()
+  const creatorId = faker.string.uuid()
+  const user = mockUser()
+
+  return {
+    id: transactionId,
+    type: faker.helpers.arrayElement(['MARKET_BUY', 'MARKET_SELL']),
+    description: faker.lorem.sentence(),
+    createdAt: faker.date.past(),
+    updatedAt: faker.date.past(),
+    creatorId,
+    marketId: market.id,
+    transactionItems: _.times(faker.datatype.number({ min: 1, max: 5 }), () => mockTransactionItem({ transactionId })),
+    market,
+    creator: {
+      user,
+    },
     ...overrides,
   }
 }
