@@ -73,8 +73,8 @@ export function MarketPositionsPage({
                   ) : null}
                   {transaction.type === 'MARKET_BUY' ? 'bought' : 'sold'}{' '}
                   <span className="font-medium">
-                    ${formatNumber(Math.round(Math.abs(userSummary.PRIMARY.toNumber())))}{' '}
-                    {!userSummary.YES.eq(0) ? 'Yes' : 'No'}
+                    ${formatNumber(Math.round(Math.abs(userSummary?.PRIMARY.toNumber())))}{' '}
+                    {!userSummary?.YES.eq(0) ? 'Yes' : 'No'}
                   </span>{' '}
                   <span className="ml-auto text-sm text-muted-foreground">
                     {formatDistanceToNow(transaction.createdAt, { addSuffix: true })}
