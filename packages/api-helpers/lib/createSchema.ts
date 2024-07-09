@@ -5,7 +5,7 @@ export type SchemaResponse<Res extends z.ZodObject<any>> = NextResponse<z.infer<
 
 type SwaggerPathSpec = {
   [key: string]: {
-    parameters?: z.ZodObject<any>
+    parameters?: z.ZodObject<any> | z.ZodOptional<z.ZodObject<any>>
     requestBody?: z.ZodObject<any>
     responses: {
       [key: number]: z.ZodObject<any> | Array<z.ZodObject<any>>

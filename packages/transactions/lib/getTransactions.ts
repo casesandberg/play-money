@@ -1,9 +1,13 @@
 import db, { Market, Transaction, TransactionItem } from '@play-money/database'
 import { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/CurrencyCodeSchema'
+import { UserProfile, sanitizeUser } from '@play-money/users/lib/sanitizeUser'
 
 export type TransactionWithItems = Transaction & {
   transactionItems: Array<TransactionItem>
-  market: Market
+  market: Market | null
+  creator: {
+    user: UserProfile | null
+  }
 }
 
 interface TransactionFilterOptions {
@@ -27,7 +31,7 @@ export async function getTransactions(
   filters: TransactionFilterOptions = {},
   sort: SortOptions = { field: 'createdAt', direction: 'desc' },
   pagination: PaginationOptions = { skip: 0, take: 10 }
-) {
+): Promise<Array<TransactionWithItems>> {
   const transactions = await db.transaction.findMany({
     where: {
       marketId: filters.marketId,
@@ -44,6 +48,11 @@ export async function getTransactions(
     include: {
       transactionItems: true,
       market: true,
+      creator: {
+        include: {
+          user: true,
+        },
+      },
     },
     orderBy: {
       [sort.field]: sort.direction,
@@ -52,5 +61,13 @@ export async function getTransactions(
     take: pagination.take,
   })
 
-  return transactions
+  return transactions.map((transaction) => {
+    return {
+      ...transaction,
+      creator: {
+        ...transaction.creator,
+        user: transaction.creator.user ? sanitizeUser(transaction.creator.user) : null,
+      },
+    }
+  })
 }
