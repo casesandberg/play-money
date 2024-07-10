@@ -54,7 +54,7 @@ export async function UserProfileLayout({
   const stats = await getUserProfileStats({ userId: profile.id })
 
   return (
-    <main className="mx-auto flex flex-col items-start gap-6 md:flex-row">
+    <main className="mx-auto flex flex-1 flex-col items-start gap-6 md:flex-row">
       <Card className="w-full md:w-80">
         <CardHeader className="flex flex-row items-start gap-4 bg-muted/50">
           <Avatar className="h-16 w-16">
