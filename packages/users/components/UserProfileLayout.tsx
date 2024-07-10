@@ -159,7 +159,7 @@ export async function UserProfileLayout({
         </CardFooter>
       </Card>
 
-      <div className="flex-1">{children}</div>
+      <div className="w-full flex-1">{children}</div>
     </main>
   )
 }

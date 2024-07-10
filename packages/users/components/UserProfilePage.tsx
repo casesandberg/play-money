@@ -122,7 +122,7 @@ export async function UserProfilePage({ username }: { username: string }) {
                                     : ''}{' '}
                                 {!userSummary.YES.eq(0) ? 'Yes' : 'No'}
                               </div>
-                              <div>${formatNumber(Math.round(Math.abs(userSummary.PRIMARY.toNumber())))}</div>
+                              <div>${formatNumber(Math.abs(userSummary.PRIMARY.toNumber()))}</div>
                             </TableCell>
                             <TableCell>
                               <div className="line-clamp-2 font-medium">{transaction.market.question}</div>

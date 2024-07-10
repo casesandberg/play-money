@@ -43,7 +43,7 @@ export function MarketPageLayout({
           {children}
         </div>
 
-        <div className="w-80">
+        <div className="w-full md:w-80">
           <MarketPageSidebar market={market} activeOptionId={activeOptionId} />
         </div>
       </main>

@@ -29,7 +29,7 @@ export function MarketTradePanel({ market, activeOptionId }: { market: ExtendedM
     <>
       <Card className={cn(effect && 'animate-slide-in-right')} onAnimationEnd={resetEffect}>
         <Tabs defaultValue="buy">
-          <CardHeader className="flex items-start bg-muted p-3">
+          <CardHeader className="flex items-start bg-muted md:p-3">
             <Combobox
               buttonClassName="bg-muted w-full text-lg border-none"
               value={option || activeOptionId}
