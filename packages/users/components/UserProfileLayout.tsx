@@ -70,10 +70,9 @@ export async function UserProfileLayout({
             <EditOrFollowUserButton userId={profile.id} />
           </div> */}
         </CardHeader>
-        <CardContent className="p-6 text-sm">
+        <CardContent className="pt-3 text-sm md:pt-6">
           <div className="grid gap-3">
             {profile.bio ? <div>{profile.bio}</div> : null}
-
             {profile.twitterHandle || profile.discordHandle || profile.website ? (
               <div className="flex min-w-0 flex-row gap-4">
                 {profile.twitterHandle ? (
@@ -110,7 +109,6 @@ export async function UserProfileLayout({
                 ) : null}
               </div>
             ) : null}
-
             {/* <div className="flex flex-row gap-4">
               <Link
                 href={`/${profile.username}/followers`}
