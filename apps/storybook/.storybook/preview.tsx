@@ -11,9 +11,11 @@ import { Toaster } from '@play-money/ui/toaster'
 import { TooltipProvider } from '@play-money/ui/tooltip'
 import { UserProvider } from '@play-money/users/context/UserContext'
 import '../../web/app/globals.css'
+import MockDate from '../src/mockdate'
 import { allModes } from './modes'
 
 faker.seed(10191)
+MockDate.set('2001-11-22')
 
 const preview: Preview = {
   parameters: {
