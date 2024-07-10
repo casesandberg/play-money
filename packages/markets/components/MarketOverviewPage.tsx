@@ -63,7 +63,7 @@ export function MarketOverviewPage({
     <Card className="flex-1">
       <MarketToolbar market={market} canEdit={isCreator} onInitiateEdit={() => setIsEditing('true')} />
 
-      <CardHeader className="pt-0">
+      <CardHeader className="pt-0 md:pt-0">
         <CardTitle className="leading-relaxed">{market.question}</CardTitle>
         <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground md:flex-nowrap">
           {!market.marketResolution ? <MarketLikelyOption market={market} /> : null}
