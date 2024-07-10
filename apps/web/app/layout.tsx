@@ -5,6 +5,7 @@ import { auth } from '@play-money/auth'
 import { SessionProvider } from '@play-money/auth/components/SessionProvider'
 import { CurrencyProvider } from '@play-money/currencies/components/CurrencyProvider'
 import type { Currency } from '@play-money/database'
+import { ThemeProvider } from '@play-money/ui/ThemeProvider'
 import '@play-money/ui/emoji'
 import '@play-money/ui/styles.css'
 import { Toaster } from '@play-money/ui/toaster'
@@ -40,16 +41,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en">
       <body className={inter.className}>
-        <SWRProvider>
-          <SessionProvider session={session}>
-            <UserProvider user={user}>
-              <CurrencyProvider currencies={currencies}>
-                <TooltipProvider>{children}</TooltipProvider>
-              </CurrencyProvider>
-            </UserProvider>
-          </SessionProvider>
-          <Toaster />
-        </SWRProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" disableTransitionOnChange enableSystem>
+          <SWRProvider>
+            <SessionProvider session={session}>
+              <UserProvider user={user}>
+                <CurrencyProvider currencies={currencies}>
+                  <TooltipProvider>{children}</TooltipProvider>
+                </CurrencyProvider>
+              </UserProvider>
+            </SessionProvider>
+            <Toaster />
+          </SWRProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

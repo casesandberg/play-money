@@ -20,7 +20,7 @@ export const CurrencyDisplay: React.FC<CurrencyDisplayProps> = ({ value, currenc
   return (
     <div className={cn('flex items-center space-x-1', className)}>
       {currency.imageUrl && <img src={currency.imageUrl} alt={currency.name} className="h-4 w-4" />}
-      <span className="font-medium text-gray-700">{formattedValue}</span>
+      <span className="font-medium">{formattedValue}</span>
     </div>
   )
 }
