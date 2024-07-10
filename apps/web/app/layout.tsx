@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { SWRProvider } from '@play-money/api-helpers/components/SWRProvider'
 import { auth } from '@play-money/auth'
@@ -19,6 +19,13 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Play Money',
   description: 'Prediction market platform',
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 }
 
 // TODO: @casesandberg Generate this from OpenAPI schema
