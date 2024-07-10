@@ -70,6 +70,7 @@ export async function createMarket({
           data: parsedOptions.map((option) => ({
             name: option.name,
             currencyCode: option.currencyCode,
+            color: option.currencyCode === 'YES' ? '#3B82F6' : '#EC4899',
             updatedAt: new Date(),
             createdAt: new Date(),
           })),

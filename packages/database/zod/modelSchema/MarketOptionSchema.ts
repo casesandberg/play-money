@@ -10,6 +10,7 @@ export const MarketOptionSchema = z.object({
   id: z.string().cuid(),
   name: z.string(),
   marketId: z.string(),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
