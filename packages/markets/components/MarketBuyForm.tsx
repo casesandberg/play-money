@@ -223,8 +223,8 @@ export const QuoteItem = ({
               ? 'text-green-500'
               : percent < 0
                 ? 'text-red-500'
-                : 'text-primary-foreground'
-            : 'text-primary-foreground'
+                : 'text-foreground'
+            : 'text-foreground'
           : 'text-muted-foreground'
       )}
     >
