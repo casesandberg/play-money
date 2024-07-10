@@ -96,7 +96,7 @@ export function CommentItem({
 
       <Collapsible open={isReplyOpen} onOpenChange={setIsReplyOpen}>
         <div className="flex flex-row items-center gap-4">
-          <UserLink user={comment.author} className="truncate" />
+          <UserLink user={comment.author} className="truncate" hideUsername />
 
           <div className="flex-shrink-0 text-sm text-muted-foreground">
             {formatDistance(comment.createdAt, new Date(), { addSuffix: true })}
@@ -187,7 +187,7 @@ export function CommentItem({
               />
             </div>
           ) : (
-            <Editor className="min-h-6" value={comment.content} disabled />
+            <Editor className="min-h-6" inputClassName="text-sm md:text-base" value={comment.content} disabled />
           )}
         </div>
 
