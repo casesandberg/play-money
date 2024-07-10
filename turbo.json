@@ -26,6 +26,9 @@
     "db:push": {
       "cache": false
     },
+    "db:reset": {
+      "cache": false
+    },
     "test": {},
     "test:watch": {
       "cache": false

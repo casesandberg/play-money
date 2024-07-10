@@ -107,6 +107,7 @@ model MarketOption {
   market       Market             @relation(fields: [marketId], references: [id])
   currencyCode CurrencyCode
   currency     Currency           @relation(fields: [currencyCode], references: [code])
+  color        String             @default("#FF00FF") /// @zod.string.regex(/^#[0-9A-Fa-f]{6}$/)
   resolutions  MarketResolution[]
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt

@@ -11,6 +11,7 @@
     "db:push": "dotenv -- turbo db:push",
     "db:generate": "dotenv -- turbo db:generate",
     "db:script": "dotenv -- npm run script -w @play-money/database",
+    "db:reset": "dotenv -- turbo db:reset",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch"
   },

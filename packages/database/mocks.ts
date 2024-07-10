@@ -127,6 +127,7 @@ export function mockMarketOption(overrides?: Partial<MarketOption>): MarketOptio
     id: faker.string.uuid(),
     name: currencyCode === 'YES' ? 'Yes' : 'No',
     currencyCode,
+    color: currencyCode === 'YES' ? '#3B82F6' : '#EC4899',
     marketId: faker.string.uuid(),
     createdAt: faker.date.past(),
     updatedAt: faker.date.past(),

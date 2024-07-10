@@ -34,7 +34,7 @@ export default async function AppQuestionsPage() {
       user: sanitizeUser(market.user),
       options: market.options.map((option) => ({
         ...option,
-        color: option.currencyCode === 'YES' ? '#3b82f6' : '#ec4899',
+        color: option.color,
       })),
       marketResolution: market.marketResolution
         ? {
@@ -42,7 +42,7 @@ export default async function AppQuestionsPage() {
             resolvedBy: sanitizeUser(market.marketResolution.resolvedBy),
             resolution: {
               ...market.marketResolution.resolution,
-              color: market.marketResolution.resolution.currencyCode === 'YES' ? '#3b82f6' : '#ec4899',
+              color: market.marketResolution.resolution.color,
             },
           }
         : undefined,
