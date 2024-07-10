@@ -42,7 +42,7 @@ function Editor({
     editorProps: {
       attributes: {
         class: cn(
-          'prose w-full flex-1 rounded-md bg-transparent border-b-0 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 overflow-auto',
+          'prose dark:prose-invert w-full flex-1 rounded-md bg-transparent border-b-0 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 overflow-auto',
           !disabled && 'p-4',
           inputClassName
         ),
