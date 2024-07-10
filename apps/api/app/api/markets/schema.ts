@@ -3,7 +3,21 @@ import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
 import { MarketOptionSchema, MarketSchema } from '@play-money/database'
 
 export default createSchema({
-  POST: {
+  get: {
+    parameters: z
+      .object({
+        createdBy: z.string().optional(),
+      })
+      .optional(),
+    responses: {
+      200: z.object({
+        markets: z.array(MarketSchema),
+      }),
+      404: ServerErrorSchema,
+      500: ServerErrorSchema,
+    },
+  },
+  post: {
     requestBody: MarketSchema.pick({
       question: true,
       description: true,

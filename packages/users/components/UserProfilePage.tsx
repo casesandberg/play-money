@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
+import { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
 import { TransactionWithItems } from '@play-money/transactions/lib/getTransactions'
 import { summarizeTransaction } from '@play-money/transactions/lib/helpers'
 import { Card, CardContent } from '@play-money/ui/card'
@@ -46,9 +47,21 @@ export async function getUserTransactions({
   return res.json()
 }
 
+export async function getUserMarkets({ userId }: { userId: string }): Promise<{ markets: Array<ExtendedMarket> }> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets?createdBy=${userId}`, {
+    credentials: 'include',
+  })
+  if (!res.ok) {
+    throw new Error('There was an error fetching data')
+  }
+
+  return res.json()
+}
+
 export async function UserProfilePage({ username }: { username: string }) {
   const user = await getUserProfile({ username })
   const { transactions } = await getUserTransactions({ userId: user.id })
+  const { markets } = await getUserMarkets({ userId: user.id })
 
   return (
     <div className="flex flex-col gap-4">
@@ -57,7 +70,7 @@ export async function UserProfilePage({ username }: { username: string }) {
           <TabsList>
             {/* <TabsTrigger value="net-worth">Net Worth</TabsTrigger> */}
             <TabsTrigger value="trades">Trades</TabsTrigger>
-            {/* <TabsTrigger value="markets">Markets</TabsTrigger> */}
+            <TabsTrigger value="markets">Markets</TabsTrigger>
           </TabsList>
         </div>
         <TabsContent value="net-worth">
@@ -144,39 +157,27 @@ export async function UserProfilePage({ username }: { username: string }) {
                   <TableRow>
                     <TableHead>Market</TableHead>
                     <TableHead className="hidden w-[150px] sm:table-cell">Resolves</TableHead>
-                    <TableHead className="hidden sm:table-cell">Traders</TableHead>
+                    {/* <TableHead className="hidden sm:table-cell">Traders</TableHead> */}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow>
-                    <TableCell>
-                      <div className="line-clamp-2">
-                        FDA legalizes magic mushrooms/psilocybin/etc. for clinical use by 2025
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">Mar 31, 2024</TableCell>
-                    <TableCell className="hidden md:table-cell">58</TableCell>
-                  </TableRow>
-
-                  <TableRow>
-                    <TableCell>
-                      <div className="line-clamp-2">
-                        Will it take more energy to cool and heat my hot tub, or keep it hot?
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">Mar 23, 2024</TableCell>
-                    <TableCell className="hidden md:table-cell">5</TableCell>
-                  </TableRow>
-
-                  <TableRow>
-                    <TableCell>
-                      <div className="line-clamp-2">
-                        Will it be possible to send mana to another user on 5th October 2024?
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">Mar 23, 2024</TableCell>
-                    <TableCell className="hidden md:table-cell">2 </TableCell>
-                  </TableRow>
+                  {markets.length
+                    ? markets.map((market) => {
+                        return (
+                          <Link href={`/questions/${market.id}/${market.slug}`} legacyBehavior key={market.id}>
+                            <TableRow className="cursor-pointer">
+                              <TableCell>
+                                <div className="line-clamp-2">{market.question}</div>
+                              </TableCell>
+                              <TableCell className="hidden md:table-cell">
+                                {market.closeDate ? format(market.closeDate, 'MMM d, yyyy') : '-'}
+                              </TableCell>
+                              {/* <TableCell className="hidden md:table-cell">58</TableCell> */}
+                            </TableRow>
+                          </Link>
+                        )
+                      })
+                    : null}
                 </TableBody>
               </Table>
             </CardContent>
