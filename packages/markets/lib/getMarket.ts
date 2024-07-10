@@ -33,18 +33,10 @@ export async function getMarket({
     return {
       ...market,
       user: sanitizeUser(market.user),
-      options: market.options.map((option) => ({
-        ...option,
-        color: option.color
-      })),
       marketResolution: market.marketResolution
         ? {
             ...market.marketResolution,
             resolvedBy: sanitizeUser(market.marketResolution.resolvedBy),
-            resolution: {
-              ...market.marketResolution.resolution,
-              color: market.marketResolution.resolution.color,
-            },
           }
         : undefined,
     }
