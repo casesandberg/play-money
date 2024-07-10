@@ -50,7 +50,7 @@ export function MarketPositionsPage({
     <div>$650 Volume</div> */}
         </div>
       </CardHeader>
-      <CardContent className="space-y-6 border-t pt-6">
+      <CardContent className="space-y-6 border-t pt-3 md:pt-6">
         <ul className="divide-y divide-muted">
           {transactions.length ? (
             transactions.map((transaction) => {
@@ -58,7 +58,7 @@ export function MarketPositionsPage({
               const userSummary = summary[transaction.creatorId]
 
               return (
-                <li className="flex items-center gap-1 py-3" key={transaction.id}>
+                <li className="flex flex-wrap items-center gap-1 py-3" key={transaction.id}>
                   {transaction.creator.user ? (
                     <div className="inline-flex items-center gap-2">
                       <Avatar className="h-6 w-6">
@@ -76,7 +76,7 @@ export function MarketPositionsPage({
                     ${formatNumber(Math.round(Math.abs(userSummary?.PRIMARY.toNumber())))}{' '}
                     {!userSummary?.YES.eq(0) ? 'Yes' : 'No'}
                   </span>{' '}
-                  <span className="ml-auto text-sm text-muted-foreground">
+                  <span className="text-sm text-muted-foreground md:ml-auto">
                     {formatDistanceToNow(transaction.createdAt, { addSuffix: true })}
                   </span>
                 </li>
