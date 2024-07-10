@@ -2,7 +2,7 @@ import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
-import db from '@play-money/database'
+import db, { Transaction } from '@play-money/database'
 import { createTransaction } from './createTransaction'
 
 export async function createMarketResolveLossTransactions({
@@ -29,25 +29,33 @@ export async function createMarketResolveLossTransactions({
     return transactions.reduce((sum, item) => sum.plus(item.amount), new Decimal(0))
   })
 
+  const transactions: Array<Transaction> = []
+
   // Transfer all losing shares back to the AMM
   for (const [accountId, amount] of Object.entries(summedLosingShares)) {
-    await createTransaction({
-      creatorId: ammAccount.id,
-      type: 'MARKET_RESOLVE_LOSS',
-      description: `Returning losing shares for market ${marketId}`,
-      marketId,
-      transactionItems: [
-        {
-          accountId: accountId,
-          currencyCode: losingCurrencyCode,
-          amount: amount.negated(),
-        },
-        {
-          accountId: ammAccount.id,
-          currencyCode: losingCurrencyCode,
-          amount,
-        },
-      ],
-    })
+    if (amount.gt(0)) {
+      transactions.push(
+        await createTransaction({
+          creatorId: ammAccount.id,
+          type: 'MARKET_RESOLVE_LOSS',
+          description: `Returning losing shares for market ${marketId}`,
+          marketId,
+          transactionItems: [
+            {
+              accountId: accountId,
+              currencyCode: losingCurrencyCode,
+              amount: amount.negated(),
+            },
+            {
+              accountId: ammAccount.id,
+              currencyCode: losingCurrencyCode,
+              amount,
+            },
+          ],
+        })
+      )
+    }
   }
+
+  return transactions
 }
