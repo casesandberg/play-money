@@ -69,4 +69,4 @@ jobs:
         run: npm_config_yes=true npx vercel env pull --yes --environment=preview --token=${{ env.VERCEL_TOKEN }}
 
       - name: Build
-        run: npm run build
+        run: dotenv -- npm run build
