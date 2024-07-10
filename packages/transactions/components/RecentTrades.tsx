@@ -38,8 +38,7 @@ export function RecentTrades() {
             ) : null}
             {transaction.type === 'MARKET_BUY' ? 'bought' : 'sold'}{' '}
             <span className="font-medium">
-              ${formatNumber(Math.round(Math.abs(userSummary.PRIMARY.toNumber())))}{' '}
-              {!userSummary.YES.eq(0) ? 'Yes' : 'No'}
+              ${formatNumber(Math.abs(userSummary.PRIMARY.toNumber()))} {!userSummary.YES.eq(0) ? 'Yes' : 'No'}
             </span>{' '}
             {transaction.market ? (
               <>
