@@ -26,7 +26,7 @@ export function MarketTradePanel({ market, activeOptionId }: { market: ExtendedM
   }
 
   return (
-    <>
+    <div className="space-y-4">
       <Card className={cn(effect && 'animate-slide-in-right')} onAnimationEnd={resetEffect}>
         <Tabs defaultValue="buy">
           <CardHeader className="flex items-start bg-muted md:p-3">
@@ -62,8 +62,8 @@ export function MarketTradePanel({ market, activeOptionId }: { market: ExtendedM
         </Tabs>
       </Card>
       {Math.round(balance?.holdings.YES) > 0 || Math.round(balance?.holdings.NO) > 0 ? (
-        <Card className="mt-4">
-          <CardContent className="flex gap-2 p-3 text-sm">
+        <Card>
+          <CardContent className="flex gap-2 p-3 text-sm md:py-4">
             <span className="text-muted-foreground">Holdings:</span>
             {market.options.map((option) => {
               const shares = balance?.holdings[option.currencyCode]
@@ -77,6 +77,6 @@ export function MarketTradePanel({ market, activeOptionId }: { market: ExtendedM
           </CardContent>
         </Card>
       ) : null}
-    </>
+    </div>
   )
 }
