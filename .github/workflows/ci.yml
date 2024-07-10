@@ -1,13 +1,14 @@
 name: CI
 
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
 on:
   push:
     branches: ['main']
   pull_request:
     types: [opened, synchronize]
-
-# env:
-#   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
 jobs:
   checks:
@@ -28,8 +29,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # - name: Pull Vercel Environment Information
-      #   run: npm_config_yes=true npx vercel pull --yes --environment=preview --token=${{ env.VERCEL_TOKEN }}
+      - name: Pull Vercel Environment Information
+        run: npm_config_yes=true npx vercel env pull --yes --environment=preview --token=${{ env.VERCEL_TOKEN }}
 
       - name: Run format
         run: npm run format
@@ -43,28 +44,28 @@ jobs:
       - name: Run tests
         run: npm run test
 
-  # build:
-  #   name: Build
-  #   timeout-minutes: 15
-  #   runs-on: ubuntu-latest
+  build:
+    name: Build
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Check out code
-  #       uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 2
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
-  #     - name: Setup Node.js environment
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 20
-  #         cache: 'npm'
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
 
-  #     - name: Install dependencies
-  #       run: npm install
+      - name: Install dependencies
+        run: npm install
 
-  #     - name: Pull Vercel Environment Information
-  #       run: npm_config_yes=true npx vercel pull --yes --environment=preview --token=${{ env.VERCEL_TOKEN }}
+      - name: Pull Vercel Environment Information
+        run: npm_config_yes=true npx vercel env pull --yes --environment=preview --token=${{ env.VERCEL_TOKEN }}
 
-  #     - name: Build
-  #       run: npm run build
+      - name: Build
+        run: npm run build
