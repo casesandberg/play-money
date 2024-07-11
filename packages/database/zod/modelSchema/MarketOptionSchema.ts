@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Prisma } from '@prisma/client'
 import { CurrencyCodeSchema } from '../inputTypeSchemas/CurrencyCodeSchema'
 
 /////////////////////////////////////////
@@ -11,6 +12,7 @@ export const MarketOptionSchema = z.object({
   name: z.string(),
   marketId: z.string(),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+  liquidityProbability: z.instanceof(Prisma.Decimal, { message: "Field 'liquidityProbability' must be a Decimal. Location: ['Models', 'MarketOption']"}),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

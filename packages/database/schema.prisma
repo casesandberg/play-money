@@ -101,16 +101,17 @@ model MarketResolution {
 }
 
 model MarketOption {
-  id           String             @id @default(cuid())
-  name         String
-  marketId     String
-  market       Market             @relation(fields: [marketId], references: [id])
-  currencyCode CurrencyCode
-  currency     Currency           @relation(fields: [currencyCode], references: [code])
-  color        String             @default("#FF00FF") /// @zod.string.regex(/^#[0-9A-Fa-f]{6}$/)
-  resolutions  MarketResolution[]
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
+  id                   String             @id @default(cuid())
+  name                 String
+  marketId             String
+  market               Market             @relation(fields: [marketId], references: [id])
+  currencyCode         CurrencyCode
+  currency             Currency           @relation(fields: [currencyCode], references: [code])
+  color                String             @default("#FF00FF") /// @zod.string.regex(/^#[0-9A-Fa-f]{6}$/)
+  liquidityProbability Decimal            @default(0.5)
+  resolutions          MarketResolution[]
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
 }
 
 model VerificationToken {

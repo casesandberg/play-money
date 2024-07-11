@@ -1,5 +1,6 @@
 import Decimal from 'decimal.js'
 import { getAccountBalance } from '@play-money/accounts/lib/getAccountBalance'
+import { MarketOption } from '@play-money/database'
 import { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/CurrencyCodeSchema'
 import { TransactionItemInput } from '@play-money/transactions/lib/createTransaction'
 
@@ -197,11 +198,18 @@ export async function addLiquidity({
   fromAccountId,
   ammAccountId,
   amount,
+  options,
 }: {
   fromAccountId: string
   ammAccountId: string
   amount: Decimal
+  options: Array<MarketOption>
 }): Promise<Array<TransactionItemInput>> {
+  const yLiquidityProbability =
+    options.find((option) => option.currencyCode === 'YES')?.liquidityProbability ?? new Decimal(0.5)
+  const nLiquidityProbability =
+    options.find((option) => option.currencyCode === 'YES')?.liquidityProbability ?? new Decimal(0.5)
+
   return [
     // Giving the shares to the AMM.
     {
