@@ -203,7 +203,7 @@ export async function addLiquidity({
   fromAccountId: string
   ammAccountId: string
   amount: Decimal
-  options: Array<MarketOption>
+  options: Array<Pick<MarketOption, 'currencyCode' | 'liquidityProbability'>>
 }): Promise<Array<TransactionItemInput>> {
   const yLiquidityProbability =
     options.find((option) => option.currencyCode === 'YES')?.liquidityProbability ?? new Decimal(0.5)

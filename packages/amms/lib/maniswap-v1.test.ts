@@ -223,6 +223,10 @@ describe('maniswap-v1', () => {
         fromAccountId: 'user1',
         ammAccountId: 'amm1',
         amount: new Decimal(50),
+        options: [
+          { currencyCode: 'YES', liquidityProbability: new Decimal(0.5) },
+          { currencyCode: 'NO', liquidityProbability: new Decimal(0.5) },
+        ],
       })
 
       expect(transactions).toEqual(
