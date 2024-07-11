@@ -1,6 +1,7 @@
 import Decimal from 'decimal.js'
 import { generateFromEmail } from 'unique-username-generator'
 import db from '@play-money/database'
+import { INITIAL_USER_BALANCE_PRIMARY } from '@play-money/economy'
 import { createHouseUserGiftTransaction } from '@play-money/transactions/lib/createHouseUserGiftTransaction'
 import { UserExistsError } from './exceptions'
 
@@ -31,7 +32,7 @@ export async function createUser({ email }: { email: string }) {
   await createHouseUserGiftTransaction({
     userId: user.id,
     creatorId: user.id,
-    amount: new Decimal(50000),
+    amount: new Decimal(INITIAL_USER_BALANCE_PRIMARY),
   })
 
   return user

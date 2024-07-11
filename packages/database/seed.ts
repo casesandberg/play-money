@@ -3,6 +3,7 @@ import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { createComment } from '@play-money/comments/lib/createComment'
 import db from '@play-money/database'
+import { INITIAL_USER_BALANCE_PRIMARY } from '@play-money/economy'
 import { createMarket } from '@play-money/markets/lib/createMarket'
 import { marketBuy } from '@play-money/markets/lib/marketBuy'
 import { resolveMarket } from '@play-money/markets/lib/resolveMarket'
@@ -93,7 +94,7 @@ async function main() {
       await createHouseUserGiftTransaction({
         userId: user.id,
         creatorId: user.id,
-        amount: new Decimal(50000),
+        amount: new Decimal(INITIAL_USER_BALANCE_PRIMARY),
       })
 
       return data.id
