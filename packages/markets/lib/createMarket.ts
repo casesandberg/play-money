@@ -71,6 +71,7 @@ export async function createMarket({
             name: option.name,
             currencyCode: option.currencyCode,
             color: option.currencyCode === 'YES' ? '#3B82F6' : '#EC4899',
+            liquidityProbability: new Decimal(1).div(parsedOptions.length),
             updatedAt: new Date(),
             createdAt: new Date(),
           })),

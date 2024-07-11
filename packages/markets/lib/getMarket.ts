@@ -2,6 +2,10 @@ import db, { Market } from '@play-money/database'
 import { sanitizeUser } from '@play-money/users/lib/sanitizeUser'
 import { ExtendedMarket } from '../components/MarketOverviewPage'
 
+export function getMarket(params: { id: string; extended: true }): Promise<ExtendedMarket>
+export function getMarket(params: { id: string; extended?: false }): Promise<Market>
+export function getMarket(params: { id: string; extended?: boolean }): Promise<Market | ExtendedMarket>
+
 export async function getMarket({
   id,
   extended,
