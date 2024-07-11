@@ -1,10 +1,11 @@
 'use client'
 
 import { format, isPast } from 'date-fns'
-import { CircleCheckBig, ChevronDown, Pencil } from 'lucide-react'
+import { CircleCheckBig, ChevronDown, Diamond } from 'lucide-react'
 import React from 'react'
-import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip } from 'recharts'
+import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip as ChartTooltip } from 'recharts'
 import useSWR from 'swr'
+import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
 import { Market, MarketOption, MarketResolution } from '@play-money/database'
 import { Alert, AlertDescription, AlertTitle } from '@play-money/ui/alert'
 import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
@@ -13,11 +14,14 @@ import { Button } from '@play-money/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@play-money/ui/collapsible'
 import { ReadMoreEditor } from '@play-money/ui/editor'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@play-money/ui/tooltip'
 import { UserLink } from '@play-money/users/components/UserLink'
 import { useUser } from '@play-money/users/context/UserContext'
 import { UserProfile } from '@play-money/users/lib/sanitizeUser'
 import { useSearchParam } from '../../ui/src/hooks/useSearchParam'
 import { EditMarketDialog } from './EditMarketDialog'
+import { LiquidityBoostAlert } from './LiquidityBoostAlert'
+import { LiquidityBoostDialog, MarketStats } from './LiquidityBoostDialog'
 import { MarketLikelyOption } from './MarketLikelyOption'
 import { MarketOptionRow } from './MarketOptionRow'
 import { MarketToolbar } from './MarketToolbar'
@@ -54,20 +58,38 @@ export function MarketOverviewPage({
   const { triggerEffect } = useSidebar()
   const { data: balance } = useSWR(`/v1/markets/${market.id}/balance`, { refreshInterval: 1000 * 60 }) // 60 seconds
   const { data: graph } = useSWR(`/v1/markets/${market.id}/graph`, { refreshInterval: 1000 * 60 * 5 }) // 5 mins
+  const { data: stats } = useSWR<MarketStats>(`/v1/markets/${market.id}/stats`, { refreshInterval: 1000 * 60 * 5 }) // 5 mins
   const [option, setOption] = useSearchParam('option', 'replace')
   const [isEditing, setIsEditing] = useSearchParam('edit')
+  const [isBoosting, setIsBoosting] = useSearchParam('boost')
   const activeOptionId = option || market.options[0]?.id || ''
   const isCreator = user?.id === market.createdBy
 
   return (
     <Card className="flex-1">
-      <MarketToolbar market={market} canEdit={isCreator} onInitiateEdit={() => setIsEditing('true')} />
+      <MarketToolbar
+        market={market}
+        canEdit={isCreator}
+        onInitiateEdit={() => setIsEditing('true')}
+        onInitiateBoost={() => setIsBoosting('true')}
+      />
 
       <CardHeader className="pt-0 md:pt-0">
         <CardTitle className="leading-relaxed">{market.question}</CardTitle>
         <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground md:flex-nowrap">
           {!market.marketResolution ? <MarketLikelyOption market={market} /> : null}
 
+          {stats?.totalLiquidity ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex flex-shrink-0 items-center gap-1">
+                  <Diamond className="h-4 w-4 text-purple-600" />
+                  <span>${formatNumber(stats.totalLiquidity)}</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>Market liquidity</TooltipContent>
+            </Tooltip>
+          ) : null}
           {market.closeDate ? (
             <div className="flex-shrink-0">
               {isPast(market.closeDate) ? 'Ended' : 'Ending'} {format(market.closeDate, 'MMM d, yyyy')}
@@ -91,7 +113,7 @@ export function MarketOverviewPage({
           {graph?.data ? (
             <ResponsiveContainer width="100%" height="100%">
               <LineChart width={300} height={128} data={graph.data}>
-                <Tooltip
+                <ChartTooltip
                   content={({ payload }) => {
                     const data = payload?.[0]?.payload
                     if (data) {
@@ -203,6 +225,10 @@ export function MarketOverviewPage({
         <ReadMoreEditor value={market.description} maxLines={6} />
       </CardContent>
 
+      <CardContent>
+        <LiquidityBoostAlert onClick={() => setIsBoosting('true')} />
+      </CardContent>
+
       <div className="px-6 text-lg font-semibold">Comments</div>
       {renderComments}
 
@@ -210,6 +236,13 @@ export function MarketOverviewPage({
         market={market}
         open={isEditing === 'true'}
         onClose={() => setIsEditing(undefined)}
+        onSuccess={onRevalidate}
+      />
+      <LiquidityBoostDialog
+        market={market}
+        stats={stats}
+        open={isBoosting === 'true'}
+        onClose={() => setIsBoosting(undefined)}
         onSuccess={onRevalidate}
       />
     </Card>

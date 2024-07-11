@@ -3,6 +3,7 @@ import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalanc
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import db, { MarketSchema, MarketOption, MarketOptionSchema } from '@play-money/database'
 import { createMarketLiquidityTransaction } from '@play-money/transactions/lib/createMarketLiquidityTransaction'
+import { addLiquidity } from './addLiquidity'
 import { slugifyTitle } from './helpers'
 
 type PartialOptions = Pick<MarketOption, 'name' | 'currencyCode'>
@@ -86,7 +87,7 @@ export async function createMarket({
     },
   })
 
-  await createMarketLiquidityTransaction({
+  await addLiquidity({
     userId: marketData.createdBy,
     amount: subsidyAmount,
     marketId: createdMarket.id,
