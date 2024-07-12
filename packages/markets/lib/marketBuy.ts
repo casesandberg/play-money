@@ -6,6 +6,7 @@ import db from '@play-money/database'
 import { UNIQUE_TRADER_LIQUIDITY_PRIMARY } from '@play-money/economy'
 import { createMarketBuyTransaction } from '@play-money/transactions/lib/createMarketBuyTransaction'
 import { createMarketLiquidityTransaction } from '@play-money/transactions/lib/createMarketLiquidityTransaction'
+import { createMarketTraderBonusTransactions } from '@play-money/transactions/lib/createMarketTraderBonusTransactions'
 import { getMarket } from './getMarket'
 import { isMarketTradable, isPurchasableCurrency } from './helpers'
 
@@ -69,6 +70,6 @@ export async function marketBuy({
       marketId,
     })
 
-    // TODO: Trader bonus transactions
+    await createMarketTraderBonusTransactions({ marketId })
   }
 }
