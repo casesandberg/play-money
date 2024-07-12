@@ -1,8 +1,11 @@
 import Decimal from 'decimal.js'
 import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
+import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import db from '@play-money/database'
+import { UNIQUE_TRADER_LIQUIDITY_PRIMARY } from '@play-money/economy'
 import { createMarketBuyTransaction } from '@play-money/transactions/lib/createMarketBuyTransaction'
+import { createMarketLiquidityTransaction } from '@play-money/transactions/lib/createMarketLiquidityTransaction'
 import { getMarket } from './getMarket'
 import { isMarketTradable, isPurchasableCurrency } from './helpers'
 
@@ -41,10 +44,31 @@ export async function marketBuy({
     throw new Error('User does not have enough balance to purchase')
   }
 
-  await createMarketBuyTransaction({
+  const transaction = await createMarketBuyTransaction({
     userId: creatorId,
     marketId,
     amount: new Decimal(amount),
     purchaseCurrencyCode: marketOption.currencyCode,
   })
+
+  const existingTradeInMarket = await db.transaction.findFirst({
+    where: {
+      id: { not: transaction.id },
+      marketId,
+      type: 'MARKET_BUY',
+      creatorId,
+    },
+  })
+
+  if (creatorId !== market.createdBy && !existingTradeInMarket) {
+    const houseAccount = await getHouseAccount()
+
+    await createMarketLiquidityTransaction({
+      accountId: houseAccount.id,
+      amount: new Decimal(UNIQUE_TRADER_LIQUIDITY_PRIMARY),
+      marketId,
+    })
+
+    // TODO: Trader bonus transactions
+  }
 }

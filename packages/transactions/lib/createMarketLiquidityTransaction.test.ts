@@ -39,7 +39,7 @@ describe('createMarketLiquidityTransaction', () => {
     })
 
     await createMarketLiquidityTransaction({
-      userId: 'user-1',
+      accountId: 'user-1-account',
       amount: new Decimal(50),
       marketId: 'market-1',
     })

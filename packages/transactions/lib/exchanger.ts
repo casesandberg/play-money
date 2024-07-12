@@ -1,6 +1,7 @@
 import Decimal from 'decimal.js'
 import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
+import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
 import { TransactionItemInput } from './createTransaction'
 
 export async function convertPrimaryToMarketShares({
@@ -11,13 +12,14 @@ export async function convertPrimaryToMarketShares({
   amount: Decimal
 }): Promise<Array<TransactionItemInput>> {
   const exchangerAccount = await getExchangerAccount()
+  const houseAccount = await getHouseAccount()
 
   if (amount.lte(0)) {
     throw new Error('Exchange amount must be greater than 0')
   }
 
   const hasEnoughBalance = await checkAccountBalance({ accountId: fromAccountId, currencyCode: 'PRIMARY', amount })
-  if (!hasEnoughBalance) {
+  if (!hasEnoughBalance && fromAccountId !== houseAccount.id) {
     throw new Error('User does not have enough balance.')
   }
 
