@@ -2,6 +2,7 @@ import Decimal from 'decimal.js'
 import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import db, { MarketSchema, MarketOption, MarketOptionSchema } from '@play-money/database'
+import { INITIAL_MARKET_LIQUIDITY_PRIMARY } from '@play-money/economy'
 import { createMarketLiquidityTransaction } from '@play-money/transactions/lib/createMarketLiquidityTransaction'
 import { slugifyTitle } from './helpers'
 
@@ -13,7 +14,7 @@ export async function createMarket({
   closeDate,
   createdBy,
   options,
-  subsidyAmount = new Decimal(1000),
+  subsidyAmount = new Decimal(INITIAL_MARKET_LIQUIDITY_PRIMARY),
 }: {
   question: string
   description: string

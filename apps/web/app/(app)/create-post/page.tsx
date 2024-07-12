@@ -9,6 +9,7 @@ import { z } from 'zod'
 import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
 import type { Market } from '@play-money/database'
 import { MarketSchema, MarketOptionSchema } from '@play-money/database'
+import { INITIAL_MARKET_LIQUIDITY_PRIMARY } from '@play-money/economy'
 import { Button } from '@play-money/ui/button'
 import { Card } from '@play-money/ui/card'
 import { Editor } from '@play-money/ui/editor'
@@ -166,7 +167,8 @@ function CreateBinaryMarketForm() {
             Trading will stop at this time in your local timezone {tzName === null ? '' : `(${tzName})`}
           </p>
           <Button loading={form.formState.isSubmitting} type="submit">
-            Create for <CurrencyDisplay className="ml-2" currencyCode="PRIMARY" value={1000} />
+            Create for{' '}
+            <CurrencyDisplay className="ml-2" currencyCode="PRIMARY" value={INITIAL_MARKET_LIQUIDITY_PRIMARY} />
           </Button>
         </form>
       </Form>
