@@ -1,4 +1,5 @@
 import db from '@play-money/database'
+import { createMarketExcessLiquidityTransactions } from '@play-money/transactions/lib/createMarketExcessLiquidityTransactions'
 import { createMarketResolveLossTransactions } from '@play-money/transactions/lib/createMarketResolveLossTransactions'
 import { createMarketResolveWinTransactions } from '@play-money/transactions/lib/createMarketResolveWinTransactions'
 import { getMarket } from './getMarket'
@@ -16,6 +17,10 @@ export async function resolveMarket({
   supportingLink?: string
 }) {
   const market = await getMarket({ id: marketId })
+
+  if (market.resolvedAt) {
+    throw new Error('Market already resolved')
+  }
 
   if (!canResolveMarket({ market, userId: resolverId })) {
     throw new Error('User cannot resolve market')
@@ -69,4 +74,6 @@ export async function resolveMarket({
     marketId,
     winningCurrencyCode: marketOption.currencyCode,
   })
+
+  await createMarketExcessLiquidityTransactions({ marketId })
 }

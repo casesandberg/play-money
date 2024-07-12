@@ -112,7 +112,7 @@ export function mockTransactionWithItems(overrides?: Partial<TransactionWithItem
     updatedAt: faker.date.past(),
     creatorId,
     marketId: market.id,
-    transactionItems: _.times(faker.datatype.number({ min: 1, max: 5 }), () => mockTransactionItem({ transactionId })),
+    transactionItems: _.times(faker.number.int({ min: 1, max: 5 }), () => mockTransactionItem({ transactionId })),
     market,
     creator: {
       user,

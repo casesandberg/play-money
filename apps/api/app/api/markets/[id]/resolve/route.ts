@@ -32,6 +32,9 @@ export async function POST(
     return NextResponse.json({})
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 })
   }
 }

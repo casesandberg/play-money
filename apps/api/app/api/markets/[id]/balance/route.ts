@@ -18,7 +18,7 @@ export async function GET(
     const [balance, holdings] = await Promise.all([
       getMarketBalance({
         marketId: id,
-        excludeTransactionTypes: ['MARKET_RESOLVE_LOSS', 'MARKET_RESOLVE_WIN'],
+        excludeTransactionTypes: ['MARKET_RESOLVE_LOSS', 'MARKET_RESOLVE_WIN', 'MARKET_EXCESS_LIQUIDITY'],
       }),
       session?.user?.id ? getUserBalanceInMarket({ userId: session.user.id, marketId: id }) : {},
     ])
