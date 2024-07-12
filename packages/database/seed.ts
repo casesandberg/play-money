@@ -80,8 +80,17 @@ async function main() {
   })
 
   let user_ids = await Promise.all(
-    _.times(10, async () => {
-      let data = mockUser()
+    _.times(5, async (i) => {
+      const devOverride =
+        i === 0 && process.env.DEV_DB_SEED_EMAIL
+          ? {
+              email: process.env.DEV_DB_SEED_EMAIL,
+              username: 'dev',
+              displayName: 'Dev User',
+            }
+          : undefined
+
+      let data = mockUser(devOverride)
       const user = await db.user.create({
         data: {
           ...data,
