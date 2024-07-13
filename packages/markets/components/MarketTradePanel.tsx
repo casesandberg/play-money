@@ -7,19 +7,11 @@ import { Card, CardContent, CardHeader } from '@play-money/ui/card'
 import { Combobox } from '@play-money/ui/combobox'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@play-money/ui/tabs'
 import { cn } from '@play-money/ui/utils'
+import { MarketStats } from './LiquidityBoostDialog'
 import { MarketBuyForm } from './MarketBuyForm'
 import { ExtendedMarket } from './MarketOverviewPage'
 import { MarketSellForm } from './MarketSellForm'
 import { useSidebar } from './SidebarContext'
-
-type MarketStats = {
-  totalLiquidity: number
-  lpUserCount: number
-  traderBonusPayouts: number
-  holdings: {
-    traderBonusPayouts?: number
-  }
-}
 
 export function MarketTradePanel({ market, activeOptionId }: { market: ExtendedMarket; activeOptionId: string }) {
   const { data: balance } = useSWR(`/v1/markets/${market.id}/balance`, { refreshInterval: 1000 * 60 }) // 60 seconds

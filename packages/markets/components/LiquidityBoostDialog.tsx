@@ -23,6 +23,9 @@ export type MarketStats = {
   totalLiquidity: number
   lpUserCount: number
   traderBonusPayouts: number
+  holdings: {
+    traderBonusPayouts?: number
+  }
 }
 
 export const LiquidityBoostDialog = ({
