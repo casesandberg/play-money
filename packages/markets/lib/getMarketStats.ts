@@ -1,20 +1,17 @@
 import Decimal from 'decimal.js'
-import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
-import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
+import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
 import db from '@play-money/database'
 import { getMarketLiquidity } from './getMarketLiquidity'
 
 async function getMarketTraderBonusPayouts(marketId: string) {
-  const ammAccount = await getAmmAccount({ marketId })
-  const exchangerAccount = await getExchangerAccount()
-  const systemAccountIds = [ammAccount.id, exchangerAccount.id]
+  const houseAccount = await getHouseAccount()
 
   const netWorth = await db.transactionItem.aggregate({
     _sum: {
       amount: true,
     },
     where: {
-      accountId: { notIn: systemAccountIds },
+      accountId: { not: houseAccount.id },
       transaction: {
         type: 'MARKET_TRADER_BONUS',
         marketId,
