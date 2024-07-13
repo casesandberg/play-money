@@ -23,7 +23,7 @@ const marketCreateFormSchema = MarketSchema.pick({ question: true, description: 
 )
 type MarketCreateFormValues = z.infer<typeof marketCreateFormSchema>
 
-export function CreateMarketForm({ onSuccess }: { onSuccess?: () => void }) {
+export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void> }) {
   const router = useRouter()
   const { mutate } = useSWRConfig()
   const tzName = /\((?<tz>[A-Za-z\s].*)\)/.exec(new Date().toString())?.groups?.tz ?? null
