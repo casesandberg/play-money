@@ -6,7 +6,6 @@ import { z } from 'zod';
 
 export const UserSchema = z.object({
   id: z.string().cuid(),
-  email: z.string().min(1, { message: "Email is required" }).email(),
   username: z.string(),
   displayName: z.string(),
   avatarUrl: z.string().nullable(),
@@ -14,9 +13,10 @@ export const UserSchema = z.object({
   discordHandle: z.string().nullable(),
   website: z.string().nullable(),
   bio: z.string().nullable(),
-  emailVerified: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  // omitted: email: z.string(),
+  // omitted: emailVerified: z.coerce.date().nullable(),
 })
 
 export type User = z.infer<typeof UserSchema>

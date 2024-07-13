@@ -94,6 +94,7 @@ async function main() {
       const user = await db.user.create({
         data: {
           ...data,
+          email: faker.internet.email(),
           accounts: {
             create: {},
           },

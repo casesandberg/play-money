@@ -1,5 +1,4 @@
 import db, { Market } from '@play-money/database'
-import { sanitizeUser } from '@play-money/users/lib/sanitizeUser'
 import { ExtendedMarket } from '../components/MarketOverviewPage'
 
 export function getMarket(params: { id: string; extended: true }): Promise<ExtendedMarket>
@@ -34,16 +33,7 @@ export async function getMarket({
       throw new Error('Market not found')
     }
 
-    return {
-      ...market,
-      user: sanitizeUser(market.user),
-      marketResolution: market.marketResolution
-        ? {
-            ...market.marketResolution,
-            resolvedBy: sanitizeUser(market.marketResolution.resolvedBy),
-          }
-        : undefined,
-    }
+    return market
   }
 
   const market = await db.market.findUnique({ where: { id } })

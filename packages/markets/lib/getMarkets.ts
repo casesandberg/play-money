@@ -1,5 +1,4 @@
 import db, { Market } from '@play-money/database'
-import { sanitizeUser } from '@play-money/users/lib/sanitizeUser'
 import { ExtendedMarket } from '../components/MarketOverviewPage'
 
 interface MarketFilterOptions {
@@ -42,24 +41,5 @@ export async function getMarkets(
     take: pagination.take,
   })
 
-  return markets.map((market) => {
-    return {
-      ...market,
-      user: sanitizeUser(market.user),
-      options: market.options.map((option) => ({
-        ...option,
-        color: option.currencyCode === 'YES' ? '#3b82f6' : '#ec4899',
-      })),
-      marketResolution: market.marketResolution
-        ? {
-            ...market.marketResolution,
-            resolvedBy: sanitizeUser(market.marketResolution.resolvedBy),
-            resolution: {
-              ...market.marketResolution.resolution,
-              color: market.marketResolution.resolution.currencyCode === 'YES' ? '#3b82f6' : '#ec4899',
-            },
-          }
-        : undefined,
-    }
-  })
+  return markets
 }

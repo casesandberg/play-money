@@ -1,12 +1,11 @@
-import db, { Market, Transaction, TransactionItem } from '@play-money/database'
+import db, { Market, Transaction, TransactionItem, User } from '@play-money/database'
 import { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/CurrencyCodeSchema'
-import { UserProfile, sanitizeUser } from '@play-money/users/lib/sanitizeUser'
 
 export type TransactionWithItems = Transaction & {
   transactionItems: Array<TransactionItem>
   market: Market | null
   creator: {
-    user: UserProfile | null
+    user: User | null
   }
 }
 
@@ -61,13 +60,5 @@ export async function getTransactions(
     take: pagination.take,
   })
 
-  return transactions.map((transaction) => {
-    return {
-      ...transaction,
-      creator: {
-        ...transaction.creator,
-        user: transaction.creator.user ? sanitizeUser(transaction.creator.user) : null,
-      },
-    }
-  })
+  return transactions
 }

@@ -1,7 +1,12 @@
 import { z } from 'zod'
 import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
-import { CurrencyCodeSchema, MarketSchema, TransactionItemSchema, TransactionSchema } from '@play-money/database'
-import { UserProfileModel } from '@play-money/users/lib/sanitizeUser'
+import {
+  CurrencyCodeSchema,
+  MarketSchema,
+  TransactionItemSchema,
+  TransactionSchema,
+  UserSchema,
+} from '@play-money/database'
 
 export default createSchema({
   GET: {
@@ -20,7 +25,7 @@ export default createSchema({
             transactionItems: z.array(TransactionItemSchema),
             market: MarketSchema.or(z.null()),
             creator: z.object({
-              user: UserProfileModel.or(z.null()),
+              user: UserSchema.or(z.null()),
             }),
           })
         ),

@@ -13,7 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@play-money/ui/input'
 import { toast } from '@play-money/ui/use-toast'
 
-const FormSchema = UserSchema.pick({ email: true })
+const FormSchema = z.object({ email: z.string().email() })
 
 type FormData = z.infer<typeof FormSchema>
 
