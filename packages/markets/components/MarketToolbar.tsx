@@ -91,7 +91,8 @@ export function MarketToolbar({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={handleCopyLink}>Copy link</DropdownMenuItem>
-          <DropdownMenuItem onClick={onInitiateBoost}>Liquidity boost</DropdownMenuItem>
+          {!market.resolvedAt ? <DropdownMenuItem onClick={onInitiateBoost}>Liquidity boost</DropdownMenuItem> : null}
+
           {canResolve ? (
             <>
               <DropdownMenuSeparator />

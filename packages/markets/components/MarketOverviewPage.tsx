@@ -225,9 +225,11 @@ export function MarketOverviewPage({
         <ReadMoreEditor value={market.description} maxLines={6} />
       </CardContent>
 
-      <CardContent>
-        <LiquidityBoostAlert onClick={() => setIsBoosting('true')} />
-      </CardContent>
+      {!market.resolvedAt ? (
+        <CardContent>
+          <LiquidityBoostAlert onClick={() => setIsBoosting('true')} />
+        </CardContent>
+      ) : null}
 
       <div className="px-6 text-lg font-semibold">Comments</div>
       {renderComments}
