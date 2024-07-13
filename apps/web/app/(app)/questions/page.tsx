@@ -6,6 +6,7 @@ import { RecentTrades } from '@play-money/transactions/components/RecentTrades'
 export async function getMarkets(): Promise<{ markets: Array<ExtendedMarket> }> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets`, {
     credentials: 'include',
+    next: { tags: ['markets'] },
   })
   if (!res.ok) {
     throw new Error('There was an error fetching data')
