@@ -12,8 +12,18 @@ import { ExtendedMarket } from './MarketOverviewPage'
 import { MarketSellForm } from './MarketSellForm'
 import { useSidebar } from './SidebarContext'
 
+type MarketStats = {
+  totalLiquidity: number
+  lpUserCount: number
+  traderBonusPayouts: number
+  holdings: {
+    traderBonusPayouts?: number
+  }
+}
+
 export function MarketTradePanel({ market, activeOptionId }: { market: ExtendedMarket; activeOptionId: string }) {
   const { data: balance } = useSWR(`/v1/markets/${market.id}/balance`, { refreshInterval: 1000 * 60 }) // 60 seconds
+  const { data: stats } = useSWR<MarketStats>(`/v1/markets/${market.id}/stats`, { refreshInterval: 1000 * 60 * 5 }) // 5 mins
   const { mutate } = useSWRConfig()
   const [option, setOption] = useSearchParam('option')
   const { effect, resetEffect } = useSidebar()
@@ -61,19 +71,34 @@ export function MarketTradePanel({ market, activeOptionId }: { market: ExtendedM
           </CardContent>
         </Tabs>
       </Card>
-      {Math.round(balance?.holdings.YES) > 0 || Math.round(balance?.holdings.NO) > 0 ? (
+      {Math.round(balance?.holdings.YES) > 0 ||
+      Math.round(balance?.holdings.NO) > 0 ||
+      stats?.holdings.traderBonusPayouts ? (
         <Card>
-          <CardContent className="flex gap-2 p-3 text-sm md:py-4">
-            <span className="text-muted-foreground">Holdings:</span>
-            {market.options.map((option) => {
-              const shares = balance?.holdings[option.currencyCode]
-              return shares ? (
-                <div key={option.id} className="font-semibold" style={{ color: option.color }}>
-                  <span>${Math.round(balance?.holdings[option.currencyCode])} </span>
-                  <span>{option.name}</span>
+          <CardContent className="flex flex-col gap-2 p-3 text-sm md:py-4">
+            {Math.round(balance?.holdings.YES) > 0 || Math.round(balance?.holdings.NO) > 0 ? (
+              <div className="flex gap-2">
+                <span className="text-muted-foreground">Holdings:</span>
+                {market.options.map((option) => {
+                  const shares = balance?.holdings[option.currencyCode]
+                  return shares ? (
+                    <div key={option.id} className="font-semibold" style={{ color: option.color }}>
+                      <span>${Math.round(balance?.holdings[option.currencyCode])} </span>
+                      <span>{option.name}</span>
+                    </div>
+                  ) : null
+                })}
+              </div>
+            ) : null}
+
+            {stats?.holdings.traderBonusPayouts != null ? (
+              <div className="flex gap-2">
+                <span className="text-muted-foreground">Trader Bonuses:</span>
+                <div className="font-semibold">
+                  <span>${Math.round(stats.holdings.traderBonusPayouts)} </span>
                 </div>
-              ) : null
-            })}
+              </div>
+            ) : null}
           </CardContent>
         </Card>
       ) : null}

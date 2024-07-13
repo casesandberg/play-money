@@ -88,7 +88,7 @@ export async function createMarket({
   })
 
   await createMarketLiquidityTransaction({
-    userId: marketData.createdBy,
+    accountId: userAccount.id,
     amount: subsidyAmount,
     marketId: createdMarket.id,
   })
