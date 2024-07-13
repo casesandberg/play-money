@@ -1,4 +1,5 @@
 import Decimal from 'decimal.js'
+import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import { createMarketLiquidityTransaction } from '@play-money/transactions/lib/createMarketLiquidityTransaction'
 
 export async function addLiquidity({
@@ -10,8 +11,9 @@ export async function addLiquidity({
   amount: Decimal
   marketId: string
 }) {
+  const userAccount = await getUserAccount({ id: userId })
   await createMarketLiquidityTransaction({
-    userId,
+    accountId: userAccount.id,
     amount,
     marketId,
   })
