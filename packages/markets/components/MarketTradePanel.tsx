@@ -91,7 +91,7 @@ export function MarketTradePanel({ market, activeOptionId }: { market: ExtendedM
               </div>
             ) : null}
 
-            {stats?.holdings.traderBonusPayouts != null ? (
+            {stats?.holdings.traderBonusPayouts ? (
               <div className="flex gap-2">
                 <span className="text-muted-foreground">Trader Bonuses:</span>
                 <div className="font-semibold">
