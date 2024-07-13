@@ -45,7 +45,7 @@ export const ResolveMarketDialog = ({
 
       if (!response.ok) {
         const data = await response.json()
-        throw new Error(data.message)
+        throw new Error(data.error)
       }
 
       toast({ title: 'Market resolved successfully' })
@@ -55,7 +55,7 @@ export const ResolveMarketDialog = ({
       console.error('Failed to resolve market:', error)
       toast({
         title: 'There was an issue resolving the market',
-        description: 'Please try again later',
+        description: error.message || 'Please try again later',
         variant: 'destructive',
       })
     }

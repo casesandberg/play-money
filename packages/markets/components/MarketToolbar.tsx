@@ -44,10 +44,12 @@ export function MarketToolbar({
   market,
   canEdit,
   onInitiateEdit,
+  onInitiateBoost,
 }: {
   market: ExtendedMarket
   canEdit?: boolean
   onInitiateEdit?: () => void
+  onInitiateBoost?: () => void
 }) {
   const { user } = useUser()
   const [isResolving, setResolving] = useQueryString('resolve')
@@ -89,6 +91,7 @@ export function MarketToolbar({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={handleCopyLink}>Copy link</DropdownMenuItem>
+          <DropdownMenuItem onClick={onInitiateBoost}>Liquidity boost</DropdownMenuItem>
           {canResolve ? (
             <>
               <DropdownMenuSeparator />

@@ -1,7 +1,8 @@
+import Decimal from 'decimal.js'
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
-import { resolveMarket } from '@play-money/markets/lib/resolveMarket'
+import { addLiquidity } from '@play-money/markets/lib/addLiquidity'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'
@@ -20,21 +21,19 @@ export async function POST(
     const { id } = schema.post.parameters.parse(params)
 
     const body = (await req.json()) as unknown
-    const { optionId, supportingLink } = schema.post.requestBody.parse(body)
+    const { amount } = schema.post.requestBody.parse(body)
 
-    await resolveMarket({
-      resolverId: session.user.id,
+    await addLiquidity({
+      userId: session.user.id,
+      amount: new Decimal(amount),
       marketId: id,
-      optionId,
-      supportingLink,
     })
 
-    return NextResponse.json({})
+    return NextResponse.json({
+      message: 'success',
+    })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
-    if (error instanceof Error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 })
   }
 }

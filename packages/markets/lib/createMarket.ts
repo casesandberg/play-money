@@ -4,6 +4,7 @@ import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import db, { MarketSchema, MarketOption, MarketOptionSchema } from '@play-money/database'
 import { INITIAL_MARKET_LIQUIDITY_PRIMARY } from '@play-money/economy'
 import { createMarketLiquidityTransaction } from '@play-money/transactions/lib/createMarketLiquidityTransaction'
+import { addLiquidity } from './addLiquidity'
 import { slugifyTitle } from './helpers'
 
 type PartialOptions = Pick<MarketOption, 'name' | 'currencyCode'>
