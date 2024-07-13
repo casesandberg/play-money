@@ -145,7 +145,12 @@ export const EditMarketDialog = ({
                       {...field}
                       className="w-auto"
                       onChange={(e) => {
-                        field.onChange(new Date(e.target.value))
+                        try {
+                          format(e.target.value, "yyyy-MM-dd'T'hh:mm") // Throws error if invalid date
+                          field.onChange(new Date(e.target.value))
+                        } catch (error) {
+                          console.error('Failed to parse date:', error)
+                        }
                       }}
                       value={field.value ? format(field.value, "yyyy-MM-dd'T'hh:mm") : ''}
                     />

@@ -4,7 +4,7 @@ import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
 import type { TransactionWithItems } from '@play-money/transactions/lib/getTransactions'
-import { Market, User, Account, TransactionItem, Currency, MarketOption, Comment, Transaction } from './zod'
+import { Market, User, Account, TransactionItem, Currency, MarketOption, Comment, MarketResolution } from './zod'
 
 export function mockUser(overrides?: Partial<User>): User {
   const firstName = faker.person.firstName()
@@ -36,7 +36,7 @@ export function mockMarket(overrides?: Partial<Market>): Market {
     description,
     slug: faker.helpers.slugify(question),
     closeDate,
-    resolvedAt: faker.helpers.maybe(faker.date.past, { probability: 0.3 }) ?? null,
+    resolvedAt: faker.helpers.maybe(faker.date.past, { probability: 0.2 }) ?? null,
     createdBy: faker.string.uuid(),
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
@@ -50,13 +50,33 @@ export function mockExtendedMarket(overrides?: Partial<ExtendedMarket>): Extende
     createdBy: user.id,
   })
 
+  const yesOption = mockMarketOption({ id: '1', name: 'Yes', marketId: market.id, currencyCode: 'YES' })
+  const noOption = mockMarketOption({ id: '2', name: 'No', marketId: market.id, currencyCode: 'NO' })
+
   return {
     ...market,
-    options: [
-      { ...mockMarketOption({ id: '1', name: 'Yes', marketId: market.id }), color: 'green' },
-      { ...mockMarketOption({ id: '2', name: 'No', marketId: market.id }), color: 'red' },
-    ],
+    options: [yesOption, noOption],
     user,
+    marketResolution: market.resolvedAt
+      ? {
+          ...mockMarketResolution(),
+          resolution: faker.helpers.arrayElement([yesOption, noOption]),
+          resolvedBy: user,
+        }
+      : undefined,
+    ...overrides,
+  }
+}
+
+export function mockMarketResolution(overrides?: Partial<MarketResolution>): MarketResolution {
+  return {
+    id: faker.string.uuid(),
+    marketId: faker.string.uuid(),
+    resolvedById: faker.string.uuid(),
+    resolutionId: faker.string.uuid(),
+    supportingLink: faker.internet.url(),
+    createdAt: faker.date.past(),
+    updatedAt: faker.date.recent(),
     ...overrides,
   }
 }
