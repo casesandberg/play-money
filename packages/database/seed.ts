@@ -3,6 +3,7 @@ import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { createComment } from '@play-money/comments/lib/createComment'
 import db from '@play-money/database'
+import { INITIAL_USER_BALANCE_PRIMARY } from '@play-money/economy'
 import { createMarket } from '@play-money/markets/lib/createMarket'
 import { marketBuy } from '@play-money/markets/lib/marketBuy'
 import { resolveMarket } from '@play-money/markets/lib/resolveMarket'
@@ -79,8 +80,17 @@ async function main() {
   })
 
   let user_ids = await Promise.all(
-    _.times(10, async () => {
-      let data = mockUser()
+    _.times(5, async (i) => {
+      const devOverride =
+        i === 0 && process.env.DEV_DB_SEED_EMAIL
+          ? {
+              email: process.env.DEV_DB_SEED_EMAIL,
+              username: 'dev',
+              displayName: 'Dev User',
+            }
+          : undefined
+
+      let data = mockUser(devOverride)
       const user = await db.user.create({
         data: {
           ...data,
@@ -93,7 +103,7 @@ async function main() {
       await createHouseUserGiftTransaction({
         userId: user.id,
         creatorId: user.id,
-        amount: new Decimal(50000),
+        amount: new Decimal(INITIAL_USER_BALANCE_PRIMARY),
       })
 
       return data.id

@@ -10,6 +10,9 @@ export default createSchema({
         totalLiquidity: z.number(),
         lpUserCount: z.number(),
         traderBonusPayouts: z.number(),
+        holdings: z.object({
+          traderBonusPayouts: z.number().optional(),
+        }),
       }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,

@@ -63,7 +63,7 @@ export async function UserProfileLayout({
           </Avatar>
 
           <div>
-            <CardTitle className="text-lg">{profile.username}</CardTitle>
+            <CardTitle className="text-lg">{profile.displayName}</CardTitle>
             <CardDescription>@{profile.username}</CardDescription>
           </div>
           {/* <div className="ml-auto flex items-center gap-1">

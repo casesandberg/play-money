@@ -3,12 +3,14 @@ import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalanc
 import { getAccountBalance } from '@play-money/accounts/lib/getAccountBalance'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
+import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import '@play-money/config/jest/jest-setup'
 import { mockAccount } from '@play-money/database/mocks'
 import { createMarketBuyTransaction } from './createMarketBuyTransaction'
 import { createTransaction } from './createTransaction'
 
+jest.mock('@play-money/accounts/lib/getHouseAccount', () => ({ getHouseAccount: jest.fn() }))
 jest.mock('@play-money/accounts/lib/getAmmAccount', () => ({ getAmmAccount: jest.fn() }))
 jest.mock('@play-money/accounts/lib/getExchangerAccount', () => ({ getExchangerAccount: jest.fn() }))
 jest.mock('@play-money/accounts/lib/getUserAccount', () => ({ getUserAccount: jest.fn() }))
@@ -33,6 +35,7 @@ describe('createMarketBuyTransaction', () => {
       return false
     })
 
+    jest.mocked(getHouseAccount).mockResolvedValue(mockAccount({ id: 'HOUSE' }))
     jest.mocked(getUserAccount).mockResolvedValue(mockAccount({ id: 'user-1-account' }))
     jest.mocked(getAmmAccount).mockResolvedValue(mockAccount({ id: 'amm-1-account' }))
     jest.mocked(getExchangerAccount).mockResolvedValue(mockAccount({ id: 'EXCHANGER' }))
