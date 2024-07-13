@@ -20,6 +20,9 @@ export const Default: Story = {
       totalLiquidity: 1200,
       lpUserCount: 2,
       traderBonusPayouts: 450,
+      holdings: {
+        traderBonusPayouts: 297,
+      },
     },
   },
 }
