@@ -1,11 +1,10 @@
-import db, { CommentEntityType, Comment, CommentReaction } from '@play-money/database'
-import { UserProfile, sanitizeUser } from '@play-money/users/lib/sanitizeUser'
+import db, { CommentEntityType, Comment, CommentReaction, User } from '@play-money/database'
 
 export type MarketComment = Comment & {
-  author: UserProfile
+  author: User
   reactions: Array<
     CommentReaction & {
-      user: UserProfile
+      user: User
     }
   >
 }
@@ -26,12 +25,5 @@ export async function getCommentsOnMarket({ marketId }: { marketId: string }): P
     },
   })
 
-  return comments.map((comment) => ({
-    ...comment,
-    author: sanitizeUser(comment.author),
-    reactions: comment.reactions.map((reaction) => ({
-      ...reaction,
-      user: sanitizeUser(reaction.user),
-    })),
-  }))
+  return comments
 }

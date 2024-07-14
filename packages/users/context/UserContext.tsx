@@ -1,11 +1,11 @@
 'use client'
 
 import React, { createContext, useContext, useState } from 'react'
-import { UserProfile } from '../lib/sanitizeUser'
+import { User } from '@play-money/database'
 
 interface UserContextType {
-  user: UserProfile | null
-  setUser: (user: UserProfile | null) => void
+  user: User | null
+  setUser: (user: User | null) => void
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined)
@@ -18,14 +18,8 @@ export function useUser() {
   return context
 }
 
-export const UserProvider = ({
-  children,
-  user: initialUser,
-}: {
-  children: React.ReactNode
-  user: UserProfile | null
-}) => {
-  const [user, setUser] = useState<UserProfile | null>(initialUser)
+export const UserProvider = ({ children, user: initialUser }: { children: React.ReactNode; user: User | null }) => {
+  const [user, setUser] = useState<User | null>(initialUser)
 
   return <UserContext.Provider value={{ user, setUser }}>{children}</UserContext.Provider>
 }

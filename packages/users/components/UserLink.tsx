@@ -1,14 +1,14 @@
 import Link from 'next/link'
 import React from 'react'
+import { User } from '@play-money/database'
 import { cn } from '@play-money/ui/utils'
-import { UserProfile } from '@play-money/users/lib/sanitizeUser'
 
 export function UserLink({
   user,
   hideUsername = false,
   className,
 }: {
-  user: UserProfile
+  user: User
   hideUsername?: boolean
   className?: string
 }) {

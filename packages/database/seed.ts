@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker'
+import { User } from '@prisma/client'
 import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { createComment } from '@play-money/comments/lib/createComment'
@@ -9,6 +10,7 @@ import { marketBuy } from '@play-money/markets/lib/marketBuy'
 import { resolveMarket } from '@play-money/markets/lib/resolveMarket'
 import { createHouseUserGiftTransaction } from '@play-money/transactions/lib/createHouseUserGiftTransaction'
 import { mockUser } from './mocks'
+import { OmittedUserFields } from './prisma'
 
 async function main() {
   await db.currency.upsert({
@@ -88,9 +90,11 @@ async function main() {
               username: 'dev',
               displayName: 'Dev User',
             }
-          : undefined
+          : {
+              email: faker.internet.email(),
+            }
 
-      let data = mockUser(devOverride)
+      let data = mockUser(devOverride) as User & OmittedUserFields
       const user = await db.user.create({
         data: {
           ...data,

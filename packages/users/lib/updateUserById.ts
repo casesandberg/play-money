@@ -1,7 +1,6 @@
 import db, { User } from '@play-money/database'
 import { checkUsername } from './checkUsername'
 import { getUserById } from './getUserById'
-import { sanitizeUser } from './sanitizeUser'
 
 export async function updateUserById({
   id,
@@ -44,5 +43,5 @@ export async function updateUserById({
     data: updatedData,
   })
 
-  return sanitizeUser(updatedUser)
+  return updatedUser
 }

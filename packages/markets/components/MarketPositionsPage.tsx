@@ -6,6 +6,7 @@ import React from 'react'
 import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
 import type { TransactionWithItems } from '@play-money/transactions/lib/getTransactions'
 import { summarizeTransaction } from '@play-money/transactions/lib/helpers'
+import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
 import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
 import { Table, TableBody, TableRow, TableHeader, TableHead, TableCell } from '@play-money/ui/table'
@@ -39,10 +40,7 @@ export function MarketPositionsPage({
           ) : null}
           {market.user ? (
             <div className="flex items-center gap-1 truncate">
-              <Avatar className="h-4 w-4">
-                <AvatarImage alt={`@${market.user.username}`} src={market.user.avatarUrl ?? ''} />
-                <AvatarFallback>{market.user.username.toUpperCase().slice(0, 2)}</AvatarFallback>
-              </Avatar>
+              <UserAvatar user={market.user} size="sm" />
               <UserLink user={market.user} hideUsername />
             </div>
           ) : null}
@@ -61,13 +59,7 @@ export function MarketPositionsPage({
                 <li className="flex flex-wrap items-center gap-1 py-3" key={transaction.id}>
                   {transaction.creator.user ? (
                     <div className="inline-flex items-center gap-2">
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage
-                          alt={`@${transaction.creator.user.username}`}
-                          src={transaction.creator.user.avatarUrl ?? ''}
-                        />
-                        <AvatarFallback>{transaction.creator.user.username.toUpperCase().slice(0, 2)}</AvatarFallback>
-                      </Avatar>
+                      <UserAvatar user={transaction.creator.user} size="sm" />
                       <UserLink hideUsername user={transaction.creator.user} />
                     </div>
                   ) : null}

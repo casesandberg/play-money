@@ -1,8 +1,7 @@
 import db, { Market, User } from '@play-money/database'
-import { UserProfile, sanitizeUser } from '@play-money/users/lib/sanitizeUser'
 
 interface SearchResults {
-  users: Array<UserProfile>
+  users: Array<User>
   markets: Array<Market>
 }
 
@@ -45,7 +44,7 @@ export async function search({ query = '' }: { query?: string }): Promise<Search
   }
 
   return {
-    users: users.map(sanitizeUser),
+    users,
     markets,
   }
 }

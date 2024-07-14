@@ -3,6 +3,7 @@
 import { formatDistance } from 'date-fns'
 import { Ellipsis, Reply } from 'lucide-react'
 import React, { useState } from 'react'
+import { UserAvatar } from '@play-money/ui/UserAvatar'
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -14,7 +15,6 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@play-money/ui/alert-dialog'
-import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
 import { Button } from '@play-money/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@play-money/ui/collapsible'
 import {
@@ -89,10 +89,7 @@ export function CommentItem({
         (isReplyOpen || isPortalOpen) && 'bg-muted/50'
       )}
     >
-      <Avatar className="mt-2 h-8 w-8">
-        <AvatarImage src={comment.author.avatarUrl ?? ''} alt={`@${comment.author.username}`} />
-        <AvatarFallback>{comment.author.username.toUpperCase().slice(0, 2)}</AvatarFallback>
-      </Avatar>
+      <UserAvatar user={comment.author} className="mt-2" />
 
       <Collapsible open={isReplyOpen} onOpenChange={setIsReplyOpen}>
         <div className="flex flex-row items-center gap-4">

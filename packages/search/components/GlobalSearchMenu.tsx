@@ -2,8 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import React, { useState, useEffect } from 'react'
-import { Market } from '@play-money/database'
-import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
+import { Market, User } from '@play-money/database'
+import { UserAvatar } from '@play-money/ui/UserAvatar'
 import {
   CommandDialog,
   CommandInput,
@@ -12,12 +12,11 @@ import {
   CommandGroup,
   CommandItem,
 } from '@play-money/ui/command'
-import { UserProfile } from '@play-money/users/lib/sanitizeUser'
 
 export function GlobalSearchMenu({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const router = useRouter()
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState<{ users: Array<UserProfile>; markets: Array<Market> } | null>(null)
+  const [results, setResults] = useState<{ users: Array<User>; markets: Array<Market> } | null>(null)
 
   useEffect(() => {
     async function search() {
@@ -75,10 +74,7 @@ export function GlobalSearchMenu({ open, onOpenChange }: { open: boolean; onOpen
                   onOpenChange(false)
                 }}
               >
-                <Avatar className="h-4 w-4">
-                  <AvatarImage src={user.avatarUrl ?? ''} alt={`@${user.username}`} />
-                  <AvatarFallback>{user.username.toUpperCase().slice(0, 2)}</AvatarFallback>
-                </Avatar>
+                <UserAvatar user={user} size="sm" />
                 <div className="font-semibold">{user.displayName}</div>
                 <div className="text-muted-foreground">@{user.username}</div>
               </CommandItem>

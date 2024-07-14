@@ -39,6 +39,7 @@
     "./use-toast": "./src/components/ui/use-toast.ts",
     "./Spotlight": "./src/components/Spotlight.tsx",
     "./ThemeProvider": "./src/components/ThemeProvider.tsx",
+    "./UserAvatar": "./src/components/UserAvatar.tsx",
     ".": "./src/index.ts"
   },
   "license": "MIT",

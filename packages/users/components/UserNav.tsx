@@ -5,7 +5,7 @@ import { signOut, signIn } from 'next-auth/react'
 import Link from 'next/link'
 import React from 'react'
 import { useTheme } from '@play-money/ui/ThemeProvider'
-import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
+import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Button } from '@play-money/ui/button'
 import {
   DropdownMenu,
@@ -27,10 +27,7 @@ export function UserNav() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={user.avatarUrl ?? ''} alt={`@${user.username}`} />
-            <AvatarFallback>{user.username.toUpperCase().slice(0, 2)}</AvatarFallback>
-          </Avatar>
+          <UserAvatar user={user} />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>

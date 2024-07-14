@@ -1,10 +1,10 @@
 import { z } from 'zod'
 import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
-import { UserProfileModel } from '@play-money/users/lib/sanitizeUser'
+import { UserSchema } from '@play-money/database'
 
 export default createSchema({
   GET: {
-    parameters: UserProfileModel.pick({ id: true }),
+    parameters: UserSchema.pick({ id: true }),
     responses: {
       200: z.object({
         netWorth: z.number(),

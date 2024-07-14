@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
+import { User } from '@play-money/database'
 import { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
 import { MarketUserTraderBonusAmount } from '@play-money/markets/components/MarketUserTraderBonusAmount'
 import { TransactionWithItems } from '@play-money/transactions/lib/getTransactions'
@@ -11,10 +12,9 @@ import { Card, CardContent } from '@play-money/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@play-money/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@play-money/ui/tabs'
 import { cn } from '@play-money/ui/utils'
-import { UserProfile } from '../lib/sanitizeUser'
 
 // TODO: @casesandberg Generate this from OpenAPI schema
-export async function getUserProfile({ username }: { username: string }): Promise<UserProfile> {
+export async function getUserProfile({ username }: { username: string }): Promise<User> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/username/${username}`, {
     credentials: 'include',
     cache: 'no-store', // If a user updates their profile, we want to get non-cahced data. Likely we should bust the cache there in the future.
