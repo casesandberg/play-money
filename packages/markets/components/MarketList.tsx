@@ -15,7 +15,7 @@ export function MarketList({ markets }: { markets: Array<ExtendedMarket> }) {
             </Link>
 
             <div className="flex min-h-5 gap-4 text-sm text-muted-foreground">
-              <div className="flex gap-2 truncate">
+              <div className="flex gap-2 overflow-hidden">
                 {market.marketResolution ? (
                   <div className="font-medium" style={{ color: market.marketResolution.resolution.color }}>
                     Resolved {market.marketResolution.resolution.name}
