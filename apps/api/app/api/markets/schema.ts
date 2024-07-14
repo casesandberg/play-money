@@ -7,6 +7,7 @@ export default createSchema({
     parameters: z
       .object({
         createdBy: z.string().optional(),
+        limit: z.coerce.number().optional(),
       })
       .optional(),
     responses: {
