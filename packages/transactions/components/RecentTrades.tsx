@@ -5,7 +5,6 @@ import _ from 'lodash'
 import Link from 'next/link'
 import useSWR from 'swr'
 import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
-import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
 import { UserLink } from '@play-money/users/components/UserLink'
 import { TransactionWithItems } from '../lib/getTransactions'
 import { summarizeTransaction } from '../lib/helpers'
@@ -26,13 +25,6 @@ export function RecentTrades() {
           <li className="py-2" key={transaction.id}>
             {transaction.creator.user ? (
               <div className="inline-flex items-center gap-1 pr-1">
-                {/* <Avatar className="h-3 w-3">
-                  <AvatarImage
-                    alt={`@${transaction.creator.user.username}`}
-                    src={transaction.creator.user.avatarUrl ?? ''}
-                  />
-                  <AvatarFallback>{transaction.creator.user.username.toUpperCase().slice(0, 2)}</AvatarFallback>
-                </Avatar> */}
                 <UserLink hideUsername user={transaction.creator.user} />
               </div>
             ) : null}

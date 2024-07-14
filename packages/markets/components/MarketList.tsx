@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { MarketLikelyOption } from '@play-money/markets/components/MarketLikelyOption'
-import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
+import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { UserLink } from '@play-money/users/components/UserLink'
 import { ExtendedMarket } from './MarketOverviewPage'
 
@@ -26,10 +26,8 @@ export function MarketList({ markets }: { markets: Array<ExtendedMarket> }) {
               </div>
 
               <div className="ml-auto flex flex-shrink-0 items-center gap-1">
-                <Avatar className="h-4 w-4">
-                  <AvatarImage alt={`@${market.user.username}`} src={market.user.avatarUrl ?? ''} />
-                  <AvatarFallback>{market.user.username.toUpperCase().slice(0, 2)}</AvatarFallback>
-                </Avatar>
+                <UserAvatar user={market.user} size="sm" />
+
                 <UserLink hideUsername user={market.user} />
               </div>
             </div>

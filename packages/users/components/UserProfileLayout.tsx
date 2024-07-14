@@ -1,6 +1,7 @@
 import { format } from 'date-fns'
 import React from 'react'
 import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
+import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@play-money/ui/card'
 import { Separator } from '@play-money/ui/separator'
@@ -57,11 +58,7 @@ export async function UserProfileLayout({
     <main className="mx-auto flex flex-1 flex-col items-start gap-6 md:flex-row">
       <Card className="w-full md:w-80">
         <CardHeader className="flex flex-row items-start gap-4 bg-muted/50">
-          <Avatar className="h-16 w-16">
-            <AvatarImage src={profile.avatarUrl ?? ''} alt={`@${profile.username}`} />
-            <AvatarFallback>{profile.username.toUpperCase().slice(0, 2)}</AvatarFallback>
-          </Avatar>
-
+          <UserAvatar user={profile} size="lg" />
           <div>
             <CardTitle className="text-lg">{profile.displayName}</CardTitle>
             <CardDescription>@{profile.username}</CardDescription>

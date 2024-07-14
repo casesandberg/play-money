@@ -7,8 +7,8 @@ import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip as ChartTooltip } 
 import useSWR from 'swr'
 import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
 import { Market, MarketOption, MarketResolution, User } from '@play-money/database'
+import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Alert, AlertDescription, AlertTitle } from '@play-money/ui/alert'
-import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
 import { Badge } from '@play-money/ui/badge'
 import { Button } from '@play-money/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
@@ -96,10 +96,7 @@ export function MarketOverviewPage({
           ) : null}
           {market.user ? (
             <div className="flex items-center gap-1 truncate">
-              <Avatar className="h-4 w-4">
-                <AvatarImage alt={`@${market.user.username}`} src={market.user.avatarUrl ?? ''} />
-                <AvatarFallback>{market.user.username.toUpperCase().slice(0, 2)}</AvatarFallback>
-              </Avatar>
+              <UserAvatar user={market.user} size="sm" />
               <UserLink user={market.user} hideUsername />
             </div>
           ) : null}
