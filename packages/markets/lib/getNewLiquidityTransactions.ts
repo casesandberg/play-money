@@ -33,6 +33,9 @@ export async function getNewLiquidityTransactions(): Promise<Array<TransactionWi
         notIn: ignoreFirstTransactionPerMarket,
       },
     },
+    orderBy: {
+      createdAt: 'desc',
+    },
     include: {
       transactionItems: true,
       market: true,
