@@ -1,6 +1,7 @@
 'use client'
 
 import { BellIcon } from 'lucide-react'
+import { useState } from 'react'
 import useSWR from 'swr'
 import { Badge } from '@play-money/ui/badge'
 import { Button } from '@play-money/ui/button'
@@ -11,6 +12,7 @@ import { NotificationGroupWithLastNotification } from '../lib/getNotifications'
 import { NotificationItem } from './NotificationItem'
 
 export function NotificationDropdown() {
+  const [isOpen, setIsOpen] = useState(false)
   const { user } = useUser()
   const { data } = useSWR<{ unreadCount: number; notifications: Array<NotificationGroupWithLastNotification> }>(
     user ? '/v1/users/me/notifications' : null,
@@ -18,7 +20,7 @@ export function NotificationDropdown() {
   )
 
   return user ? (
-    <DropdownMenu>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
           <BellIcon className="h-5 w-5" />
@@ -27,7 +29,15 @@ export function NotificationDropdown() {
           ) : null}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-[400px] p-0" align="end">
+      <DropdownMenuContent
+        className="w-[400px] p-0"
+        align="end"
+        onCloseAutoFocus={(e) => {
+          // Stop focus on the trigger button when closing the dropdown conflicting with focusing comments
+          e.preventDefault()
+          e.stopPropagation()
+        }}
+      >
         <Card className="border-0 shadow-lg">
           <div className="flex justify-between border-b p-3 px-4 md:p-3 md:px-4">
             <div>
@@ -46,9 +56,9 @@ export function NotificationDropdown() {
             <div className="divide-y">
               {data?.notifications.length ? (
                 data?.notifications.map(({ id, count, lastNotification }, i) => (
-                  <DropdownMenuItem key={id} asChild className="p-0">
+                  <div key={id} onClick={() => setIsOpen(false)}>
                     <NotificationItem notification={lastNotification} count={count} unread={!lastNotification.readAt} />
-                  </DropdownMenuItem>
+                  </div>
                 ))
               ) : (
                 <div className="p-4 text-center text-sm text-muted-foreground">Zero notifications</div>
