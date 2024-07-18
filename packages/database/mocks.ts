@@ -4,7 +4,17 @@ import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
 import type { TransactionWithItems } from '@play-money/transactions/lib/getTransactions'
-import { Market, User, Account, TransactionItem, Currency, MarketOption, Comment, MarketResolution } from './zod'
+import {
+  Market,
+  User,
+  Account,
+  TransactionItem,
+  Currency,
+  MarketOption,
+  Comment,
+  MarketResolution,
+  Notification,
+} from './zod'
 
 export function mockUser(overrides?: Partial<User>): User {
   const firstName = faker.person.firstName()
@@ -164,6 +174,33 @@ export function mockComment(overrides?: Partial<Comment>): Comment {
     authorId: faker.string.uuid(),
     parentId: null,
     hidden: false,
+    createdAt: faker.date.past(),
+    updatedAt: faker.date.past(),
+    ...overrides,
+  }
+}
+
+type ExtendedNotification = Notification & { actor: User; recipient: User; market: Market; comment: Comment }
+export function mockNotification(overrides?: Partial<Notification>): ExtendedNotification {
+  return {
+    id: faker.string.uuid(),
+    recipientId: faker.string.uuid(),
+    recipient: mockUser(),
+    actorId: faker.string.uuid(),
+    actor: mockUser(),
+    type: faker.helpers.arrayElement(['MARKET_COMMENT']),
+    marketId: faker.string.uuid(),
+    market: mockMarket(),
+    commentId: faker.string.uuid(),
+    comment: mockComment(),
+    transactionId: faker.string.uuid(),
+    marketOptionId: faker.string.uuid(),
+    marketResolutionId: faker.string.uuid(),
+    parentCommentId: faker.string.uuid(),
+    commentReactionId: faker.string.uuid(),
+    content: null,
+    actionUrl: '/market/1',
+    readAt: null,
     createdAt: faker.date.past(),
     updatedAt: faker.date.past(),
     ...overrides,
