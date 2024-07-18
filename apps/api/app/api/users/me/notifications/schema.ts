@@ -10,4 +10,11 @@ export default createSchema({
       500: ServerErrorSchema,
     },
   },
+  post: {
+    responses: {
+      200: z.object({ success: z.boolean() }),
+      404: ServerErrorSchema,
+      500: ServerErrorSchema,
+    },
+  },
 })

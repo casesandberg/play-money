@@ -5,7 +5,7 @@ export async function updateNotificationsRead({
   marketId,
 }: {
   userId: string
-  marketId: string
+  marketId?: string
 }): Promise<number> {
   const now = new Date()
 

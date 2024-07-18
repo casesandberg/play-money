@@ -6,7 +6,7 @@ import useSWR from 'swr'
 import { Badge } from '@play-money/ui/badge'
 import { Button } from '@play-money/ui/button'
 import { Card, CardContent } from '@play-money/ui/card'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@play-money/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@play-money/ui/dropdown-menu'
 import { useUser } from '@play-money/users/context/UserContext'
 import { NotificationGroupWithLastNotification } from '../lib/getNotifications'
 import { NotificationItem } from './NotificationItem'
@@ -14,10 +14,27 @@ import { NotificationItem } from './NotificationItem'
 export function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false)
   const { user } = useUser()
-  const { data } = useSWR<{ unreadCount: number; notifications: Array<NotificationGroupWithLastNotification> }>(
+  const { data, mutate } = useSWR<{ unreadCount: number; notifications: Array<NotificationGroupWithLastNotification> }>(
     user ? '/v1/users/me/notifications' : null,
     { refreshInterval: 1000 * 60 * 5 } // 5 mins
   )
+
+  const handleMarkAllRead = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/notifications`, {
+        method: 'POST',
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        console.error('Error marking read:', response.statusText)
+      }
+
+      void mutate()
+    } catch (error) {
+      console.error('Error marking read:', error)
+    }
+  }
 
   return user ? (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -47,7 +64,13 @@ export function NotificationDropdown() {
               </Badge>
             </div>
             <div>
-              <Button variant="link" size="sm" className="h-6 p-1" disabled={!data?.unreadCount}>
+              <Button
+                variant="link"
+                size="sm"
+                className="h-6 p-1"
+                disabled={!data?.unreadCount}
+                onClick={handleMarkAllRead}
+              >
                 Mark all read
               </Button>
             </div>
