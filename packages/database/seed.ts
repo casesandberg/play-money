@@ -114,16 +114,16 @@ async function main() {
     })
   )
   await Promise.all(
-    _.times(10, async () => {
+    _.times(20, async () => {
       const market = await createMarket({
-        question: faker.lorem.sentence(),
+        question: `Will ${faker.lorem.sentence().toLowerCase().slice(0, -1)}?`,
         description: `<p>${faker.lorem.paragraph()}</p>`,
         closeDate: faker.date.future(),
         createdBy: faker.helpers.arrayElement(user_ids),
       })
 
       await Promise.all(
-        _.times(5, async () => {
+        _.times(10, async () => {
           const creatorId = faker.helpers.arrayElement(user_ids)
           await marketBuy({
             marketId: market.id,

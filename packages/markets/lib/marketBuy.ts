@@ -4,9 +4,11 @@ import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import db from '@play-money/database'
 import { UNIQUE_TRADER_LIQUIDITY_PRIMARY } from '@play-money/economy'
+import { createNotification } from '@play-money/notifications/lib/createNotification'
 import { createMarketBuyTransaction } from '@play-money/transactions/lib/createMarketBuyTransaction'
 import { createMarketLiquidityTransaction } from '@play-money/transactions/lib/createMarketLiquidityTransaction'
 import { createMarketTraderBonusTransactions } from '@play-money/transactions/lib/createMarketTraderBonusTransactions'
+import { getUniqueLiquidityProviderIds } from '@play-money/transactions/lib/getUniqueLiquidityProviderIds'
 import { getMarket } from './getMarket'
 import { isMarketTradable, isPurchasableCurrency } from './helpers'
 
@@ -72,4 +74,21 @@ export async function marketBuy({
 
     await createMarketTraderBonusTransactions({ marketId })
   }
+
+  const recipientIds = await getUniqueLiquidityProviderIds(marketId, [creatorId])
+
+  await Promise.all(
+    recipientIds.map((recipientId) =>
+      createNotification({
+        type: 'MARKET_TRADE',
+        actorId: creatorId,
+        marketId: market.id,
+        marketOptionId: marketOption.id,
+        transactionId: transaction.id,
+        groupKey: market.id,
+        userId: recipientId,
+        actionUrl: `/questions/${market.id}/${market.slug}/trades`,
+      })
+    )
+  )
 }

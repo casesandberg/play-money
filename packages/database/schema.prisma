@@ -39,6 +39,11 @@ model User {
 
   email         String    @unique /// @zod.custom.omit([model, input])
   emailVerified DateTime? /// @zod.custom.omit([model, input])
+
+  // Unnecessary reverse relations
+  recipientNotifications Notification[]      @relation("NotificationRecipient")
+  actorNotifications     Notification[]      @relation("NotificationActor")
+  notificationGroups     NotificationGroup[] @relation()
 }
 
 model AuthAccount {
@@ -85,6 +90,9 @@ model Market {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Unnecessary reverse relations
+  notifications Notification[] @relation()
 }
 
 model MarketResolution {
@@ -98,6 +106,9 @@ model MarketResolution {
   supportingLink String?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+
+  // Unnecessary reverse relations
+  notifications Notification[] @relation()
 }
 
 model MarketOption {
@@ -112,6 +123,9 @@ model MarketOption {
   resolutions          MarketResolution[]
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
+
+  // Unnecessary reverse relations
+  notifications Notification[] @relation()
 }
 
 model VerificationToken {
@@ -141,6 +155,10 @@ model Comment {
   hidden     Boolean           @default(false)
   entityType CommentEntityType
   entityId   String
+
+  // Unnecessary reverse relations
+  notifications       Notification[] @relation("NotificationComment")
+  notificationParents Notification[] @relation("NotificationParentComment")
 }
 
 model CommentReaction {
@@ -150,6 +168,9 @@ model CommentReaction {
   userId    String
   comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
   commentId String
+
+  // Unnecessary reverse relations
+  notifications Notification[] @relation()
 }
 
 enum CurrencyCode {
@@ -182,6 +203,9 @@ model Transaction {
   creator          Account           @relation(fields: [creatorId], references: [id])
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @default(now())
+
+  // Unnecessary reverse relations
+  notifications Notification[] @relation()
 }
 
 model TransactionItem {
@@ -207,4 +231,63 @@ model Account {
   transactions     Transaction[]
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @default(now())
+}
+
+enum NotificationType {
+  MARKET_RESOLVED
+  MARKET_TRADE
+  MARKET_LIQUIDITY_ADDED
+  MARKET_COMMENT
+  COMMENT_REPLY
+  COMMENT_MENTION
+  COMMENT_REACTION
+}
+
+model Notification {
+  id                 String            @id @default(cuid())
+  recipientId        String
+  recipient          User              @relation("NotificationRecipient", fields: [recipientId], references: [id])
+  actorId            String
+  actor              User?             @relation("NotificationActor", fields: [actorId], references: [id])
+  type               NotificationType
+  content            Json
+  marketId           String?
+  market             Market?           @relation(fields: [marketId], references: [id])
+  marketOptionId     String?
+  marketOption       MarketOption?     @relation(fields: [marketOptionId], references: [id])
+  marketResolutionId String?
+  marketResolution   MarketResolution? @relation(fields: [marketResolutionId], references: [id])
+  transactionId      String?
+  transaction        Transaction?      @relation(fields: [transactionId], references: [id])
+  commentId          String?
+  comment            Comment?          @relation("NotificationComment", fields: [commentId], references: [id])
+  parentCommentId    String?
+  parentComment      Comment?          @relation("NotificationParentComment", fields: [parentCommentId], references: [id])
+  commentReactionId  String?
+  commentReaction    CommentReaction?  @relation(fields: [commentReactionId], references: [id])
+
+  actionUrl String
+  readAt    DateTime?
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  groups    NotificationGroup[] @relation()
+
+  @@index(fields: [recipientId, createdAt])
+}
+
+model NotificationGroup {
+  id                 String           @id @default(cuid())
+  recipientId        String
+  recipient          User             @relation(fields: [recipientId], references: [id])
+  type               NotificationType
+  count              Int              @default(1)
+  lastNotificationId String
+  lastNotification   Notification     @relation(fields: [lastNotificationId], references: [id])
+  groupWindowEnd     DateTime
+  groupKey           String
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  @@unique(fields: [recipientId, type, groupWindowEnd, groupKey])
+  @@index(fields: [recipientId, type, groupWindowEnd, groupKey])
 }
