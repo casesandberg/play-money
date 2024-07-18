@@ -138,6 +138,7 @@ export type NotificationContent =
   | MarketResolvedNotificationContent
   | MarketTradeNotificationContent
   | MarketLiquidityAddedNotificationContent
+  | MarketCommentNotificationContent
   | CommentReplyNotificationContent
   | CommentMentionNotificationContent
   | CommentReactionNotificationContent
