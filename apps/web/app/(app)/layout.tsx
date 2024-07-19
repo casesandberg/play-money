@@ -2,6 +2,7 @@ import { MenuIcon } from 'lucide-react'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { ActiveUserBalance } from '@play-money/accounts/components/ActiveUserBalance'
+import { NotificationDropdown } from '@play-money/notifications/components/NotificationDropdown'
 import { GlobalSearchTrigger } from '@play-money/search/components/GlobalSearchTrigger'
 import { Badge } from '@play-money/ui/badge'
 import { Button } from '@play-money/ui/button'
@@ -86,6 +87,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <div className="ml-auto flex items-center space-x-4">
             <ActiveUserBalance initialBalance={balance} />
             <GlobalSearchTrigger className="hidden md:flex" />
+            <NotificationDropdown />
             <UserNav />
           </div>
         </div>

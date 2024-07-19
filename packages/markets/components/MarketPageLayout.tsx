@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import React from 'react'
+import { useTrackResourceViewed } from '@play-money/notifications/hooks/useTrackResourceViewed'
 import { Tabs, TabsList, TabsTrigger } from '@play-money/ui/tabs'
 import { ExtendedMarket } from './MarketOverviewPage'
 import { MarketPageSidebar } from './MarketPageSidebar'
@@ -21,6 +22,8 @@ export function MarketPageLayout({
   const pathname = usePathname()
 
   const initialTab = pathname.includes('/trades') ? 'trades' : 'overview'
+
+  useTrackResourceViewed({ resourceId: market.id, resourceType: 'MARKET' })
 
   const handleTabChange = (value: string) => {
     if (value === 'overview') {

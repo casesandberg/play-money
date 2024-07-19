@@ -1,5 +1,5 @@
 import Decimal from 'decimal.js'
-import { TransactionWithItems } from './getTransactions'
+import { Transaction, TransactionItem } from '@play-money/database'
 
 type HoldingsSummary = {
   [accountId: string]: {
@@ -7,7 +7,9 @@ type HoldingsSummary = {
   }
 }
 
-export function summarizeTransaction(transaction: TransactionWithItems): HoldingsSummary {
+export function summarizeTransaction(
+  transaction: Transaction & { transactionItems: Array<TransactionItem> }
+): HoldingsSummary {
   const summary: HoldingsSummary = {}
 
   for (const item of transaction.transactionItems) {

@@ -19,6 +19,7 @@
     "@play-money/currencies": "*",
     "@play-money/database": "*",
     "@play-money/markets": "*",
+    "@play-money/notifications": "*",
     "@play-money/search": "*",
     "@play-money/transactions": "*",
     "@play-money/users": "*",

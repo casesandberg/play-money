@@ -11,3 +11,5 @@ export * from './CurrencySchema';
 export * from './TransactionSchema';
 export * from './TransactionItemSchema';
 export * from './AccountSchema';
+export * from './NotificationSchema';
+export * from './NotificationGroupSchema';

@@ -20,6 +20,7 @@
     "@play-money/database": "*",
     "@play-money/economy": "*",
     "@play-money/markets": "*",
+    "@play-money/notifications": "*",
     "@play-money/search": "*",
     "@play-money/transactions": "*",
     "@play-money/ui": "*",
