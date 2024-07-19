@@ -77,7 +77,7 @@ export function NotificationDropdown() {
           </div>
           <CardContent className="max-h-[450px] overflow-y-auto p-0 md:p-0">
             <div className="divide-y">
-              {data?.notifications.length ? (
+              {data?.notifications?.length ? (
                 data?.notifications.map(({ id, count, lastNotification }, i) => (
                   <div key={id} onClick={() => setIsOpen(false)}>
                     <NotificationItem notification={lastNotification} count={count} unread={!lastNotification.readAt} />
