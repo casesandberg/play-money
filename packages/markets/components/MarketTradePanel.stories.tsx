@@ -26,6 +26,7 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   args: {
     market: mockExtendedMarket(),
+    isResolved: false,
     activeOptionId: '1',
   },
 }
@@ -33,6 +34,7 @@ export const Default: Story = {
 export const NoOptionSelected: Story = {
   args: {
     market: mockExtendedMarket(),
+    isResolved: false,
     activeOptionId: '2',
   },
 }
