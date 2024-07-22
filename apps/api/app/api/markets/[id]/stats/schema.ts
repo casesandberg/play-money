@@ -10,8 +10,21 @@ export default createSchema({
         totalLiquidity: z.number(),
         lpUserCount: z.number(),
         traderBonusPayouts: z.number(),
-        holdings: z.object({
+        positions: z
+          .record(
+            z.string(),
+            z.object({
+              cost: z.number(),
+              value: z.number(),
+              shares: z.number(),
+              payout: z.number(),
+            })
+          )
+          .optional(),
+        earnings: z.object({
           traderBonusPayouts: z.number().optional(),
+          held: z.number().optional(),
+          sold: z.number().optional(),
         }),
       }),
       404: ServerErrorSchema,

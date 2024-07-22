@@ -12,7 +12,7 @@ export async function getMarketQuote({
 }: {
   marketId: string
   optionId: string
-  amount: number
+  amount: Decimal
   isBuy: boolean
 }) {
   const marketOption = await db.marketOption.findFirst({
@@ -29,13 +29,11 @@ export async function getMarketQuote({
 
   const ammAccount = await getAmmAccount({ marketId })
 
-  const decimalAmount = new Decimal(amount)
-
   // TODO: Change to multi-step quote to account for limit orders
   const { probability, shares } = await quote({
     ammAccountId: ammAccount.id,
     currencyCode: marketOption.currencyCode,
-    amount: decimalAmount,
+    amount,
     isBuy,
   })
 

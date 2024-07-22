@@ -15,7 +15,7 @@ export async function GET(
     const session = await auth()
 
     const { id } = schema.get.parameters.parse(params)
-    const { totalLiquidity, lpUserCount, traderBonusPayouts, holdings } = await getMarketStats({
+    const { totalLiquidity, lpUserCount, traderBonusPayouts, positions, earnings } = await getMarketStats({
       marketId: id,
       userId: session?.user?.id,
     })
@@ -24,9 +24,8 @@ export async function GET(
       totalLiquidity: totalLiquidity.toNumber(),
       lpUserCount,
       traderBonusPayouts: traderBonusPayouts.toNumber(),
-      holdings: {
-        traderBonusPayouts: holdings.traderBonusPayouts?.toNumber(),
-      },
+      positions,
+      earnings,
     })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
