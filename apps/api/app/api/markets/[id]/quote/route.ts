@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js'
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
 import { getMarketQuote } from '@play-money/markets/lib/getMarketQuote'
@@ -18,7 +19,7 @@ export async function POST(
     const { probability, shares } = await getMarketQuote({
       marketId: id,
       optionId,
-      amount,
+      amount: new Decimal(amount),
       isBuy,
     })
 

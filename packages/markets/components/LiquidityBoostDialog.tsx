@@ -23,8 +23,19 @@ export type MarketStats = {
   totalLiquidity: number
   lpUserCount: number
   traderBonusPayouts: number
-  holdings: {
+  positions: Record<
+    string,
+    {
+      cost: number
+      value: number
+      shares: number
+      payout: number
+    }
+  >
+  earnings: {
     traderBonusPayouts?: number
+    held?: number
+    sold?: number
   }
 }
 

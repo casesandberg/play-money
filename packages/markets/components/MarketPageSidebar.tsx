@@ -1,20 +1,14 @@
 'use client'
 
 import React from 'react'
-import { Badge } from '@play-money/ui/badge'
 import { isMarketResolved } from '../lib/helpers'
-import { MarketLeaderboardPanel } from './MarketLeaderboardPanel'
 import { ExtendedMarket } from './MarketOverviewPage'
 import { MarketTradePanel } from './MarketTradePanel'
 
 export function MarketPageSidebar({ market, activeOptionId }: { market: ExtendedMarket; activeOptionId: string }) {
   return (
     <div className="space-y-8">
-      {isMarketResolved(market) ? (
-        <MarketLeaderboardPanel market={market} />
-      ) : (
-        <MarketTradePanel market={market} activeOptionId={activeOptionId} />
-      )}
+      <MarketTradePanel market={market} isResolved={isMarketResolved(market)} activeOptionId={activeOptionId} />
 
       {/* <div>
         <div className="text-xs font-semibold uppercase text-muted-foreground">Related questions</div>

@@ -7,11 +7,13 @@ export async function getAccountBalance({
   currencyCode,
   marketId,
   excludeTransactionTypes,
+  includeTransactionTypes,
 }: {
   accountId: string
   currencyCode: CurrencyCodeType
   marketId?: string
   excludeTransactionTypes?: string[]
+  includeTransactionTypes?: string[]
 }): Promise<Decimal> {
   const transactionItems = await db.transactionItem.findMany({
     where: {
@@ -21,6 +23,7 @@ export async function getAccountBalance({
         marketId,
         type: {
           notIn: excludeTransactionTypes,
+          in: includeTransactionTypes,
         },
       },
     },
