@@ -8,12 +8,14 @@ export async function updateUserById({
   displayName,
   bio,
   avatarUrl,
+  timezone,
 }: {
   id: string
   username?: string
   displayName?: string
   bio?: string
   avatarUrl?: string
+  timezone?: string
 }) {
   const user = await getUserById({ id })
 
@@ -33,7 +35,9 @@ export async function updateUserById({
   if (avatarUrl) {
     updatedData.avatarUrl = avatarUrl
   }
-
+  if (timezone) {
+    updatedData.timezone = timezone
+  }
   if (displayName) {
     updatedData.displayName = displayName
   }

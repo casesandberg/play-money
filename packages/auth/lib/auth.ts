@@ -41,4 +41,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       from: 'case@casesandberg.com',
     }),
   ],
+
+  callbacks: {
+    async signIn({ user }) {
+      if (user) {
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+        await db.user.update({
+          where: { id: user.id },
+          data: { timezone },
+        })
+      }
+      return true
+    },
+  },
 })

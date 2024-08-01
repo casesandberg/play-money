@@ -49,7 +49,17 @@ export function Combobox({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-0">
-        <Command>
+        <Command
+          filter={(rowValue, search, keywords) => {
+            const normalize = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '')
+            const normalizedValue = normalize(rowValue)
+            const normalizedSearch = normalize(search)
+            const normalizedKeywords = keywords?.map(normalize) || []
+
+            const extendedValue = `${normalizedValue} ${normalizedKeywords.join(' ')}`
+            return extendedValue.includes(normalizedSearch) ? 1 : 0
+          }}
+        >
           <CommandInput placeholder={searchLabel} />
           <CommandList>
             <CommandEmpty>{emptyLabel}</CommandEmpty>
