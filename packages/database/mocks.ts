@@ -16,6 +16,22 @@ import {
   Notification,
 } from './zod'
 
+// Monkey patch for es2022
+declare namespace Intl {
+  type Key = 'calendar' | 'collation' | 'currency' | 'numberingSystem' | 'timeZone' | 'unit'
+
+  function supportedValuesOf(input: Key): string[]
+
+  type DateTimeFormatOptions = {
+    timeZone: string
+    timeZoneName: string
+  }
+  class DateTimeFormat {
+    constructor(locale: string, options: DateTimeFormatOptions)
+    format(date: Date): string
+  }
+}
+
 export function mockUser(overrides?: Partial<User>): User {
   const firstName = faker.person.firstName()
   const lastName = faker.person.lastName()
@@ -30,6 +46,7 @@ export function mockUser(overrides?: Partial<User>): User {
     website: faker.helpers.maybe(faker.internet.domainName, { probability: 0.3 }) ?? null,
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
+    timezone: faker.helpers.arrayElement(Intl.supportedValuesOf('timeZone')),
     ...overrides,
   }
 }
