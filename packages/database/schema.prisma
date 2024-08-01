@@ -27,6 +27,7 @@ model User {
   discordHandle    String?
   website          String?
   bio              String?
+  timezone         String             @default("America/Los_Angeles")
   authAccounts     AuthAccount[]
   sessions         Session[]
   comments         Comment[]
