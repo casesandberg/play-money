@@ -149,7 +149,8 @@ export async function UserProfileLayout({
         </CardContent>
         <CardFooter className="flex flex-row items-center border-t bg-muted/50 py-3 md:py-3">
           <div className="text-xs text-muted-foreground">
-            Joined <time dateTime={profile.createdAt.toString()}>{format(profile.createdAt, 'MMM d, yyyy')}</time>
+            Joined <time dateTime={profile.createdAt.toString()}>{format(profile.createdAt, 'MMM d, yyyy')}</time> —{' '}
+            {stats.activeDayCount} day{stats.activeDayCount > 1 ? 's' : ''} active
           </div>
         </CardFooter>
       </Card>

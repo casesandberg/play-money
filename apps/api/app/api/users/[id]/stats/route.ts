@@ -31,6 +31,7 @@ export async function GET(
       hasCreatedMarket,
       hasCommented,
       hasBoostedLiquidity,
+      activeDayCount,
     } = await getUserStats({ userId: id })
 
     return NextResponse.json({
@@ -38,6 +39,7 @@ export async function GET(
       tradingVolume: tradingVolume.toNumber(),
       totalMarkets,
       lastTradeAt,
+      activeDayCount,
       quests: [
         {
           title: 'Bet in a market',

@@ -11,6 +11,7 @@ export default createSchema({
         tradingVolume: z.number(),
         totalMarkets: z.number(),
         lastTradeAt: z.date().optional(),
+        activeDayCount: z.number(),
         quests: z.array(
           z.object({
             title: z.string(),

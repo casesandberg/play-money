@@ -5,6 +5,7 @@ import {
   hasCreatedMarketToday,
   hasCommentedToday,
   hasBoostedLiquidityToday,
+  calculateActiveDayCount,
 } from '@play-money/quests/lib/helpers'
 
 async function getMarketsCountByUser(userId: string) {
@@ -93,6 +94,7 @@ export async function getUserStats({ userId }: { userId: string }) {
     hasCreatedMarket,
     hasCommented,
     hasBoostedLiquidity,
+    activeDayCount,
   ] = await Promise.all([
     getNetWorthByUser(userId),
     getTradingVolumeByUser(userId),
@@ -102,6 +104,7 @@ export async function getUserStats({ userId }: { userId: string }) {
     hasCreatedMarketToday({ userId }),
     hasCommentedToday({ userId }),
     hasBoostedLiquidityToday({ userId }),
+    calculateActiveDayCount({ userId }),
   ])
 
   return {
@@ -113,5 +116,6 @@ export async function getUserStats({ userId }: { userId: string }) {
     hasCreatedMarket,
     hasCommented,
     hasBoostedLiquidity,
+    activeDayCount,
   }
 }
