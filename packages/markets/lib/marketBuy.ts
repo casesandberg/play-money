@@ -5,6 +5,8 @@ import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import db from '@play-money/database'
 import { UNIQUE_TRADER_LIQUIDITY_PRIMARY } from '@play-money/economy'
 import { createNotification } from '@play-money/notifications/lib/createNotification'
+import { createDailyTradeBonusTransaction } from '@play-money/quests/lib/createDailyTradeBonusTransaction'
+import { hasPlacedMarketTradeToday } from '@play-money/quests/lib/helpers'
 import { createMarketBuyTransaction } from '@play-money/transactions/lib/createMarketBuyTransaction'
 import { createMarketLiquidityTransaction } from '@play-money/transactions/lib/createMarketLiquidityTransaction'
 import { createMarketTraderBonusTransactions } from '@play-money/transactions/lib/createMarketTraderBonusTransactions'
@@ -91,4 +93,9 @@ export async function marketBuy({
       })
     )
   )
+
+  // TODO: Look into returning multiple messages to let the user know toast of the bonus.
+  if (!(await hasPlacedMarketTradeToday({ userId: creatorId }))) {
+    await createDailyTradeBonusTransaction({ accountId: userAccount.id, marketId })
+  }
 }

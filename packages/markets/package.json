@@ -10,6 +10,7 @@
     "@play-money/database": "*",
     "@play-money/economy": "*",
     "@play-money/notifications": "*",
+    "@play-money/quests": "*",
     "@play-money/transactions": "*",
     "decimal.js": "^10.4.3",
     "next": "^14.1.1",

@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
+import {
+  DAILY_COMMENT_BONUS_PRIMARY,
+  DAILY_LIQUIDITY_BONUS_PRIMARY,
+  DAILY_MARKET_BONUS_PRIMARY,
+  DAILY_TRADE_BONUS_PRIMARY,
+} from '@play-money/economy'
 import { UserNotFoundError } from '@play-money/users/lib/exceptions'
 import { getUserById } from '@play-money/users/lib/getUserById'
 import { getUserStats } from '@play-money/users/lib/getUserStats'
@@ -16,13 +22,48 @@ export async function GET(
 
     await getUserById({ id })
 
-    const { netWorth, tradingVolume, totalMarkets, lastTradeAt } = await getUserStats({ userId: id })
+    const {
+      netWorth,
+      tradingVolume,
+      totalMarkets,
+      lastTradeAt,
+      hasPlacedMarketTrade,
+      hasCreatedMarket,
+      hasCommented,
+      hasBoostedLiquidity,
+    } = await getUserStats({ userId: id })
 
     return NextResponse.json({
       netWorth: netWorth.toNumber(),
       tradingVolume: tradingVolume.toNumber(),
       totalMarkets,
       lastTradeAt,
+      quests: [
+        {
+          title: 'Bet in a market',
+          award: DAILY_TRADE_BONUS_PRIMARY,
+          completed: hasPlacedMarketTrade,
+          href: '/questions',
+        },
+        {
+          title: 'Create a market',
+          award: DAILY_MARKET_BONUS_PRIMARY,
+          completed: hasCreatedMarket,
+          href: '/create-post',
+        },
+        {
+          title: 'Write a comment',
+          award: DAILY_COMMENT_BONUS_PRIMARY,
+          completed: hasCommented,
+          href: '/questions',
+        },
+        {
+          title: 'Boost liquidity in a market',
+          award: DAILY_LIQUIDITY_BONUS_PRIMARY,
+          completed: hasBoostedLiquidity,
+          href: '/questions',
+        },
+      ],
     })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging

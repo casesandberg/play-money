@@ -18,6 +18,7 @@
     "@play-money/comments": "*",
     "@play-money/currencies": "*",
     "@play-money/database": "*",
+    "@play-money/economy": "*",
     "@play-money/markets": "*",
     "@play-money/notifications": "*",
     "@play-money/search": "*",
