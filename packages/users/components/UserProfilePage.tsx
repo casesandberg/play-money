@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
-import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
 import { User } from '@play-money/database'
 import { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
 import { MarketUserTraderBonusAmount } from '@play-money/markets/components/MarketUserTraderBonusAmount'
@@ -13,6 +12,7 @@ import { Card, CardContent } from '@play-money/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@play-money/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@play-money/ui/tabs'
 import { cn } from '@play-money/ui/utils'
+import { UserGraph } from './UserGraph'
 
 // TODO: @casesandberg Generate this from OpenAPI schema
 export async function getUserProfile({ username }: { username: string }): Promise<User> {
@@ -67,6 +67,8 @@ export async function UserProfilePage({ username }: { username: string }) {
 
   return (
     <div className="flex flex-col gap-4">
+      <UserGraph userId={user.id} />
+
       <Tabs defaultValue="trades">
         <div className="flex items-center">
           <TabsList>
