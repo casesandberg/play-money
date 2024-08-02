@@ -1,6 +1,7 @@
 import NextAuth from 'next-auth'
 import Resend from 'next-auth/providers/resend'
 import db from '@play-money/database'
+import { updateUserById } from '@play-money/users/lib/updateUserById'
 import { PrismaAdapter } from './auth-prisma-adapter'
 
 if (!process.env.NEXTAUTH_URL) {
@@ -44,12 +45,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
   callbacks: {
     async signIn({ user }) {
-      if (user) {
+      if (user?.id) {
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-        await db.user.update({
-          where: { id: user.id },
-          data: { timezone },
-        })
+        await updateUserById({ id: user.id, timezone })
       }
       return true
     },
