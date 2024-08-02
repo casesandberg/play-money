@@ -1,0 +1,13 @@
+{
+  "name": "@play-money/quests",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@play-money/database": "*",
+    "@play-money/users": "*",
+    "date-fns-tz": "^3.1.3"
+  }
+}

@@ -1,5 +1,12 @@
 import Decimal from 'decimal.js'
 import db from '@play-money/database'
+import {
+  hasPlacedMarketTradeToday,
+  hasCreatedMarketToday,
+  hasCommentedToday,
+  hasBoostedLiquidityToday,
+  calculateActiveDayCount,
+} from '@play-money/quests/lib/helpers'
 
 async function getMarketsCountByUser(userId: string) {
   const count = await db.market.count({
@@ -78,11 +85,26 @@ async function getLastTradeByUser(userId: string) {
 }
 
 export async function getUserStats({ userId }: { userId: string }) {
-  const [netWorth, tradingVolume, totalMarkets, lastTradeAt] = await Promise.all([
+  const [
+    netWorth,
+    tradingVolume,
+    totalMarkets,
+    lastTradeAt,
+    hasPlacedMarketTrade,
+    hasCreatedMarket,
+    hasCommented,
+    hasBoostedLiquidity,
+    activeDayCount,
+  ] = await Promise.all([
     getNetWorthByUser(userId),
     getTradingVolumeByUser(userId),
     getMarketsCountByUser(userId),
     getLastTradeByUser(userId),
+    hasPlacedMarketTradeToday({ userId }),
+    hasCreatedMarketToday({ userId }),
+    hasCommentedToday({ userId }),
+    hasBoostedLiquidityToday({ userId }),
+    calculateActiveDayCount({ userId }),
   ])
 
   return {
@@ -90,5 +112,10 @@ export async function getUserStats({ userId }: { userId: string }) {
     tradingVolume,
     totalMarkets,
     lastTradeAt,
+    hasPlacedMarketTrade,
+    hasCreatedMarket,
+    hasCommented,
+    hasBoostedLiquidity,
+    activeDayCount,
   }
 }
