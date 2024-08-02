@@ -104,7 +104,7 @@ export async function calculateActiveDayCount({ userId }: { userId: string }): P
   SELECT COUNT(DISTINCT ("createdAt" AT TIME ZONE 'UTC' AT TIME ZONE ${timezone})::date) AS "activeDayCount"
   FROM "Transaction"
   WHERE "creatorId" = ${userAccount.id}
-    AND "type" IN ('DAILY_LIQUIDITY_BONUS', 'DAILY_TRADE_BONUS')
+    AND "type" IN ('DAILY_LIQUIDITY_BONUS', 'DAILY_TRADE_BONUS', 'DAILY_COMMENT_BONUS', 'DAILY_MARKET_BONUS')
 `
 
   return Number(result[0]?.activeDayCount ?? 0)
