@@ -2,6 +2,7 @@
 
 import React from 'react'
 import useSWR, { useSWRConfig } from 'swr'
+import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
 import { useSearchParam } from '@play-money/ui'
 import { Card, CardContent, CardHeader } from '@play-money/ui/card'
 import { Combobox } from '@play-money/ui/combobox'
@@ -88,17 +89,21 @@ export function MarketTradePanel({
                     return shares && position ? (
                       <div key={option.id}>
                         <div className="flex  justify-between gap-2">
-                          <div className="font-semibold" style={{ color: option.color }}>
-                            ${Math.round(position.value)} {option.name}
+                          <div className="font-mono font-semibold" style={{ color: option.color }}>
+                            <CurrencyDisplay value={position.value} currencyCode="PRIMARY" /> {option.name}
                             <span className="ml-2 text-xs font-normal text-foreground">
                               ({Math.round(((position.value - position.cost) / position.cost) * 100) > 0 ? '+' : ''}
                               {Math.round(((position.value - position.cost) / position.cost) * 100)}%)
                             </span>
                           </div>
                         </div>
-                        <div className="flex gap-2 text-xs text-muted-foreground">
-                          <div>Cost ${Math.round(position.cost)}</div>
-                          <div>Payout ${Math.round(position.payout)}</div>
+                        <div className="flex gap-2 font-mono text-xs text-muted-foreground">
+                          <div>
+                            Cost <CurrencyDisplay value={position.cost} currencyCode="PRIMARY" />
+                          </div>
+                          <div>
+                            Payout <CurrencyDisplay value={position.payout} currencyCode="PRIMARY" />
+                          </div>
                         </div>
                       </div>
                     ) : null
@@ -113,27 +118,33 @@ export function MarketTradePanel({
 
                 {stats?.earnings.held ? (
                   <div className="flex justify-between gap-2">
-                    <span>Held positions</span>
+                    <span className="font-mono">Held positions</span>
                     <div className="font-semibold">
-                      <span>${Math.round(stats.earnings.held)} </span>
+                      <span>
+                        <CurrencyDisplay value={stats.earnings.held} currencyCode="PRIMARY" />{' '}
+                      </span>
                     </div>
                   </div>
                 ) : null}
 
                 {stats?.earnings.sold ? (
                   <div className="flex justify-between gap-2">
-                    <span>Sold positions</span>
+                    <span className="font-mono">Sold positions</span>
                     <div className="font-semibold">
-                      <span>${Math.round(stats.earnings.sold)} </span>
+                      <span>
+                        <CurrencyDisplay value={stats.earnings.sold} currencyCode="PRIMARY" />
+                      </span>
                     </div>
                   </div>
                 ) : null}
 
                 {stats?.earnings.traderBonusPayouts ? (
                   <div className="flex justify-between gap-2">
-                    <span>Trader Bonuses:</span>
+                    <span className="font-mono">Trader Bonuses:</span>
                     <div className="font-semibold">
-                      <span>${Math.round(stats.earnings.traderBonusPayouts)} </span>
+                      <span>
+                        <CurrencyDisplay value={stats.earnings.traderBonusPayouts} currencyCode="PRIMARY" />
+                      </span>
                     </div>
                   </div>
                 ) : null}

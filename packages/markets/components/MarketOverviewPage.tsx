@@ -5,6 +5,7 @@ import { CircleCheckBig, ChevronDown, Diamond } from 'lucide-react'
 import React from 'react'
 import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip as ChartTooltip } from 'recharts'
 import useSWR from 'swr'
+import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
 import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
 import { Market, MarketOption, MarketResolution, User } from '@play-money/database'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
@@ -75,7 +76,7 @@ export function MarketOverviewPage({
 
       <CardHeader className="pt-0 md:pt-0">
         <CardTitle className="leading-relaxed">{market.question}</CardTitle>
-        <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground md:flex-nowrap">
+        <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 font-mono text-sm text-muted-foreground md:flex-nowrap">
           {!market.marketResolution ? <MarketLikelyOption market={market} /> : null}
 
           {stats?.totalLiquidity ? (
@@ -83,7 +84,7 @@ export function MarketOverviewPage({
               <TooltipTrigger asChild>
                 <div className="flex flex-shrink-0 items-center gap-1">
                   <Diamond className="h-4 w-4 text-purple-600" />
-                  <span>${formatNumber(stats.totalLiquidity)}</span>
+                  <CurrencyDisplay value={stats.totalLiquidity} currencyCode="PRIMARY" isShort hasSymbol={false} />
                 </div>
               </TooltipTrigger>
               <TooltipContent>Market liquidity</TooltipContent>

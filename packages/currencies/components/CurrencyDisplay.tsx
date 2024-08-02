@@ -2,25 +2,34 @@
 
 import React from 'react'
 import { cn } from '@play-money/ui/utils'
-import { formatCurrency } from '../lib/formatCurrency'
+import { formatCurrency, formatNumber } from '../lib/formatCurrency'
 import { useCurrencyContext } from './CurrencyProvider'
 
-interface CurrencyDisplayProps {
+export function CurrencyDisplay({
+  value,
+  currencyCode,
+  className,
+  hasSymbol = true,
+  isShort = false,
+}: {
   value: number
   currencyCode: string
   className?: string
-}
-
-export const CurrencyDisplay: React.FC<CurrencyDisplayProps> = ({ value, currencyCode, className }) => {
+  hasSymbol?: boolean
+  isShort?: boolean
+}) {
   const { currencies, displayOptions } = useCurrencyContext()
   const currency = currencies[currencyCode]
 
-  const formattedValue = formatCurrency(value, currency.imageUrl ? '' : currency.symbol, displayOptions.decimals)
+  const formattedValue = formatCurrency(value, '', displayOptions.decimals)
+  const formattedShort = formatNumber(value)
 
   return (
-    <div className={cn('flex items-center space-x-1', className)}>
-      {currency.imageUrl && <img src={currency.imageUrl} alt={currency.name} className="h-4 w-4" />}
-      <span className="font-medium">{formattedValue}</span>
-    </div>
+    <span className={cn('whitespace-nowrap font-mono', className)}>
+      <span className="inline-block -translate-y-[5%] scale-125 pr-0.5 leading-none">
+        {hasSymbol ? (currencyCode === 'PRIMARY' ? '¤' : currency.symbol) : null}
+      </span>
+      {isShort ? formattedShort : formattedValue}
+    </span>
   )
 }

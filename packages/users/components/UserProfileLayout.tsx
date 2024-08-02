@@ -1,8 +1,8 @@
 import { format } from 'date-fns'
 import React from 'react'
+import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
 import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
-import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@play-money/ui/card'
 import { Separator } from '@play-money/ui/separator'
 import { getUserProfile } from '../components/UserProfilePage'
@@ -128,11 +128,13 @@ export async function UserProfileLayout({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
-              <div className="font-semibold">{formatNumber(stats.netWorth)}</div>
+              <div className="font-semibold">
+                <CurrencyDisplay value={stats.netWorth} currencyCode="PRIMARY" isShort />
+              </div>
               <div className="text-muted-foreground">Net worth</div>
             </div>
             <div className="text-center">
-              <div className="font-semibold">{formatNumber(stats.tradingVolume)}</div>
+              <div className="font-mono font-semibold">{formatNumber(stats.tradingVolume)}</div>
               <div className="text-muted-foreground">Trading volume</div>
             </div>
             <div className="text-center">
