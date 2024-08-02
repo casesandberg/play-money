@@ -28,6 +28,7 @@ export default createSchema({
         MarketOptionSchema.pick({
           name: true,
           currencyCode: true,
+          color: true,
         })
       ),
     }),
