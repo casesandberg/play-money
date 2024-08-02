@@ -8,7 +8,7 @@ import { hasCreatedMarketToday } from '@play-money/quests/lib/helpers'
 import { createMarketLiquidityTransaction } from '@play-money/transactions/lib/createMarketLiquidityTransaction'
 import { slugifyTitle } from './helpers'
 
-type PartialOptions = Pick<MarketOption, 'name' | 'currencyCode'>
+type PartialOptions = Pick<MarketOption, 'name' | 'currencyCode' | 'color'>
 
 export async function createMarket({
   question,
@@ -40,16 +40,20 @@ export async function createMarket({
   let parsedOptions: Array<PartialOptions>
 
   if (options?.length) {
-    parsedOptions = options.map((data) => MarketOptionSchema.pick({ name: true, currencyCode: true }).parse(data))
+    parsedOptions = options.map((data) =>
+      MarketOptionSchema.pick({ name: true, currencyCode: true, color: true }).parse(data)
+    )
   } else {
     parsedOptions = [
       {
         name: 'Yes',
         currencyCode: 'YES',
+        color: '#3B82F6',
       },
       {
         name: 'No',
         currencyCode: 'NO',
+        color: '#EC4899',
       },
     ]
   }
@@ -73,7 +77,7 @@ export async function createMarket({
           data: parsedOptions.map((option) => ({
             name: option.name,
             currencyCode: option.currencyCode,
-            color: option.currencyCode === 'YES' ? '#3B82F6' : '#EC4899',
+            color: option.color || (option.currencyCode === 'YES' ? '#3B82F6' : '#EC4899'),
             liquidityProbability: new Decimal(1).div(parsedOptions.length),
             updatedAt: new Date(),
             createdAt: new Date(),

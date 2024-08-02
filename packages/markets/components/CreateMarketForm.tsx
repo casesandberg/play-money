@@ -1,8 +1,10 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PopoverClose } from '@radix-ui/react-popover'
 import moment from 'moment'
 import { useRouter } from 'next/navigation'
+import { CirclePicker } from 'react-color'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { useSWRConfig } from 'swr'
 import { z } from 'zod'
@@ -16,10 +18,11 @@ import { Editor } from '@play-money/ui/editor'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
 import { Label } from '@play-money/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@play-money/ui/popover'
 import { toast } from '@play-money/ui/use-toast'
 
 const marketCreateFormSchema = MarketSchema.pick({ question: true, description: true, closeDate: true }).and(
-  z.object({ options: z.array(MarketOptionSchema.pick({ name: true, currencyCode: true })) })
+  z.object({ options: z.array(MarketOptionSchema.pick({ name: true, currencyCode: true, color: true })) })
 )
 type MarketCreateFormValues = z.infer<typeof marketCreateFormSchema>
 
@@ -35,8 +38,8 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
       description: '',
       closeDate: moment().add(1, 'month').endOf('day').toDate(),
       options: [
-        { name: 'Yes', currencyCode: 'YES' },
-        { name: 'No', currencyCode: 'NO' },
+        { name: 'Yes', currencyCode: 'YES', color: '#3B82F6' },
+        { name: 'No', currencyCode: 'NO', color: '#EC4899' },
       ],
     },
   })
@@ -95,29 +98,52 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
           <div className="space-y-2">
             <Label>Options</Label>
 
-            <div className="-space-y-px">
+            <Card className="divide-y">
               {fields.map((fieldItem, index) => (
-                <FormField
-                  control={form.control}
-                  key={fieldItem.currencyCode}
-                  name={`options.${index}.name`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <div className="relative">
+                <div className="flex items-center gap-1 p-2" key={fieldItem.currencyCode}>
+                  <div className="ml-2 w-8 text-sm font-medium text-muted-foreground">#{index + 1}</div>
+                  <FormField
+                    control={form.control}
+                    name={`options.${index}.name`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormControl>
                           <Input placeholder={fieldItem.currencyCode === 'YES' ? 'Yes' : 'No'} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-sm text-muted-foreground opacity-50">
-                            {fieldItem.currencyCode === 'YES' ? 'Resolves yes' : 'Resolves no'}
-                          </div>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name={`options.${index}.color`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button size="icon" variant="outline">
+                                <div style={{ backgroundColor: field.value }} className="h-4 w-4" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent>
+                              <PopoverClose>
+                                <CirclePicker
+                                  onChangeComplete={(color) => field.onChange(color.hex)}
+                                  color={field.value}
+                                />
+                              </PopoverClose>
+                            </PopoverContent>
+                          </Popover>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               ))}
-            </div>
+            </Card>
           </div>
 
           <FormField
