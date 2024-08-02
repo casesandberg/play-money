@@ -133,7 +133,7 @@ export function MarketSellForm({
                       placeholder="100"
                       {...field}
                       onChange={(e) => field.onChange(e.currentTarget.valueAsNumber)}
-                      className="h-9"
+                      className="h-9 font-mono"
                     />
 
                     <Button size="sm" type="button" variant="secondary" onClick={() => field.onChange(max)}>

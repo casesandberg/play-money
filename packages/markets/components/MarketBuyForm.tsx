@@ -131,7 +131,7 @@ export function MarketBuyForm({
                     size="sm"
                     type="button"
                     variant="secondary"
-                    className="h-6 px-2"
+                    className="h-6 px-2 font-mono"
                     onClick={() => field.onChange((field.value || 0) + 100)}
                   >
                     +100
@@ -140,7 +140,7 @@ export function MarketBuyForm({
                     size="sm"
                     type="button"
                     variant="secondary"
-                    className="h-6 px-2"
+                    className="h-6 px-2 font-mono"
                     onClick={() => field.onChange((field.value || 0) + 500)}
                   >
                     +500
@@ -149,7 +149,7 @@ export function MarketBuyForm({
                     size="sm"
                     type="button"
                     variant="secondary"
-                    className="h-6 px-2"
+                    className="h-6 px-2 font-mono"
                     onClick={() => field.onChange((field.value || 0) + 5000)}
                   >
                     +5k
@@ -163,7 +163,7 @@ export function MarketBuyForm({
                     placeholder="100"
                     {...field}
                     onChange={(e) => field.onChange(e.currentTarget.valueAsNumber)}
-                    className="h-9"
+                    className="h-9 font-mono"
                   />
                 </div>
               </FormControl>
@@ -216,7 +216,7 @@ export const QuoteItem = ({
     <span className="text-muted-foreground">{label}</span>
     <span
       className={cn(
-        'font-semibold',
+        'font-mono font-semibold',
         value
           ? percent
             ? percent > 0

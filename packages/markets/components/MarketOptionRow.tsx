@@ -30,7 +30,7 @@ export function MarketOptionRow({
       <div className="flex flex-1 flex-col gap-2">
         <div className="font-semibold leading-none">{option.name}</div>
         <div className="flex flex-row items-center gap-2">
-          <div className="text-xs font-semibold leading-none" style={{ color: option.color }}>
+          <div className="font-mono text-xs font-semibold leading-none" style={{ color: option.color }}>
             {Math.round(probability * 100)}%
           </div>
           <Progress

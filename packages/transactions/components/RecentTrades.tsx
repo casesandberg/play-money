@@ -4,7 +4,7 @@ import { formatDistanceToNow } from 'date-fns'
 import _ from 'lodash'
 import Link from 'next/link'
 import useSWR from 'swr'
-import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
+import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
 import { UserLink } from '@play-money/users/components/UserLink'
 import { TransactionWithItems } from '../lib/getTransactions'
 import { summarizeTransaction } from '../lib/helpers'
@@ -30,7 +30,8 @@ export function RecentTrades() {
             ) : null}
             {transaction.type === 'MARKET_BUY' ? 'bought' : 'sold'}{' '}
             <span className="font-medium">
-              ${formatNumber(Math.abs(userSummary.PRIMARY.toNumber()))} {!userSummary.YES.eq(0) ? 'Yes' : 'No'}
+              <CurrencyDisplay value={userSummary.PRIMARY.abs().toNumber()} currencyCode="PRIMARY" isShort />{' '}
+              {!userSummary.YES.eq(0) ? 'Yes' : 'No'}
             </span>{' '}
             {transaction.market ? (
               <>

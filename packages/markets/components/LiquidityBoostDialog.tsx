@@ -5,6 +5,7 @@ import _ from 'lodash'
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
+import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
 import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
 import { Market } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
@@ -106,7 +107,9 @@ export const LiquidityBoostDialog = ({
               <ul className="grid gap-1 text-sm">
                 <li className="flex items-center justify-between">
                   <span className="text-muted-foreground">Existing liquidity</span>
-                  <span className="font-medium">${formatNumber(stats.totalLiquidity)}</span>
+                  <span className="font-medium">
+                    <CurrencyDisplay value={stats.totalLiquidity} currencyCode="PRIMARY" />
+                  </span>
                 </li>
                 <li className="flex items-center justify-between">
                   <span className="text-muted-foreground">Liquidity providers</span>
@@ -114,7 +117,9 @@ export const LiquidityBoostDialog = ({
                 </li>
                 <li className="flex items-center justify-between">
                   <span className="text-muted-foreground">Unique trader bonuses</span>
-                  <span className="font-medium">${formatNumber(stats.traderBonusPayouts)}</span>
+                  <span className="font-medium">
+                    <CurrencyDisplay value={stats.traderBonusPayouts} currencyCode="PRIMARY" />
+                  </span>
                 </li>
               </ul>
             </div>
@@ -135,7 +140,7 @@ export const LiquidityBoostDialog = ({
                         size="sm"
                         type="button"
                         variant="secondary"
-                        className="h-6 px-2"
+                        className="h-6 px-2 font-mono"
                         onClick={() => field.onChange((field.value || 0) + 1000)}
                       >
                         +1000
@@ -144,7 +149,7 @@ export const LiquidityBoostDialog = ({
                         size="sm"
                         type="button"
                         variant="secondary"
-                        className="h-6 px-2"
+                        className="h-6 px-2 font-mono"
                         onClick={() => field.onChange((field.value || 0) + 5000)}
                       >
                         +5k
@@ -153,7 +158,7 @@ export const LiquidityBoostDialog = ({
                         size="sm"
                         type="button"
                         variant="secondary"
-                        className="h-6 px-2"
+                        className="h-6 px-2 font-mono"
                         onClick={() => field.onChange((field.value || 0) + 25000)}
                       >
                         +25k
@@ -167,7 +172,7 @@ export const LiquidityBoostDialog = ({
                         placeholder="1000"
                         {...field}
                         onChange={(e) => field.onChange(e.currentTarget.valueAsNumber)}
-                        className="h-9"
+                        className="h-9 font-mono"
                       />
                     </div>
                   </FormControl>

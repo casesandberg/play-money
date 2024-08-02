@@ -5,6 +5,7 @@ import _ from 'lodash'
 import Link from 'next/link'
 import React from 'react'
 import useSWR from 'swr'
+import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
 import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
 import { UserLink } from '@play-money/users/components/UserLink'
 import { TransactionWithItems } from '../lib/getTransactions'
@@ -23,7 +24,9 @@ export function RecentLiquidity() {
 
         return (
           <li className="py-2" key={transaction.id}>
-            <span className="font-medium">${formatNumber(Math.abs(userSummary.PRIMARY.toNumber()))}</span>
+            <span className="font-medium">
+              <CurrencyDisplay value={userSummary.PRIMARY.abs().toNumber()} currencyCode="PRIMARY" isShort />
+            </span>
             <span className="text-muted-foreground"> added to </span>
             {transaction.market ? (
               <span className="underline">

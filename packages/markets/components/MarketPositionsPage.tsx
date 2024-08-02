@@ -3,6 +3,7 @@
 import { format, isPast, formatDistanceToNow } from 'date-fns'
 import Link from 'next/link'
 import React from 'react'
+import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
 import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
 import type { TransactionWithItems } from '@play-money/transactions/lib/getTransactions'
 import { summarizeTransaction } from '@play-money/transactions/lib/helpers'
@@ -30,7 +31,7 @@ export function MarketPositionsPage({
 
       <CardHeader className="pt-0 md:pt-0">
         <CardTitle className="leading-relaxed">{market.question}</CardTitle>
-        <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground md:flex-nowrap">
+        <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 font-mono text-sm text-muted-foreground md:flex-nowrap">
           {!market.marketResolution ? <MarketLikelyOption market={market} /> : null}
 
           {market.closeDate ? (
@@ -64,8 +65,9 @@ export function MarketPositionsPage({
                     </div>
                   ) : null}
                   {transaction.type === 'MARKET_BUY' ? 'bought' : 'sold'}{' '}
-                  <span className="font-medium">
-                    ${formatNumber(Math.abs(userSummary?.PRIMARY.toNumber()))} {!userSummary?.YES.eq(0) ? 'Yes' : 'No'}
+                  <span className="font-semibold">
+                    <CurrencyDisplay value={userSummary?.PRIMARY.abs().toNumber()} currencyCode="PRIMARY" />{' '}
+                    {!userSummary?.YES.eq(0) ? 'Yes' : 'No'}
                   </span>{' '}
                   <span className="text-sm text-muted-foreground md:ml-auto">
                     {formatDistanceToNow(transaction.createdAt, { addSuffix: true })}

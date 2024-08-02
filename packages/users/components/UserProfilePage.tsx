@@ -2,6 +2,7 @@ import { format } from 'date-fns'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
+import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
 import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
 import { User } from '@play-money/database'
 import { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
@@ -123,7 +124,9 @@ export async function UserProfilePage({ username }: { username: string }) {
                                     : ''}{' '}
                                 {!userSummary.YES.eq(0) ? 'Yes' : 'No'}
                               </div>
-                              <div>${formatNumber(Math.abs(userSummary.PRIMARY.toNumber()))}</div>
+                              <div>
+                                <CurrencyDisplay value={userSummary.PRIMARY.abs().toNumber()} currencyCode="PRIMARY" />
+                              </div>
                             </TableCell>
                             <TableCell>
                               <div className="line-clamp-2 font-medium">{transaction.market.question}</div>

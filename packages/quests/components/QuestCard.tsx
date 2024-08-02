@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
 import { Badge } from '@play-money/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
 import { cn } from '@play-money/ui/utils'
@@ -38,7 +39,11 @@ export function QuestCard({ quests }: { quests: Quest[] }) {
                       {quest.title}
                     </p>
                   </div>
-                  {!quest.completed && <Badge>+${quest.award}</Badge>}
+                  {!quest.completed && (
+                    <Badge>
+                      <CurrencyDisplay value={quest.award} currencyCode="PRIMARY" />
+                    </Badge>
+                  )}
                 </div>
               </Link>
             ))}
