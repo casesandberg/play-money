@@ -85,7 +85,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </Link>
           <MainNav className="hidden gap-6 md:flex" />
 
-          <div className="ml-auto flex items-center space-x-4">
+          <div className="ml-auto flex items-center space-x-2">
             <NotificationDropdown />
             <UserNav initialBalance={balance} />
           </div>
