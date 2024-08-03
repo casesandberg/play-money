@@ -4,6 +4,7 @@ import { Laptop, Sun, Moon } from 'lucide-react'
 import { signOut, signIn } from 'next-auth/react'
 import Link from 'next/link'
 import React from 'react'
+import { ActiveUserBalance } from '@play-money/accounts/components/ActiveUserBalance'
 import { useTheme } from '@play-money/ui/ThemeProvider'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Button } from '@play-money/ui/button'
@@ -19,15 +20,16 @@ import {
 import { Tabs, TabsList, TabsTrigger } from '@play-money/ui/tabs'
 import { useUser } from '@play-money/users/context/UserContext'
 
-export function UserNav() {
+export function UserNav({ initialBalance }: { initialBalance: number }) {
   const { user } = useUser()
   const { theme = 'system', setTheme } = useTheme()
 
   return user ? (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+        <Button variant="outline" className="px-2">
           <UserAvatar user={user} />
+          <ActiveUserBalance initialBalance={initialBalance} />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>

@@ -1,9 +1,8 @@
 import { MenuIcon } from 'lucide-react'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
-import { ActiveUserBalance } from '@play-money/accounts/components/ActiveUserBalance'
 import { NotificationDropdown } from '@play-money/notifications/components/NotificationDropdown'
-import { GlobalSearchTrigger } from '@play-money/search/components/GlobalSearchTrigger'
+import { GlobalSearchTriggerLink } from '@play-money/search/components/GlobalSearchTriggerLink'
 import { Badge } from '@play-money/ui/badge'
 import { Button } from '@play-money/ui/button'
 import { Sheet, SheetTrigger, SheetContent, SheetClose } from '@play-money/ui/sheet'
@@ -27,6 +26,9 @@ function MainNav({
         <Link className="font-medium transition-colors hover:text-primary" href="/create-post">
           Create Market
         </Link>
+      )}
+      {renderItemWrap(
+        <GlobalSearchTriggerLink className="h-auto text-[length:inherit] text-foreground transition-colors hover:text-primary" />
       )}
     </nav>
   )
@@ -63,7 +65,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <SheetContent side="left">
               <div className="flex flex-col gap-4">
                 <span className="text-lg font-bold tracking-tight text-muted-foreground">PlayMoney</span>
-                <GlobalSearchTrigger />
                 <MainNav
                   className="flex flex-col items-start space-y-4 text-lg"
                   renderItemWrap={(child) => <SheetClose asChild>{child}</SheetClose>}
@@ -85,10 +86,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <MainNav className="hidden gap-6 md:flex" />
 
           <div className="ml-auto flex items-center space-x-4">
-            <ActiveUserBalance initialBalance={balance} />
-            <GlobalSearchTrigger className="hidden md:flex" />
             <NotificationDropdown />
-            <UserNav />
+            <UserNav initialBalance={balance} />
           </div>
         </div>
       </header>
