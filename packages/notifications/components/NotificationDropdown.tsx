@@ -47,7 +47,7 @@ export function NotificationDropdown() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="w-[400px] p-0"
+        className="w-screen p-0 md:w-[400px]"
         align="end"
         onCloseAutoFocus={(e) => {
           // Stop focus on the trigger button when closing the dropdown conflicting with focusing comments
