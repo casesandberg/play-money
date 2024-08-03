@@ -173,7 +173,7 @@ export function MarketBuyForm({
         />
 
         <Button type="submit" className="w-full truncate" loading={form.formState.isSubmitting}>
-          Bet {_.truncate(option.name, { length: 20 })}
+          Buy {_.truncate(option.name, { length: 20 })}
         </Button>
 
         <ul className="grid gap-1 text-sm">
