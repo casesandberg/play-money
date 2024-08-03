@@ -190,8 +190,8 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
             Trading will stop at this time in your local timezone {tzName === null ? '' : `(${tzName})`}
           </p>
           <Button loading={form.formState.isSubmitting} type="submit">
-            Create for{' '}
-            <CurrencyDisplay className="ml-2" currencyCode="PRIMARY" value={INITIAL_MARKET_LIQUIDITY_PRIMARY} />
+            Create for
+            <CurrencyDisplay currencyCode="PRIMARY" value={INITIAL_MARKET_LIQUIDITY_PRIMARY} />
           </Button>
         </form>
       </Form>
