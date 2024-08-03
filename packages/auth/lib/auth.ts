@@ -45,10 +45,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
   callbacks: {
     async signIn({ user }) {
-      if (user?.id) {
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-        await updateUserById({ id: user.id, timezone })
-      }
+      // This actually runs on the server so the timezone is not actually the users.
+      // TODO: Move this to the user account setup on create account when created.
+      // if (user?.id) {
+      //   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+      //   if (Intl.supportedValuesOf('timeZone').includes(timezone)) {
+      //     await updateUserById({ id: user.id, timezone })
+      //   }
+      // }
       return true
     },
   },
