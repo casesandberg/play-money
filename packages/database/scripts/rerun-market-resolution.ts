@@ -16,18 +16,24 @@ async function main() {
         return
       }
 
-      const lossTransactions = await createMarketResolveLossTransactions({
-        marketId,
-        losingCurrencyCode: resolution.currencyCode === 'YES' ? 'NO' : 'YES',
-      })
+      const nonWinningOptions = market.options.filter((o) => o.id !== resolution.id)
+
+      const lossTransactions = await Promise.all(
+        nonWinningOptions.map((option) => {
+          return createMarketResolveLossTransactions({
+            marketId,
+            losingOptionId: option.id,
+          })
+        })
+      )
 
       const winTransactions = await createMarketResolveWinTransactions({
         marketId,
-        winningCurrencyCode: resolution.currencyCode as 'YES' | 'NO',
+        winningOptionId: resolution.id,
       })
 
       console.log(
-        `Market ${marketId} resolution re-run. ${lossTransactions.length} losses, ${winTransactions.length} wins.`
+        `Market ${marketId} resolution re-run. ${lossTransactions.flat().length} losses, ${winTransactions.length} wins.`
       )
       return
     }

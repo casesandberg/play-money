@@ -3,7 +3,8 @@ import _ from 'lodash'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
 import db from '@play-money/database'
-import { mockAccount, mockTransactionItem } from '@play-money/database/mocks'
+import { mockAccount, mockMarketOption, mockTransactionItem } from '@play-money/database/mocks'
+import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
 import { createMarketResolveLossTransactions } from './createMarketResolveLossTransactions'
 import { createTransaction } from './createTransaction'
 
@@ -25,6 +26,8 @@ jest.mock('./createTransaction', () => ({
   createTransaction: jest.fn(),
 }))
 
+jest.mock('@play-money/markets/lib/getMarketOption', () => ({ getMarketOption: jest.fn() }))
+
 describe('createMarketResolveLossTransactions', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -34,10 +37,11 @@ describe('createMarketResolveLossTransactions', () => {
     jest.mocked(getAmmAccount).mockResolvedValue(mockAccount({ id: 'amm-account-id' }))
     jest.mocked(getExchangerAccount).mockResolvedValue(mockAccount({ id: 'exchanger-account-id' }))
     jest.mocked(db.transactionItem.findMany).mockResolvedValue([])
+    jest.mocked(getMarketOption).mockResolvedValue(mockMarketOption({ id: 'option-1', currencyCode: 'NO' }))
 
     await createMarketResolveLossTransactions({
       marketId: 'market-1',
-      losingCurrencyCode: 'NO',
+      losingOptionId: 'option-1',
     })
 
     expect(createTransaction).not.toHaveBeenCalled()
@@ -53,10 +57,11 @@ describe('createMarketResolveLossTransactions', () => {
         mockTransactionItem({ accountId: 'user-1', currencyCode: 'NO', amount: new Decimal(50) }),
         mockTransactionItem({ accountId: 'user-1', currencyCode: 'NO', amount: new Decimal(-20) }),
       ])
+    jest.mocked(getMarketOption).mockResolvedValue(mockMarketOption({ id: 'option-1', currencyCode: 'NO' }))
 
     await createMarketResolveLossTransactions({
       marketId: 'market-1',
-      losingCurrencyCode: 'NO',
+      losingOptionId: 'option-1',
     })
 
     expect(createTransaction).toHaveBeenCalledWith(
@@ -92,10 +97,11 @@ describe('createMarketResolveLossTransactions', () => {
         mockTransactionItem({ accountId: 'user-2', currencyCode: 'NO', amount: new Decimal(30) }),
         mockTransactionItem({ accountId: 'user-2', currencyCode: 'NO', amount: new Decimal(20) }),
       ])
+    jest.mocked(getMarketOption).mockResolvedValue(mockMarketOption({ id: 'option-1', currencyCode: 'NO' }))
 
     await createMarketResolveLossTransactions({
       marketId: 'market-1',
-      losingCurrencyCode: 'NO',
+      losingOptionId: 'option-1',
     })
 
     expect(createTransaction).toHaveBeenCalledWith(

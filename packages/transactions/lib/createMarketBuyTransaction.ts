@@ -3,39 +3,35 @@ import _ from 'lodash'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import { buy, costToHitProbability } from '@play-money/amms/lib/maniswap-v1'
+import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
 import { createTransaction, TransactionItemInput } from './createTransaction'
 import { convertPrimaryToMarketShares } from './exchanger'
 
 interface MarketBuyTransactionInput {
   userId: string
-  amount: Decimal // in dollars
-  purchaseCurrencyCode: 'YES' | 'NO'
+  amount: Decimal
   marketId: string
+  optionId: string
 }
 
-export async function createMarketBuyTransaction({
-  userId,
-  marketId,
-  amount,
-  purchaseCurrencyCode,
-}: MarketBuyTransactionInput) {
+export async function createMarketBuyTransaction({ userId, amount, marketId, optionId }: MarketBuyTransactionInput) {
   const userAccount = await getUserAccount({ id: userId })
   const ammAccount = await getAmmAccount({ marketId })
+  const marketOption = await getMarketOption({ id: optionId, marketId })
 
   const exchangerTransactions = await convertPrimaryToMarketShares({
     fromAccountId: userAccount.id,
     amount,
   })
 
-  // When buying shares, the opposite shares will decrease when filling amm/limit orders.
-  // Any amount of opposite shares left means the entire amount has not yet been been filled.
-  let oppositeOutstandingShares = amount
-  let oppositeCurrencyCode = purchaseCurrencyCode === 'YES' ? 'NO' : 'YES'
+  // When buying shares, the other options' shares will decrease when filling amm/limit orders.
+  // Any amount of other shares left means the entire amount has not yet been been filled.
+  let outstandingShares = amount
   let accumulatedTransactionItems: Array<TransactionItemInput> = [...exchangerTransactions]
   // To account for floating point errors, we will limit the number of loops to a sane number.
   let maximumSaneLoops = 100
 
-  while (oppositeOutstandingShares.greaterThan(0) && maximumSaneLoops > 0) {
+  while (outstandingShares.greaterThan(0) && maximumSaneLoops > 0) {
     let closestLimitOrder = {} as any // TODO: Implement limit order matching
 
     const amountToBuy = closestLimitOrder?.probability
@@ -43,24 +39,26 @@ export async function createMarketBuyTransaction({
           await costToHitProbability({
             ammAccountId: ammAccount.id,
             probability: closestLimitOrder?.probability,
-            maxAmount: oppositeOutstandingShares,
+            maxAmount: outstandingShares,
           })
         ).cost
-      : oppositeOutstandingShares
+      : outstandingShares
 
     const ammTransactions = await buy({
       fromAccountId: userAccount.id,
       ammAccountId: ammAccount.id,
-      currencyCode: purchaseCurrencyCode,
+      assetType: 'MARKET_OPTION',
+      assetId: optionId,
       amount: amountToBuy,
     })
 
     accumulatedTransactionItems.push(...ammTransactions)
 
     const transactionsByUserOfAlternateCurrency = ammTransactions.filter(
-      (item) => item.currencyCode === oppositeCurrencyCode && item.accountId === userAccount.id
+      (item) =>
+        ![marketOption.currencyCode, 'PRIMARY', 'LPB'].includes(item.currencyCode) && item.accountId === userAccount.id
     )
-    oppositeOutstandingShares = oppositeOutstandingShares.add(
+    outstandingShares = outstandingShares.add(
       transactionsByUserOfAlternateCurrency.reduce((sum, item) => sum.plus(item.amount), new Decimal(0))
     )
 
@@ -74,7 +72,7 @@ export async function createMarketBuyTransaction({
   const transaction = await createTransaction({
     creatorId: userAccount.id,
     type: 'MARKET_BUY',
-    description: `Purchase ${amount} dollars worth of ${purchaseCurrencyCode} shares in market ${marketId}`,
+    description: `Purchase ${amount} dollars of option ${optionId} in market ${marketId}`,
     marketId,
     transactionItems: accumulatedTransactionItems,
   })

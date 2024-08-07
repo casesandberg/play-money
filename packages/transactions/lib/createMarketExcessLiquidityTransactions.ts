@@ -10,14 +10,12 @@ import { convertMarketSharesToPrimary } from './exchanger'
 export async function createMarketExcessLiquidityTransactions({ marketId }: { marketId: string }) {
   const ammAccount = await getAmmAccount({ marketId })
 
-  const remainingYes = (
-    await getAccountBalance({ marketId, accountId: ammAccount.id, currencyCode: 'YES' })
-  ).toDecimalPlaces(4)
-  const remainingNo = (
-    await getAccountBalance({ marketId, accountId: ammAccount.id, currencyCode: 'NO' })
-  ).toDecimalPlaces(4)
+  const balances = [
+    { amount: await getAccountBalance({ marketId, accountId: ammAccount.id, currencyCode: 'YES' }) },
+    { amount: await getAccountBalance({ marketId, accountId: ammAccount.id, currencyCode: 'NO' }) },
+  ]
 
-  const amountToDistribute = Decimal.min(remainingYes, remainingNo)
+  const amountToDistribute = Decimal.min(...balances.map((b) => b.amount))
   const liquidity = await getMarketLiquidity(marketId)
   const transactions: Array<Transaction> = []
 

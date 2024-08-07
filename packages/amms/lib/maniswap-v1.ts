@@ -2,6 +2,7 @@ import Decimal from 'decimal.js'
 import { getAccountBalance } from '@play-money/accounts/lib/getAccountBalance'
 import { MarketOption } from '@play-money/database'
 import { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/CurrencyCodeSchema'
+import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
 import { TransactionItemInput } from '@play-money/transactions/lib/createTransaction'
 
 /*
@@ -27,15 +28,23 @@ function calculateNewProbability(y: Decimal, n: Decimal): Decimal {
 export async function buy({
   fromAccountId,
   ammAccountId,
-  currencyCode,
+  assetType,
+  assetId,
   amount,
 }: {
   fromAccountId: string
   ammAccountId: string
-  currencyCode: CurrencyCodeType
+  assetType: 'MARKET_OPTION'
+  assetId: string
   amount: Decimal
 }): Promise<Array<TransactionItemInput>> {
-  const buyingYes = currencyCode === 'YES'
+  if (assetType !== 'MARKET_OPTION') {
+    throw new Error('There is only support for buying market options at this time')
+  }
+  const marketOption = await getMarketOption({ id: assetId })
+
+  // TODO: Update to support multi markets with >2 options.
+  const buyingYes = marketOption.currencyCode === 'YES'
   const oppositeCurrencyCode: CurrencyCodeType = buyingYes ? 'NO' : 'YES'
 
   const y = await getAccountBalance({ accountId: ammAccountId, currencyCode: 'YES' })
@@ -45,14 +54,14 @@ export async function buy({
 
   const ammTransactions = [
     // Giving the shares to the AMM.
-    { accountId: fromAccountId, currencyCode: currencyCode, amount: amount.neg() },
+    { accountId: fromAccountId, currencyCode: marketOption.currencyCode, amount: amount.neg() },
     { accountId: fromAccountId, currencyCode: oppositeCurrencyCode, amount: amount.neg() },
-    { accountId: ammAccountId, currencyCode: currencyCode, amount: amount },
+    { accountId: ammAccountId, currencyCode: marketOption.currencyCode, amount: amount },
     { accountId: ammAccountId, currencyCode: oppositeCurrencyCode, amount: amount },
 
     // Returning purchased shares to the user.
-    { accountId: ammAccountId, currencyCode: currencyCode, amount: toReturn.neg() },
-    { accountId: fromAccountId, currencyCode: currencyCode, amount: toReturn },
+    { accountId: ammAccountId, currencyCode: marketOption.currencyCode, amount: toReturn.neg() },
+    { accountId: fromAccountId, currencyCode: marketOption.currencyCode, amount: toReturn },
   ]
 
   return ammTransactions
@@ -61,15 +70,23 @@ export async function buy({
 export async function sell({
   fromAccountId,
   ammAccountId,
-  currencyCode,
   amount,
+  assetType,
+  assetId,
 }: {
   fromAccountId: string
   ammAccountId: string
-  currencyCode: CurrencyCodeType
   amount: Decimal
+  assetType: 'MARKET_OPTION'
+  assetId: string
 }): Promise<Array<TransactionItemInput>> {
-  const sellingYes = currencyCode === 'YES'
+  if (assetType !== 'MARKET_OPTION') {
+    throw new Error('There is only support for buying market options at this time')
+  }
+  const marketOption = await getMarketOption({ id: assetId })
+
+  // TODO: Update to support multi markets with >2 options.
+  const sellingYes = marketOption.currencyCode === 'YES'
   const oppositeCurrencyCode: CurrencyCodeType = sellingYes ? 'NO' : 'YES'
 
   const y = await getAccountBalance({ accountId: ammAccountId, currencyCode: 'YES' })
@@ -79,13 +96,13 @@ export async function sell({
 
   return [
     // Giving the shares to the AMM.
-    { accountId: fromAccountId, currencyCode: currencyCode, amount: amount.neg() },
-    { accountId: ammAccountId, currencyCode: currencyCode, amount: amount },
+    { accountId: fromAccountId, currencyCode: marketOption.currencyCode, amount: amount.neg() },
+    { accountId: ammAccountId, currencyCode: marketOption.currencyCode, amount: amount },
 
     // Returning purchased shares to the user.
-    { accountId: fromAccountId, currencyCode: currencyCode, amount: toReturn },
+    { accountId: fromAccountId, currencyCode: marketOption.currencyCode, amount: toReturn },
     { accountId: fromAccountId, currencyCode: oppositeCurrencyCode, amount: toReturn },
-    { accountId: ammAccountId, currencyCode: currencyCode, amount: toReturn.neg() },
+    { accountId: ammAccountId, currencyCode: marketOption.currencyCode, amount: toReturn.neg() },
     { accountId: ammAccountId, currencyCode: oppositeCurrencyCode, amount: toReturn.neg() },
   ]
 }

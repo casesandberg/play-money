@@ -2,6 +2,8 @@ import Decimal from 'decimal.js'
 import { toBeDeepCloseTo, toMatchCloseTo } from 'jest-matcher-deep-close-to'
 import { getAccountBalance } from '@play-money/accounts/lib/getAccountBalance'
 import '@play-money/config/jest/jest-setup'
+import { mockMarketOption } from '@play-money/database/mocks'
+import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
 import { addLiquidity, buy, costToHitProbability, sell } from './maniswap-v1'
 
 expect.extend({ toBeDeepCloseTo, toMatchCloseTo })
@@ -9,6 +11,7 @@ expect.extend({ toBeDeepCloseTo, toMatchCloseTo })
 jest.mock('@play-money/accounts/lib/getAccountBalance', () => ({
   getAccountBalance: jest.fn(),
 }))
+jest.mock('@play-money/markets/lib/getMarketOption', () => ({ getMarketOption: jest.fn() }))
 
 describe('maniswap-v1', () => {
   describe('buy', () => {
@@ -19,11 +22,13 @@ describe('maniswap-v1', () => {
         if (currencyCode === 'NO') return new Decimal(300)
         return new Decimal(0)
       })
+      jest.mocked(getMarketOption).mockResolvedValue(mockMarketOption({ id: 'option-1', currencyCode: 'YES' }))
 
       const transactions = await buy({
         fromAccountId: 'user1',
         ammAccountId: 'amm1',
-        currencyCode: 'YES',
+        assetType: 'MARKET_OPTION',
+        assetId: 'option-1',
         amount: new Decimal(50),
       })
 
@@ -44,11 +49,13 @@ describe('maniswap-v1', () => {
         if (currencyCode === 'NO') return new Decimal(300)
         return new Decimal(0)
       })
+      jest.mocked(getMarketOption).mockResolvedValue(mockMarketOption({ id: 'option-1', currencyCode: 'NO' }))
 
       const transactions = await buy({
         fromAccountId: 'user1',
         ammAccountId: 'amm1',
-        currencyCode: 'NO',
+        assetType: 'MARKET_OPTION',
+        assetId: 'option-1',
         amount: new Decimal(50),
       })
 
@@ -71,11 +78,13 @@ describe('maniswap-v1', () => {
       if (currencyCode === 'NO') return new Decimal(350)
       return new Decimal(0)
     })
+    jest.mocked(getMarketOption).mockResolvedValue(mockMarketOption({ id: 'option-1', currencyCode: 'YES' }))
 
     const transactions = await sell({
       fromAccountId: 'user1',
       ammAccountId: 'amm1',
-      currencyCode: 'YES',
+      assetType: 'MARKET_OPTION',
+      assetId: 'option-1',
       amount: new Decimal(64.29),
     })
 
@@ -97,11 +106,13 @@ describe('maniswap-v1', () => {
       if (currencyCode === 'NO') return new Decimal(200)
       return new Decimal(0)
     })
+    jest.mocked(getMarketOption).mockResolvedValue(mockMarketOption({ id: 'option-1', currencyCode: 'NO' }))
 
     const transactions = await sell({
       fromAccountId: 'user1',
       ammAccountId: 'amm1',
-      currencyCode: 'NO',
+      assetType: 'MARKET_OPTION',
+      assetId: 'option-1',
       amount: new Decimal(150),
     })
 

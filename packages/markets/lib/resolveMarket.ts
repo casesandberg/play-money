@@ -6,7 +6,7 @@ import { createMarketResolveWinTransactions } from '@play-money/transactions/lib
 import { getUniqueTraderIds } from '@play-money/transactions/lib/getUniqueTraderIds'
 import { getUserById } from '@play-money/users/lib/getUserById'
 import { getMarket } from './getMarket'
-import { canResolveMarket, isPurchasableCurrency } from './helpers'
+import { canResolveMarket } from './helpers'
 
 export async function resolveMarket({
   resolverId,
@@ -19,7 +19,7 @@ export async function resolveMarket({
   optionId: string
   supportingLink?: string
 }) {
-  const market = await getMarket({ id: marketId })
+  const market = await getMarket({ id: marketId, extended: true })
 
   if (market.resolvedAt) {
     throw new Error('Market already resolved')
@@ -27,18 +27,6 @@ export async function resolveMarket({
 
   if (!canResolveMarket({ market, userId: resolverId })) {
     throw new Error('User cannot resolve market')
-  }
-
-  const marketOption = await db.marketOption.findFirst({
-    where: { id: optionId, marketId },
-  })
-
-  if (!marketOption) {
-    throw new Error('Invalid optionId')
-  }
-
-  if (!isPurchasableCurrency(marketOption.currencyCode)) {
-    throw new Error('Invalid option currency code')
   }
 
   await db.$transaction(async (tx) => {
@@ -68,14 +56,20 @@ export async function resolveMarket({
     })
   })
 
-  await createMarketResolveLossTransactions({
-    marketId,
-    losingCurrencyCode: marketOption.currencyCode === 'YES' ? 'NO' : 'YES',
-  })
+  const nonWinningOptions = market.options.filter((o) => o.id !== optionId)
+
+  await Promise.all(
+    nonWinningOptions.map((option) => {
+      return createMarketResolveLossTransactions({
+        marketId,
+        losingOptionId: option.id,
+      })
+    })
+  )
 
   await createMarketResolveWinTransactions({
     marketId,
-    winningCurrencyCode: marketOption.currencyCode,
+    winningOptionId: optionId,
   })
 
   await createMarketExcessLiquidityTransactions({ marketId })
@@ -89,7 +83,7 @@ export async function resolveMarket({
         type: 'MARKET_RESOLVED',
         actorId: resolverId,
         marketId: market.id,
-        marketOptionId: marketOption.id,
+        marketOptionId: optionId,
         groupKey: market.id,
         userId: recipientId,
         actionUrl: `/questions/${market.id}/${market.slug}`,
