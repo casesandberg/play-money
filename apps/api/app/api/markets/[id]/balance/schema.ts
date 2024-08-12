@@ -6,16 +6,9 @@ export default createSchema({
     parameters: z.object({ id: z.string() }),
     responses: {
       200: z.object({
-        YES: z.number(),
-        NO: z.number(),
-        probability: z.object({
-          YES: z.number(),
-          NO: z.number(),
-        }),
-        holdings: z.object({
-          YES: z.number().optional(),
-          NO: z.number().optional(),
-        }),
+        // TODO: Hookup with NetBalance
+        amm: z.array(z.object({})),
+        user: z.array(z.object({})),
       }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,

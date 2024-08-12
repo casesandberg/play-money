@@ -31,13 +31,13 @@ export function MarketOptionRow({
         <div className="font-semibold leading-none">{option.name}</div>
         <div className="flex flex-row items-center gap-2">
           <div className="font-mono text-xs font-semibold leading-none" style={{ color: option.color }}>
-            {Math.round(probability * 100)}%
+            {probability}%
           </div>
           <Progress
             className="h-2 max-w-[200px] transition-transform"
             data-color={option.color}
             indicatorStyle={{ backgroundColor: option.color }}
-            value={probability * 100}
+            value={probability}
           />
         </div>
       </div>

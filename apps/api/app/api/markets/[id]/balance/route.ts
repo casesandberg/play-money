@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
+import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
+import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import type { SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
-import { getMarketBalance } from '@play-money/markets/lib/getMarketBalance'
-import { getUserBalanceInMarket } from '@play-money/markets/lib/getUserBalanceInMarket'
+import { getBalances, transformBalancesToNumbers } from '@play-money/finance/lib/getBalances'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'
@@ -14,16 +15,18 @@ export async function GET(
   try {
     const { id } = schema.get.parameters.parse(params)
     const session = await auth()
+    const ammAccount = await getAmmAccount({ marketId: id })
+    const userAccount = session?.user?.id ? await getUserAccount({ id: session.user.id }) : undefined
 
-    const [balance, holdings] = await Promise.all([
-      getMarketBalance({
-        marketId: id,
-        excludeTransactionTypes: ['MARKET_RESOLVE_LOSS', 'MARKET_RESOLVE_WIN', 'MARKET_EXCESS_LIQUIDITY'],
-      }),
-      session?.user?.id ? getUserBalanceInMarket({ userId: session.user.id, marketId: id }) : {},
+    const [ammBalances, userBalancesInMarket] = await Promise.all([
+      getBalances({ accountId: ammAccount.id, marketId: id }),
+      userAccount ? getBalances({ accountId: userAccount.id, marketId: id }) : undefined,
     ])
 
-    return NextResponse.json({ ...balance, holdings })
+    return NextResponse.json({
+      amm: transformBalancesToNumbers(ammBalances),
+      user: transformBalancesToNumbers(userBalancesInMarket),
+    })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 })

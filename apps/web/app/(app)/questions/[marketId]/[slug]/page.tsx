@@ -1,4 +1,5 @@
 import { revalidateTag } from 'next/cache'
+import { cookies } from 'next/headers'
 import { MarketComments } from '@play-money/comments/components/MarketComments'
 import type { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
 import { MarketOverviewPage } from '@play-money/markets/components/MarketOverviewPage'
@@ -6,7 +7,7 @@ import { MarketOverviewPage } from '@play-money/markets/components/MarketOvervie
 // TODO: @casesandberg Generate this from OpenAPI schema
 export async function getExtendedMarket({ marketId }: { marketId: string }): Promise<ExtendedMarket> {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}?extended=true`, {
-    credentials: 'include',
+    headers: { Cookie: cookies().toString() },
     next: { tags: [`market:${marketId}`] },
   })
   return response.json() as Promise<ExtendedMarket>
