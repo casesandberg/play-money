@@ -22,7 +22,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@play-money/ui/popover'
 import { toast } from '@play-money/ui/use-toast'
 
 const marketCreateFormSchema = MarketSchema.pick({ question: true, description: true, closeDate: true }).and(
-  z.object({ options: z.array(MarketOptionSchema.pick({ name: true, currencyCode: true, color: true })) })
+  z.object({ options: z.array(MarketOptionSchema.pick({ name: true, color: true })) })
 )
 type MarketCreateFormValues = z.infer<typeof marketCreateFormSchema>
 
@@ -38,8 +38,8 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
       description: '',
       closeDate: moment().add(1, 'month').endOf('day').toDate(),
       options: [
-        { name: 'Yes', currencyCode: 'YES', color: '#3B82F6' },
-        { name: 'No', currencyCode: 'NO', color: '#EC4899' },
+        { name: 'Yes', color: '#3B82F6' },
+        { name: 'No', color: '#EC4899' },
       ],
     },
   })
@@ -100,7 +100,7 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
 
             <Card className="divide-y">
               {fields.map((fieldItem, index) => (
-                <div className="flex items-center gap-1 p-2" key={fieldItem.currencyCode}>
+                <div className="flex items-center gap-1 p-2" key={index}>
                   <div className="ml-2 w-8 text-sm font-medium text-muted-foreground">#{index + 1}</div>
                   <FormField
                     control={form.control}
@@ -108,7 +108,7 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
                     render={({ field }) => (
                       <FormItem className="flex-1">
                         <FormControl>
-                          <Input placeholder={fieldItem.currencyCode === 'YES' ? 'Yes' : 'No'} {...field} />
+                          <Input placeholder={index === 0 ? 'Yes' : 'No'} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

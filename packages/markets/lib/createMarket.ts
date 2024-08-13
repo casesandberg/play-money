@@ -8,7 +8,7 @@ import { hasCreatedMarketToday } from '@play-money/quests/lib/helpers'
 import { createMarketLiquidityTransaction } from '@play-money/transactions/lib/createMarketLiquidityTransaction'
 import { slugifyTitle } from './helpers'
 
-type PartialOptions = Pick<MarketOption, 'name' | 'currencyCode' | 'color'>
+type PartialOptions = Pick<MarketOption, 'name' | 'color'>
 
 export async function createMarket({
   question,
@@ -39,20 +39,20 @@ export async function createMarket({
 
   let parsedOptions: Array<PartialOptions>
 
+  if (options && options.length > 2) {
+    throw new Error('Only 2 options are currently supported')
+  }
+
   if (options?.length) {
-    parsedOptions = options.map((data) =>
-      MarketOptionSchema.pick({ name: true, currencyCode: true, color: true }).parse(data)
-    )
+    parsedOptions = options.map((data) => MarketOptionSchema.pick({ name: true, color: true }).parse(data))
   } else {
     parsedOptions = [
       {
         name: 'Yes',
-        currencyCode: 'YES',
         color: '#3B82F6',
       },
       {
         name: 'No',
-        currencyCode: 'NO',
         color: '#EC4899',
       },
     ]
@@ -74,10 +74,10 @@ export async function createMarket({
       ...marketData,
       options: {
         createMany: {
-          data: parsedOptions.map((option) => ({
+          data: parsedOptions.map((option, i) => ({
             name: option.name,
-            currencyCode: option.currencyCode,
-            color: option.color || (option.currencyCode === 'YES' ? '#3B82F6' : '#EC4899'),
+            currencyCode: i === 0 ? 'YES' : 'NO',
+            color: option.color || (i === 0 ? '#3B82F6' : '#EC4899'),
             liquidityProbability: new Decimal(1).div(parsedOptions.length),
             updatedAt: new Date(),
             createdAt: new Date(),
