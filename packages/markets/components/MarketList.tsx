@@ -16,7 +16,10 @@ export function MarketList({
       {markets.map((market) => {
         return (
           <div className="border p-4" key={market.id}>
-            <Link className="line-clamp-2 text-lg font-medium" href={`/questions/${market.id}/${market.slug}`}>
+            <Link
+              className="line-clamp-2 text-lg font-medium visited:text-muted-foreground"
+              href={`/questions/${market.id}/${market.slug}`}
+            >
               {market.question}
             </Link>
 
