@@ -104,14 +104,14 @@ describe('createMarketBuyTransaction', () => {
             accountId: 'amm-1-account',
           },
           {
-            amount: expect.closeToDecimal(-64.29),
             currencyCode: 'YES',
             accountId: 'amm-1-account',
+            amount: expect.closeToDecimal(-64.29),
           },
           {
-            amount: expect.closeToDecimal(64.29),
             currencyCode: 'YES',
             accountId: 'user-1-account',
+            amount: expect.closeToDecimal(64.29),
           },
         ]),
       })
