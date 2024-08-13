@@ -109,15 +109,22 @@ export async function sell({
 
 export async function quote({
   ammAccountId,
-  currencyCode,
   amount,
   isBuy,
+  assetType,
+  assetId,
 }: {
   ammAccountId: string
-  currencyCode: CurrencyCodeType
   amount: Decimal
   isBuy: boolean
+  assetType: 'MARKET_OPTION'
+  assetId: string
 }): Promise<{ probability: Decimal; shares: Decimal }> {
+  if (assetType !== 'MARKET_OPTION') {
+    throw new Error('There is only support for quoting market options at this time')
+  }
+  const marketOption = await getMarketOption({ id: assetId })
+
   const y = await getAccountBalance({ accountId: ammAccountId, currencyCode: 'YES' })
   const n = await getAccountBalance({ accountId: ammAccountId, currencyCode: 'NO' })
 
@@ -126,7 +133,7 @@ export async function quote({
   let newN: Decimal
 
   if (isBuy) {
-    if (currencyCode === 'YES') {
+    if (marketOption.currencyCode === 'YES') {
       shares = calculateBuyShares(amount, y, n)
       newY = y.add(amount).minus(shares)
       newN = n.add(amount)
@@ -136,7 +143,7 @@ export async function quote({
       newY = y.add(amount)
     }
   } else {
-    if (currencyCode === 'YES') {
+    if (marketOption.currencyCode === 'YES') {
       shares = calculateSellShares(amount, y, n)
       newY = y.add(amount)
       newN = n.sub(shares)
@@ -148,7 +155,8 @@ export async function quote({
   }
 
   return {
-    probability: currencyCode === 'YES' ? calculateNewProbability(newY, newN) : calculateNewProbability(newN, newY),
+    probability:
+      marketOption.currencyCode === 'YES' ? calculateNewProbability(newY, newN) : calculateNewProbability(newN, newY),
     shares,
   }
 }
