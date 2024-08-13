@@ -91,7 +91,7 @@ export function CommentItem({
     >
       <UserAvatar user={comment.author} className="mt-2" />
 
-      <Collapsible open={isReplyOpen} onOpenChange={setIsReplyOpen}>
+      <Collapsible open={isReplyOpen} onOpenChange={setIsReplyOpen} className="w-full">
         <div className="flex flex-row items-center gap-4">
           <UserLink user={comment.author} className="truncate" hideUsername />
 
@@ -103,9 +103,9 @@ export function CommentItem({
 
           <div
             className={cn(
-              '-my-2 -mr-2 ml-auto flex flex-row items-center opacity-0 transition-opacity group-hover:opacity-100',
+              '-my-2 -mr-2 ml-auto flex flex-row items-center transition-opacity group-hover:opacity-100',
               (isReplyOpen || isPortalOpen) && 'opacity-100',
-              'hidden md:flex'
+              'opacity-100 md:opacity-0'
             )}
           >
             <EmojiPicker buttonProps={{ variant: 'ghost' }} onSelect={onEmojiSelect} onOpenChange={setIsPortalOpen} />
