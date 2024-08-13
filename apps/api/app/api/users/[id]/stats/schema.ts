@@ -12,6 +12,7 @@ export default createSchema({
         totalMarkets: z.number(),
         lastTradeAt: z.date().optional(),
         activeDayCount: z.number(),
+        otherIncome: z.number(),
         quests: z.array(
           z.object({
             title: z.string(),

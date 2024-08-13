@@ -35,7 +35,7 @@ export async function createMarketLiquidityTransaction({
   const transaction = await createTransaction({
     creatorId: accountId,
     type: 'MARKET_LIQUIDITY',
-    description: `Add ${amount} dollars worth of shares in market ${marketId}`,
+    description: `Add ${amount} worth of liquidity to market ${marketId}`,
     marketId,
     transactionItems: [...exchangerTransactions, ...ammTransactions],
   })

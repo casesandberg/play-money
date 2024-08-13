@@ -5,7 +5,8 @@ import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import '@play-money/config/jest/jest-setup'
-import { mockAccount } from '@play-money/database/mocks'
+import { mockAccount, mockMarketOption } from '@play-money/database/mocks'
+import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
 import { createMarketSellTransaction } from './createMarketSellTransaction'
 import { createTransaction } from './createTransaction'
 
@@ -15,6 +16,7 @@ jest.mock('@play-money/accounts/lib/getUserAccount', () => ({ getUserAccount: je
 jest.mock('@play-money/accounts/lib/getAccountBalance', () => ({ getAccountBalance: jest.fn() }))
 jest.mock('@play-money/accounts/lib/checkAccountBalance', () => ({ checkAccountBalance: jest.fn() }))
 jest.mock('./createTransaction', () => ({ createTransaction: jest.fn() }))
+jest.mock('@play-money/markets/lib/getMarketOption', () => ({ getMarketOption: jest.fn() }))
 
 describe('createMarketSellTransaction', () => {
   beforeEach(() => {
@@ -35,11 +37,12 @@ describe('createMarketSellTransaction', () => {
     jest.mocked(getUserAccount).mockResolvedValue(mockAccount({ id: 'user-1-account' }))
     jest.mocked(getExchangerAccount).mockResolvedValue(mockAccount({ id: 'EXCHANGER' }))
     jest.mocked(getAmmAccount).mockResolvedValue(mockAccount({ id: 'amm-1-account' }))
+    jest.mocked(getMarketOption).mockResolvedValue(mockMarketOption({ id: 'option-1', currencyCode: 'YES' }))
 
     await createMarketSellTransaction({
       userId: 'user-1',
       amount: new Decimal(64.29),
-      sellCurrencyCode: 'YES',
+      optionId: 'option-1',
       marketId: 'market-1',
     })
 

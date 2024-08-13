@@ -1,10 +1,10 @@
 import Decimal from 'decimal.js'
 import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
-import db from '@play-money/database'
 import { createMarketSellTransaction } from '@play-money/transactions/lib/createMarketSellTransaction'
 import { getMarket } from './getMarket'
-import { isMarketTradable, isPurchasableCurrency } from './helpers'
+import { getMarketOption } from './getMarketOption'
+import { isMarketTradable } from './helpers'
 
 export async function marketSell({
   marketId,
@@ -22,17 +22,7 @@ export async function marketSell({
     throw new Error('Market is closed')
   }
 
-  const marketOption = await db.marketOption.findFirst({
-    where: { id: optionId, marketId },
-  })
-
-  if (!marketOption) {
-    throw new Error('Invalid optionId')
-  }
-
-  if (!isPurchasableCurrency(marketOption.currencyCode)) {
-    throw new Error('Invalid option currency code')
-  }
+  const marketOption = await getMarketOption({ id: optionId, marketId })
 
   const userAccount = await getUserAccount({ id: creatorId })
   const hasEnoughBalance = await checkAccountBalance({
@@ -49,6 +39,6 @@ export async function marketSell({
     userId: creatorId,
     marketId,
     amount,
-    sellCurrencyCode: marketOption.currencyCode,
+    optionId,
   })
 }

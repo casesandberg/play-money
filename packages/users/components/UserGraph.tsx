@@ -49,7 +49,7 @@ export function UserGraph({ userId }: { userId: string }) {
     <Card>
       <div className="flex flex-wrap items-center gap-x-4 px-4 pt-4">
         <div className="text-lg font-medium text-muted-foreground">
-          {change ? <CurrencyDisplay value={change.latestAmount} currencyCode="PRIMARY" /> : null} Net Worth
+          {change ? <CurrencyDisplay value={change.latestAmount} currencyCode="PRIMARY" /> : null} Balance
         </div>
 
         {change.difference !== 0 && !Number.isNaN(change.difference) ? (

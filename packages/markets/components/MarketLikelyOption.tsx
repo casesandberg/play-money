@@ -2,6 +2,8 @@
 
 import React from 'react'
 import useSWR from 'swr'
+import { NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
+import { marketOptionBalancesToProbabilities } from '@play-money/finance/lib/helpers'
 import { ExtendedMarket } from './MarketOverviewPage'
 
 function getProbabilityChange(data: Array<{ endAt: Date; startAt: Date; probability: number }>) {
@@ -38,21 +40,24 @@ function getProbabilityChange(data: Array<{ endAt: Date; startAt: Date; probabil
 }
 
 export function MarketLikelyOption({ market }: { market: ExtendedMarket }) {
-  const { data: balance } = useSWR(`/v1/markets/${market.id}/balance`, { refreshInterval: 1000 * 60 }) // 60 seconds
+  const { data: balance } = useSWR<{ amm: Array<NetBalanceAsNumbers>; user: Array<NetBalanceAsNumbers> }>(
+    `/v1/markets/${market.id}/balance`,
+    { refreshInterval: 1000 * 60 }
+  ) // 60 seconds
   const { data: graph } = useSWR(`/v1/markets/${market.id}/graph`, { refreshInterval: 1000 * 60 * 5 }) // 5 mins
 
-  const mostLikelyProbability = Math.max(
-    ...market.options.map((option) => balance?.probability[option.currencyCode] || 0)
-  )
-  const mostLikelyOption = market.options.find(
-    (option) => balance?.probability[option.currencyCode] === mostLikelyProbability
-  )
+  const probabilities = marketOptionBalancesToProbabilities(balance?.amm)
+  const mostLikelyOptionId = Object.entries(probabilities).length
+    ? Object.entries(probabilities).reduce((a, b) => (a[1] > b[1] ? a : b))[0]
+    : undefined
+  const mostLikelyOption = market.options.find((option) => option.id === mostLikelyOptionId)
+
   const change = getProbabilityChange(graph?.data || [])
 
-  return mostLikelyOption ? (
+  return mostLikelyOptionId && mostLikelyOption ? (
     <>
       <div style={{ color: mostLikelyOption.color }} className="flex-shrink-0 font-medium">
-        {Math.round(mostLikelyProbability * 100)}% {mostLikelyOption.name}
+        {probabilities[mostLikelyOptionId]}% {mostLikelyOption.name}
       </div>
 
       {change.difference !== 0 ? (

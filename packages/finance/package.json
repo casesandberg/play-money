@@ -1,5 +1,5 @@
 {
-  "name": "@play-money/markets",
+  "name": "@play-money/finance",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,6 @@
     "@play-money/accounts": "*",
     "@play-money/database": "*",
     "@play-money/economy": "*",
-    "@play-money/finance": "*",
     "@play-money/notifications": "*",
     "@play-money/quests": "*",
     "@play-money/transactions": "*",

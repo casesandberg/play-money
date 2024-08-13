@@ -8,6 +8,8 @@ import useSWR from 'swr'
 import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
 import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
 import { Market, MarketOption, MarketResolution, User } from '@play-money/database'
+import { NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
+import { marketOptionBalancesToProbabilities } from '@play-money/finance/lib/helpers'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Alert, AlertDescription, AlertTitle } from '@play-money/ui/alert'
 import { Badge } from '@play-money/ui/badge'
@@ -29,7 +31,7 @@ import { useSidebar } from './SidebarContext'
 
 export type ExtendedMarket = Market & {
   user: User
-  options: Array<MarketOption & { color: string }>
+  options: Array<MarketOption & { color: string; value?: number; cost?: number }>
   marketResolution?: MarketResolution & {
     resolution: MarketOption & { color: string }
     resolvedBy: User
@@ -56,7 +58,10 @@ export function MarketOverviewPage({
 }) {
   const { user } = useUser()
   const { triggerEffect } = useSidebar()
-  const { data: balance } = useSWR(`/v1/markets/${market.id}/balance`, { refreshInterval: 1000 * 60 }) // 60 seconds
+  const { data: balance } = useSWR<{ amm: Array<NetBalanceAsNumbers>; user: Array<NetBalanceAsNumbers> }>(
+    `/v1/markets/${market.id}/balance`,
+    { refreshInterval: 1000 * 60 }
+  ) // 60 seconds
   const { data: graph } = useSWR(`/v1/markets/${market.id}/graph`, { refreshInterval: 1000 * 60 * 5 }) // 5 mins
   const { data: stats } = useSWR<MarketStats>(`/v1/markets/${market.id}/stats`, { refreshInterval: 1000 * 60 * 5 }) // 5 mins
   const [option, setOption] = useSearchParam('option', 'replace')
@@ -64,6 +69,7 @@ export function MarketOverviewPage({
   const [isBoosting, setIsBoosting] = useSearchParam('boost')
   const activeOptionId = option || market.options[0]?.id || ''
   const isCreator = user?.id === market.createdBy
+  const probabilities = marketOptionBalancesToProbabilities(balance?.amm)
 
   return (
     <Card className="flex-1">
@@ -186,7 +192,7 @@ export function MarketOverviewPage({
                         key={option.id}
                         option={option}
                         active={option.id === activeOptionId}
-                        probability={balance?.probability[option.currencyCode] || 0}
+                        probability={probabilities[option.id] || 0}
                         className={i > 0 ? 'border-t' : ''}
                         onSelect={() => {
                           setOption(option.id)
@@ -206,7 +212,7 @@ export function MarketOverviewPage({
                 key={option.id}
                 option={option}
                 active={option.id === activeOptionId}
-                probability={balance?.probability[option.currencyCode] || 0}
+                probability={probabilities[option.id] || 0}
                 className={i > 0 ? 'border-t' : ''}
                 onSelect={() => {
                   setOption(option.id)

@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
+import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import { stripUndefined, type SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
 import { CommentNotFoundError } from '@play-money/comments/lib/exceptions'
+import { getUserMarketOptionIncome } from '@play-money/finance/lib/getUserMarketOptionIncome'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import { updateMarket } from '@play-money/markets/lib/updateMarket'
 import schema from './schema'
@@ -25,8 +27,34 @@ export async function GET(
 
     const { id, extended } = schema.get.parameters.parse({ ...params, ...idParams })
 
-    const market = await getMarket({ id, extended })
+    const session = await auth()
+    const userAccount = session?.user?.id ? await getUserAccount({ id: session.user.id }) : undefined
 
+    if (extended) {
+      const market = await getMarket({ id, extended })
+
+      // TODO: Move cost and value into P&L document
+      market.options = await Promise.all(
+        market.options.map(async (option) => {
+          if (userAccount) {
+            const { cost, value } = await getUserMarketOptionIncome({
+              accountId: userAccount.id,
+              marketId: id,
+              optionId: option.id,
+            })
+
+            option.cost = cost
+            option.value = value
+          }
+
+          return option
+        })
+      )
+
+      return NextResponse.json(market)
+    }
+
+    const market = await getMarket({ id })
     return NextResponse.json(market)
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging

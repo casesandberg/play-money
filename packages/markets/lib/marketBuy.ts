@@ -12,7 +12,7 @@ import { createMarketLiquidityTransaction } from '@play-money/transactions/lib/c
 import { createMarketTraderBonusTransactions } from '@play-money/transactions/lib/createMarketTraderBonusTransactions'
 import { getUniqueLiquidityProviderIds } from '@play-money/transactions/lib/getUniqueLiquidityProviderIds'
 import { getMarket } from './getMarket'
-import { isMarketTradable, isPurchasableCurrency } from './helpers'
+import { isMarketTradable } from './helpers'
 
 export async function marketBuy({
   marketId,
@@ -30,18 +30,6 @@ export async function marketBuy({
     throw new Error('Market is closed')
   }
 
-  const marketOption = await db.marketOption.findFirst({
-    where: { id: optionId, marketId },
-  })
-
-  if (!marketOption) {
-    throw new Error('Invalid optionId')
-  }
-
-  if (!isPurchasableCurrency(marketOption.currencyCode)) {
-    throw new Error('Invalid option currency code')
-  }
-
   const userAccount = await getUserAccount({ id: creatorId })
   const hasEnoughBalance = await checkAccountBalance({ accountId: userAccount.id, currencyCode: 'PRIMARY', amount })
 
@@ -53,7 +41,7 @@ export async function marketBuy({
     userId: creatorId,
     marketId,
     amount: new Decimal(amount),
-    purchaseCurrencyCode: marketOption.currencyCode,
+    optionId,
   })
 
   const existingTradeInMarket = await db.transaction.findFirst({
@@ -85,7 +73,7 @@ export async function marketBuy({
         type: 'MARKET_TRADE',
         actorId: creatorId,
         marketId: market.id,
-        marketOptionId: marketOption.id,
+        marketOptionId: optionId,
         transactionId: transaction.id,
         groupKey: market.id,
         userId: recipientId,

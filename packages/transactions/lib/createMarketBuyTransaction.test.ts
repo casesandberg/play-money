@@ -6,7 +6,8 @@ import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccoun
 import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import '@play-money/config/jest/jest-setup'
-import { mockAccount } from '@play-money/database/mocks'
+import { mockAccount, mockMarketOption } from '@play-money/database/mocks'
+import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
 import { createMarketBuyTransaction } from './createMarketBuyTransaction'
 import { createTransaction } from './createTransaction'
 
@@ -16,6 +17,7 @@ jest.mock('@play-money/accounts/lib/getExchangerAccount', () => ({ getExchangerA
 jest.mock('@play-money/accounts/lib/getUserAccount', () => ({ getUserAccount: jest.fn() }))
 jest.mock('@play-money/accounts/lib/getAccountBalance', () => ({ getAccountBalance: jest.fn() }))
 jest.mock('@play-money/accounts/lib/checkAccountBalance', () => ({ checkAccountBalance: jest.fn() }))
+jest.mock('@play-money/markets/lib/getMarketOption', () => ({ getMarketOption: jest.fn() }))
 jest.mock('./createTransaction', () => ({ createTransaction: jest.fn() }))
 
 describe('createMarketBuyTransaction', () => {
@@ -39,12 +41,13 @@ describe('createMarketBuyTransaction', () => {
     jest.mocked(getUserAccount).mockResolvedValue(mockAccount({ id: 'user-1-account' }))
     jest.mocked(getAmmAccount).mockResolvedValue(mockAccount({ id: 'amm-1-account' }))
     jest.mocked(getExchangerAccount).mockResolvedValue(mockAccount({ id: 'EXCHANGER' }))
+    jest.mocked(getMarketOption).mockResolvedValue(mockMarketOption({ id: 'option-1' }))
 
     await createMarketBuyTransaction({
       userId: 'user-1',
       amount: new Decimal(50),
-      purchaseCurrencyCode: 'YES',
       marketId: 'market-1',
+      optionId: 'option-1',
     })
 
     expect(createTransaction).toHaveBeenCalledWith(
@@ -101,14 +104,14 @@ describe('createMarketBuyTransaction', () => {
             accountId: 'amm-1-account',
           },
           {
-            amount: expect.closeToDecimal(-64.29),
             currencyCode: 'YES',
             accountId: 'amm-1-account',
+            amount: expect.closeToDecimal(-64.29),
           },
           {
-            amount: expect.closeToDecimal(64.29),
             currencyCode: 'YES',
             accountId: 'user-1-account',
+            amount: expect.closeToDecimal(64.29),
           },
         ]),
       })

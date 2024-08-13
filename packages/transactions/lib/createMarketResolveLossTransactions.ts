@@ -3,23 +3,26 @@ import _ from 'lodash'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
 import db, { Transaction } from '@play-money/database'
+import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
 import { createTransaction } from './createTransaction'
 
 export async function createMarketResolveLossTransactions({
   marketId,
-  losingCurrencyCode,
+  losingOptionId,
 }: {
   marketId: string
-  losingCurrencyCode: 'YES' | 'NO'
+  losingOptionId: string
 }) {
   const ammAccount = await getAmmAccount({ marketId })
   const exchangerAccount = await getExchangerAccount()
+  const marketOption = await getMarketOption({ id: losingOptionId, marketId })
   const systemAccountIds = [ammAccount.id, exchangerAccount.id]
 
+  // TODO: Solve this with a better balance report
   const losingShares = await db.transactionItem.findMany({
     where: {
       transaction: { marketId },
-      currencyCode: losingCurrencyCode,
+      currencyCode: marketOption.currencyCode,
       accountId: { notIn: systemAccountIds },
     },
   })
@@ -43,12 +46,12 @@ export async function createMarketResolveLossTransactions({
           transactionItems: [
             {
               accountId: accountId,
-              currencyCode: losingCurrencyCode,
+              currencyCode: marketOption.currencyCode,
               amount: amount.negated(),
             },
             {
               accountId: ammAccount.id,
-              currencyCode: losingCurrencyCode,
+              currencyCode: marketOption.currencyCode,
               amount,
             },
           ],

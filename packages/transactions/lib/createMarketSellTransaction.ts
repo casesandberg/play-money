@@ -3,30 +3,26 @@ import _ from 'lodash'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import { costToHitProbability, sell } from '@play-money/amms/lib/maniswap-v1'
+import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
 import { createTransaction, TransactionItemInput } from './createTransaction'
 import { convertMarketSharesToPrimary } from './exchanger'
 
 type MarketSellTransactionInput = {
   userId: string
   amount: Decimal // in shares
-  sellCurrencyCode: 'YES' | 'NO'
+  optionId: string
   marketId: string
 }
 
-export async function createMarketSellTransaction({
-  userId,
-  marketId,
-  amount,
-  sellCurrencyCode,
-}: MarketSellTransactionInput) {
+export async function createMarketSellTransaction({ userId, marketId, amount, optionId }: MarketSellTransactionInput) {
   const userAccount = await getUserAccount({ id: userId })
   const ammAccount = await getAmmAccount({ marketId })
+  const marketOption = await getMarketOption({ id: optionId, marketId })
 
   // When selling shares, the number of shares will decrease some by filling amm/limit orders.
   // We need an equilivant number of yes and no shares to get money back out of the exchanger.
   let outstandingShares = amount
   let oppositeOutstandingShares = new Decimal(0)
-  let oppositeCurrencyCode = sellCurrencyCode === 'YES' ? 'NO' : 'YES'
   let accumulatedTransactionItems: Array<TransactionItemInput> = []
   // To account for floating point errors, we will limit the number of loops to a sane number.
   let maximumSaneLoops = 100
@@ -47,20 +43,22 @@ export async function createMarketSellTransaction({
     const ammTransactions = await sell({
       fromAccountId: userAccount.id,
       ammAccountId: ammAccount.id,
-      currencyCode: sellCurrencyCode,
       amount: amountToSell,
+      assetType: 'MARKET_OPTION',
+      assetId: optionId,
     })
 
     accumulatedTransactionItems.push(...ammTransactions)
     const transactionsByUserOfSellCurrency = ammTransactions.filter(
-      (item) => item.currencyCode === sellCurrencyCode && item.accountId === userAccount.id
+      (item) => item.currencyCode === marketOption.currencyCode && item.accountId === userAccount.id
     )
     outstandingShares = outstandingShares.add(
       transactionsByUserOfSellCurrency.reduce((sum, item) => sum.add(item.amount), new Decimal(0))
     )
 
     const transactionsByUserOfOppositeCurrency = ammTransactions.filter(
-      (item) => item.currencyCode === oppositeCurrencyCode && item.accountId === userAccount.id
+      (item) =>
+        ![marketOption.currencyCode, 'PRIMARY', 'LPB'].includes(item.currencyCode) && item.accountId === userAccount.id
     )
     oppositeOutstandingShares = oppositeOutstandingShares.add(
       transactionsByUserOfOppositeCurrency.reduce((sum, item) => sum.add(item.amount), new Decimal(0))
@@ -82,7 +80,7 @@ export async function createMarketSellTransaction({
   const transaction = await createTransaction({
     creatorId: userAccount.id,
     type: 'MARKET_SELL',
-    description: `Sell ${amount} shares worth of ${sellCurrencyCode} in market ${marketId}`,
+    description: `Sell ${amount} worth of option ${optionId} in market ${marketId}`,
     marketId,
     transactionItems: accumulatedTransactionItems,
   })

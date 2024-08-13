@@ -3,6 +3,7 @@
 import React from 'react'
 import useSWR, { useSWRConfig } from 'swr'
 import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
+import { NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
 import { useSearchParam } from '@play-money/ui'
 import { Card, CardContent, CardHeader } from '@play-money/ui/card'
 import { Combobox } from '@play-money/ui/combobox'
@@ -23,18 +24,34 @@ export function MarketTradePanel({
   isResolved: boolean
   activeOptionId: string
 }) {
-  const { data: balance } = useSWR(`/v1/markets/${market.id}/balance`, { refreshInterval: 1000 * 60 }) // 60 seconds
-  const { data: stats } = useSWR<MarketStats>(`/v1/markets/${market.id}/stats`, { refreshInterval: 1000 * 60 * 5 }) // 5 mins
+  // We can SSR this now, since the P&L will be the one thats updated externally and this one will only ever be updated by a user!
+  const { data: balance } = useSWR<{ amm: Array<NetBalanceAsNumbers>; user: Array<NetBalanceAsNumbers> }>(
+    `/v1/markets/${market.id}/balance`,
+    { refreshInterval: 1000 * 60 }
+  ) // 60 seconds
   const { mutate } = useSWRConfig()
   const [option, setOption] = useSearchParam('option')
   const { effect, resetEffect } = useSidebar()
   const activeOption = market.options.find((o) => o.id === (option || activeOptionId))
+  const activeOptionUserBalance = balance?.user.find(
+    (balance) => balance.assetType === 'MARKET_OPTION' && balance.assetId === activeOption?.id
+  )
 
   const handleRefresh = async () => {
     void mutate('/v1/users/me/balance')
     void mutate(`/v1/markets/${market.id}/balance`)
     void mutate(`/v1/markets/${market.id}/graph`)
   }
+
+  const primaryBalance = balance?.user.find((b) => b.assetId === 'PRIMARY')
+
+  const primaryQuestSum =
+    (primaryBalance?.subtotals['DAILY_TRADE_BONUS'] || 0) +
+    (primaryBalance?.subtotals['DAILY_COMMENT_BONUS'] || 0) +
+    (primaryBalance?.subtotals['DAILY_MARKET_BONUS'] || 0) +
+    (primaryBalance?.subtotals['DAILY_LIQUIDITY_BONUS'] || 0)
+
+  const unrealizedSum = market.options.reduce((total, option) => total + (option.value || 0), 0)
 
   return (
     <div className="space-y-4">
@@ -66,7 +83,7 @@ export function MarketTradePanel({
                     marketId={market.id}
                     option={activeOption}
                     onComplete={handleRefresh}
-                    max={balance?.holdings[activeOption.currencyCode]}
+                    max={activeOptionUserBalance?.amount}
                   />
                 ) : null}
               </TabsContent>
@@ -74,82 +91,100 @@ export function MarketTradePanel({
           </Tabs>
         </Card>
       ) : null}
-      {Math.round(balance?.holdings.YES) > 0 ||
-      Math.round(balance?.holdings.NO) > 0 ||
-      Object.values(stats?.earnings || []).some((value) => !!value) ? (
+
+      {unrealizedSum !== 0 ? (
         <Card>
-          <CardContent className="flex flex-col gap-4 p-3 text-sm md:py-4">
-            {Math.round(balance?.holdings.YES) > 0 || Math.round(balance?.holdings.NO) > 0 ? (
-              <div>
-                <div className="mb-1 font-medium text-muted-foreground">Open positions</div>
-                <div className="space-y-2">
-                  {market.options.map((option) => {
-                    const shares = balance?.holdings[option.currencyCode]
-                    const position = stats?.positions[option.id]
-                    return shares && position ? (
-                      <div key={option.id}>
-                        <div className="flex  justify-between gap-2">
-                          <div className="font-mono font-semibold" style={{ color: option.color }}>
-                            <CurrencyDisplay value={position.value} currencyCode="PRIMARY" /> {option.name}
-                            <span className="ml-2 text-xs font-normal text-foreground">
-                              ({Math.round(((position.value - position.cost) / position.cost) * 100) > 0 ? '+' : ''}
-                              {Math.round(((position.value - position.cost) / position.cost) * 100)}%)
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex gap-2 font-mono text-xs text-muted-foreground">
-                          <div>
-                            Cost <CurrencyDisplay value={position.cost} currencyCode="PRIMARY" />
-                          </div>
-                          <div>
-                            Payout <CurrencyDisplay value={position.payout} currencyCode="PRIMARY" />
-                          </div>
-                        </div>
-                      </div>
-                    ) : null
-                  })}
+          <CardContent className="flex flex-col gap-2 p-3 md:py-4">
+            <div className="flex justify-between font-mono text-sm font-semibold">
+              <span>Open positions</span>
+              <CurrencyDisplay value={unrealizedSum} currencyCode="PRIMARY" />
+            </div>
+            <div>
+              {market.options.map((option) => {
+                const change =
+                  option.cost && option.value ? Math.round(((option.value - option.cost) / option.cost) * 100) : 0
+                return option.value != undefined && option.value !== 0 ? (
+                  <div key={option.id} className="flex justify-between text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <div className="size-2 rounded-md" style={{ backgroundColor: option.color }} />
+                      <span className="font-mono">{option.name}</span>
+                    </div>
+                    <div className="flex gap-2">
+                      {change ? (
+                        <span
+                          className={change > 0 ? 'text-lime-500' : 'text-red-400'}
+                        >{`(${change > 0 ? '+' : ''}${change}%)`}</span>
+                      ) : null}
+                      <CurrencyDisplay value={option.value} currencyCode="PRIMARY" />
+                    </div>
+                  </div>
+                ) : null
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {primaryBalance?.amount ? (
+        <Card>
+          <CardContent className="flex flex-col gap-2 p-3 md:py-4">
+            <div className="flex justify-between font-mono text-sm font-semibold">
+              <span>Balance</span>
+              <CurrencyDisplay value={primaryBalance?.amount} currencyCode="PRIMARY" />
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {primaryBalance?.subtotals['MARKET_RESOLVE_WIN'] ? (
+                <div className="flex justify-between gap-2">
+                  <span className="font-mono">Market resolution</span>
+                  <CurrencyDisplay value={primaryBalance?.subtotals['MARKET_RESOLVE_WIN']} currencyCode="PRIMARY" />
                 </div>
-              </div>
-            ) : null}
+              ) : null}
 
-            {Object.values(stats?.earnings || []).some((value) => !!value) ? (
-              <div>
-                <div className="mb-1 font-medium text-muted-foreground">Earnings</div>
+              {primaryBalance?.subtotals['MARKET_SELL'] ? (
+                <div className="flex justify-between gap-2">
+                  <span className="font-mono">Market sell</span>
+                  <CurrencyDisplay value={primaryBalance?.subtotals['MARKET_SELL']} currencyCode="PRIMARY" />
+                </div>
+              ) : null}
 
-                {stats?.earnings.held ? (
-                  <div className="flex justify-between gap-2">
-                    <span className="font-mono">Held positions</span>
-                    <div className="font-semibold">
-                      <span>
-                        <CurrencyDisplay value={stats.earnings.held} currencyCode="PRIMARY" />{' '}
-                      </span>
-                    </div>
-                  </div>
-                ) : null}
+              {primaryBalance?.subtotals['MARKET_BUY'] ? (
+                <div className="flex justify-between gap-2">
+                  <span className="font-mono">Market buy</span>
+                  <CurrencyDisplay value={primaryBalance?.subtotals['MARKET_BUY']} currencyCode="PRIMARY" />
+                </div>
+              ) : null}
 
-                {stats?.earnings.sold ? (
-                  <div className="flex justify-between gap-2">
-                    <span className="font-mono">Sold positions</span>
-                    <div className="font-semibold">
-                      <span>
-                        <CurrencyDisplay value={stats.earnings.sold} currencyCode="PRIMARY" />
-                      </span>
-                    </div>
-                  </div>
-                ) : null}
+              {primaryBalance?.subtotals['MARKET_LIQUIDITY'] ? (
+                <div className="flex justify-between gap-2">
+                  <span className="font-mono">Liquidity added</span>
+                  <CurrencyDisplay value={primaryBalance?.subtotals['MARKET_LIQUIDITY']} currencyCode="PRIMARY" />
+                </div>
+              ) : null}
 
-                {stats?.earnings.traderBonusPayouts ? (
-                  <div className="flex justify-between gap-2">
-                    <span className="font-mono">Trader Bonuses:</span>
-                    <div className="font-semibold">
-                      <span>
-                        <CurrencyDisplay value={stats.earnings.traderBonusPayouts} currencyCode="PRIMARY" />
-                      </span>
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-            ) : null}
+              {primaryBalance?.subtotals['MARKET_TRADER_BONUS'] ? (
+                <div className="flex justify-between gap-2">
+                  <span className="font-mono">Liquidity distribution</span>
+                  <CurrencyDisplay value={primaryBalance?.subtotals['MARKET_TRADER_BONUS']} currencyCode="PRIMARY" />
+                </div>
+              ) : null}
+
+              {primaryBalance?.subtotals['MARKET_EXCESS_LIQUIDITY'] ? (
+                <div className="flex justify-between gap-2">
+                  <span className="font-mono">Liquidity returned</span>
+                  <CurrencyDisplay
+                    value={primaryBalance?.subtotals['MARKET_EXCESS_LIQUIDITY']}
+                    currencyCode="PRIMARY"
+                  />
+                </div>
+              ) : null}
+
+              {primaryQuestSum ? (
+                <div className="flex justify-between gap-2">
+                  <span className="font-mono">Daily quests</span>
+                  <CurrencyDisplay value={primaryQuestSum} currencyCode="PRIMARY" />
+                </div>
+              ) : null}
+            </div>
           </CardContent>
         </Card>
       ) : null}
