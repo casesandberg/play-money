@@ -3,7 +3,7 @@ import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalanc
 import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import db from '@play-money/database'
-import { UNIQUE_TRADER_LIQUIDITY_PRIMARY } from '@play-money/economy'
+import { DAILY_TRADE_BONUS_PRIMARY, UNIQUE_TRADER_LIQUIDITY_PRIMARY } from '@play-money/economy'
 import { createNotification } from '@play-money/notifications/lib/createNotification'
 import { createDailyTradeBonusTransaction } from '@play-money/quests/lib/createDailyTradeBonusTransaction'
 import { hasPlacedMarketTradeToday } from '@play-money/quests/lib/helpers'
@@ -83,7 +83,7 @@ export async function marketBuy({
   )
 
   // TODO: Look into returning multiple messages to let the user know toast of the bonus.
-  if (!(await hasPlacedMarketTradeToday({ userId: creatorId }))) {
+  if (!(await hasPlacedMarketTradeToday({ userId: creatorId })) && amount.gte(DAILY_TRADE_BONUS_PRIMARY)) {
     await createDailyTradeBonusTransaction({ accountId: userAccount.id, marketId })
   }
 }

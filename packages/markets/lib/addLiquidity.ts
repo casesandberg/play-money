@@ -1,5 +1,6 @@
 import Decimal from 'decimal.js'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
+import { DAILY_LIQUIDITY_BONUS_PRIMARY } from '@play-money/economy'
 import { createNotification } from '@play-money/notifications/lib/createNotification'
 import { createDailyLiquidityBonusTransaction } from '@play-money/quests/lib/createDailyLiquidityBonusTransaction'
 import { hasBoostedLiquidityToday } from '@play-money/quests/lib/helpers'
@@ -45,7 +46,7 @@ export async function addLiquidity({
     )
   )
 
-  if (!(await hasBoostedLiquidityToday({ userId: userId }))) {
+  if (!(await hasBoostedLiquidityToday({ userId: userId })) && amount.gte(DAILY_LIQUIDITY_BONUS_PRIMARY)) {
     await createDailyLiquidityBonusTransaction({ accountId: userAccount.id, marketId: market.id })
   }
 
