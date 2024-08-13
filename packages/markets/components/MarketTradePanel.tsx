@@ -103,7 +103,7 @@ export function MarketTradePanel({
               {market.options.map((option) => {
                 const change =
                   option.cost && option.value ? Math.round(((option.value - option.cost) / option.cost) * 100) : 0
-                return option.value != undefined ? (
+                return option.value != undefined && option.value !== 0 ? (
                   <div key={option.id} className="flex justify-between text-xs text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <div className="size-2 rounded-md" style={{ backgroundColor: option.color }} />
