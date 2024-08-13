@@ -1,3 +1,4 @@
+import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
 import db, { Market } from '@play-money/database'
 import { ExtendedMarket } from '../components/MarketOverviewPage'
 
@@ -41,5 +42,45 @@ export async function getMarkets(
     take: pagination.take,
   })
 
-  return markets
+  // TODO: Move this onto the market model
+  const exchangerAccount = await getExchangerAccount()
+  return Promise.all(
+    markets.map(async (market) => {
+      const [commentCount, liquidityCount, uniqueTraders] = await Promise.all([
+        db.comment.count({
+          where: {
+            entityType: 'MARKET',
+            entityId: market.id,
+          },
+        }),
+        db.transactionItem.aggregate({
+          _sum: {
+            amount: true,
+          },
+          where: {
+            accountId: exchangerAccount.id,
+            currencyCode: 'PRIMARY',
+            transaction: {
+              marketId: market.id,
+            },
+          },
+        }),
+        prisma.transaction.groupBy({
+          by: ['creatorId'],
+          where: {
+            marketId: market.id,
+            type: 'MARKET_BUY',
+          },
+          _count: true,
+        }),
+      ])
+
+      return {
+        ...market,
+        commentCount,
+        liquidityCount: liquidityCount._sum.amount?.toNumber(),
+        uniqueTraderCount: uniqueTraders.length,
+      }
+    })
+  )
 }
