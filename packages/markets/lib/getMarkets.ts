@@ -65,7 +65,7 @@ export async function getMarkets(
             },
           },
         }),
-        prisma.transaction.groupBy({
+        db.transaction.groupBy({
           by: ['creatorId'],
           where: {
             marketId: market.id,
