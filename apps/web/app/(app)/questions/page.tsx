@@ -5,7 +5,9 @@ import { UserQuestCard } from '@play-money/quests/components/UserQuestCard'
 import { RecentLiquidity } from '@play-money/transactions/components/RecentLiquidity'
 import { RecentTrades } from '@play-money/transactions/components/RecentTrades'
 
-export async function getMarkets(): Promise<{ markets: Array<ExtendedMarket> }> {
+export async function getMarkets(): Promise<{
+  markets: Array<ExtendedMarket & { commentCount: number; liquidityCount: number; uniqueTraderCount: number }>
+}> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets`, {
     credentials: 'include',
     next: { tags: ['markets'] },
@@ -14,7 +16,9 @@ export async function getMarkets(): Promise<{ markets: Array<ExtendedMarket> }> 
     throw new Error('There was an error fetching data')
   }
 
-  return res.json() as unknown as { markets: Array<ExtendedMarket> }
+  return res.json() as unknown as {
+    markets: Array<ExtendedMarket & { commentCount: number; liquidityCount: number; uniqueTraderCount: number }>
+  }
 }
 
 export default async function AppQuestionsPage() {

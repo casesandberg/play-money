@@ -55,17 +55,17 @@ export function MarketLikelyOption({ market }: { market: ExtendedMarket }) {
   const change = getProbabilityChange(graph?.data || [])
 
   return mostLikelyOptionId && mostLikelyOption ? (
-    <>
+    <div className="flex items-center gap-2">
       <div style={{ color: mostLikelyOption.color }} className="flex-shrink-0 font-medium">
         {probabilities[mostLikelyOptionId]}% {mostLikelyOption.name}
       </div>
 
       {change.difference !== 0 ? (
-        <div className="flex-shrink-0">
-          {change.difference > 0 ? '+' : ''}
-          {Math.round(change.difference * 100)}% this week
+        <div className="flex-shrink-0 text-xs">
+          ({change.difference > 0 ? '+' : ''}
+          {Math.round(change.difference * 100)}%)
         </div>
       ) : null}
-    </>
+    </div>
   ) : null
 }

@@ -129,7 +129,17 @@ export async function getBalances({ accountId, marketId }: { accountId: string; 
   const [yesTransactions, noTransactions, primaryTransactions] = await Promise.all([
     market ? getAccountTransactions({ accountId, currencyCode: 'YES', marketId }) : undefined,
     market ? getAccountTransactions({ accountId, currencyCode: 'NO', marketId }) : undefined,
-    getAccountTransactions({ accountId, currencyCode: 'PRIMARY', marketId }),
+    getAccountTransactions({
+      accountId,
+      currencyCode: 'PRIMARY',
+      marketId,
+      excludeTransactionTypes: [
+        'DAILY_TRADE_BONUS',
+        'DAILY_COMMENT_BONUS',
+        'DAILY_MARKET_BONUS',
+        'DAILY_LIQUIDITY_BONUS',
+      ],
+    }),
   ])
 
   const balances = [createBalanceItem(primaryTransactions, accountId, 'CURRENCY', 'PRIMARY')]

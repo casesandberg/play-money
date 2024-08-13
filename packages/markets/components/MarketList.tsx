@@ -1,16 +1,25 @@
+import { MessageSquareIcon, UsersIcon, DiamondIcon } from 'lucide-react'
 import Link from 'next/link'
+import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
 import { MarketLikelyOption } from '@play-money/markets/components/MarketLikelyOption'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
-import { UserLink } from '@play-money/users/components/UserLink'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@play-money/ui/tooltip'
 import { ExtendedMarket } from './MarketOverviewPage'
 
-export function MarketList({ markets }: { markets: Array<ExtendedMarket> }) {
+export function MarketList({
+  markets,
+}: {
+  markets: Array<ExtendedMarket & { commentCount: number; liquidityCount: number; uniqueTraderCount: number }>
+}) {
   return (
     <div className="flex-1 space-y-4">
       {markets.map((market) => {
         return (
           <div className="border p-4" key={market.id}>
-            <Link className="line-clamp-2 text-lg font-medium" href={`/questions/${market.id}/${market.slug}`}>
+            <Link
+              className="line-clamp-2 text-lg font-medium visited:text-muted-foreground"
+              href={`/questions/${market.id}/${market.slug}`}
+            >
               {market.question}
             </Link>
 
@@ -25,10 +34,49 @@ export function MarketList({ markets }: { markets: Array<ExtendedMarket> }) {
                 )}
               </div>
 
-              <div className="ml-auto flex flex-shrink-0 items-center gap-1">
-                <UserAvatar user={market.user} size="sm" />
+              <div className="ml-auto flex flex-shrink-0 items-center gap-4">
+                {market.commentCount ? (
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div className="flex items-center gap-1">
+                        <MessageSquareIcon className="size-3" strokeWidth={3} />
+                        {market.commentCount}
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>Comments</TooltipContent>
+                  </Tooltip>
+                ) : null}
 
-                <UserLink hideUsername user={market.user} />
+                {market.uniqueTraderCount ? (
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div className="flex items-center gap-1">
+                        <UsersIcon className="size-3" strokeWidth={3} />
+                        {market.uniqueTraderCount}
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>Traders</TooltipContent>
+                  </Tooltip>
+                ) : null}
+
+                {market.liquidityCount ? (
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div className="flex items-center gap-0">
+                        <DiamondIcon className="size-3" strokeWidth={3} />
+                        <CurrencyDisplay
+                          currencyCode="PRIMARY"
+                          value={market.liquidityCount}
+                          isShort
+                          hasSymbol={false}
+                        />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>Liquidity</TooltipContent>
+                  </Tooltip>
+                ) : null}
+
+                <UserAvatar user={market.user} size="sm" />
               </div>
             </div>
           </div>
