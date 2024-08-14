@@ -129,7 +129,7 @@ export async function UserProfileLayout({
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
               <div className="font-semibold">
-                <CurrencyDisplay value={stats.netWorth + stats.otherIncome} currencyCode="PRIMARY" isShort />
+                <CurrencyDisplay value={stats.netWorth + stats.otherIncome} isShort />
               </div>
               <div className="text-muted-foreground">Net worth</div>
             </div>

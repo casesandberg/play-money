@@ -4,13 +4,11 @@ import { formatCurrency, formatNumber } from '../lib/formatCurrency'
 
 export function CurrencyDisplay({
   value,
-  currencyCode,
   className,
   hasSymbol = true,
   isShort = false,
 }: {
   value: number
-  currencyCode: string
   className?: string
   hasSymbol?: boolean
   isShort?: boolean
@@ -20,9 +18,7 @@ export function CurrencyDisplay({
 
   return (
     <span className={cn('whitespace-nowrap font-mono', className)}>
-      <span className="inline-block -translate-y-[5%] scale-125 pr-0.5 leading-none">
-        {hasSymbol ? (currencyCode === 'PRIMARY' ? '¤' : '') : null}
-      </span>
+      <span className="inline-block -translate-y-[5%] scale-125 pr-0.5 leading-none">{hasSymbol ? '¤' : null}</span>
       {isShort ? formattedShort : formattedValue}
     </span>
   )

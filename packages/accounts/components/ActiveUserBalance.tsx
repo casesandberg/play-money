@@ -8,5 +8,5 @@ export function ActiveUserBalance({ initialBalance }: { initialBalance?: number 
   const { user } = useUser()
   const { data } = useSWR(user ? '/v1/users/me/balance' : null)
 
-  return user ? <CurrencyDisplay currencyCode="PRIMARY" value={data?.balance ?? initialBalance ?? 0} /> : null
+  return user ? <CurrencyDisplay value={data?.balance ?? initialBalance ?? 0} /> : null
 }

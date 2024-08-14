@@ -66,7 +66,7 @@ export function MarketPositionsPage({
                   ) : null}
                   {transaction.type === 'MARKET_BUY' ? 'bought' : 'sold'}{' '}
                   <span className="font-semibold">
-                    <CurrencyDisplay value={userSummary?.PRIMARY.abs().toNumber()} currencyCode="PRIMARY" />{' '}
+                    <CurrencyDisplay value={userSummary?.PRIMARY.abs().toNumber()} />{' '}
                     {!userSummary?.YES.eq(0) ? 'Yes' : 'No'}
                   </span>{' '}
                   <span className="text-sm text-muted-foreground md:ml-auto">

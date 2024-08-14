@@ -25,7 +25,7 @@ export function RecentLiquidity() {
         return (
           <li className="py-2" key={transaction.id}>
             <span className="font-medium">
-              <CurrencyDisplay value={userSummary.PRIMARY.abs().toNumber()} currencyCode="PRIMARY" isShort />
+              <CurrencyDisplay value={userSummary.PRIMARY.abs().toNumber()} isShort />
             </span>
             <span className="text-muted-foreground"> added to </span>
             {transaction.market ? (

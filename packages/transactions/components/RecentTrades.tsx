@@ -30,7 +30,7 @@ export function RecentTrades() {
             ) : null}
             {transaction.type === 'MARKET_BUY' ? 'bought' : 'sold'}{' '}
             <span className="font-medium">
-              <CurrencyDisplay value={userSummary.PRIMARY.abs().toNumber()} currencyCode="PRIMARY" isShort />{' '}
+              <CurrencyDisplay value={userSummary.PRIMARY.abs().toNumber()} isShort />{' '}
               {!userSummary.YES.eq(0) ? 'Yes' : 'No'}
             </span>{' '}
             {transaction.market ? (

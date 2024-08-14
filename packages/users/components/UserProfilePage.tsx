@@ -127,7 +127,7 @@ export async function UserProfilePage({ username }: { username: string }) {
                                 {!userSummary.YES.eq(0) ? 'Yes' : 'No'}
                               </div>
                               <div>
-                                <CurrencyDisplay value={userSummary.PRIMARY.abs().toNumber()} currencyCode="PRIMARY" />
+                                <CurrencyDisplay value={userSummary.PRIMARY.abs().toNumber()} />
                               </div>
                             </TableCell>
                             <TableCell>

@@ -90,7 +90,7 @@ export function MarketOverviewPage({
               <TooltipTrigger asChild>
                 <div className="flex flex-shrink-0 items-center gap-1">
                   <Diamond className="h-4 w-4 text-purple-600" />
-                  <CurrencyDisplay value={stats.totalLiquidity} currencyCode="PRIMARY" isShort hasSymbol={false} />
+                  <CurrencyDisplay value={stats.totalLiquidity} isShort hasSymbol={false} />
                 </div>
               </TooltipTrigger>
               <TooltipContent>Market liquidity</TooltipContent>

@@ -191,7 +191,7 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
           </p>
           <Button loading={form.formState.isSubmitting} type="submit">
             Create for
-            <CurrencyDisplay currencyCode="PRIMARY" value={INITIAL_MARKET_LIQUIDITY_PRIMARY} />
+            <CurrencyDisplay value={INITIAL_MARKET_LIQUIDITY_PRIMARY} />
           </Button>
         </form>
       </Form>

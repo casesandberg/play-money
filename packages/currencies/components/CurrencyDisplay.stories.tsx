@@ -12,14 +12,12 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   args: {
     value: 13492.24,
-    currencyCode: 'PRIMARY',
   },
 }
 
 export const FontSmall: Story = {
   args: {
     value: 13492.24,
-    currencyCode: 'PRIMARY',
     className: 'text-sm',
   },
 }
@@ -27,7 +25,6 @@ export const FontSmall: Story = {
 export const FontXSmall: Story = {
   args: {
     value: 13492.24,
-    currencyCode: 'PRIMARY',
     className: 'text-xs',
   },
 }
@@ -35,7 +32,6 @@ export const FontXSmall: Story = {
 export const FontLarge: Story = {
   args: {
     value: 13492.24,
-    currencyCode: 'PRIMARY',
     className: 'text-lg',
   },
 }
@@ -43,7 +39,6 @@ export const FontLarge: Story = {
 export const Short: Story = {
   args: {
     value: 13492.24,
-    currencyCode: 'PRIMARY',
     isShort: true,
   },
 }
@@ -51,7 +46,6 @@ export const Short: Story = {
 export const ShortMillions: Story = {
   args: {
     value: 1949212.24,
-    currencyCode: 'PRIMARY',
     isShort: true,
   },
 }
@@ -59,7 +53,6 @@ export const ShortMillions: Story = {
 export const EnsureNoWrap: Story = {
   args: {
     value: 13492.24,
-    currencyCode: 'PRIMARY',
   },
   decorators: [
     (Story) => (

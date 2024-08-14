@@ -64,12 +64,7 @@ export function MarketList({
                     <TooltipTrigger>
                       <div className="flex items-center gap-0">
                         <DiamondIcon className="size-3" strokeWidth={3} />
-                        <CurrencyDisplay
-                          currencyCode="PRIMARY"
-                          value={market.liquidityCount}
-                          isShort
-                          hasSymbol={false}
-                        />
+                        <CurrencyDisplay value={market.liquidityCount} isShort hasSymbol={false} />
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>Liquidity</TooltipContent>
