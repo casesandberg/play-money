@@ -1,7 +1,8 @@
 import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
-import { addLiquidity } from '@play-money/amms/lib/maniswap-v1'
+import { addLiquidity } from '@play-money/amms/lib/maniswap-v1.1'
+import { getBalances } from '@play-money/finance/lib/getBalances'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import { createTransaction } from './createTransaction'
 import { convertPrimaryToMarketShares } from './exchanger'
@@ -20,17 +21,49 @@ export async function createMarketLiquidityTransaction({
   const ammAccount = await getAmmAccount({ marketId })
   const market = await getMarket({ id: marketId, extended: true })
 
+  const ammBalances = await getBalances({ accountId: ammAccount.id, marketId })
+  const ammAssetBalances = ammBalances.filter(({ assetType }) => assetType === 'MARKET_OPTION')
+
   const exchangerTransactions = await convertPrimaryToMarketShares({
     fromAccountId: accountId,
     amount,
   })
 
-  const ammTransactions = await addLiquidity({
-    fromAccountId: accountId,
-    ammAccountId: ammAccount.id,
+  // TODO
+  const liquidityAdditions = await addLiquidity({
     amount,
-    options: market.options,
+    options: market.options.map((option) => {
+      const optionBalance = ammAssetBalances.find(({ assetId }) => assetId === option.id)!
+
+      return {
+        ...option,
+        shares: optionBalance.amount,
+      }
+    }),
   })
+
+  const ammTransactions = [
+    {
+      accountId: accountId,
+      currencyCode: 'YES',
+      amount: amount.neg(),
+    },
+    {
+      accountId: ammAccount.id,
+      currencyCode: 'YES',
+      amount: amount,
+    },
+    {
+      accountId: accountId,
+      currencyCode: 'NO',
+      amount: amount.neg(),
+    },
+    {
+      accountId: ammAccount.id,
+      currencyCode: 'NO',
+      amount: amount,
+    },
+  ] as const
 
   const transaction = await createTransaction({
     creatorId: accountId,

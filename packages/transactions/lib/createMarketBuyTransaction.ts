@@ -2,7 +2,8 @@ import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
-import { buy, costToHitProbability } from '@play-money/amms/lib/maniswap-v1'
+import { buy, quote } from '@play-money/amms/lib/maniswap-v1.1'
+import { getBalances } from '@play-money/finance/lib/getBalances'
 import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
 import { createTransaction, TransactionItemInput } from './createTransaction'
 import { convertPrimaryToMarketShares } from './exchanger'
@@ -19,6 +20,9 @@ export async function createMarketBuyTransaction({ userId, amount, marketId, opt
   const ammAccount = await getAmmAccount({ marketId })
   const marketOption = await getMarketOption({ id: optionId, marketId })
 
+  const ammBalances = await getBalances({ accountId: ammAccount.id, marketId })
+  const ammAssetBalances = ammBalances.filter(({ assetType }) => assetType === 'MARKET_OPTION')
+
   const exchangerTransactions = await convertPrimaryToMarketShares({
     fromAccountId: userAccount.id,
     amount,
@@ -31,37 +35,41 @@ export async function createMarketBuyTransaction({ userId, amount, marketId, opt
   // To account for floating point errors, we will limit the number of loops to a sane number.
   let maximumSaneLoops = 100
 
-  while (outstandingShares.greaterThan(0) && maximumSaneLoops > 0) {
+  while (outstandingShares.toDecimalPlaces(4).greaterThan(0) && maximumSaneLoops > 0) {
     let closestLimitOrder = {} as any // TODO: Implement limit order matching
 
     const amountToBuy = closestLimitOrder?.probability
       ? (
-          await costToHitProbability({
-            ammAccountId: ammAccount.id,
-            probability: closestLimitOrder?.probability,
-            maxAmount: outstandingShares,
+          await quote({
+            amount: outstandingShares,
+            probability: closestLimitOrder?.probability ?? 0.99,
+            targetShare: ammAssetBalances.find((balance) => balance.assetId === marketOption.id)!.amount,
+            shares: ammAssetBalances.map((balance) => balance.amount),
           })
         ).cost
       : outstandingShares
 
-    const ammTransactions = await buy({
-      fromAccountId: userAccount.id,
-      ammAccountId: ammAccount.id,
-      assetType: 'MARKET_OPTION',
-      assetId: optionId,
+    const returnedShares = await buy({
       amount: amountToBuy,
+      targetShare: ammAssetBalances.find((balance) => balance.assetId === marketOption.id)!.amount,
+      shares: ammAssetBalances.map((balance) => balance.amount),
     })
 
-    accumulatedTransactionItems.push(...ammTransactions)
+    const oppositeCurrencyCode = marketOption.currencyCode === 'YES' ? 'NO' : 'YES'
 
-    const transactionsByUserOfAlternateCurrency = ammTransactions.filter(
-      (item) =>
-        ![marketOption.currencyCode, 'PRIMARY', 'LPB'].includes(item.currencyCode) && item.accountId === userAccount.id
-    )
-    outstandingShares = outstandingShares.add(
-      transactionsByUserOfAlternateCurrency.reduce((sum, item) => sum.plus(item.amount), new Decimal(0))
+    accumulatedTransactionItems.push(
+      // Giving the shares to the AMM.
+      { accountId: userAccount.id, currencyCode: marketOption.currencyCode, amount: amountToBuy.neg() },
+      { accountId: userAccount.id, currencyCode: oppositeCurrencyCode, amount: amountToBuy.neg() },
+      { accountId: ammAccount.id, currencyCode: marketOption.currencyCode, amount: amountToBuy },
+      { accountId: ammAccount.id, currencyCode: oppositeCurrencyCode, amount: amountToBuy },
+
+      // Returning purchased shares to the user.
+      { accountId: ammAccount.id, currencyCode: marketOption.currencyCode, amount: returnedShares.neg() },
+      { accountId: userAccount.id, currencyCode: marketOption.currencyCode, amount: returnedShares }
     )
 
+    outstandingShares = outstandingShares.sub(amountToBuy)
     maximumSaneLoops -= 1
   }
 

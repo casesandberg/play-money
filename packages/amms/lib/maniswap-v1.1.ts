@@ -158,6 +158,39 @@ export function addLiquidity({
   amount: Decimal
   options: Array<{ shares: Decimal; liquidityProbability: Decimal }>
 }): Array<Decimal> {
-  // TODO: Fix this to account property for liquidityProbability
-  return options.map((option) => option.shares.plus(amount.times(option.liquidityProbability).times(2)))
+  const totalShares = options.reduce((sum, option) => sum.add(option.shares), new Decimal(0))
+  const newShares: Decimal[] = []
+
+  for (const option of options) {
+    const { shares, liquidityProbability } = option
+    const currentProbability = shares.div(totalShares)
+
+    const p = calculateNewP(currentProbability, liquidityProbability, amount, shares, totalShares)
+    const newOptionShares = calculateNewShares(p, amount, shares, totalShares)
+
+    newShares.push(newOptionShares)
+  }
+
+  return newShares
+}
+
+function calculateNewP(
+  currentProbability: Decimal,
+  liquidityProbability: Decimal,
+  amount: Decimal,
+  shares: Decimal,
+  totalShares: Decimal
+): Decimal {
+  // This is a simplified approximation. You may need to use numerical methods for more accuracy.
+  const weight = amount.div(totalShares.add(amount))
+  return currentProbability.mul(Decimal.sub(1, weight)).add(liquidityProbability.mul(weight))
+}
+
+function calculateNewShares(p: Decimal, amount: Decimal, shares: Decimal, totalShares: Decimal): Decimal {
+  const n = totalShares.sub(shares)
+  const newShares = Decimal.pow(shares.add(amount), p)
+    .mul(Decimal.pow(n.add(amount), Decimal.sub(1, p)))
+    .sub(Decimal.pow(shares, p).mul(Decimal.pow(n, Decimal.sub(1, p))))
+
+  return newShares
 }

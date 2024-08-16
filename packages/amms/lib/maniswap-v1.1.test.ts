@@ -193,7 +193,7 @@ describe('maniswap-v1.1', () => {
         ],
       })
 
-      expect(result).toEqual([expect.closeToDecimal(450), expect.closeToDecimal(450)])
+      expect(result).toEqual([expect.closeToDecimal(50), expect.closeToDecimal(50)])
     })
   })
 })

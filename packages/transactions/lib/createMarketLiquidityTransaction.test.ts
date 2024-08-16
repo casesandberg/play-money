@@ -6,6 +6,7 @@ import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import '@play-money/config/jest/jest-setup'
 import { mockAccount, mockMarket, mockMarketOption } from '@play-money/database/mocks'
+import { getBalances } from '@play-money/finance/lib/getBalances'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import { createMarketLiquidityTransaction } from './createMarketLiquidityTransaction'
 import { createTransaction } from './createTransaction'
@@ -17,6 +18,7 @@ jest.mock('@play-money/accounts/lib/getUserAccount', () => ({ getUserAccount: je
 jest.mock('@play-money/accounts/lib/checkAccountBalance', () => ({ checkAccountBalance: jest.fn() }))
 jest.mock('@play-money/markets/lib/getMarket', () => ({ getMarket: jest.fn() }))
 jest.mock('./createTransaction', () => ({ createTransaction: jest.fn() }))
+jest.mock('@play-money/finance/lib/getBalances', () => ({ getBalances: jest.fn() }))
 
 describe('createMarketLiquidityTransaction', () => {
   beforeEach(() => {
@@ -24,6 +26,28 @@ describe('createMarketLiquidityTransaction', () => {
   })
 
   it('should call createTransaction with approperate transactionItems', async () => {
+    jest.mocked(getBalances).mockImplementation(async ({ accountId }) => {
+      if (accountId === 'amm-1-account') {
+        return [
+          {
+            accountId,
+            assetType: 'MARKET_OPTION',
+            assetId: 'option-1',
+            amount: new Decimal(0),
+            subtotals: {},
+          },
+          {
+            accountId,
+            assetType: 'MARKET_OPTION',
+            assetId: 'option-2',
+            amount: new Decimal(0),
+            subtotals: {},
+          },
+        ]
+      }
+      return []
+    })
+
     jest.mocked(checkAccountBalance).mockImplementation(async ({ accountId, amount }) => {
       if (accountId === 'user-1-account' && amount.equals(50)) return true
       return false
@@ -36,8 +60,8 @@ describe('createMarketLiquidityTransaction', () => {
     jest.mocked(getMarket).mockResolvedValue({
       ...mockMarket(),
       options: [
-        mockMarketOption({ id: 'YES', liquidityProbability: new Decimal(0.5) }),
-        mockMarketOption({ id: 'NO', liquidityProbability: new Decimal(0.5) }),
+        mockMarketOption({ id: 'option-1', liquidityProbability: new Decimal(0.5) }),
+        mockMarketOption({ id: 'option-2', liquidityProbability: new Decimal(0.5) }),
       ],
     })
 
@@ -98,16 +122,6 @@ describe('createMarketLiquidityTransaction', () => {
           {
             amount: expect.closeToDecimal(-50),
             currencyCode: 'PRIMARY',
-            accountId: 'user-1-account',
-          },
-          {
-            amount: expect.closeToDecimal(-50),
-            currencyCode: 'LPB',
-            accountId: 'amm-1-account',
-          },
-          {
-            amount: expect.closeToDecimal(50),
-            currencyCode: 'LPB',
             accountId: 'user-1-account',
           },
         ]),
