@@ -1,9 +1,43 @@
 import Decimal from 'decimal.js'
-import { getAccountBalance } from '@play-money/accounts/lib/getAccountBalance'
-import { MarketOption } from '@play-money/database'
+import db, { MarketOption } from '@play-money/database'
 import { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/CurrencyCodeSchema'
 import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
 import { TransactionItemInput } from '@play-money/transactions/lib/createTransaction'
+
+export async function getAccountBalance({
+  accountId,
+  currencyCode,
+  marketId,
+  excludeTransactionTypes,
+  includeTransactionTypes,
+}: {
+  accountId: string
+  currencyCode: CurrencyCodeType
+  marketId?: string
+  excludeTransactionTypes?: string[]
+  includeTransactionTypes?: string[]
+}): Promise<Decimal> {
+  const transactionItems = await db.transactionItem.findMany({
+    where: {
+      accountId,
+      currencyCode,
+      transaction: {
+        marketId,
+        type: {
+          notIn: excludeTransactionTypes,
+          in: includeTransactionTypes,
+        },
+      },
+    },
+    include: {
+      transaction: {
+        select: { marketId: true, type: true },
+      },
+    },
+  })
+
+  return transactionItems.reduce((sum, item) => sum.plus(item.amount), new Decimal(0))
+}
 
 /*
  This is currently a _Uniswap_ implementation, not Maniswap, since it does not have a dynamic `p`.

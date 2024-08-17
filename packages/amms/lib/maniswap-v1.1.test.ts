@@ -5,9 +5,6 @@ import { addLiquidity, trade, quote } from './maniswap-v1.1'
 
 expect.extend({ toBeDeepCloseTo, toMatchCloseTo })
 
-jest.mock('@play-money/accounts/lib/getAccountBalance', () => ({
-  getAccountBalance: jest.fn(),
-}))
 jest.mock('@play-money/markets/lib/getMarketOption', () => ({ getMarketOption: jest.fn() }))
 
 describe('maniswap-v1.1', () => {
