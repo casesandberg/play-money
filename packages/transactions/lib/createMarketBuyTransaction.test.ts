@@ -1,10 +1,10 @@
 import Decimal from 'decimal.js'
-import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
 import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
 import '@play-money/config/jest/jest-setup'
 import { mockAccount, mockMarket, mockMarketOption } from '@play-money/database/mocks'
 import { getBalances, getAssetBalance, NetBalance } from '@play-money/finance/lib/getBalances'
+import { getMarketAmmAccount } from '@play-money/finance/lib/getMarketAmmAccount'
 import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
@@ -12,7 +12,7 @@ import { createMarketBuyTransaction } from './createMarketBuyTransaction'
 import { createTransaction } from './createTransaction'
 
 jest.mock('@play-money/accounts/lib/getHouseAccount', () => ({ getHouseAccount: jest.fn() }))
-jest.mock('@play-money/accounts/lib/getAmmAccount', () => ({ getAmmAccount: jest.fn() }))
+jest.mock('@play-money/finance/lib/getMarketAmmAccount', () => ({ getMarketAmmAccount: jest.fn() }))
 jest.mock('@play-money/accounts/lib/getExchangerAccount', () => ({ getExchangerAccount: jest.fn() }))
 jest.mock('@play-money/finance/lib/getUserPrimaryAccount', () => ({ getUserPrimaryAccount: jest.fn() }))
 jest.mock('@play-money/markets/lib/getMarketOption', () => ({ getMarketOption: jest.fn() }))
@@ -42,7 +42,7 @@ describe('createMarketBuyTransaction', () => {
 
     jest.mocked(getHouseAccount).mockResolvedValue(mockAccount({ id: 'HOUSE' }))
     jest.mocked(getUserPrimaryAccount).mockResolvedValue(mockAccount({ id: 'user-1-account' }))
-    jest.mocked(getAmmAccount).mockResolvedValue(mockAccount({ id: 'amm-1-account' }))
+    jest.mocked(getMarketAmmAccount).mockResolvedValue(mockAccount({ id: 'amm-1-account' }))
     jest.mocked(getExchangerAccount).mockResolvedValue(mockAccount({ id: 'EXCHANGER' }))
     jest.mocked(getMarketOption).mockResolvedValue(mockMarketOption({ id: 'option-1', currencyCode: 'YES' }))
 

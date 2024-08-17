@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js'
-import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import db from '@play-money/database'
+import { getMarketAmmAccount } from '@play-money/finance/lib/getMarketAmmAccount'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import { MarketTransaction } from './getMarketTransactions'
 
@@ -27,7 +27,7 @@ export async function getMarketTransactionsTimeSeries({
   excludeTransactionTypes?: string[]
 }) {
   const market = await getMarket({ id: marketId })
-  const ammAccount = await getAmmAccount({ marketId: marketId })
+  const ammAccount = await getMarketAmmAccount({ marketId: marketId })
 
   if (!startAt) {
     startAt = market.createdAt

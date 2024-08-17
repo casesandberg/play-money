@@ -1,6 +1,6 @@
 import db from '@play-money/database'
 
-export async function getAmmAccount({ marketId }: { marketId: string }) {
+export async function getMarketAmmAccount({ marketId }: { marketId: string }) {
   const market = await db.market.findUnique({
     where: {
       id: marketId,

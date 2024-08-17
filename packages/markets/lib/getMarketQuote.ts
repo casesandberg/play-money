@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
-import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { quote } from '@play-money/amms/lib/maniswap-v1.1'
 import { getBalances } from '@play-money/finance/lib/getBalances'
+import { getMarketAmmAccount } from '@play-money/finance/lib/getMarketAmmAccount'
 
 export async function getMarketQuote({
   marketId,
@@ -14,7 +14,7 @@ export async function getMarketQuote({
   amount: Decimal
   isBuy: boolean
 }) {
-  const ammAccount = await getAmmAccount({ marketId })
+  const ammAccount = await getMarketAmmAccount({ marketId })
   const ammBalances = await getBalances({ accountId: ammAccount.id, marketId })
 
   const targetBalance = ammBalances.find(({ assetId }) => assetId === optionId)
