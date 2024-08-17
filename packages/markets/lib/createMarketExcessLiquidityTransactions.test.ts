@@ -8,18 +8,18 @@ import {
   mockTransactionItem,
   mockTransactionWithItems,
 } from '@play-money/database/mocks'
+import { createTransaction } from '@play-money/finance/lib/createTransaction'
 import { getBalances } from '@play-money/finance/lib/getBalances'
 import { getMarketAmmAccount } from '@play-money/finance/lib/getMarketAmmAccount'
 import { getMarketClearingAccount } from '@play-money/finance/lib/getMarketClearingAccount'
-import { getMarket } from '@play-money/markets/lib/getMarket'
 import { createMarketExcessLiquidityTransactions } from './createMarketExcessLiquidityTransactions'
-import { createTransaction } from './createTransaction'
+import { getMarket } from './getMarket'
 
 jest.mock('@play-money/finance/lib/getMarketAmmAccount', () => ({ getMarketAmmAccount: jest.fn() }))
 jest.mock('@play-money/finance/lib/getMarketClearingAccount', () => ({ getMarketClearingAccount: jest.fn() }))
-jest.mock('./createTransaction', () => ({ createTransaction: jest.fn() }))
+jest.mock('@play-money/finance/lib/createTransaction', () => ({ createTransaction: jest.fn() }))
 jest.mock('@play-money/finance/lib/getBalances', () => ({ getBalances: jest.fn() }))
-jest.mock('@play-money/markets/lib/getMarket', () => ({ getMarket: jest.fn() }))
+jest.mock('./getMarket', () => ({ getMarket: jest.fn() }))
 
 jest.mock('@play-money/database', () => ({
   transactionItem: {

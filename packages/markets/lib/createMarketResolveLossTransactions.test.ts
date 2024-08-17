@@ -2,11 +2,11 @@ import Decimal from 'decimal.js'
 import _ from 'lodash'
 import db from '@play-money/database'
 import { mockAccount, mockMarketOption, mockTransactionItem } from '@play-money/database/mocks'
+import { createTransaction } from '@play-money/finance/lib/createTransaction'
 import { getMarketAmmAccount } from '@play-money/finance/lib/getMarketAmmAccount'
 import { getMarketClearingAccount } from '@play-money/finance/lib/getMarketClearingAccount'
-import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
 import { createMarketResolveLossTransactions } from './createMarketResolveLossTransactions'
-import { createTransaction } from './createTransaction'
+import { getMarketOption } from './getMarketOption'
 
 jest.mock('@play-money/finance/lib/getMarketAmmAccount', () => ({
   getMarketAmmAccount: jest.fn(),
@@ -22,11 +22,8 @@ jest.mock('@play-money/database', () => ({
   },
 }))
 
-jest.mock('./createTransaction', () => ({
-  createTransaction: jest.fn(),
-}))
-
-jest.mock('@play-money/markets/lib/getMarketOption', () => ({ getMarketOption: jest.fn() }))
+jest.mock('@play-money/finance/lib/createTransaction', () => ({ createTransaction: jest.fn() }))
+jest.mock('./getMarketOption', () => ({ getMarketOption: jest.fn() }))
 
 describe('createMarketResolveLossTransactions', () => {
   beforeEach(() => {

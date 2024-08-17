@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
-import { getTransactions } from '@play-money/transactions/lib/getTransactions'
+import { getTransactions } from '@play-money/finance/lib/getTransactions'
 import { UserNotFoundError } from '@play-money/users/lib/exceptions'
 import { getUserById } from '@play-money/users/lib/getUserById'
 import schema from './schema'

@@ -1,9 +1,9 @@
 import React from 'react'
+import { RecentLiquidity } from '@play-money/finance/components/RecentLiquidity'
+import { RecentTrades } from '@play-money/finance/components/RecentTrades'
 import { MarketList } from '@play-money/markets/components/MarketList'
 import type { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
 import { UserQuestCard } from '@play-money/quests/components/UserQuestCard'
-import { RecentLiquidity } from '@play-money/transactions/components/RecentLiquidity'
-import { RecentTrades } from '@play-money/transactions/components/RecentTrades'
 
 export async function getMarkets(): Promise<{
   markets: Array<ExtendedMarket & { commentCount: number; liquidityCount: number; uniqueTraderCount: number }>

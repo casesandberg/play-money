@@ -5,7 +5,7 @@ import { getAssetBalance } from '@play-money/finance/lib/getBalances'
 import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'
 import { createDailyMarketBonusTransaction } from '@play-money/quests/lib/createDailyMarketBonusTransaction'
 import { hasCreatedMarketToday } from '@play-money/quests/lib/helpers'
-import { createMarketLiquidityTransaction } from '@play-money/transactions/lib/createMarketLiquidityTransaction'
+import { createMarketLiquidityTransaction } from './createMarketLiquidityTransaction'
 import { slugifyTitle } from './helpers'
 
 type PartialOptions = Pick<MarketOption, 'name' | 'color'>

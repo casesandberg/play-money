@@ -1,5 +1,5 @@
+import type { TransactionWithItems } from '@play-money/finance/lib/getTransactions'
 import { MarketPositionsPage } from '@play-money/markets/components/MarketPositionsPage'
-import type { TransactionWithItems } from '@play-money/transactions/lib/getTransactions'
 import { getExtendedMarket } from '../page'
 
 // TODO: @casesandberg Generate this from OpenAPI schema

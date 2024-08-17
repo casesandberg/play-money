@@ -21,7 +21,6 @@
     "@play-money/notifications": "*",
     "@play-money/quests": "*",
     "@play-money/search": "*",
-    "@play-money/transactions": "*",
     "@play-money/ui": "*",
     "@play-money/users": "*",
     "lodash": "^4.17.21",

@@ -8,7 +8,6 @@
   "dependencies": {
     "@play-money/database": "*",
     "@play-money/finance": "*",
-    "@play-money/transactions": "*",
     "decimal.js": "^10.4.3",
     "next": "^14.1.1",
     "react": "^18.2.0",

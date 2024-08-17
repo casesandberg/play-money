@@ -19,7 +19,6 @@
     "@play-money/markets": "*",
     "@play-money/notifications": "*",
     "@play-money/search": "*",
-    "@play-money/transactions": "*",
     "@play-money/users": "*",
     "bcryptjs": "^2.4.3",
     "decimal.js": "^10.4.3",

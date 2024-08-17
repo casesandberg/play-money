@@ -1,8 +1,8 @@
 import Decimal from 'decimal.js'
 import db, { MarketOption } from '@play-money/database'
 import { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/CurrencyCodeSchema'
+import { TransactionItemInput } from '@play-money/finance/lib/createTransaction'
 import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
-import { TransactionItemInput } from '@play-money/transactions/lib/createTransaction'
 
 export async function getAccountBalance({
   accountId,

@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 import { getAssetBalance } from '@play-money/finance/lib/getBalances'
 import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'
-import { createMarketSellTransaction } from '@play-money/transactions/lib/createMarketSellTransaction'
+import { createMarketSellTransaction } from './createMarketSellTransaction'
 import { getMarket } from './getMarket'
 import { getMarketOption } from './getMarketOption'
 import { isMarketTradable } from './helpers'

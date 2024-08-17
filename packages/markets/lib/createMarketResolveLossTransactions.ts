@@ -1,10 +1,10 @@
 import Decimal from 'decimal.js'
 import _ from 'lodash'
 import db, { Transaction } from '@play-money/database'
+import { createTransaction } from '@play-money/finance/lib/createTransaction'
 import { getMarketAmmAccount } from '@play-money/finance/lib/getMarketAmmAccount'
 import { getMarketClearingAccount } from '@play-money/finance/lib/getMarketClearingAccount'
-import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
-import { createTransaction } from './createTransaction'
+import { getMarketOption } from './getMarketOption'
 
 export async function createMarketResolveLossTransactions({
   marketId,

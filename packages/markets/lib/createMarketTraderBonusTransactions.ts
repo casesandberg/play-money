@@ -2,9 +2,9 @@ import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { Transaction } from '@play-money/database'
 import { UNIQUE_TRADER_BONUS_PRIMARY } from '@play-money/finance/economy'
+import { createTransaction } from '@play-money/finance/lib/createTransaction'
 import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
-import { getMarketLiquidity } from '@play-money/markets/lib/getMarketLiquidity'
-import { createTransaction } from './createTransaction'
+import { getMarketLiquidity } from './getMarketLiquidity'
 
 export async function createMarketTraderBonusTransactions({ marketId }: { marketId: string }) {
   const houseAccount = await getHouseAccount()

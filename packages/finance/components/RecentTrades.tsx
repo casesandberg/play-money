@@ -5,9 +5,9 @@ import _ from 'lodash'
 import Link from 'next/link'
 import useSWR from 'swr'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
+import { summarizeTransaction } from '@play-money/finance/lib/helpers'
 import { UserLink } from '@play-money/users/components/UserLink'
 import { TransactionWithItems } from '../lib/getTransactions'
-import { summarizeTransaction } from '../lib/helpers'
 
 export function RecentTrades() {
   const { data } = useSWR<{ transactions: Array<TransactionWithItems> }>(

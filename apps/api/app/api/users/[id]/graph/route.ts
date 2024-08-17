@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
+import { getAccountTotalTimeSeries } from '@play-money/finance/lib/getAccountTotalTimeSeries'
 import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'
-import { getAccountTotalTimeSeries } from '@play-money/transactions/lib/getAccountTotalTimeSeries'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'

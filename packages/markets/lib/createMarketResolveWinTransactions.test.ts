@@ -2,20 +2,20 @@ import Decimal from 'decimal.js'
 import _ from 'lodash'
 import db from '@play-money/database'
 import { mockAccount, mockMarket, mockMarketOption, mockTransactionItem } from '@play-money/database/mocks'
+import { createTransaction } from '@play-money/finance/lib/createTransaction'
 import { getBalances } from '@play-money/finance/lib/getBalances'
 import { getMarketAmmAccount } from '@play-money/finance/lib/getMarketAmmAccount'
 import { getMarketClearingAccount } from '@play-money/finance/lib/getMarketClearingAccount'
-import { getMarket } from '@play-money/markets/lib/getMarket'
-import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
 import { createMarketResolveWinTransactions } from './createMarketResolveWinTransactions'
-import { createTransaction } from './createTransaction'
+import { getMarket } from './getMarket'
+import { getMarketOption } from './getMarketOption'
 
 jest.mock('@play-money/finance/lib/getMarketAmmAccount', () => ({ getMarketAmmAccount: jest.fn() }))
 jest.mock('@play-money/finance/lib/getMarketClearingAccount', () => ({ getMarketClearingAccount: jest.fn() }))
 jest.mock('@play-money/database', () => ({ transactionItem: { findMany: jest.fn() } }))
-jest.mock('./createTransaction', () => ({ createTransaction: jest.fn() }))
-jest.mock('@play-money/markets/lib/getMarket', () => ({ getMarket: jest.fn() }))
-jest.mock('@play-money/markets/lib/getMarketOption', () => ({ getMarketOption: jest.fn() }))
+jest.mock('@play-money/finance/lib/createTransaction', () => ({ createTransaction: jest.fn() }))
+jest.mock('./getMarket', () => ({ getMarket: jest.fn() }))
+jest.mock('./getMarketOption', () => ({ getMarketOption: jest.fn() }))
 jest.mock('@play-money/finance/lib/getBalances', () => ({ getBalances: jest.fn(), getAssetBalance: jest.fn() }))
 
 describe('createMarketResolveWinTransactions', () => {

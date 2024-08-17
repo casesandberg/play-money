@@ -4,7 +4,7 @@ import db from '@play-money/database'
 import { User } from '@play-money/database'
 import { OmittedUserFields } from '@play-money/database/prisma'
 import { INITIAL_USER_BALANCE_PRIMARY } from '@play-money/finance/economy'
-import { createHouseUserGiftTransaction } from '@play-money/transactions/lib/createHouseUserGiftTransaction'
+import { createHouseUserGiftTransaction } from '@play-money/finance/lib/createHouseUserGiftTransaction'
 import { UserExistsError } from './exceptions'
 
 export async function createUser({ email }: { email: string }): Promise<User & OmittedUserFields> {
