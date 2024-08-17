@@ -1,8 +1,8 @@
 import Decimal from 'decimal.js'
 import _ from 'lodash'
-import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
 import db, { Transaction } from '@play-money/database'
 import { getMarketAmmAccount } from '@play-money/finance/lib/getMarketAmmAccount'
+import { getMarketClearingAccount } from '@play-money/finance/lib/getMarketClearingAccount'
 import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
 import { createTransaction } from './createTransaction'
 import { convertMarketSharesToPrimary } from './exchanger'
@@ -15,7 +15,7 @@ export async function createMarketResolveWinTransactions({
   winningOptionId: string
 }) {
   const ammAccount = await getMarketAmmAccount({ marketId })
-  const exchangerAccount = await getExchangerAccount()
+  const exchangerAccount = await getMarketClearingAccount({ marketId })
   const marketOption = await getMarketOption({ id: winningOptionId, marketId })
   const systemAccountIds = [ammAccount.id, exchangerAccount.id]
 

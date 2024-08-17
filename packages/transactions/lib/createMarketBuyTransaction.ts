@@ -26,6 +26,7 @@ export async function createMarketBuyTransaction({ userId, amount, marketId, opt
   const exchangerTransactions = await convertPrimaryToMarketShares({
     fromAccountId: userAccount.id,
     amount,
+    marketId,
   })
 
   // When buying shares, the other options' shares will decrease when filling amm/limit orders.

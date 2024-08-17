@@ -1,17 +1,19 @@
 import Decimal from 'decimal.js'
-import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
 import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
 import { getAssetBalance, getBalances } from '@play-money/finance/lib/getBalances'
+import { getMarketClearingAccount } from '@play-money/finance/lib/getMarketClearingAccount'
 import { TransactionItemInput } from './createTransaction'
 
 export async function convertPrimaryToMarketShares({
   fromAccountId,
   amount,
+  marketId,
 }: {
   fromAccountId: string
   amount: Decimal
+  marketId: string
 }): Promise<Array<TransactionItemInput>> {
-  const exchangerAccount = await getExchangerAccount()
+  const exchangerAccount = await getMarketClearingAccount({ marketId })
   const houseAccount = await getHouseAccount()
 
   if (amount.lte(0)) {
@@ -75,7 +77,7 @@ export async function convertMarketSharesToPrimary({
   marketId: string
   inflightTransactionItems?: Array<TransactionItemInput>
 }): Promise<Array<TransactionItemInput>> {
-  const exchangerAccount = await getExchangerAccount()
+  const exchangerAccount = await getMarketClearingAccount({ marketId })
 
   if (amount.lte(0)) {
     throw new Error('Exchange amount must be greater than 0')

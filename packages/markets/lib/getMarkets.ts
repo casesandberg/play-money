@@ -1,5 +1,5 @@
-import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
 import db, { Market } from '@play-money/database'
+import { getMarketClearingAccount } from '@play-money/finance/lib/getMarketClearingAccount'
 import { ExtendedMarket } from '../components/MarketOverviewPage'
 
 interface MarketFilterOptions {
@@ -42,10 +42,9 @@ export async function getMarkets(
     take: pagination.take,
   })
 
-  // TODO: Move this onto the market model
-  const exchangerAccount = await getExchangerAccount()
   return Promise.all(
     markets.map(async (market) => {
+      const clearingAccount = await getMarketClearingAccount({ marketId: market.id })
       const [commentCount, liquidityCount, uniqueTraders] = await Promise.all([
         db.comment.count({
           where: {
@@ -58,7 +57,7 @@ export async function getMarkets(
             amount: true,
           },
           where: {
-            accountId: exchangerAccount.id,
+            accountId: clearingAccount.id,
             currencyCode: 'PRIMARY',
             transaction: {
               marketId: market.id,

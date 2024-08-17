@@ -1,9 +1,9 @@
 import Decimal from 'decimal.js'
 import _ from 'lodash'
-import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
 import db from '@play-money/database'
 import { mockAccount, mockMarketOption, mockTransactionItem } from '@play-money/database/mocks'
 import { getMarketAmmAccount } from '@play-money/finance/lib/getMarketAmmAccount'
+import { getMarketClearingAccount } from '@play-money/finance/lib/getMarketClearingAccount'
 import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
 import { createMarketResolveLossTransactions } from './createMarketResolveLossTransactions'
 import { createTransaction } from './createTransaction'
@@ -12,8 +12,8 @@ jest.mock('@play-money/finance/lib/getMarketAmmAccount', () => ({
   getMarketAmmAccount: jest.fn(),
 }))
 
-jest.mock('@play-money/accounts/lib/getExchangerAccount', () => ({
-  getExchangerAccount: jest.fn(),
+jest.mock('@play-money/finance/lib/getMarketClearingAccount', () => ({
+  getMarketClearingAccount: jest.fn(),
 }))
 
 jest.mock('@play-money/database', () => ({
@@ -35,7 +35,7 @@ describe('createMarketResolveLossTransactions', () => {
 
   it('should handle no losing shares', async () => {
     jest.mocked(getMarketAmmAccount).mockResolvedValue(mockAccount({ id: 'amm-account-id' }))
-    jest.mocked(getExchangerAccount).mockResolvedValue(mockAccount({ id: 'exchanger-account-id' }))
+    jest.mocked(getMarketClearingAccount).mockResolvedValue(mockAccount({ id: 'exchanger-account-id' }))
     jest.mocked(db.transactionItem.findMany).mockResolvedValue([])
     jest.mocked(getMarketOption).mockResolvedValue(mockMarketOption({ id: 'option-1', currencyCode: 'NO' }))
 
@@ -49,7 +49,7 @@ describe('createMarketResolveLossTransactions', () => {
 
   it('should handle a single user with multiple transactions', async () => {
     jest.mocked(getMarketAmmAccount).mockResolvedValue(mockAccount({ id: 'amm-account-id' }))
-    jest.mocked(getExchangerAccount).mockResolvedValue(mockAccount({ id: 'exchanger-account-id' }))
+    jest.mocked(getMarketClearingAccount).mockResolvedValue(mockAccount({ id: 'exchanger-account-id' }))
     jest
       .mocked(db.transactionItem.findMany)
       .mockResolvedValue([
@@ -88,7 +88,7 @@ describe('createMarketResolveLossTransactions', () => {
 
   it('should handle multiple users with multiple transactions', async () => {
     jest.mocked(getMarketAmmAccount).mockResolvedValue(mockAccount({ id: 'amm-account-id' }))
-    jest.mocked(getExchangerAccount).mockResolvedValue(mockAccount({ id: 'exchanger-account-id' }))
+    jest.mocked(getMarketClearingAccount).mockResolvedValue(mockAccount({ id: 'exchanger-account-id' }))
     jest
       .mocked(db.transactionItem.findMany)
       .mockResolvedValue([

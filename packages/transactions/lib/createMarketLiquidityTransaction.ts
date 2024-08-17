@@ -27,6 +27,7 @@ export async function createMarketLiquidityTransaction({
   const exchangerTransactions = await convertPrimaryToMarketShares({
     fromAccountId: accountId,
     amount,
+    marketId,
   })
 
   // TODO
