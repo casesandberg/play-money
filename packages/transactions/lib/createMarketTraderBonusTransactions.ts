@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { Transaction } from '@play-money/database'
-import { UNIQUE_TRADER_BONUS_PRIMARY } from '@play-money/economy'
+import { UNIQUE_TRADER_BONUS_PRIMARY } from '@play-money/finance/economy'
 import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
 import { getMarketLiquidity } from '@play-money/markets/lib/getMarketLiquidity'
 import { createTransaction } from './createTransaction'

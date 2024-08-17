@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js'
 import db from '@play-money/database'
-import { DAILY_TRADE_BONUS_PRIMARY, UNIQUE_TRADER_LIQUIDITY_PRIMARY } from '@play-money/economy'
+import { DAILY_TRADE_BONUS_PRIMARY, UNIQUE_TRADER_LIQUIDITY_PRIMARY } from '@play-money/finance/economy'
 import { getAssetBalance } from '@play-money/finance/lib/getBalances'
 import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
 import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'

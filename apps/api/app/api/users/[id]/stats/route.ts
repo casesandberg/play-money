@@ -5,7 +5,7 @@ import {
   DAILY_LIQUIDITY_BONUS_PRIMARY,
   DAILY_MARKET_BONUS_PRIMARY,
   DAILY_TRADE_BONUS_PRIMARY,
-} from '@play-money/economy'
+} from '@play-money/finance/economy'
 import { UserNotFoundError } from '@play-money/users/lib/exceptions'
 import { getUserById } from '@play-money/users/lib/getUserById'
 import { getUserStats } from '@play-money/users/lib/getUserStats'

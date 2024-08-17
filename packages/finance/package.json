@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@play-money/database": "*",
-    "@play-money/economy": "*",
     "@play-money/quests": "*",
     "decimal.js": "^10.4.3",
     "next": "^14.1.1",

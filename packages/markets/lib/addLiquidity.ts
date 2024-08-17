@@ -1,5 +1,5 @@
 import Decimal from 'decimal.js'
-import { DAILY_LIQUIDITY_BONUS_PRIMARY } from '@play-money/economy'
+import { DAILY_LIQUIDITY_BONUS_PRIMARY } from '@play-money/finance/economy'
 import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'
 import { createNotification } from '@play-money/notifications/lib/createNotification'
 import { createDailyLiquidityBonusTransaction } from '@play-money/quests/lib/createDailyLiquidityBonusTransaction'

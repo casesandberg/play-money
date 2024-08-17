@@ -7,7 +7,6 @@
   },
   "dependencies": {
     "@play-money/database": "*",
-    "@play-money/economy": "*",
     "@play-money/finance": "*",
     "@play-money/notifications": "*",
     "@play-money/quests": "*",

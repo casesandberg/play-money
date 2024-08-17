@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js'
 import db, { MarketSchema, MarketOption, MarketOptionSchema } from '@play-money/database'
-import { INITIAL_MARKET_LIQUIDITY_PRIMARY } from '@play-money/economy'
+import { INITIAL_MARKET_LIQUIDITY_PRIMARY } from '@play-money/finance/economy'
 import { getAssetBalance } from '@play-money/finance/lib/getBalances'
 import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'
 import { createDailyMarketBonusTransaction } from '@play-money/quests/lib/createDailyMarketBonusTransaction'
