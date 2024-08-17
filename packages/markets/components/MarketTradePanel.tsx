@@ -2,7 +2,7 @@
 
 import React from 'react'
 import useSWR, { useSWRConfig } from 'swr'
-import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
+import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
 import { useSearchParam } from '@play-money/ui'
 import { Card, CardContent, CardHeader } from '@play-money/ui/card'

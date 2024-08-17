@@ -1,7 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
-import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
+import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { useUser } from '@play-money/users/context/UserContext'
 
 export function ActiveUserBalance({ initialBalance }: { initialBalance?: number }) {

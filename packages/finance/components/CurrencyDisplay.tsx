@@ -1,6 +1,6 @@
 import React from 'react'
+import { formatCurrency, formatNumber } from '@play-money/finance/lib/formatCurrency'
 import { cn } from '@play-money/ui/utils'
-import { formatCurrency, formatNumber } from '../lib/formatCurrency'
 
 export function CurrencyDisplay({
   value,

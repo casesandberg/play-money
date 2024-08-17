@@ -1,7 +1,7 @@
 import { formatDistanceToNow } from 'date-fns'
 import Link from 'next/link'
 import React from 'react'
-import { formatNumber } from '@play-money/currencies/lib/formatCurrency'
+import { formatNumber } from '@play-money/finance/lib/formatCurrency'
 import { summarizeTransaction } from '@play-money/transactions/lib/helpers'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { cn } from '@play-money/ui/utils'

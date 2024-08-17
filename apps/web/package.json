@@ -15,7 +15,6 @@
     "@play-money/api-helpers": "*",
     "@play-money/auth": "*",
     "@play-money/comments": "*",
-    "@play-money/currencies": "*",
     "@play-money/database": "*",
     "@play-money/economy": "*",
     "@play-money/finance": "*",

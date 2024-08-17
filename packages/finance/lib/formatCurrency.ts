@@ -5,7 +5,7 @@ export function formatCurrency(value: number, currencySymbol: string, decimals =
     currencyDisplay: 'symbol',
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
-  }
+  } as const
 
   return new Intl.NumberFormat('en-US', options).format(value).replace('$', currencySymbol)
 }
