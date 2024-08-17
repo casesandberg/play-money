@@ -6,10 +6,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@play-money/accounts": "*",
     "@play-money/database": "*",
-    "@play-money/economy": "*",
-    "@play-money/transactions": "*",
+    "@play-money/finance": "*",
     "decimal.js": "^10.4.3",
     "next": "^14.1.1",
     "react": "^18.2.0",

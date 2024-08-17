@@ -1,6 +1,6 @@
-import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
 import db from '@play-money/database'
-import { TransactionWithItems } from '@play-money/transactions/lib/getTransactions'
+import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
+import { TransactionWithItems } from '@play-money/finance/lib/getTransactions'
 
 export async function getNewLiquidityTransactions(): Promise<Array<TransactionWithItems>> {
   const houseAccount = await getHouseAccount()

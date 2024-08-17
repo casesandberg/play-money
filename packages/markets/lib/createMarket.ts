@@ -1,11 +1,11 @@
 import Decimal from 'decimal.js'
-import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import db, { MarketSchema, MarketOption, MarketOptionSchema } from '@play-money/database'
-import { INITIAL_MARKET_LIQUIDITY_PRIMARY } from '@play-money/economy'
+import { INITIAL_MARKET_LIQUIDITY_PRIMARY } from '@play-money/finance/economy'
 import { getAssetBalance } from '@play-money/finance/lib/getBalances'
 import { createDailyMarketBonusTransaction } from '@play-money/quests/lib/createDailyMarketBonusTransaction'
 import { hasCreatedMarketToday } from '@play-money/quests/lib/helpers'
-import { createMarketLiquidityTransaction } from '@play-money/transactions/lib/createMarketLiquidityTransaction'
+import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
+import { createMarketLiquidityTransaction } from './createMarketLiquidityTransaction'
 import { slugifyTitle } from './helpers'
 
 type PartialOptions = Pick<MarketOption, 'name' | 'color'>
@@ -58,7 +58,7 @@ export async function createMarket({
     ]
   }
 
-  const userAccount = await getUserAccount({ id: marketData.createdBy })
+  const userAccount = await getUserPrimaryAccount({ userId: marketData.createdBy })
   const userPrimaryBalance = await getAssetBalance({
     accountId: userAccount.id,
     assetType: 'CURRENCY',

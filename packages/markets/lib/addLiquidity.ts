@@ -1,11 +1,11 @@
 import Decimal from 'decimal.js'
-import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
-import { DAILY_LIQUIDITY_BONUS_PRIMARY } from '@play-money/economy'
+import { DAILY_LIQUIDITY_BONUS_PRIMARY } from '@play-money/finance/economy'
+import { getUniqueLiquidityProviderIds } from '@play-money/markets/lib/getUniqueLiquidityProviderIds'
 import { createNotification } from '@play-money/notifications/lib/createNotification'
 import { createDailyLiquidityBonusTransaction } from '@play-money/quests/lib/createDailyLiquidityBonusTransaction'
 import { hasBoostedLiquidityToday } from '@play-money/quests/lib/helpers'
-import { createMarketLiquidityTransaction } from '@play-money/transactions/lib/createMarketLiquidityTransaction'
-import { getUniqueLiquidityProviderIds } from '@play-money/transactions/lib/getUniqueLiquidityProviderIds'
+import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
+import { createMarketLiquidityTransaction } from './createMarketLiquidityTransaction'
 import { getMarket } from './getMarket'
 
 export async function addLiquidity({
@@ -23,7 +23,7 @@ export async function addLiquidity({
     throw new Error('Market already resolved')
   }
 
-  const userAccount = await getUserAccount({ id: userId })
+  const userAccount = await getUserPrimaryAccount({ userId })
   const transaction = await createMarketLiquidityTransaction({
     accountId: userAccount.id,
     amount,

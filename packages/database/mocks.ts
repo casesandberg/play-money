@@ -2,8 +2,8 @@ import { faker } from '@faker-js/faker'
 import cuid from 'cuid'
 import Decimal from 'decimal.js'
 import _ from 'lodash'
+import type { TransactionWithItems } from '@play-money/finance/lib/getTransactions'
 import { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
-import type { TransactionWithItems } from '@play-money/transactions/lib/getTransactions'
 import {
   Market,
   User,

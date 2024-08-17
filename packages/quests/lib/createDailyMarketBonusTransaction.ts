@@ -1,8 +1,8 @@
 import Decimal from 'decimal.js'
 import _ from 'lodash'
-import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
-import { DAILY_MARKET_BONUS_PRIMARY } from '@play-money/economy'
-import { createTransaction } from '@play-money/transactions/lib/createTransaction'
+import { DAILY_MARKET_BONUS_PRIMARY } from '@play-money/finance/economy'
+import { createTransaction } from '@play-money/finance/lib/createTransaction'
+import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
 
 export async function createDailyMarketBonusTransaction({
   accountId,

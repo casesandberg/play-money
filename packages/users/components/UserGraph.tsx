@@ -4,7 +4,7 @@ import { format } from 'date-fns'
 import React from 'react'
 import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip as ChartTooltip, Area } from 'recharts'
 import useSWR from 'swr'
-import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
+import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { Card } from '@play-money/ui/card'
 import { cn } from '@play-money/ui/utils'
 

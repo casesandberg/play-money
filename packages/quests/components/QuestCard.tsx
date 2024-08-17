@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
+import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { Badge } from '@play-money/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
 import { cn } from '@play-money/ui/utils'

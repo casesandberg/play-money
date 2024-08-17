@@ -1,6 +1,6 @@
+import { createMarketResolveLossTransactions } from '@play-money/markets/lib/createMarketResolveLossTransactions'
+import { createMarketResolveWinTransactions } from '@play-money/markets/lib/createMarketResolveWinTransactions'
 import { getMarket } from '@play-money/markets/lib/getMarket'
-import { createMarketResolveLossTransactions } from '@play-money/transactions/lib/createMarketResolveLossTransactions'
-import { createMarketResolveWinTransactions } from '@play-money/transactions/lib/createMarketResolveWinTransactions'
 import db from '../prisma'
 
 const marketId = 'clyc6m3yr000gwrsrtrvkt9yj'

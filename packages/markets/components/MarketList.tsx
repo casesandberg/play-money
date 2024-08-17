@@ -1,6 +1,6 @@
 import { MessageSquareIcon, UsersIcon, DiamondIcon } from 'lucide-react'
 import Link from 'next/link'
-import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
+import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { MarketLikelyOption } from '@play-money/markets/components/MarketLikelyOption'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@play-money/ui/tooltip'

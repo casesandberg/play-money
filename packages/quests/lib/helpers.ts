@@ -1,8 +1,8 @@
 import { startOfDay, endOfDay } from 'date-fns'
 import { fromZonedTime, toZonedTime } from 'date-fns-tz'
-import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import db from '@play-money/database'
 import { getUserById } from '@play-money/users/lib/getUserById'
+import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
 
 export async function hasPlacedMarketTradeToday({ userId }: { userId: string }) {
   const { timezone } = await getUserById({ id: userId })
@@ -98,7 +98,7 @@ export async function hasBoostedLiquidityToday({ userId }: { userId: string }) {
 
 export async function calculateActiveDayCount({ userId }: { userId: string }): Promise<number> {
   const { timezone } = await getUserById({ id: userId })
-  const userAccount = await getUserAccount({ id: userId })
+  const userAccount = await getUserPrimaryAccount({ userId })
 
   const result = await db.$queryRaw<[{ activeDayCount: number }]>`
   SELECT COUNT(DISTINCT ("createdAt" AT TIME ZONE 'UTC' AT TIME ZONE ${timezone})::date) AS "activeDayCount"

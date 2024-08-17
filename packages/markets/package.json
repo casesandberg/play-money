@@ -3,16 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@play-money/accounts": "*",
     "@play-money/database": "*",
-    "@play-money/economy": "*",
     "@play-money/finance": "*",
     "@play-money/notifications": "*",
     "@play-money/quests": "*",
-    "@play-money/transactions": "*",
     "decimal.js": "^10.4.3",
     "next": "^14.1.1",
     "react": "^18.2.0",
@@ -20,6 +19,8 @@
     "zod": "^3.23.5"
   },
   "devDependencies": {
-    "@types/react-color": "^3.0.12"
+    "@types/react-color": "^3.0.12",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.4"
   }
 }

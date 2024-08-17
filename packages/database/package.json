@@ -11,7 +11,7 @@
     "script": "tsx scripts/run.js"
   },
   "dependencies": {
-    "@play-money/economy": "*",
+    "@play-money/finance": "*",
     "@prisma/client": "^5.16.2",
     "@types/bcryptjs": "^2.4.6",
     "bcryptjs": "^2.4.3",

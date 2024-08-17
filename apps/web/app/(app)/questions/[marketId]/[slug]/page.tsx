@@ -1,6 +1,6 @@
 import { revalidateTag } from 'next/cache'
 import { cookies } from 'next/headers'
-import { MarketComments } from '@play-money/comments/components/MarketComments'
+import { MarketComments } from '@play-money/markets/components/MarketComments'
 import type { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
 import { MarketOverviewPage } from '@play-money/markets/components/MarketOverviewPage'
 

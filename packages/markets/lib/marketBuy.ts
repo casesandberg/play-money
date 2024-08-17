@@ -1,16 +1,16 @@
 import Decimal from 'decimal.js'
-import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
-import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import db from '@play-money/database'
-import { DAILY_TRADE_BONUS_PRIMARY, UNIQUE_TRADER_LIQUIDITY_PRIMARY } from '@play-money/economy'
+import { DAILY_TRADE_BONUS_PRIMARY, UNIQUE_TRADER_LIQUIDITY_PRIMARY } from '@play-money/finance/economy'
 import { getAssetBalance } from '@play-money/finance/lib/getBalances'
+import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
+import { getUniqueLiquidityProviderIds } from '@play-money/markets/lib/getUniqueLiquidityProviderIds'
 import { createNotification } from '@play-money/notifications/lib/createNotification'
 import { createDailyTradeBonusTransaction } from '@play-money/quests/lib/createDailyTradeBonusTransaction'
 import { hasPlacedMarketTradeToday } from '@play-money/quests/lib/helpers'
-import { createMarketBuyTransaction } from '@play-money/transactions/lib/createMarketBuyTransaction'
-import { createMarketLiquidityTransaction } from '@play-money/transactions/lib/createMarketLiquidityTransaction'
-import { createMarketTraderBonusTransactions } from '@play-money/transactions/lib/createMarketTraderBonusTransactions'
-import { getUniqueLiquidityProviderIds } from '@play-money/transactions/lib/getUniqueLiquidityProviderIds'
+import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
+import { createMarketBuyTransaction } from './createMarketBuyTransaction'
+import { createMarketLiquidityTransaction } from './createMarketLiquidityTransaction'
+import { createMarketTraderBonusTransactions } from './createMarketTraderBonusTransactions'
 import { getMarket } from './getMarket'
 import { isMarketTradable } from './helpers'
 
@@ -30,7 +30,7 @@ export async function marketBuy({
     throw new Error('Market is closed')
   }
 
-  const userAccount = await getUserAccount({ id: creatorId })
+  const userAccount = await getUserPrimaryAccount({ userId: creatorId })
   const userPrimaryBalance = await getAssetBalance({
     accountId: userAccount.id,
     assetType: 'CURRENCY',

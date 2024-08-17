@@ -3,6 +3,7 @@
 import { formatDistance } from 'date-fns'
 import { Ellipsis, Reply } from 'lucide-react'
 import React, { useState } from 'react'
+import { CommentWithReactions } from '@play-money/comments/lib/getComment'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import {
   AlertDialog,
@@ -29,7 +30,6 @@ import { EmojiPicker, EmojiReactionList } from '@play-money/ui/emoji'
 import { toast } from '@play-money/ui/use-toast'
 import { cn } from '@play-money/ui/utils'
 import { UserLink } from '@play-money/users/components/UserLink'
-import { MarketComment } from '../lib/getCommentsOnMarket'
 import { CreateCommentForm } from './CreateCommentForm'
 
 export function CommentItem({
@@ -42,7 +42,7 @@ export function CommentItem({
   onDelete,
 }: {
   activeUserId: string
-  comment: MarketComment
+  comment: CommentWithReactions
   isHighlighted?: boolean
   onEmojiSelect: (emoji: string) => void
   onCreateReply: (content: string) => Promise<void>
