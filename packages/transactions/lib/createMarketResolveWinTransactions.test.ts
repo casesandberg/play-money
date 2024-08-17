@@ -3,30 +3,20 @@ import _ from 'lodash'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
 import db from '@play-money/database'
-import { mockAccount, mockMarketOption, mockTransactionItem } from '@play-money/database/mocks'
+import { mockAccount, mockMarket, mockMarketOption, mockTransactionItem } from '@play-money/database/mocks'
+import { getBalances } from '@play-money/finance/lib/getBalances'
+import { getMarket } from '@play-money/markets/lib/getMarket'
 import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
 import { createMarketResolveWinTransactions } from './createMarketResolveWinTransactions'
 import { createTransaction } from './createTransaction'
 
-jest.mock('@play-money/accounts/lib/getAmmAccount', () => ({
-  getAmmAccount: jest.fn(),
-}))
-
-jest.mock('@play-money/accounts/lib/getExchangerAccount', () => ({
-  getExchangerAccount: jest.fn(),
-}))
-
-jest.mock('@play-money/database', () => ({
-  transactionItem: {
-    findMany: jest.fn(),
-  },
-}))
-
-jest.mock('./createTransaction', () => ({
-  createTransaction: jest.fn(),
-}))
-
+jest.mock('@play-money/accounts/lib/getAmmAccount', () => ({ getAmmAccount: jest.fn() }))
+jest.mock('@play-money/accounts/lib/getExchangerAccount', () => ({ getExchangerAccount: jest.fn() }))
+jest.mock('@play-money/database', () => ({ transactionItem: { findMany: jest.fn() } }))
+jest.mock('./createTransaction', () => ({ createTransaction: jest.fn() }))
+jest.mock('@play-money/markets/lib/getMarket', () => ({ getMarket: jest.fn() }))
 jest.mock('@play-money/markets/lib/getMarketOption', () => ({ getMarketOption: jest.fn() }))
+jest.mock('@play-money/finance/lib/getBalances', () => ({ getBalances: jest.fn(), getAssetBalance: jest.fn() }))
 
 describe('createMarketResolveWinTransactions', () => {
   beforeEach(() => {
@@ -38,6 +28,21 @@ describe('createMarketResolveWinTransactions', () => {
     jest.mocked(getExchangerAccount).mockResolvedValue(mockAccount({ id: 'exchanger-account-id' }))
     jest.mocked(db.transactionItem.findMany).mockResolvedValue([])
     jest.mocked(getMarketOption).mockResolvedValue(mockMarketOption({ id: 'option-1', currencyCode: 'YES' }))
+
+    jest.mocked(getBalances).mockImplementation(async ({ accountId }) => {
+      if (accountId === 'amm-1-account') {
+        return []
+      }
+      return []
+    })
+
+    jest.mocked(getMarket).mockResolvedValue({
+      ...mockMarket(),
+      options: [
+        mockMarketOption({ id: 'option-1', liquidityProbability: new Decimal(0.5) }),
+        mockMarketOption({ id: 'option-2', liquidityProbability: new Decimal(0.5) }),
+      ],
+    })
 
     await createMarketResolveWinTransactions({
       marketId: 'market-1',
@@ -58,6 +63,21 @@ describe('createMarketResolveWinTransactions', () => {
         mockTransactionItem({ accountId: 'user-1', currencyCode: 'YES', amount: new Decimal(-20) }),
       ])
     jest.mocked(getMarketOption).mockResolvedValue(mockMarketOption({ id: 'option-1', currencyCode: 'YES' }))
+
+    jest.mocked(getBalances).mockImplementation(async ({ accountId }) => {
+      if (accountId === 'amm-1-account') {
+        return []
+      }
+      return []
+    })
+
+    jest.mocked(getMarket).mockResolvedValue({
+      ...mockMarket(),
+      options: [
+        mockMarketOption({ id: 'option-1', liquidityProbability: new Decimal(0.5) }),
+        mockMarketOption({ id: 'option-2', liquidityProbability: new Decimal(0.5) }),
+      ],
+    })
 
     await createMarketResolveWinTransactions({
       marketId: 'market-1',

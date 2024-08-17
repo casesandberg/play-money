@@ -1,8 +1,8 @@
 import Decimal from 'decimal.js'
-import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import db, { MarketSchema, MarketOption, MarketOptionSchema } from '@play-money/database'
 import { INITIAL_MARKET_LIQUIDITY_PRIMARY } from '@play-money/economy'
+import { getAssetBalance } from '@play-money/finance/lib/getBalances'
 import { createDailyMarketBonusTransaction } from '@play-money/quests/lib/createDailyMarketBonusTransaction'
 import { hasCreatedMarketToday } from '@play-money/quests/lib/helpers'
 import { createMarketLiquidityTransaction } from '@play-money/transactions/lib/createMarketLiquidityTransaction'
@@ -59,13 +59,13 @@ export async function createMarket({
   }
 
   const userAccount = await getUserAccount({ id: marketData.createdBy })
-  const hasEnoughBalance = await checkAccountBalance({
+  const userPrimaryBalance = await getAssetBalance({
     accountId: userAccount.id,
-    currencyCode: 'PRIMARY',
-    amount: subsidyAmount,
+    assetType: 'CURRENCY',
+    assetId: 'PRIMARY',
   })
 
-  if (!hasEnoughBalance) {
+  if (!userPrimaryBalance.amount.gte(subsidyAmount)) {
     throw new Error('User does not have enough balance to create market')
   }
 

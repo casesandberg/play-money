@@ -1,5 +1,5 @@
 import { Decimal } from 'decimal.js'
-import { getAssetBalances, getAssetCost } from '@play-money/finance/lib/getBalances'
+import { getAssetBalance, getAssetCost } from '@play-money/finance/lib/getBalances'
 import { getMarketQuote } from '@play-money/markets/lib/getMarketQuote'
 
 // Other Comprehensive Income (OCI) is recorded as Equity. It does not count towards income or net income. Unrealized Gains and Losses from Market Options.
@@ -12,7 +12,7 @@ export async function getUserMarketOptionIncome({
   marketId: string
   optionId: string
 }) {
-  const assetBalance = await getAssetBalances({
+  const assetBalance = await getAssetBalance({
     accountId,
     marketId,
     assetType: 'MARKET_OPTION',

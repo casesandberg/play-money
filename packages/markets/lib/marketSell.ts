@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js'
-import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
+import { getAssetBalance } from '@play-money/finance/lib/getBalances'
 import { createMarketSellTransaction } from '@play-money/transactions/lib/createMarketSellTransaction'
 import { getMarket } from './getMarket'
 import { getMarketOption } from './getMarketOption'
@@ -25,13 +25,13 @@ export async function marketSell({
   const marketOption = await getMarketOption({ id: optionId, marketId })
 
   const userAccount = await getUserAccount({ id: creatorId })
-  const hasEnoughBalance = await checkAccountBalance({
+  const userOptionBalance = await getAssetBalance({
     accountId: userAccount.id,
-    currencyCode: marketOption.currencyCode,
-    amount,
+    assetType: 'MARKET_OPTION',
+    assetId: marketOption.id,
   })
 
-  if (!hasEnoughBalance) {
+  if (!userOptionBalance.amount.gte(amount)) {
     throw new Error('User does not have enough balance to sell')
   }
 

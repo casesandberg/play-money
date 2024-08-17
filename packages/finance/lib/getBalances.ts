@@ -166,7 +166,7 @@ export function transformBalancesToNumbers(balances: Array<NetBalance> = []): Ar
   }))
 }
 
-export async function getAssetBalances({
+export async function getAssetBalance({
   accountId,
   marketId,
   assetType,

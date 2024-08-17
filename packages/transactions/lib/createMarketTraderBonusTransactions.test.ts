@@ -8,8 +8,6 @@ import { createTransaction } from './createTransaction'
 
 jest.mock('@play-money/accounts/lib/getHouseAccount', () => ({ getHouseAccount: jest.fn() }))
 jest.mock('@play-money/accounts/lib/getExchangerAccount', () => ({ getExchangerAccount: jest.fn() }))
-jest.mock('@play-money/accounts/lib/checkAccountBalance', () => ({ checkAccountBalance: jest.fn() }))
-jest.mock('@play-money/accounts/lib/getAccountBalance', () => ({ getAccountBalance: jest.fn() }))
 jest.mock('./createTransaction', () => ({ createTransaction: jest.fn() }))
 jest.mock('@play-money/database', () => ({
   transactionItem: {

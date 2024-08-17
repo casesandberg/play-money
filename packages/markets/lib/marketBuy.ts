@@ -1,9 +1,9 @@
 import Decimal from 'decimal.js'
-import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import db from '@play-money/database'
 import { DAILY_TRADE_BONUS_PRIMARY, UNIQUE_TRADER_LIQUIDITY_PRIMARY } from '@play-money/economy'
+import { getAssetBalance } from '@play-money/finance/lib/getBalances'
 import { createNotification } from '@play-money/notifications/lib/createNotification'
 import { createDailyTradeBonusTransaction } from '@play-money/quests/lib/createDailyTradeBonusTransaction'
 import { hasPlacedMarketTradeToday } from '@play-money/quests/lib/helpers'
@@ -31,9 +31,13 @@ export async function marketBuy({
   }
 
   const userAccount = await getUserAccount({ id: creatorId })
-  const hasEnoughBalance = await checkAccountBalance({ accountId: userAccount.id, currencyCode: 'PRIMARY', amount })
+  const userPrimaryBalance = await getAssetBalance({
+    accountId: userAccount.id,
+    assetType: 'CURRENCY',
+    assetId: 'PRIMARY',
+  })
 
-  if (!hasEnoughBalance) {
+  if (!userPrimaryBalance.amount.gte(amount)) {
     throw new Error('User does not have enough balance to purchase')
   }
 

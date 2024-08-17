@@ -1,12 +1,6 @@
 import { z } from 'zod'
 import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
-import {
-  CurrencyCodeSchema,
-  MarketSchema,
-  TransactionItemSchema,
-  TransactionSchema,
-  UserSchema,
-} from '@play-money/database'
+import { MarketSchema, TransactionItemSchema, TransactionSchema, UserSchema } from '@play-money/database'
 
 export default createSchema({
   GET: {
@@ -15,7 +9,6 @@ export default createSchema({
         marketId: z.string().optional(),
         userId: z.string().optional(),
         transactionType: z.array(z.string()).optional(),
-        currencyCode: CurrencyCodeSchema.optional(),
       })
       .optional(),
     responses: {

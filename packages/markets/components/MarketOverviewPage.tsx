@@ -63,13 +63,14 @@ export function MarketOverviewPage({
     { refreshInterval: 1000 * 60 }
   ) // 60 seconds
   const { data: graph } = useSWR(`/v1/markets/${market.id}/graph`, { refreshInterval: 1000 * 60 * 5 }) // 5 mins
-  const { data: stats } = useSWR<MarketStats>(`/v1/markets/${market.id}/stats`, { refreshInterval: 1000 * 60 * 5 }) // 5 mins
   const [option, setOption] = useSearchParam('option', 'replace')
   const [isEditing, setIsEditing] = useSearchParam('edit')
   const [isBoosting, setIsBoosting] = useSearchParam('boost')
   const activeOptionId = option || market.options[0]?.id || ''
   const isCreator = user?.id === market.createdBy
   const probabilities = marketOptionBalancesToProbabilities(balance?.amm)
+
+  const stats = {}
 
   return (
     <Card className="flex-1">
@@ -84,18 +85,6 @@ export function MarketOverviewPage({
         <CardTitle className="leading-relaxed">{market.question}</CardTitle>
         <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 font-mono text-sm text-muted-foreground md:flex-nowrap">
           {!market.marketResolution ? <MarketLikelyOption market={market} /> : null}
-
-          {stats?.totalLiquidity ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex flex-shrink-0 items-center gap-1">
-                  <Diamond className="h-4 w-4 text-purple-600" />
-                  <CurrencyDisplay value={stats.totalLiquidity} currencyCode="PRIMARY" isShort hasSymbol={false} />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>Market liquidity</TooltipContent>
-            </Tooltip>
-          ) : null}
           {market.closeDate ? (
             <div className="flex-shrink-0">
               {isPast(market.closeDate) ? 'Ended' : 'Ending'} {format(market.closeDate, 'MMM d, yyyy')}
@@ -245,7 +234,6 @@ export function MarketOverviewPage({
       />
       <LiquidityBoostDialog
         market={market}
-        stats={stats}
         open={isBoosting === 'true'}
         onClose={() => setIsBoosting(undefined)}
         onSuccess={onRevalidate}

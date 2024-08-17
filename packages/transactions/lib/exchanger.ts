@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
-import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
 import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
+import { getAssetBalance, getBalances } from '@play-money/finance/lib/getBalances'
 import { TransactionItemInput } from './createTransaction'
 
 export async function convertPrimaryToMarketShares({
@@ -18,8 +18,13 @@ export async function convertPrimaryToMarketShares({
     throw new Error('Exchange amount must be greater than 0')
   }
 
-  const hasEnoughBalance = await checkAccountBalance({ accountId: fromAccountId, currencyCode: 'PRIMARY', amount })
-  if (!hasEnoughBalance && fromAccountId !== houseAccount.id) {
+  const accountPrimaryBalance = await getAssetBalance({
+    accountId: fromAccountId,
+    assetType: 'CURRENCY',
+    assetId: 'PRIMARY',
+  })
+
+  if (!accountPrimaryBalance.amount.gte(amount) && fromAccountId !== houseAccount.id) {
     throw new Error('User does not have enough balance.')
   }
 
@@ -62,10 +67,12 @@ export async function convertPrimaryToMarketShares({
 export async function convertMarketSharesToPrimary({
   fromAccountId,
   amount,
+  marketId,
   inflightTransactionItems,
 }: {
   fromAccountId: string
   amount: Decimal
+  marketId: string
   inflightTransactionItems?: Array<TransactionItemInput>
 }): Promise<Array<TransactionItemInput>> {
   const exchangerAccount = await getExchangerAccount()
@@ -74,19 +81,14 @@ export async function convertMarketSharesToPrimary({
     throw new Error('Exchange amount must be greater than 0')
   }
 
-  const hasEnoughYesBalance = await checkAccountBalance({
+  const balances = await getBalances({
     accountId: fromAccountId,
-    currencyCode: 'YES',
-    amount,
-    inflightTransactionItems,
+    marketId,
   })
-  const hasEnoughNoBalance = await checkAccountBalance({
-    accountId: fromAccountId,
-    currencyCode: 'NO',
-    amount,
-    inflightTransactionItems,
-  })
-  if (!hasEnoughYesBalance || !hasEnoughNoBalance) {
+
+  const optionBalances = balances.filter(({ assetType }) => assetType === 'MARKET_OPTION')
+
+  if (!optionBalances.every((balance) => balance.amount.gte(amount))) {
     throw new Error('User does not have enough shares.')
   }
 

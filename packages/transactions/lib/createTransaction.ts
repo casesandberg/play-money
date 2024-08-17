@@ -1,5 +1,4 @@
 import Decimal from 'decimal.js'
-import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import db, { TransactionItem, Transaction } from '@play-money/database'
 
 export type TransactionItemInput = Pick<TransactionItem, 'accountId' | 'currencyCode' | 'amount'>
@@ -31,21 +30,21 @@ export async function createTransaction({
     }
   })
 
-  await Promise.all(
-    transactionItems.map(async (item) => {
-      if (item.amount.lessThan(0)) {
-        const hasEnoughBalance = await checkAccountBalance({
-          accountId: item.accountId,
-          currencyCode: item.currencyCode,
-          amount: item.amount,
-        })
+  // await Promise.all(
+  //   transactionItems.map(async (item) => {
+  //     if (item.amount.lessThan(0)) {
+  //       const hasEnoughBalance = await checkAccountBalanc({
+  //         accountId: item.accountId,
+  //         currencyCode: item.currencyCode,
+  //         amount: item.amount,
+  //       })
 
-        if (!hasEnoughBalance) {
-          // console.log(`User ${item.accountId} does not have enough balance for currencyCode ${item.currencyCode}`)
-        }
-      }
-    })
-  )
+  //       if (!hasEnoughBalance) {
+  //         // console.log(`User ${item.accountId} does not have enough balance for currencyCode ${item.currencyCode}`)
+  //       }
+  //     }
+  //   })
+  // )
 
   // TODO: squash transactionItems to remove unnecessary items
 

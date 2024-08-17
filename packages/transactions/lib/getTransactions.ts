@@ -1,5 +1,4 @@
 import db, { Market, Transaction, TransactionItem, User } from '@play-money/database'
-import { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/CurrencyCodeSchema'
 
 export type TransactionWithItems = Transaction & {
   transactionItems: Array<TransactionItem>
@@ -13,7 +12,6 @@ interface TransactionFilterOptions {
   marketId?: string
   userId?: string
   transactionType?: string[]
-  currencyCode?: CurrencyCodeType
 }
 
 interface SortOptions {
@@ -38,11 +36,6 @@ export async function getTransactions(
         userId: filters.userId,
       },
       type: filters.transactionType ? { in: filters.transactionType } : undefined,
-      transactionItems: {
-        some: {
-          currencyCode: filters.currencyCode,
-        },
-      },
     },
     include: {
       transactionItems: true,

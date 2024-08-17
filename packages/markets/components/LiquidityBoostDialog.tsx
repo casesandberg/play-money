@@ -108,7 +108,7 @@ export const LiquidityBoostDialog = ({
                 <li className="flex items-center justify-between">
                   <span className="text-muted-foreground">Existing liquidity</span>
                   <span className="font-medium">
-                    <CurrencyDisplay value={stats.totalLiquidity} currencyCode="PRIMARY" />
+                    <CurrencyDisplay value={stats.totalLiquidity} />
                   </span>
                 </li>
                 <li className="flex items-center justify-between">
@@ -118,7 +118,7 @@ export const LiquidityBoostDialog = ({
                 <li className="flex items-center justify-between">
                   <span className="text-muted-foreground">Unique trader bonuses</span>
                   <span className="font-medium">
-                    <CurrencyDisplay value={stats.traderBonusPayouts} currencyCode="PRIMARY" />
+                    <CurrencyDisplay value={stats.traderBonusPayouts} />
                   </span>
                 </li>
               </ul>

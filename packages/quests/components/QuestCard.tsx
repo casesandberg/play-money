@@ -41,7 +41,7 @@ export function QuestCard({ quests }: { quests: Quest[] }) {
                   </div>
                   {!quest.completed && (
                     <Badge>
-                      <CurrencyDisplay value={quest.award} currencyCode="PRIMARY" />
+                      <CurrencyDisplay value={quest.award} />
                     </Badge>
                   )}
                 </div>
