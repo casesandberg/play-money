@@ -40,6 +40,7 @@ export async function createMarketExcessLiquidityTransactions({ marketId }: { ma
           ...(await convertMarketSharesToPrimary({
             fromAccountId: ammAccount.id,
             amount: payout,
+            marketId,
           })),
           {
             accountId: ammAccount.id,

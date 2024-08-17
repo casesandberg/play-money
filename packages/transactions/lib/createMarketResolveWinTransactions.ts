@@ -61,6 +61,7 @@ export async function createMarketResolveWinTransactions({
             ...(await convertMarketSharesToPrimary({
               fromAccountId: ammAccount.id,
               amount,
+              marketId,
               inflightTransactionItems,
             })),
             {

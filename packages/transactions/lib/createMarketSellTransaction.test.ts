@@ -1,5 +1,4 @@
 import Decimal from 'decimal.js'
-import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
@@ -14,7 +13,6 @@ import { createTransaction } from './createTransaction'
 jest.mock('@play-money/accounts/lib/getAmmAccount', () => ({ getAmmAccount: jest.fn() }))
 jest.mock('@play-money/accounts/lib/getExchangerAccount', () => ({ getExchangerAccount: jest.fn() }))
 jest.mock('@play-money/accounts/lib/getUserAccount', () => ({ getUserAccount: jest.fn() }))
-jest.mock('@play-money/accounts/lib/checkAccountBalance', () => ({ checkAccountBalance: jest.fn() }))
 jest.mock('./createTransaction', () => ({ createTransaction: jest.fn() }))
 jest.mock('@play-money/markets/lib/getMarketOption', () => ({ getMarketOption: jest.fn() }))
 jest.mock('@play-money/finance/lib/getBalances', () => ({ getBalances: jest.fn() }))
@@ -26,10 +24,6 @@ describe('createMarketSellTransaction', () => {
   })
 
   it('should call createTransaction with approperate transactionItems', async () => {
-    jest.mocked(checkAccountBalance).mockImplementation(async () => {
-      return true
-    })
-
     jest.mocked(getUserAccount).mockResolvedValue(mockAccount({ id: 'user-1-account' }))
     jest.mocked(getExchangerAccount).mockResolvedValue(mockAccount({ id: 'EXCHANGER' }))
     jest.mocked(getAmmAccount).mockResolvedValue(mockAccount({ id: 'amm-1-account' }))

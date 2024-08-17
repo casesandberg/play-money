@@ -1,6 +1,5 @@
 import Decimal from 'decimal.js'
 import _ from 'lodash'
-import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
 import db from '@play-money/database'
@@ -18,7 +17,6 @@ import { createTransaction } from './createTransaction'
 
 jest.mock('@play-money/accounts/lib/getAmmAccount', () => ({ getAmmAccount: jest.fn() }))
 jest.mock('@play-money/accounts/lib/getExchangerAccount', () => ({ getExchangerAccount: jest.fn() }))
-jest.mock('@play-money/accounts/lib/checkAccountBalance', () => ({ checkAccountBalance: jest.fn() }))
 jest.mock('./createTransaction', () => ({ createTransaction: jest.fn() }))
 jest.mock('@play-money/finance/lib/getBalances', () => ({ getBalances: jest.fn() }))
 jest.mock('@play-money/markets/lib/getMarket', () => ({ getMarket: jest.fn() }))
@@ -64,7 +62,6 @@ describe('createMarketExcessLiquidityTransactions', () => {
   it('should handle remaining shares of zero', async () => {
     jest.mocked(getAmmAccount).mockResolvedValue(mockAccount({ id: 'amm-1-account' }))
     jest.mocked(getExchangerAccount).mockResolvedValue(mockAccount({ id: 'exchanger-account-id' }))
-    jest.mocked(checkAccountBalance).mockImplementation(async () => true)
 
     jest.mocked(getBalances).mockImplementation(async ({ accountId }) => {
       if (accountId === 'amm-1-account') {
@@ -112,7 +109,6 @@ describe('createMarketExcessLiquidityTransactions', () => {
         ],
       }),
     ])
-    jest.mocked(checkAccountBalance).mockImplementation(async () => true)
 
     jest.mocked(getBalances).mockImplementation(async ({ accountId }) => {
       if (accountId === 'amm-1-account') {
@@ -180,7 +176,6 @@ describe('createMarketExcessLiquidityTransactions', () => {
         ],
       }),
     ])
-    jest.mocked(checkAccountBalance).mockImplementation(async () => true)
 
     jest.mocked(getBalances).mockImplementation(async ({ accountId }) => {
       if (accountId === 'amm-1-account') {

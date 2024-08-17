@@ -1,12 +1,11 @@
 import Decimal from 'decimal.js'
-import { checkAccountBalance } from '@play-money/accounts/lib/checkAccountBalance'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getExchangerAccount } from '@play-money/accounts/lib/getExchangerAccount'
 import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import '@play-money/config/jest/jest-setup'
 import { mockAccount, mockMarket, mockMarketOption } from '@play-money/database/mocks'
-import { getBalances } from '@play-money/finance/lib/getBalances'
+import { getBalances, getAssetBalance, NetBalance } from '@play-money/finance/lib/getBalances'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
 import { createMarketBuyTransaction } from './createMarketBuyTransaction'
@@ -16,11 +15,10 @@ jest.mock('@play-money/accounts/lib/getHouseAccount', () => ({ getHouseAccount: 
 jest.mock('@play-money/accounts/lib/getAmmAccount', () => ({ getAmmAccount: jest.fn() }))
 jest.mock('@play-money/accounts/lib/getExchangerAccount', () => ({ getExchangerAccount: jest.fn() }))
 jest.mock('@play-money/accounts/lib/getUserAccount', () => ({ getUserAccount: jest.fn() }))
-jest.mock('@play-money/accounts/lib/checkAccountBalance', () => ({ checkAccountBalance: jest.fn() }))
 jest.mock('@play-money/markets/lib/getMarketOption', () => ({ getMarketOption: jest.fn() }))
 jest.mock('@play-money/markets/lib/getMarket', () => ({ getMarket: jest.fn() }))
 jest.mock('./createTransaction', () => ({ createTransaction: jest.fn() }))
-jest.mock('@play-money/finance/lib/getBalances', () => ({ getBalances: jest.fn() }))
+jest.mock('@play-money/finance/lib/getBalances', () => ({ getBalances: jest.fn(), getAssetBalance: jest.fn() }))
 jest.mock('@play-money/markets/lib/getMarket', () => ({ getMarket: jest.fn() }))
 
 describe('createMarketBuyTransaction', () => {
@@ -29,9 +27,17 @@ describe('createMarketBuyTransaction', () => {
   })
 
   it('should call createTransaction with approperate transactionItems', async () => {
-    jest.mocked(checkAccountBalance).mockImplementation(async ({ accountId, amount }) => {
-      if (accountId === 'user-1-account' && amount.equals(50)) return true
-      return false
+    jest.mocked(getAssetBalance).mockImplementation(async ({ accountId }) => {
+      if (accountId === 'user-1-account') {
+        return {
+          accountId,
+          assetType: 'CURRENCY',
+          assetId: 'PRIMARY',
+          amount: new Decimal(50),
+          subtotals: {},
+        }
+      }
+      return {} as NetBalance
     })
 
     jest.mocked(getHouseAccount).mockResolvedValue(mockAccount({ id: 'HOUSE' }))
