@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 import { getAssetBalance, getBalances } from '@play-money/finance/lib/getBalances'
 import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
-import { getMarketClearingAccount } from '@play-money/finance/lib/getMarketClearingAccount'
+import { getMarketClearingAccount } from '@play-money/markets/lib/getMarketClearingAccount'
 import { TransactionItemInput } from './createTransaction'
 
 export async function convertPrimaryToMarketShares({

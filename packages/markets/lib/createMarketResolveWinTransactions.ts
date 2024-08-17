@@ -3,8 +3,8 @@ import _ from 'lodash'
 import db, { Transaction } from '@play-money/database'
 import { createTransaction } from '@play-money/finance/lib/createTransaction'
 import { convertMarketSharesToPrimary } from '@play-money/finance/lib/exchanger'
-import { getMarketAmmAccount } from '@play-money/finance/lib/getMarketAmmAccount'
-import { getMarketClearingAccount } from '@play-money/finance/lib/getMarketClearingAccount'
+import { getMarketAmmAccount } from './getMarketAmmAccount'
+import { getMarketClearingAccount } from './getMarketClearingAccount'
 import { getMarketOption } from './getMarketOption'
 
 export async function createMarketResolveWinTransactions({

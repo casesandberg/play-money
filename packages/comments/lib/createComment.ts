@@ -1,10 +1,10 @@
 import db, { Comment } from '@play-money/database'
-import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import { getUniqueLiquidityProviderIds } from '@play-money/markets/lib/getUniqueLiquidityProviderIds'
 import { createNotification } from '@play-money/notifications/lib/createNotification'
 import { createDailyCommentBonusTransaction } from '@play-money/quests/lib/createDailyCommentBonusTransaction'
 import { hasCommentedToday } from '@play-money/quests/lib/helpers'
+import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
 
 export async function createComment({
   content,

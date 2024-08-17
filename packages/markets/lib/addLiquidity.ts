@@ -1,10 +1,10 @@
 import Decimal from 'decimal.js'
 import { DAILY_LIQUIDITY_BONUS_PRIMARY } from '@play-money/finance/economy'
-import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'
 import { getUniqueLiquidityProviderIds } from '@play-money/markets/lib/getUniqueLiquidityProviderIds'
 import { createNotification } from '@play-money/notifications/lib/createNotification'
 import { createDailyLiquidityBonusTransaction } from '@play-money/quests/lib/createDailyLiquidityBonusTransaction'
 import { hasBoostedLiquidityToday } from '@play-money/quests/lib/helpers'
+import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
 import { createMarketLiquidityTransaction } from './createMarketLiquidityTransaction'
 import { getMarket } from './getMarket'
 

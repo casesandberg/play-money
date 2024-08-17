@@ -1,6 +1,6 @@
 import db, { Market } from '@play-money/database'
-import { getMarketClearingAccount } from '@play-money/finance/lib/getMarketClearingAccount'
 import { ExtendedMarket } from '../components/MarketOverviewPage'
+import { getMarketClearingAccount } from './getMarketClearingAccount'
 
 interface MarketFilterOptions {
   createdBy?: string

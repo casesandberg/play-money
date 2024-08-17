@@ -4,8 +4,8 @@ import { Transaction } from '@play-money/database'
 import { createTransaction } from '@play-money/finance/lib/createTransaction'
 import { convertMarketSharesToPrimary } from '@play-money/finance/lib/exchanger'
 import { getBalances } from '@play-money/finance/lib/getBalances'
-import { getMarketAmmAccount } from '@play-money/finance/lib/getMarketAmmAccount'
 import { getMarket } from './getMarket'
+import { getMarketAmmAccount } from './getMarketAmmAccount'
 import { getMarketLiquidity } from './getMarketLiquidity'
 
 export async function createMarketExcessLiquidityTransactions({ marketId }: { marketId: string }) {

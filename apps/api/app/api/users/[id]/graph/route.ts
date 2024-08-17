@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
-import { getAccountTotalTimeSeries } from '@play-money/finance/lib/getAccountTotalTimeSeries'
-import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'
+import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
+import { getUserTotalTimeSeries } from '@play-money/users/lib/getUserTotalTimeSeries'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'
@@ -14,7 +14,7 @@ export async function GET(
     const { id } = schema.GET.parameters.parse(params)
     const userAccount = await getUserPrimaryAccount({ userId: id })
 
-    const data = await getAccountTotalTimeSeries({
+    const data = await getUserTotalTimeSeries({
       accountId: userAccount.id,
       tickInterval: 1,
       endAt: new Date(),

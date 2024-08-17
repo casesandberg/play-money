@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 import { quote } from '@play-money/finance/amms/maniswap-v1.1'
 import { getBalances } from '@play-money/finance/lib/getBalances'
-import { getMarketAmmAccount } from '@play-money/finance/lib/getMarketAmmAccount'
+import { getMarketAmmAccount } from './getMarketAmmAccount'
 
 export async function getMarketQuote({
   marketId,

@@ -1,8 +1,8 @@
 import { startOfDay, endOfDay } from 'date-fns'
 import { fromZonedTime, toZonedTime } from 'date-fns-tz'
 import db from '@play-money/database'
-import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'
 import { getUserById } from '@play-money/users/lib/getUserById'
+import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
 
 export async function hasPlacedMarketTradeToday({ userId }: { userId: string }) {
   const { timezone } = await getUserById({ id: userId })

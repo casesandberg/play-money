@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 import db from '@play-money/database'
-import { getMarketAmmAccount } from '@play-money/finance/lib/getMarketAmmAccount'
 import { getMarket } from '@play-money/markets/lib/getMarket'
+import { getMarketAmmAccount } from './getMarketAmmAccount'
 import { MarketTransaction } from './getMarketTransactions'
 
 type Bucket = {

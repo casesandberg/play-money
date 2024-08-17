@@ -8,7 +8,7 @@ type Bucket = {
   totalAmount: Decimal
 }
 
-export async function getAccountTotalTimeSeries({
+export async function getUserTotalTimeSeries({
   accountId,
   startAt,
   endAt = new Date(),
