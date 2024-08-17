@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 import { toBeDeepCloseTo, toMatchCloseTo } from 'jest-matcher-deep-close-to'
 import '@play-money/config/jest/jest-setup'
-import { addLiquidity, buy, quote, sell } from './maniswap-v1.1'
+import { addLiquidity, trade, quote } from './maniswap-v1.1'
 
 expect.extend({ toBeDeepCloseTo, toMatchCloseTo })
 
@@ -11,13 +11,14 @@ jest.mock('@play-money/accounts/lib/getAccountBalance', () => ({
 jest.mock('@play-money/markets/lib/getMarketOption', () => ({ getMarketOption: jest.fn() }))
 
 describe('maniswap-v1.1', () => {
-  describe('buy', () => {
+  describe('trade', () => {
     it('should return correct amount for buying YES', async () => {
       // Current probability = 0.75
-      const amount = await buy({
+      const amount = await trade({
         amount: new Decimal(50),
         targetShare: new Decimal(100),
         shares: [new Decimal(100), new Decimal(300)],
+        isBuy: true,
       })
 
       expect(amount).toBeCloseToDecimal(64.29)
@@ -25,38 +26,41 @@ describe('maniswap-v1.1', () => {
 
     it('should return correct amount for buying NO', async () => {
       // Current probability = 0.75
-      const amount = await buy({
+      const amount = await trade({
         amount: new Decimal(50),
         targetShare: new Decimal(300),
         shares: [new Decimal(100), new Decimal(300)],
+        isBuy: true,
       })
 
       expect(amount).toBeCloseToDecimal(150)
     })
-  })
 
-  // This is the inverse of the test for buying YES
-  it('should return correct amount for selling YES', async () => {
-    // Current probability ~= 0.80
-    const amount = await sell({
-      amount: new Decimal(64.29),
-      targetShare: new Decimal(85.71),
-      shares: [new Decimal(85.71), new Decimal(350)],
+    // This is the inverse of the test for buying YES
+    it('should return correct amount for selling YES', async () => {
+      // Current probability ~= 0.80
+      const amount = await trade({
+        amount: new Decimal(64.29),
+        targetShare: new Decimal(85.71),
+        shares: [new Decimal(85.71), new Decimal(350)],
+        isBuy: false,
+      })
+
+      expect(amount).toBeCloseToDecimal(50)
     })
 
-    expect(amount).toBeCloseToDecimal(50)
-  })
+    // This is the inverse of the test for buying NO
+    it('should return correct amount for selling NO', async () => {
+      // Current probability ~= 0.57
+      const amount = await trade({
+        amount: new Decimal(150),
+        targetShare: new Decimal(200),
+        shares: [new Decimal(150), new Decimal(200)],
+        isBuy: false,
+      })
 
-  // This is the inverse of the test for buying NO
-  it('should return correct amount for selling NO', async () => {
-    // Current probability ~= 0.57
-    const amount = await sell({
-      amount: new Decimal(150),
-      targetShare: new Decimal(200),
-      shares: [new Decimal(150), new Decimal(200)],
+      expect(amount).toBeCloseToDecimal(50)
     })
-
-    expect(amount).toBeCloseToDecimal(50)
   })
 
   describe('quote', () => {

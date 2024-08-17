@@ -2,7 +2,7 @@ import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
-import { quote, sell } from '@play-money/amms/lib/maniswap-v1.1'
+import { trade, quote } from '@play-money/amms/lib/maniswap-v1.1'
 import { getBalances } from '@play-money/finance/lib/getBalances'
 import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
 import { createTransaction, TransactionItemInput } from './createTransaction'
@@ -45,10 +45,11 @@ export async function createMarketSellTransaction({ userId, marketId, amount, op
         ).cost
       : outstandingShares
 
-    const returnedShares = await sell({
+    const returnedShares = await trade({
       amount: amountToSell,
       targetShare: ammAssetBalances.find((balance) => balance.assetId === marketOption.id)!.amount,
       shares: ammAssetBalances.map((balance) => balance.amount),
+      isBuy: false,
     })
 
     const oppositeCurrencyCode = marketOption.currencyCode === 'YES' ? 'NO' : 'YES'

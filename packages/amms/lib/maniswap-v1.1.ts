@@ -1,14 +1,5 @@
 import Decimal from 'decimal.js'
 
-function findDecimalIndex(shares: Decimal[], targetShare: Decimal): number {
-  for (let i = 0; i < shares.length; i++) {
-    if (shares[i].eq(targetShare)) {
-      return i
-    }
-  }
-  return -1 // Return -1 if no match is found
-}
-
 /*
  This is currently a _Uniswap_ implementation, not Maniswap, since it does not have a dynamic `p`.
  Instead, the `p` is set at 0.5, which allows us to ignore the exponent (since the actual value of k does not
@@ -16,94 +7,78 @@ function findDecimalIndex(shares: Decimal[], targetShare: Decimal): number {
 
  For more information, see https://manifoldmarkets.notion.site/Maniswap-ce406e1e897d417cbd491071ea8a0c39
 */
-function calculateBuyShares({
+function calculateTrade({
   amount,
   targetShare,
-  sharesSum,
+  totalShares,
+  isBuy,
 }: {
   amount: Decimal
   targetShare: Decimal
-  sharesSum: Decimal
-}): Decimal {
-  return amount.times(amount.add(sharesSum)).div(amount.add(sharesSum.sub(targetShare)))
-}
+  totalShares: Decimal
+  isBuy: boolean
+}) {
+  if (isBuy) {
+    return amount.times(amount.add(totalShares)).div(amount.add(totalShares.sub(targetShare)))
+  }
 
-function calculateSellShares({
-  amount,
-  targetShare,
-  sharesSum,
-}: {
-  amount: Decimal
-  targetShare: Decimal
-  sharesSum: Decimal
-}): Decimal {
-  return sharesSum
+  return totalShares
     .add(amount)
-    .sub(Decimal.sqrt(sharesSum.add(amount).pow(2).sub(sharesSum.sub(targetShare).times(4).times(amount))))
+    .sub(Decimal.sqrt(totalShares.add(amount).pow(2).sub(totalShares.sub(targetShare).times(4).times(amount))))
     .times(0.5)
 }
 
-function calculateBuyProbabilityCost({
+function calculateProbabilityCost({
   probability,
   targetShare,
-  sharesSum,
+  totalShares,
+  isBuy,
 }: {
   probability: Decimal
   targetShare: Decimal
-  sharesSum: Decimal
+  totalShares: Decimal
+  isBuy: boolean
 }): Decimal {
-  const totalOppositeShares = sharesSum.sub(targetShare)
+  const totalOppositeShares = totalShares.sub(targetShare)
 
-  return Decimal.sqrt(totalOppositeShares.times(targetShare).times(probability).neg().div(probability.sub(1))).sub(
-    totalOppositeShares
+  const factor = isBuy ? probability.neg().div(probability.sub(1)) : probability.sub(1).neg().div(probability)
+
+  if (isBuy) {
+    return Decimal.sqrt(totalOppositeShares.times(targetShare).times(probability).neg().div(probability.sub(1))).sub(
+      totalOppositeShares
+    )
+  }
+
+  return Decimal.sqrt(totalOppositeShares.times(targetShare).times(factor)).sub(
+    isBuy ? totalOppositeShares : targetShare
   )
 }
 
-function calculateSellProbabilityCost({
-  probability,
-  targetShare,
-  sharesSum,
-}: {
-  probability: Decimal
-  targetShare: Decimal
-  sharesSum: Decimal
-}): Decimal {
-  const totalOppositeShares = sharesSum.sub(targetShare)
-
-  return Decimal.sqrt(totalOppositeShares.times(targetShare).times(probability.sub(1)).neg().div(probability)).sub(
-    targetShare
-  )
+function findShareIndex(shares: Array<Decimal>, targetShare: Decimal): number {
+  return shares.findIndex((share) => share.eq(targetShare))
 }
 
-function calculateProbability({ targetShare, shares }: { targetShare: Decimal; shares: Array<Decimal> }): Decimal {
-  const totalShares = shares.reduce((sum, share) => sum.add(share), new Decimal(0))
+function sumShares(shares: Array<Decimal>) {
+  return shares.reduce((sum, share) => sum.add(share), new Decimal(0))
+}
+
+function calculateProbability({ targetShare, totalShares }: { targetShare: Decimal; totalShares: Decimal }): Decimal {
   return totalShares.sub(targetShare).div(totalShares)
 }
 
-export function buy({
+export function trade({
   amount,
   targetShare,
   shares,
+  isBuy,
 }: {
   amount: Decimal
   targetShare: Decimal
   shares: Array<Decimal>
-}): Decimal {
-  const sharesSum = shares.reduce((sum, share) => sum.add(share), new Decimal(0))
-  return calculateBuyShares({ amount, targetShare, sharesSum })
-}
-
-export function sell({
-  amount,
-  targetShare,
-  shares,
-}: {
-  amount: Decimal
-  targetShare: Decimal
-  shares: Array<Decimal>
-}): Decimal {
-  const sharesSum = shares.reduce((sum, share) => sum.add(share), new Decimal(0))
-  return calculateSellShares({ amount, targetShare, sharesSum })
+  isBuy: boolean
+}) {
+  const totalShares = sumShares(shares)
+  return calculateTrade({ amount, targetShare, totalShares, isBuy })
 }
 
 export async function quote({
@@ -117,35 +92,23 @@ export async function quote({
   targetShare: Decimal
   shares: Array<Decimal>
 }): Promise<{ probability: Decimal; shares: Decimal; cost: Decimal }> {
-  const targetIndex = findDecimalIndex(shares, targetShare)
-  const sharesSum = shares.reduce((sum, share) => sum.add(share), new Decimal(0))
-
-  const currentProbability = calculateProbability({
-    targetShare,
-    shares,
-  })
-
+  const targetIndex = findShareIndex(shares, targetShare)
+  const totalShares = sumShares(shares)
+  const currentProbability = calculateProbability({ targetShare, totalShares })
   const isBuy = currentProbability.lt(probability)
 
-  let costToHitProbability = isBuy
-    ? calculateBuyProbabilityCost({ probability, targetShare, sharesSum })
-    : calculateSellProbabilityCost({ probability, targetShare, sharesSum })
+  let costToHitProbability = calculateProbabilityCost({ probability, targetShare, totalShares, isBuy })
+  const cost = Decimal.min(costToHitProbability, amount)
 
-  const cost = costToHitProbability.gt(amount) ? amount : costToHitProbability
-
-  const returnedShares = isBuy
-    ? calculateBuyShares({ amount: cost, targetShare, sharesSum })
-    : calculateSellShares({ amount: cost, targetShare, sharesSum })
+  const returnedShares = calculateTrade({ amount: cost, targetShare, totalShares, isBuy })
 
   const updatedShares = shares.map((share, i) =>
     i === targetIndex ? share.sub(returnedShares).add(cost) : isBuy ? share.add(cost) : share.sub(returnedShares)
   )
+  const updatedTotalShares = sumShares(updatedShares)
 
   return {
-    probability: calculateProbability({
-      targetShare: updatedShares[targetIndex],
-      shares: updatedShares,
-    }),
+    probability: calculateProbability({ targetShare: updatedShares[targetIndex], totalShares: updatedTotalShares }),
     shares: returnedShares,
     cost,
   }
@@ -158,39 +121,39 @@ export function addLiquidity({
   amount: Decimal
   options: Array<{ shares: Decimal; liquidityProbability: Decimal }>
 }): Array<Decimal> {
-  const totalShares = options.reduce((sum, option) => sum.add(option.shares), new Decimal(0))
-  const newShares: Decimal[] = []
+  // const totalShares = options.reduce((sum, option) => sum.add(option.shares), new Decimal(0))
+  // const newShares: Decimal[] = []
 
-  for (const option of options) {
-    const { shares, liquidityProbability } = option
-    const currentProbability = shares.div(totalShares)
+  // for (const option of options) {
+  //   const { shares, liquidityProbability } = option
+  //   const currentProbability = shares.div(totalShares)
 
-    const p = calculateNewP(currentProbability, liquidityProbability, amount, shares, totalShares)
-    const newOptionShares = calculateNewShares(p, amount, shares, totalShares)
+  //   const p = calculateNewP(currentProbability, liquidityProbability, amount, shares, totalShares)
+  //   const newOptionShares = calculateNewShares(p, amount, shares, totalShares)
 
-    newShares.push(newOptionShares)
-  }
+  //   newShares.push(newOptionShares)
+  // }
 
-  return newShares
+  return [amount, amount]
 }
 
-function calculateNewP(
-  currentProbability: Decimal,
-  liquidityProbability: Decimal,
-  amount: Decimal,
-  shares: Decimal,
-  totalShares: Decimal
-): Decimal {
-  // This is a simplified approximation. You may need to use numerical methods for more accuracy.
-  const weight = amount.div(totalShares.add(amount))
-  return currentProbability.mul(Decimal.sub(1, weight)).add(liquidityProbability.mul(weight))
-}
+// function calculateNewP(
+//   currentProbability: Decimal,
+//   liquidityProbability: Decimal,
+//   amount: Decimal,
+//   shares: Decimal,
+//   totalShares: Decimal
+// ): Decimal {
+//   // This is a simplified approximation. You may need to use numerical methods for more accuracy.
+//   const weight = amount.div(totalShares.add(amount))
+//   return currentProbability.mul(Decimal.sub(1, weight)).add(liquidityProbability.mul(weight))
+// }
 
-function calculateNewShares(p: Decimal, amount: Decimal, shares: Decimal, totalShares: Decimal): Decimal {
-  const n = totalShares.sub(shares)
-  const newShares = Decimal.pow(shares.add(amount), p)
-    .mul(Decimal.pow(n.add(amount), Decimal.sub(1, p)))
-    .sub(Decimal.pow(shares, p).mul(Decimal.pow(n, Decimal.sub(1, p))))
+// function calculateNewShares(p: Decimal, amount: Decimal, shares: Decimal, totalShares: Decimal): Decimal {
+//   const n = totalShares.sub(shares)
+//   const newShares = Decimal.pow(shares.add(amount), p)
+//     .mul(Decimal.pow(n.add(amount), Decimal.sub(1, p)))
+//     .sub(Decimal.pow(shares, p).mul(Decimal.pow(n, Decimal.sub(1, p))))
 
-  return newShares
-}
+//   return newShares
+// }
