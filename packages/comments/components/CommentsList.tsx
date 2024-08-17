@@ -2,10 +2,10 @@
 
 import _ from 'lodash'
 import React, { useState, useEffect } from 'react'
+import { CommentWithReactions } from '@play-money/comments/lib/getComment'
 import { toast } from '@play-money/ui/use-toast'
 import { useUser } from '@play-money/users/context/UserContext'
 import { flattenReplies } from '../lib/flattenReplies'
-import { MarketComment } from '../lib/getCommentsOnMarket'
 import { CommentItem } from './CommentItem'
 import { CreateCommentForm } from './CreateCommentForm'
 
@@ -14,7 +14,7 @@ export function CommentsList({
   entity,
   onRevalidate,
 }: {
-  comments: Array<MarketComment>
+  comments: Array<CommentWithReactions>
   entity: { type: string; id: string }
   onRevalidate: () => void
 }) {

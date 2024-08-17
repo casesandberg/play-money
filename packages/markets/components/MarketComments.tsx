@@ -1,8 +1,8 @@
 import 'next'
 import { revalidateTag } from 'next/cache'
 import React from 'react'
-import { MarketComment } from '../lib/getCommentsOnMarket'
-import { CommentsList } from './CommentsList'
+import { CommentsList } from '@play-money/comments/components/CommentsList'
+import { CommentWithReactions } from '@play-money/comments/lib/getComment'
 
 declare module 'next' {
   interface NextFetchRequestConfig {
@@ -17,7 +17,11 @@ declare global {
 }
 
 // TODO: @casesandberg Generate this from OpenAPI schema
-async function getMarketComments({ marketId }: { marketId: string }): Promise<{ comments: Array<MarketComment> }> {
+async function getMarketComments({
+  marketId,
+}: {
+  marketId: string
+}): Promise<{ comments: Array<CommentWithReactions> }> {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/comments`, {
     credentials: 'include',
     next: { tags: ['comments'] },
