@@ -1,5 +1,5 @@
-import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
 import db from '@play-money/database'
+import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
 import { TransactionWithItems } from '@play-money/transactions/lib/getTransactions'
 
 export async function getNewLiquidityTransactions(): Promise<Array<TransactionWithItems>> {

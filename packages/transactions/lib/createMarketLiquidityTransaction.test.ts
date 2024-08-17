@@ -1,15 +1,15 @@
 import Decimal from 'decimal.js'
-import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
 import '@play-money/config/jest/jest-setup'
 import { mockAccount, mockMarket, mockMarketOption } from '@play-money/database/mocks'
 import { getAssetBalance, getBalances, NetBalance } from '@play-money/finance/lib/getBalances'
+import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
 import { getMarketAmmAccount } from '@play-money/finance/lib/getMarketAmmAccount'
 import { getMarketClearingAccount } from '@play-money/finance/lib/getMarketClearingAccount'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import { createMarketLiquidityTransaction } from './createMarketLiquidityTransaction'
 import { createTransaction } from './createTransaction'
 
-jest.mock('@play-money/accounts/lib/getHouseAccount', () => ({ getHouseAccount: jest.fn() }))
+jest.mock('@play-money/finance/lib/getHouseAccount', () => ({ getHouseAccount: jest.fn() }))
 jest.mock('@play-money/finance/lib/getMarketAmmAccount', () => ({ getMarketAmmAccount: jest.fn() }))
 jest.mock('@play-money/finance/lib/getMarketClearingAccount', () => ({ getMarketClearingAccount: jest.fn() }))
 jest.mock('@play-money/markets/lib/getMarket', () => ({ getMarket: jest.fn() }))

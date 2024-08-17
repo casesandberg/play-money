@@ -1,12 +1,12 @@
 import Decimal from 'decimal.js'
 import _ from 'lodash'
-import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
 import db from '@play-money/database'
 import { mockAccount, mockTransactionItem, mockTransactionWithItems } from '@play-money/database/mocks'
+import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
 import { createMarketTraderBonusTransactions } from './createMarketTraderBonusTransactions'
 import { createTransaction } from './createTransaction'
 
-jest.mock('@play-money/accounts/lib/getHouseAccount', () => ({ getHouseAccount: jest.fn() }))
+jest.mock('@play-money/finance/lib/getHouseAccount', () => ({ getHouseAccount: jest.fn() }))
 jest.mock('./createTransaction', () => ({ createTransaction: jest.fn() }))
 jest.mock('@play-money/database', () => ({
   transactionItem: {

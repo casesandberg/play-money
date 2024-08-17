@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js'
 import _ from 'lodash'
-import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
+import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
 import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'
 import { createTransaction } from './createTransaction'
 
