@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
-import { getAccountBalance } from '@play-money/accounts/lib/getAccountBalance'
 import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import type { SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
+import { getAssetBalance } from '@play-money/finance/lib/getBalances'
 import type schema from './schema'
 
 export const dynamic = 'force-dynamic'
@@ -16,9 +16,13 @@ export async function GET(_req: Request): Promise<SchemaResponse<typeof schema.G
     }
 
     const userAccount = await getUserAccount({ id: session.user.id })
-    const balance = await getAccountBalance({ accountId: userAccount.id, currencyCode: 'PRIMARY' })
+    const primaryBalance = await getAssetBalance({
+      accountId: userAccount.id,
+      assetType: 'CURRENCY',
+      assetId: 'PRIMARY',
+    })
 
-    return NextResponse.json({ balance: balance.toNumber() })
+    return NextResponse.json({ balance: primaryBalance.amount.toNumber() })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
 
