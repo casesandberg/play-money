@@ -8,7 +8,6 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@play-money/amms": "*",
     "@play-money/finance": "*",
     "decimal.js": "^10.4.3",
     "lodash": "^4.17.21",

@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js'
 import _ from 'lodash'
-import { trade, quote } from '@play-money/amms/lib/maniswap-v1.1'
+import { trade, quote } from '@play-money/finance/amms/maniswap-v1.1'
 import { getBalances } from '@play-money/finance/lib/getBalances'
 import { getMarketAmmAccount } from '@play-money/finance/lib/getMarketAmmAccount'
 import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'

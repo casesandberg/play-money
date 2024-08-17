@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
