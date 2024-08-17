@@ -5,7 +5,6 @@ import React from 'react'
 import { CurrencyDisplay } from '@play-money/currencies/components/CurrencyDisplay'
 import { User } from '@play-money/database'
 import { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
-import { MarketUserTraderBonusAmount } from '@play-money/markets/components/MarketUserTraderBonusAmount'
 import { TransactionWithItems } from '@play-money/transactions/lib/getTransactions'
 import { summarizeTransaction } from '@play-money/transactions/lib/helpers'
 import { Card, CardContent } from '@play-money/ui/card'
@@ -163,7 +162,7 @@ export async function UserProfilePage({ username }: { username: string }) {
                   <TableRow>
                     <TableHead>Market</TableHead>
                     <TableHead className="hidden w-[150px] sm:table-cell">Resolves</TableHead>
-                    <TableHead className="hidden sm:table-cell">Bonus</TableHead>
+                    {/* <TableHead className="hidden sm:table-cell">Bonus</TableHead> */}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -178,9 +177,9 @@ export async function UserProfilePage({ username }: { username: string }) {
                               <TableCell className="hidden md:table-cell">
                                 {market.closeDate ? format(market.closeDate, 'MMM d, yyyy') : '-'}
                               </TableCell>
-                              <TableCell className="hidden md:table-cell">
+                              {/* <TableCell className="hidden md:table-cell">
                                 <MarketUserTraderBonusAmount marketId={market.id} />
-                              </TableCell>
+                              </TableCell> */}
                             </TableRow>
                           </Link>
                         )
