@@ -1,10 +1,10 @@
 import db from '@play-money/database'
 import { UserNotFoundError } from '@play-money/users/lib/exceptions'
 
-export async function getUserAccount({ id }: { id: string }) {
+export async function getUserPrimaryAccount({ userId }: { userId: string }) {
   const user = await db.user.findUnique({
     where: {
-      id,
+      id: userId,
     },
     include: {
       accounts: true,
@@ -12,7 +12,7 @@ export async function getUserAccount({ id }: { id: string }) {
   })
 
   if (!user) {
-    throw new UserNotFoundError(`User with id "${id}" not found`)
+    throw new UserNotFoundError(`User with id "${userId}" not found`)
   }
 
   const account = user.accounts[0]

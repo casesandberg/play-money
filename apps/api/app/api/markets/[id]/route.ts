@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
-import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import { stripUndefined, type SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
 import { CommentNotFoundError } from '@play-money/comments/lib/exceptions'
 import { getUserMarketOptionIncome } from '@play-money/finance/lib/getUserMarketOptionIncome'
+import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import { updateMarket } from '@play-money/markets/lib/updateMarket'
 import schema from './schema'
@@ -28,7 +28,7 @@ export async function GET(
     const { id, extended } = schema.get.parameters.parse({ ...params, ...idParams })
 
     const session = await auth()
-    const userAccount = session?.user?.id ? await getUserAccount({ id: session.user.id }) : undefined
+    const userAccount = session?.user?.id ? await getUserPrimaryAccount({ userId: session.user.id }) : undefined
 
     if (extended) {
       const market = await getMarket({ id, extended })

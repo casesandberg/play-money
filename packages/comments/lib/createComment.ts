@@ -1,5 +1,5 @@
-import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import db, { Comment } from '@play-money/database'
+import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import { createNotification } from '@play-money/notifications/lib/createNotification'
 import { createDailyCommentBonusTransaction } from '@play-money/quests/lib/createDailyCommentBonusTransaction'
@@ -62,7 +62,7 @@ export async function createComment({
   )
 
   if (!(await hasCommentedToday({ userId: authorId }))) {
-    const userAccount = await getUserAccount({ id: authorId })
+    const userAccount = await getUserPrimaryAccount({ userId: authorId })
     await createDailyCommentBonusTransaction({ accountId: userAccount.id, marketId: market.id })
   }
 

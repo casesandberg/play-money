@@ -1,9 +1,9 @@
 import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { getAmmAccount } from '@play-money/accounts/lib/getAmmAccount'
-import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import { trade, quote } from '@play-money/amms/lib/maniswap-v1.1'
 import { getBalances } from '@play-money/finance/lib/getBalances'
+import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'
 import { getMarketOption } from '@play-money/markets/lib/getMarketOption'
 import { createTransaction, TransactionItemInput } from './createTransaction'
 import { convertMarketSharesToPrimary } from './exchanger'
@@ -16,7 +16,7 @@ type MarketSellTransactionInput = {
 }
 
 export async function createMarketSellTransaction({ userId, marketId, amount, optionId }: MarketSellTransactionInput) {
-  const userAccount = await getUserAccount({ id: userId })
+  const userAccount = await getUserPrimaryAccount({ userId })
   const ammAccount = await getAmmAccount({ marketId })
   const marketOption = await getMarketOption({ id: optionId, marketId })
 

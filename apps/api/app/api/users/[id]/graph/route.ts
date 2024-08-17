@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import type { SchemaResponse } from '@play-money/api-helpers'
+import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'
 import { getAccountTotalTimeSeries } from '@play-money/transactions/lib/getAccountTotalTimeSeries'
 import schema from './schema'
 
@@ -12,7 +12,7 @@ export async function GET(
 ): Promise<SchemaResponse<typeof schema.GET.responses>> {
   try {
     const { id } = schema.GET.parameters.parse(params)
-    const userAccount = await getUserAccount({ id })
+    const userAccount = await getUserPrimaryAccount({ userId: id })
 
     const data = await getAccountTotalTimeSeries({
       accountId: userAccount.id,

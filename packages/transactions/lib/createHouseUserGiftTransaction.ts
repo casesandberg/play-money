@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
-import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
+import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'
 import { createTransaction } from './createTransaction'
 
 interface HouseUserGiftTransactionInput {
@@ -11,8 +11,8 @@ interface HouseUserGiftTransactionInput {
 }
 
 export async function createHouseUserGiftTransaction({ userId, amount, creatorId }: HouseUserGiftTransactionInput) {
-  const userAccount = await getUserAccount({ id: userId })
-  const creatorAccount = await getUserAccount({ id: creatorId })
+  const userAccount = await getUserPrimaryAccount({ userId })
+  const creatorAccount = await getUserPrimaryAccount({ userId: creatorId })
   const houseAccount = await getHouseAccount()
 
   const transaction = await createTransaction({

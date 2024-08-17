@@ -1,9 +1,9 @@
 import Decimal from 'decimal.js'
 import { getHouseAccount } from '@play-money/accounts/lib/getHouseAccount'
-import { getUserAccount } from '@play-money/accounts/lib/getUserAccount'
 import db from '@play-money/database'
 import { DAILY_TRADE_BONUS_PRIMARY, UNIQUE_TRADER_LIQUIDITY_PRIMARY } from '@play-money/economy'
 import { getAssetBalance } from '@play-money/finance/lib/getBalances'
+import { getUserPrimaryAccount } from '@play-money/finance/lib/getUserPrimaryAccount'
 import { createNotification } from '@play-money/notifications/lib/createNotification'
 import { createDailyTradeBonusTransaction } from '@play-money/quests/lib/createDailyTradeBonusTransaction'
 import { hasPlacedMarketTradeToday } from '@play-money/quests/lib/helpers'
@@ -30,7 +30,7 @@ export async function marketBuy({
     throw new Error('Market is closed')
   }
 
-  const userAccount = await getUserAccount({ id: creatorId })
+  const userAccount = await getUserPrimaryAccount({ userId: creatorId })
   const userPrimaryBalance = await getAssetBalance({
     accountId: userAccount.id,
     assetType: 'CURRENCY',
