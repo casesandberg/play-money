@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import React, { useState, useEffect } from 'react'
+import { getSearch } from '@play-money/api-helpers/client'
 import { Market, User } from '@play-money/database'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import {
@@ -21,13 +22,8 @@ export function GlobalSearchMenu({ open, onOpenChange }: { open: boolean; onOpen
   useEffect(() => {
     async function search() {
       if (open) {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/search?query=${query}`)
-
-        if (!response.ok) {
-          const { message } = await response.json()
-          throw new Error(message || 'Network response was not ok')
-        }
-        setResults(await response.json())
+        const data = await getSearch({ query })
+        setResults(data)
       }
     }
 

@@ -3,17 +3,13 @@
 import { formatDistanceToNow } from 'date-fns'
 import _ from 'lodash'
 import Link from 'next/link'
-import useSWR from 'swr'
+import { useRecentTrades } from '@play-money/api-helpers/client/hooks'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { summarizeTransaction } from '@play-money/finance/lib/helpers'
 import { UserLink } from '@play-money/users/components/UserLink'
-import { TransactionWithItems } from '../lib/getTransactions'
 
 export function RecentTrades() {
-  const { data } = useSWR<{ transactions: Array<TransactionWithItems> }>(
-    `/v1/transactions?transactionType=MARKET_BUY,MARKET_SELL`,
-    { refreshInterval: 1000 * 60 * 5 }
-  ) // 5 mins
+  const { data } = useRecentTrades()
 
   return (
     <ul className="divide-y divide-muted text-sm">

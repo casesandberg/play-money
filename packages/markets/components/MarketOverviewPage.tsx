@@ -4,9 +4,8 @@ import { format, isPast } from 'date-fns'
 import { CircleCheckBig, ChevronDown, Diamond } from 'lucide-react'
 import React from 'react'
 import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip as ChartTooltip } from 'recharts'
-import useSWR from 'swr'
+import { useMarketBalance, useMarketGraph } from '@play-money/api-helpers/client/hooks'
 import { Market, MarketOption, MarketResolution, User } from '@play-money/database'
-import { NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
 import { marketOptionBalancesToProbabilities } from '@play-money/finance/lib/helpers'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Alert, AlertDescription, AlertTitle } from '@play-money/ui/alert'
@@ -55,19 +54,14 @@ export function MarketOverviewPage({
 }) {
   const { user } = useUser()
   const { triggerEffect } = useSidebar()
-  const { data: balance } = useSWR<{ amm: Array<NetBalanceAsNumbers>; user: Array<NetBalanceAsNumbers> }>(
-    `/v1/markets/${market.id}/balance`,
-    { refreshInterval: 1000 * 60 }
-  ) // 60 seconds
-  const { data: graph } = useSWR(`/v1/markets/${market.id}/graph`, { refreshInterval: 1000 * 60 * 5 }) // 5 mins
+  const { data: balance } = useMarketBalance({ marketId: market.id })
+  const { data: graph } = useMarketGraph({ marketId: market.id })
   const [option, setOption] = useSearchParam('option', 'replace')
   const [isEditing, setIsEditing] = useSearchParam('edit')
   const [isBoosting, setIsBoosting] = useSearchParam('boost')
   const activeOptionId = option || market.options[0]?.id || ''
   const isCreator = user?.id === market.createdBy
   const probabilities = marketOptionBalancesToProbabilities(balance?.amm)
-
-  const stats = {}
 
   return (
     <Card className="flex-1">

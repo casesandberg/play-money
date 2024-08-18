@@ -6,9 +6,10 @@ import moment from 'moment'
 import { useRouter } from 'next/navigation'
 import { CirclePicker } from 'react-color'
 import { useFieldArray, useForm } from 'react-hook-form'
-import { useSWRConfig } from 'swr'
+import { mutate } from 'swr'
 import { z } from 'zod'
-import type { Market } from '@play-money/database'
+import { createMarket } from '@play-money/api-helpers/client'
+import { MY_BALANCE_PATH } from '@play-money/api-helpers/client/hooks'
 import { MarketSchema, MarketOptionSchema } from '@play-money/database'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { INITIAL_MARKET_LIQUIDITY_PRIMARY } from '@play-money/finance/economy'
@@ -28,7 +29,6 @@ type MarketCreateFormValues = z.infer<typeof marketCreateFormSchema>
 
 export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void> }) {
   const router = useRouter()
-  const { mutate } = useSWRConfig()
   const tzName = /\((?<tz>[A-Za-z\s].*)\)/.exec(new Date().toString())?.groups?.tz ?? null
 
   const form = useForm<MarketCreateFormValues>({
@@ -45,29 +45,21 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
   })
 
   async function onSubmit(market: MarketCreateFormValues) {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets`, {
-      method: 'POST',
-      body: JSON.stringify(market),
-      credentials: 'include',
-    })
+    try {
+      const newMarket = await createMarket(market)
 
-    if (!response.ok || response.status >= 400) {
-      const { error } = (await response.json()) as { error: string }
+      onSuccess?.()
+      void mutate(MY_BALANCE_PATH)
+      toast({
+        title: 'Your market has been created',
+      })
+      router.push(`/questions/${newMarket.id}/${newMarket.slug}`)
+    } catch (error) {
       toast({
         title: 'There was an error creating your market',
-        description: error,
+        description: (error as Error).message,
       })
-      return
     }
-
-    const newMarket = (await response.json()) as Market
-
-    onSuccess?.()
-    void mutate('/v1/users/me/balance')
-    toast({
-      title: 'Your market has been created',
-    })
-    router.push(`/questions/${newMarket.id}/${newMarket.slug}`)
   }
 
   const handleSubmit = form.handleSubmit(onSubmit)

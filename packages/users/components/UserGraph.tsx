@@ -4,6 +4,7 @@ import { format } from 'date-fns'
 import React from 'react'
 import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip as ChartTooltip, Area } from 'recharts'
 import useSWR from 'swr'
+import { useUserGraph } from '@play-money/api-helpers/client/hooks'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { Card } from '@play-money/ui/card'
 import { cn } from '@play-money/ui/utils'
@@ -42,7 +43,7 @@ export function getTotalAmountChange(data: Array<{ endAt: Date; startAt: Date; t
 }
 
 export function UserGraph({ userId }: { userId: string }) {
-  const { data: graph } = useSWR(`/v1/users/${userId}/graph`, { refreshInterval: 1000 * 60 * 5 }) // 5 mins
+  const { data: graph } = useUserGraph({ userId })
   const change = getTotalAmountChange(graph?.data || [])
 
   return (

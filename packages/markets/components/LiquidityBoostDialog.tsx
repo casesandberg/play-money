@@ -5,6 +5,7 @@ import _ from 'lodash'
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
+import { createLiquidity } from '@play-money/api-helpers/client'
 import { Market } from '@play-money/database'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { formatNumber } from '@play-money/finance/lib/formatCurrency'
@@ -63,17 +64,7 @@ export const LiquidityBoostDialog = ({
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${market.id}/liquidity`, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        credentials: 'include',
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.message)
-      }
-
+      await createLiquidity({ marketId: market.id, amount: data.amount })
       toast({ title: `$${data.amount} liquidity added!` })
       form.reset()
       onSuccess?.()

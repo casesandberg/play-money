@@ -2,11 +2,12 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import _ from 'lodash'
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
+import { createMarketResolve } from '@play-money/api-helpers/client'
 import { Button } from '@play-money/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@play-money/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@play-money/ui/dialog'
 import { ReadMoreEditor } from '@play-money/ui/editor'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
@@ -37,16 +38,7 @@ export const ResolveMarketDialog = ({
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${market.id}/resolve`, {
-        method: 'POST',
-        body: JSON.stringify({ optionId: data.optionId, supportingLink: data.supportingLink }),
-        credentials: 'include',
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error)
-      }
+      await createMarketResolve({ marketId: market.id, optionId: data.optionId, supportingLink: data.supportingLink })
 
       toast({ title: 'Market resolved successfully' })
       form.reset()
