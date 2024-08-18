@@ -2,23 +2,19 @@
 
 import { BellIcon } from 'lucide-react'
 import { useState } from 'react'
-import useSWR from 'swr'
 import { createMyNotifications } from '@play-money/api-helpers/client'
+import { useNotifications } from '@play-money/api-helpers/client/hooks'
 import { Badge } from '@play-money/ui/badge'
 import { Button } from '@play-money/ui/button'
 import { Card, CardContent } from '@play-money/ui/card'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@play-money/ui/dropdown-menu'
 import { useUser } from '@play-money/users/context/UserContext'
-import { NotificationGroupWithLastNotification } from '../lib/getNotifications'
 import { NotificationItem } from './NotificationItem'
 
 export function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false)
   const { user } = useUser()
-  const { data, mutate } = useSWR<{ unreadCount: number; notifications: Array<NotificationGroupWithLastNotification> }>(
-    user ? '/v1/users/me/notifications' : null,
-    { refreshInterval: 1000 * 60 * 5 } // 5 mins
-  )
+  const { data, mutate } = useNotifications({ skip: !user })
 
   const handleMarkAllRead = async () => {
     try {

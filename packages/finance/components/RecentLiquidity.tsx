@@ -4,16 +4,13 @@ import { formatDistanceToNow } from 'date-fns'
 import _ from 'lodash'
 import Link from 'next/link'
 import React from 'react'
-import useSWR from 'swr'
+import { useLiquidity } from '@play-money/api-helpers/client/hooks'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { UserLink } from '@play-money/users/components/UserLink'
-import { TransactionWithItems } from '../lib/getTransactions'
 import { summarizeTransaction } from '../lib/helpers'
 
 export function RecentLiquidity() {
-  const { data } = useSWR<{ transactions: Array<TransactionWithItems> }>(`/v1/liquidity`, {
-    refreshInterval: 1000 * 60 * 5,
-  }) // 5 mins
+  const { data } = useLiquidity()
 
   return (
     <ul className="divide-y divide-muted text-sm">

@@ -1,15 +1,19 @@
 'use client'
 
 import React from 'react'
-import useSWR, { useSWRConfig } from 'swr'
+import { mutate } from 'swr'
+import {
+  MARKET_BALANCE_PATH,
+  MARKET_GRAPH_PATH,
+  MY_BALANCE_PATH,
+  useMarketBalance,
+} from '@play-money/api-helpers/client/hooks'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
-import { NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
 import { useSearchParam } from '@play-money/ui'
 import { Card, CardContent, CardHeader } from '@play-money/ui/card'
 import { Combobox } from '@play-money/ui/combobox'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@play-money/ui/tabs'
 import { cn } from '@play-money/ui/utils'
-import { MarketStats } from './LiquidityBoostDialog'
 import { MarketBuyForm } from './MarketBuyForm'
 import { ExtendedMarket } from './MarketOverviewPage'
 import { MarketSellForm } from './MarketSellForm'
@@ -25,11 +29,7 @@ export function MarketTradePanel({
   activeOptionId: string
 }) {
   // We can SSR this now, since the P&L will be the one thats updated externally and this one will only ever be updated by a user!
-  const { data: balance } = useSWR<{ amm: Array<NetBalanceAsNumbers>; user: Array<NetBalanceAsNumbers> }>(
-    `/v1/markets/${market.id}/balance`,
-    { refreshInterval: 1000 * 60 }
-  ) // 60 seconds
-  const { mutate } = useSWRConfig()
+  const { data: balance } = useMarketBalance({ marketId: market.id })
   const [option, setOption] = useSearchParam('option')
   const { effect, resetEffect } = useSidebar()
   const activeOption = market.options.find((o) => o.id === (option || activeOptionId))
@@ -38,9 +38,9 @@ export function MarketTradePanel({
   )
 
   const handleRefresh = async () => {
-    void mutate('/v1/users/me/balance')
-    void mutate(`/v1/markets/${market.id}/balance`)
-    void mutate(`/v1/markets/${market.id}/graph`)
+    void mutate(MY_BALANCE_PATH)
+    void mutate(MARKET_BALANCE_PATH(market.id))
+    void mutate(MARKET_GRAPH_PATH(market.id))
   }
 
   const primaryBalance = balance?.user.find((b) => b.assetId === 'PRIMARY')

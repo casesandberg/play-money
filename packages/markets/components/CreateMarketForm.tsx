@@ -6,9 +6,10 @@ import moment from 'moment'
 import { useRouter } from 'next/navigation'
 import { CirclePicker } from 'react-color'
 import { useFieldArray, useForm } from 'react-hook-form'
-import { useSWRConfig } from 'swr'
+import { mutate } from 'swr'
 import { z } from 'zod'
 import { createMarket } from '@play-money/api-helpers/client'
+import { MY_BALANCE_PATH } from '@play-money/api-helpers/client/hooks'
 import { MarketSchema, MarketOptionSchema } from '@play-money/database'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { INITIAL_MARKET_LIQUIDITY_PRIMARY } from '@play-money/finance/economy'
@@ -28,7 +29,6 @@ type MarketCreateFormValues = z.infer<typeof marketCreateFormSchema>
 
 export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void> }) {
   const router = useRouter()
-  const { mutate } = useSWRConfig()
   const tzName = /\((?<tz>[A-Za-z\s].*)\)/.exec(new Date().toString())?.groups?.tz ?? null
 
   const form = useForm<MarketCreateFormValues>({
@@ -49,7 +49,7 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
       const newMarket = await createMarket(market)
 
       onSuccess?.()
-      void mutate('/v1/users/me/balance')
+      void mutate(MY_BALANCE_PATH)
       toast({
         title: 'Your market has been created',
       })

@@ -1,8 +1,7 @@
 'use client'
 
 import React from 'react'
-import useSWR from 'swr'
-import { NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
+import { useMarketBalance, useMarketGraph } from '@play-money/api-helpers/client/hooks'
 import { marketOptionBalancesToProbabilities } from '@play-money/finance/lib/helpers'
 import { ExtendedMarket } from './MarketOverviewPage'
 
@@ -40,11 +39,8 @@ function getProbabilityChange(data: Array<{ endAt: Date; startAt: Date; probabil
 }
 
 export function MarketLikelyOption({ market }: { market: ExtendedMarket }) {
-  const { data: balance } = useSWR<{ amm: Array<NetBalanceAsNumbers>; user: Array<NetBalanceAsNumbers> }>(
-    `/v1/markets/${market.id}/balance`,
-    { refreshInterval: 1000 * 60 }
-  ) // 60 seconds
-  const { data: graph } = useSWR(`/v1/markets/${market.id}/graph`, { refreshInterval: 1000 * 60 * 5 }) // 5 mins
+  const { data: balance } = useMarketBalance({ marketId: market.id })
+  const { data: graph } = useMarketGraph({ marketId: market.id })
 
   const probabilities = marketOptionBalancesToProbabilities(balance?.amm)
   const mostLikelyOptionId = Object.entries(probabilities).length
