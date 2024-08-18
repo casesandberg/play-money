@@ -3,6 +3,20 @@ import { Market, User } from '@play-money/database'
 import type { TransactionWithItems } from '@play-money/finance/lib/getTransactions'
 import type { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
 
+// @ts-ignore: Next complains if we import itself here
+declare module 'next' {
+  interface NextFetchRequestConfig {
+    tags?: Array<string>
+  }
+}
+
+declare global {
+  interface RequestInit {
+    // @ts-ignore
+    next?: NextFetchRequestConfig
+  }
+}
+
 // TODO: @casesandberg Generate this from OpenAPI schema
 
 async function apiHandler<T>(
