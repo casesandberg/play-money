@@ -90,7 +90,25 @@ export async function convertMarketSharesToPrimary({
 
   const optionBalances = balances.filter(({ assetType }) => assetType === 'MARKET_OPTION')
 
-  if (!optionBalances.every((balance) => balance.amount.gte(amount))) {
+  // TODO: Fix this with transactions rewrite
+  const inflightAdjustments = (inflightTransactionItems || []).reduce(
+    (acc, transaction) => {
+      if (transaction.accountId === fromAccountId && ['YES', 'NO'].includes(transaction.currencyCode)) {
+        const currentAdjustment = acc[transaction.currencyCode] || new Decimal(0)
+        acc[transaction.currencyCode] = currentAdjustment.add(transaction.amount)
+      }
+      return acc
+    },
+    {} as Record<string, Decimal>
+  )
+
+  const hasSufficientShares = optionBalances.every((balance, i) => {
+    const inflightAdjustment = inflightAdjustments[i === 0 ? 'YES' : 'NO'] || new Decimal(0)
+    console.log(balance.amount, inflightAdjustment, amount)
+    return balance.amount.add(inflightAdjustment).gte(amount)
+  })
+
+  if (!hasSufficientShares) {
     throw new Error('User does not have enough shares.')
   }
 
