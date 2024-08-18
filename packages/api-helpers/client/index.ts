@@ -3,20 +3,6 @@ import { Market, User } from '@play-money/database'
 import type { TransactionWithItems } from '@play-money/finance/lib/getTransactions'
 import type { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
 
-// @ts-ignore: Next complains if we import itself here
-declare module 'next' {
-  interface NextFetchRequestConfig {
-    tags?: Array<string>
-  }
-}
-
-declare global {
-  interface RequestInit {
-    // @ts-ignore
-    next?: NextFetchRequestConfig
-  }
-}
-
 // TODO: @casesandberg Generate this from OpenAPI schema
 
 async function apiHandler<T>(
@@ -38,7 +24,7 @@ async function apiHandler<T>(
     body: options?.body ? JSON.stringify(options.body) : undefined,
     next: options?.next,
     ...creds,
-  })
+  } as RequestInit)
   if (!res.ok || res.status >= 400) {
     const { error } = (await res.json()) as { error: string }
     throw new Error(error || 'There was an error with this request')

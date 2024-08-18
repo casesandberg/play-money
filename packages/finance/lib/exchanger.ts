@@ -104,7 +104,6 @@ export async function convertMarketSharesToPrimary({
 
   const hasSufficientShares = optionBalances.every((balance, i) => {
     const inflightAdjustment = inflightAdjustments[i === 0 ? 'YES' : 'NO'] || new Decimal(0)
-    console.log(balance.amount, inflightAdjustment, amount)
     return balance.amount.add(inflightAdjustment).gte(amount)
   })
 
