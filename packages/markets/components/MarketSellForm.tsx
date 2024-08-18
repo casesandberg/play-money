@@ -5,12 +5,12 @@ import _ from 'lodash'
 import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
+import { createMarketSell, getMarketQuote } from '@play-money/api-helpers/client'
 import { Button } from '@play-money/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
 import { Slider } from '@play-money/ui/slider'
 import { toast } from '@play-money/ui/use-toast'
-import { cn } from '@play-money/ui/utils'
 import { QuoteItem, calculateReturnPercentage, formatCurrency, formatPercentage } from './MarketBuyForm'
 import { ExtendedMarket } from './MarketOverviewPage'
 
@@ -48,20 +48,7 @@ export function MarketSellForm({
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/sell`, {
-        method: 'POST',
-        body: JSON.stringify({
-          optionId: option.id,
-          amount: data.amount,
-        }),
-        credentials: 'include',
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error)
-      }
-
+      await createMarketSell({ marketId: marketId, optionId: option.id, amount: data.amount })
       toast({ title: 'Shares sold successfully' })
       form.reset({ amount: 0 })
       setQuote(null)
@@ -78,17 +65,7 @@ export function MarketSellForm({
 
   const fetchQuote = async (amount: number, optionId: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/quote`, {
-        method: 'POST',
-        body: JSON.stringify({ optionId, amount, isBuy: false }),
-        credentials: 'include',
-      })
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.message)
-      }
-
+      const data = await getMarketQuote({ marketId, optionId, amount, isBuy: false })
       setQuote(data)
     } catch (error) {
       console.error('Failed to fetch quote:', error)

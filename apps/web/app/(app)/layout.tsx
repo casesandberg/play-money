@@ -1,6 +1,6 @@
 import { MenuIcon } from 'lucide-react'
-import { cookies } from 'next/headers'
 import Link from 'next/link'
+import { getMyBalance } from '@play-money/api-helpers/client'
 import { NotificationDropdown } from '@play-money/notifications/components/NotificationDropdown'
 import { GlobalSearchTriggerLink } from '@play-money/search/components/GlobalSearchTriggerLink'
 import { Badge } from '@play-money/ui/badge'
@@ -34,23 +34,8 @@ function MainNav({
   )
 }
 
-// TODO: @casesandberg Generate this from OpenAPI schema
-export async function getUserBalance(): Promise<{ balance: number }> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/balance`, {
-    headers: { Cookie: cookies().toString() },
-  })
-  if (!res.ok) {
-    if (res.status === 401) {
-      return { balance: 0 } // User is not logged in
-    }
-    throw new Error('There was an error fetching data')
-  }
-
-  return res.json() as Promise<{ balance: number }>
-}
-
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const { balance } = await getUserBalance()
+  const { balance } = await getMyBalance()
   return (
     <div className="flex min-h-screen flex-col">
       <header className="flex w-full flex-col justify-between border-b">

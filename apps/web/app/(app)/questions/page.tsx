@@ -1,25 +1,9 @@
 import React from 'react'
+import { getMarkets } from '@play-money/api-helpers/client'
 import { RecentLiquidity } from '@play-money/finance/components/RecentLiquidity'
 import { RecentTrades } from '@play-money/finance/components/RecentTrades'
 import { MarketList } from '@play-money/markets/components/MarketList'
-import type { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
 import { UserQuestCard } from '@play-money/quests/components/UserQuestCard'
-
-export async function getMarkets(): Promise<{
-  markets: Array<ExtendedMarket & { commentCount: number; liquidityCount: number; uniqueTraderCount: number }>
-}> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets`, {
-    credentials: 'include',
-    next: { tags: ['markets'] },
-  })
-  if (!res.ok) {
-    throw new Error('There was an error fetching data')
-  }
-
-  return res.json() as unknown as {
-    markets: Array<ExtendedMarket & { commentCount: number; liquidityCount: number; uniqueTraderCount: number }>
-  }
-}
 
 export default async function AppQuestionsPage() {
   const { markets } = await getMarkets()

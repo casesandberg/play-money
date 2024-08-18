@@ -1,5 +1,5 @@
+import { getExtendedMarket } from '@play-money/api-helpers/client'
 import { MarketPageLayout } from '@play-money/markets/components/MarketPageLayout'
-import { getExtendedMarket } from './[slug]/page'
 
 export default async function AppQuestionsLayout({
   children,

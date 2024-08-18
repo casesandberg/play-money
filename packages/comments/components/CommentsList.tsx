@@ -2,6 +2,7 @@
 
 import _ from 'lodash'
 import React, { useState, useEffect } from 'react'
+import { createComment, createCommentReaction, deleteComment, updateComment } from '@play-money/api-helpers/client'
 import { CommentWithReactions } from '@play-money/comments/lib/getComment'
 import { toast } from '@play-money/ui/use-toast'
 import { useUser } from '@play-money/users/context/UserContext'
@@ -38,57 +39,29 @@ export function CommentsList({
   }, [])
 
   const handleToggleEmojiReaction = (commentId: string) => async (emoji: string) => {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/comments/${commentId}/reaction`, {
-      method: 'POST',
-      body: JSON.stringify({
-        emoji,
-        commentId,
-      }),
-      credentials: 'include',
-    })
+    await createCommentReaction({ commentId, emoji })
     onRevalidate()
   }
 
   const handleCreateReply = (parentId?: string) => async (content: string) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/comments`, {
-      method: 'POST',
-      body: JSON.stringify({
-        content,
-        parentId: parentId ?? null,
-        entityType: entity.type,
-        entityId: entity.id,
-      }),
-      credentials: 'include',
-    })
-
-    if (!response.ok || response.status >= 400) {
-      const { error } = (await response.json()) as { error: string }
+    try {
+      await createComment({ content, parentId, entity })
+      onRevalidate()
+    } catch (error) {
       toast({
         title: 'There was an error creating your comment',
-        description: error,
+        description: (error as Error).message,
       })
-      return
     }
-
-    onRevalidate()
   }
 
   const handleEdit = (commentId: string) => async (content: string) => {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/comments/${commentId}`, {
-      method: 'PATCH',
-      body: JSON.stringify({
-        content,
-      }),
-      credentials: 'include',
-    })
+    await updateComment({ commentId, content })
     onRevalidate()
   }
 
   const handleDelete = (commentId: string) => async () => {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/comments/${commentId}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    })
+    await deleteComment({ commentId })
     onRevalidate()
   }
 

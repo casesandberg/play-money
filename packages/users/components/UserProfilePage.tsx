@@ -1,66 +1,17 @@
 import { format } from 'date-fns'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
 import React from 'react'
-import { User } from '@play-money/database'
+import { getUserMarkets, getUserTransactions, getUserUsername } from '@play-money/api-helpers/client'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
-import { TransactionWithItems } from '@play-money/finance/lib/getTransactions'
 import { summarizeTransaction } from '@play-money/finance/lib/helpers'
-import { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
 import { Card, CardContent } from '@play-money/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@play-money/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@play-money/ui/tabs'
 import { cn } from '@play-money/ui/utils'
 import { UserGraph } from './UserGraph'
 
-// TODO: @casesandberg Generate this from OpenAPI schema
-export async function getUserProfile({ username }: { username: string }): Promise<User> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/username/${username}`, {
-    credentials: 'include',
-    cache: 'no-store', // If a user updates their profile, we want to get non-cahced data. Likely we should bust the cache there in the future.
-  })
-  if (!res.ok) {
-    if (res.status === 404) {
-      // TODO: @casesandberg Figure out how to pass around errors for next error boundaries
-      // if (errorResponse?.error?.code === UserNotFoundError.code) {
-      // throw new UserNotFoundError(errorResponse.error.message)
-      notFound()
-    }
-
-    throw new Error('There was an error fetching data')
-  }
-
-  return res.json()
-}
-
-export async function getUserTransactions({
-  userId,
-}: {
-  userId: string
-}): Promise<{ transactions: Array<TransactionWithItems> }> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/transactions`, {
-    credentials: 'include',
-  })
-  if (!res.ok) {
-    throw new Error('There was an error fetching data')
-  }
-
-  return res.json()
-}
-
-export async function getUserMarkets({ userId }: { userId: string }): Promise<{ markets: Array<ExtendedMarket> }> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets?createdBy=${userId}`, {
-    credentials: 'include',
-  })
-  if (!res.ok) {
-    throw new Error('There was an error fetching data')
-  }
-
-  return res.json()
-}
-
 export async function UserProfilePage({ username }: { username: string }) {
-  const user = await getUserProfile({ username })
+  const user = await getUserUsername({ username })
   const { transactions } = await getUserTransactions({ userId: user.id })
   const { markets } = await getUserMarkets({ userId: user.id })
 

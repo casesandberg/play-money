@@ -5,6 +5,7 @@ import _ from 'lodash'
 import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
+import { createMarketBuy, getMarketQuote } from '@play-money/api-helpers/client'
 import { Button } from '@play-money/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
@@ -36,20 +37,7 @@ export function MarketBuyForm({
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/buy`, {
-        method: 'POST',
-        body: JSON.stringify({
-          optionId: option.id,
-          amount: data.amount,
-        }),
-        credentials: 'include',
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error)
-      }
-
+      await createMarketBuy({ marketId, optionId: option.id, amount: data.amount })
       toast({ title: 'Bet placed successfully' })
       form.reset({ amount: 0 })
       setQuote(null)
@@ -66,17 +54,7 @@ export function MarketBuyForm({
 
   const fetchQuote = async (amount: number, optionId: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/quote`, {
-        method: 'POST',
-        body: JSON.stringify({ optionId, amount }),
-        credentials: 'include',
-      })
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.message)
-      }
-
+      const data = await getMarketQuote({ marketId, optionId, amount })
       setQuote(data)
     } catch (error) {
       console.error('Failed to fetch quote:', error)

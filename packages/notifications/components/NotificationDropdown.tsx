@@ -3,6 +3,7 @@
 import { BellIcon } from 'lucide-react'
 import { useState } from 'react'
 import useSWR from 'swr'
+import { createMyNotifications } from '@play-money/api-helpers/client'
 import { Badge } from '@play-money/ui/badge'
 import { Button } from '@play-money/ui/button'
 import { Card, CardContent } from '@play-money/ui/card'
@@ -21,14 +22,7 @@ export function NotificationDropdown() {
 
   const handleMarkAllRead = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/notifications`, {
-        method: 'POST',
-        credentials: 'include',
-      })
-
-      if (!response.ok) {
-        console.error('Error marking read:', response.statusText)
-      }
+      await createMyNotifications()
 
       void mutate()
     } catch (error) {

@@ -6,6 +6,7 @@ import _ from 'lodash'
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
+import { updateMarket } from '@play-money/api-helpers/client'
 import { MarketSchema, Market } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@play-money/ui/dialog'
@@ -65,18 +66,7 @@ export const EditMarketDialog = ({
   const onSubmit = async (data: FormData) => {
     try {
       const changedData = getDirtyValues(form.formState.dirtyFields, data)
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${market.id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(changedData),
-        credentials: 'include',
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.message)
-      }
-
+      await updateMarket({ marketId: market.id, body: changedData })
       toast({ title: 'Market edited successfully' })
       form.reset()
       onSuccess?.()

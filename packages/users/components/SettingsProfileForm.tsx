@@ -3,12 +3,12 @@
 import { debounce } from 'lodash'
 import React from 'react'
 import { useForm } from 'react-hook-form'
+import { getUserCheckUsername, updateMe } from '@play-money/api-helpers/client'
 import { User } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
 import { Combobox } from '@play-money/ui/combobox'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@play-money/ui/select'
 import { Textarea } from '@play-money/ui/textarea'
 import { toast } from '@play-money/ui/use-toast'
 import { useUser } from '../context/UserContext'
@@ -31,15 +31,6 @@ declare namespace Intl {
 
 type ProfileFormValues = Pick<User, 'username' | 'bio' | 'avatarUrl' | 'displayName' | 'timezone'>
 
-// TODO: @casesandberg Generate this from OpenAPI schema
-async function checkUsernameAvailability(username: string): Promise<{ available: boolean; message?: string }> {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/v1/users/check-username?username=${encodeURIComponent(username)}`,
-    { credentials: 'include' }
-  )
-  return await response.json()
-}
-
 export function SettingsProfileForm() {
   const { user, setUser } = useUser()
   const form = useForm<ProfileFormValues>({
@@ -56,27 +47,19 @@ export function SettingsProfileForm() {
   } = form
 
   async function onSubmit(data: ProfileFormValues) {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me`, {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-      credentials: 'include',
-    })
+    try {
+      const user = await updateMe(data)
 
-    if (!response.ok || response.status >= 400) {
-      const { message } = await response.json()
+      setUser(user)
+      toast({
+        title: 'Your profile has been updated',
+      })
+    } catch (error) {
       toast({
         title: 'There was an error updating your profile',
-        description: message,
+        description: (error as Error).message,
       })
-      return
     }
-
-    const user = await response.json()
-
-    setUser(user)
-    toast({
-      title: 'Your profile has been updated',
-    })
   }
 
   return (
@@ -107,7 +90,7 @@ export function SettingsProfileForm() {
                 if (user?.username === value) {
                   return true
                 }
-                const { available, message } = await checkUsernameAvailability(value)
+                const { available, message } = await getUserCheckUsername({ username: value })
                 return available || message || 'There is an error with that username'
               },
               500,

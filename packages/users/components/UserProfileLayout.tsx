@@ -1,11 +1,11 @@
 import { format } from 'date-fns'
 import React from 'react'
+import { getUserStats, getUserUsername } from '@play-money/api-helpers/client'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { formatNumber } from '@play-money/finance/lib/formatCurrency'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@play-money/ui/card'
 import { Separator } from '@play-money/ui/separator'
-import { getUserProfile } from '../components/UserProfilePage'
 
 const DiscordIcon = ({ className }: { className: string }) => (
   <svg viewBox="0 -28.5 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" className={className}>
@@ -33,17 +33,6 @@ c21.209-2.535,41.426-8.171,60.222-16.505C497.448,118.542,479.666,137.004,459.186
   </svg>
 )
 
-export async function getUserProfileStats({ userId }: { userId: string }) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/stats`, {
-    credentials: 'include',
-  })
-  if (!res.ok) {
-    throw new Error('There was an error fetching data')
-  }
-
-  return res.json()
-}
-
 export async function UserProfileLayout({
   params: { username },
   children,
@@ -51,8 +40,8 @@ export async function UserProfileLayout({
   params: { username: string }
   children: React.ReactNode
 }) {
-  const profile = await getUserProfile({ username })
-  const stats = await getUserProfileStats({ userId: profile.id })
+  const profile = await getUserUsername({ username })
+  const stats = await getUserStats({ userId: profile.id })
 
   return (
     <main className="mx-auto flex flex-1 flex-col items-start gap-6 md:flex-row">
