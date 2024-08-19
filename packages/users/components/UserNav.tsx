@@ -20,7 +20,7 @@ import { Tabs, TabsList, TabsTrigger } from '@play-money/ui/tabs'
 import { useUser } from '@play-money/users/context/UserContext'
 import { ActiveUserBalance } from './ActiveUserBalance'
 
-export function UserNav({ initialBalance }: { initialBalance: number }) {
+export function UserNav({ initialBalance }: { initialBalance?: number }) {
   const { user } = useUser()
   const { theme = 'system', setTheme } = useTheme()
 
