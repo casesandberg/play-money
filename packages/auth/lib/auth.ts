@@ -8,6 +8,10 @@ if (!process.env.NEXTAUTH_URL) {
   throw new Error('NEXTAUTH_URL is not set')
 }
 
+if (!process.env.NEXTAUTH_FROM_ADDRESS) {
+  throw new Error('NEXTAUTH_FROM_ADDRESS is not set')
+}
+
 const useSecureCookies = process.env.NEXTAUTH_URL.startsWith('https://')
 const cookiePrefix = useSecureCookies ? '__Secure-' : ''
 const hostName = new URL(process.env.NEXTAUTH_URL).hostname
@@ -39,7 +43,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
   providers: [
     Resend({
-      from: 'case@casesandberg.com',
+      from: process.env.NEXTAUTH_FROM_ADDRESS,
     }),
   ],
 
