@@ -7,6 +7,7 @@ import { createNotification } from '@play-money/notifications/lib/createNotifica
 import { createDailyTradeBonusTransaction } from '@play-money/quests/lib/createDailyTradeBonusTransaction'
 import { hasPlacedMarketTradeToday } from '@play-money/quests/lib/helpers'
 import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
+import { createLiquidityVolumeBonusTransaction } from './createLiquidityVolumeBonusTransaction'
 import { createMarketBuyTransaction } from './createMarketBuyTransaction'
 import { createMarketLiquidityTransaction } from './createMarketLiquidityTransaction'
 import { createMarketTraderBonusTransactions } from './createMarketTraderBonusTransactions'
@@ -59,6 +60,8 @@ export async function marketBuy({
       createMarketTraderBonusTransactions({ marketId, initiatorId: userId }),
     ])
   }
+
+  await createLiquidityVolumeBonusTransaction({ marketId: market.id, amountTraded: amount })
 
   const recipientIds = await getUniqueLiquidityProviderIds(marketId, [userId])
 
