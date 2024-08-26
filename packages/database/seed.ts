@@ -4,8 +4,7 @@ import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { createComment } from '@play-money/comments/lib/createComment'
 import db from '@play-money/database'
-import { INITIAL_USER_BALANCE_PRIMARY } from '@play-money/finance/economy'
-import { createHouseUserGiftTransaction } from '@play-money/finance/lib/createHouseUserGiftTransaction'
+import { createHouseSingupBonusTransaction } from '@play-money/finance/lib/createHouseSingupBonusTransaction'
 import { createMarket } from '@play-money/markets/lib/createMarket'
 import { marketBuy } from '@play-money/markets/lib/marketBuy'
 import { resolveMarket } from '@play-money/markets/lib/resolveMarket'
@@ -17,15 +16,8 @@ async function main() {
     where: { internalType: 'HOUSE' },
     update: {},
     create: {
+      type: 'HOUSE',
       internalType: 'HOUSE',
-    },
-  })
-
-  await db.account.upsert({
-    where: { internalType: 'EXCHANGER' },
-    update: {},
-    create: {
-      internalType: 'EXCHANGER',
     },
   })
 
@@ -42,25 +34,27 @@ async function main() {
               email: faker.internet.email(),
             }
 
-      let data = mockUser(devOverride) as User & OmittedUserFields
+      let { primaryAccountId, ...data } = mockUser(devOverride) as User & OmittedUserFields
       const user = await db.user.create({
         data: {
           ...data,
-          accounts: {
-            create: {},
+          primaryAccount: {
+            create: {
+              type: 'USER',
+            },
           },
         },
       })
 
-      await createHouseUserGiftTransaction({
+      await createHouseSingupBonusTransaction({
         userId: user.id,
-        creatorId: user.id,
-        amount: new Decimal(INITIAL_USER_BALANCE_PRIMARY),
+        initiatorId: user.id,
       })
 
       return data.id
     })
   )
+
   await Promise.all(
     _.times(20, async () => {
       const market = await createMarket({
@@ -70,30 +64,28 @@ async function main() {
         createdBy: faker.helpers.arrayElement(user_ids),
       })
 
-      await Promise.all(
-        _.times(10, async () => {
-          const creatorId = faker.helpers.arrayElement(user_ids)
-          await marketBuy({
-            marketId: market.id,
-            optionId: market.options[faker.helpers.arrayElement([0, 1])].id,
-            creatorId,
-            amount: new Decimal(faker.string.numeric({ length: { min: 3, max: 3 } })),
-          })
-
-          await faker.helpers.maybe(
-            async () => {
-              return await createComment({
-                content: `<p>${faker.lorem.paragraph()}</p>`,
-                authorId: creatorId,
-                parentId: null,
-                entityType: 'MARKET',
-                entityId: market.id,
-              })
-            },
-            { probability: 0.5 }
-          )
+      for (let j = 0; j < 10; j++) {
+        const userId = faker.helpers.arrayElement(user_ids)
+        await marketBuy({
+          marketId: market.id,
+          optionId: market.options[faker.helpers.arrayElement([0, 1])].id,
+          userId,
+          amount: new Decimal(faker.string.numeric({ length: { min: 3, max: 3 } })),
         })
-      )
+
+        await faker.helpers.maybe(
+          async () => {
+            return await createComment({
+              content: `<p>${faker.lorem.paragraph()}</p>`,
+              authorId: userId,
+              parentId: null,
+              entityType: 'MARKET',
+              entityId: market.id,
+            })
+          },
+          { probability: 0.5 }
+        )
+      }
 
       await createComment({
         content: `<p>${faker.lorem.paragraph()}</p>`,
@@ -114,6 +106,9 @@ async function main() {
         },
         { probability: 0.2 }
       )
+
+      // TODO: hunt down race condition that causes disconnect to throw an error
+      await new Promise((resolve) => setTimeout(resolve, 1000))
 
       return market
     })
