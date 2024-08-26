@@ -34,8 +34,8 @@ model User {
   commentReactions CommentReaction[]
   resolvedMarkets  MarketResolution[]
   markets          Market[]
-  primaryAccountId String?             @unique
-  primaryAccount   Account?            @relation("UserPrimaryAccount", fields: [primaryAccountId], references: [id])
+  primaryAccountId String             @unique
+  primaryAccount   Account            @relation("UserPrimaryAccount", fields: [primaryAccountId], references: [id])
   accounts         Account[]
   transactions     Transaction[]
   createdAt        DateTime           @default(now())
@@ -88,10 +88,10 @@ model Market {
   transactions      Transaction[]
   createdBy         String
   user              User                   @relation(fields: [createdBy], references: [id])
-  ammAccountId      String?                 @unique
-  ammAccount        Account?                @relation("MarketAMMAccount", fields: [ammAccountId], references: [id])
-  clearingAccountId String?                 @unique
-  clearingAccount   Account?                @relation("MarketClearingAccount", fields: [clearingAccountId], references: [id])
+  ammAccountId      String                 @unique
+  ammAccount        Account                @relation("MarketAMMAccount", fields: [ammAccountId], references: [id])
+  clearingAccountId String                 @unique
+  clearingAccount   Account                @relation("MarketClearingAccount", fields: [clearingAccountId], references: [id])
   accounts          Account[]              @relation("MarketAccounts")
   options           MarketOption[]         @relation()
   marketResolution  MarketResolution?
