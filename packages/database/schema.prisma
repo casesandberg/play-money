@@ -289,7 +289,6 @@ model Balance {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now())
 
-  @@unique(fields: [accountId, assetType, assetId, marketId])
   @@index(fields: [accountId, assetType, assetId, marketId])
 }
 
