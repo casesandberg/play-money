@@ -12,15 +12,6 @@ import { mockUser } from './mocks'
 import { OmittedUserFields } from './prisma'
 
 async function main() {
-  await db.account.upsert({
-    where: { internalType: 'HOUSE' },
-    update: {},
-    create: {
-      type: 'HOUSE',
-      internalType: 'HOUSE',
-    },
-  })
-
   let user_ids = await Promise.all(
     _.times(5, async (i) => {
       const devOverride =
@@ -48,7 +39,6 @@ async function main() {
 
       await createHouseSingupBonusTransaction({
         userId: user.id,
-        initiatorId: user.id,
       })
 
       return data.id

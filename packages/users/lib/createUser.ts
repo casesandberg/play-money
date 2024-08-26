@@ -34,7 +34,6 @@ export async function createUser({ email }: { email: string }): Promise<User & O
 
   await createHouseSingupBonusTransaction({
     userId: user.id,
-    initiatorId: user.id,
   })
 
   return user as User & OmittedUserFields
