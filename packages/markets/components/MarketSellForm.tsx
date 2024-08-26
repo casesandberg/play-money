@@ -11,8 +11,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@play-money/ui/input'
 import { Slider } from '@play-money/ui/slider'
 import { toast } from '@play-money/ui/use-toast'
+import { ExtendedMarketOption } from '../types'
 import { QuoteItem, calculateReturnPercentage, formatCurrency, formatPercentage } from './MarketBuyForm'
-import { ExtendedMarket } from './MarketOverviewPage'
 
 const FormSchema = z.object({
   amount: z.coerce.number().min(1, { message: 'Amount must be greater than zero' }),
@@ -27,7 +27,7 @@ export function MarketSellForm({
   onComplete,
 }: {
   marketId: string
-  option: ExtendedMarket['options'][0]
+  option: ExtendedMarketOption
   max?: number
   onComplete?: () => void
 }) {

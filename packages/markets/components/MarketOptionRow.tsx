@@ -11,7 +11,7 @@ export function MarketOptionRow({
   className,
   onSelect,
 }: {
-  option: MarketOption & { color: string }
+  option: MarketOption
   active: boolean
   probability: number
   className?: string
@@ -28,7 +28,7 @@ export function MarketOptionRow({
       onClick={onSelect}
     >
       <div className="flex flex-1 flex-col gap-2">
-        <div className="font-semibold leading-none">{option.name}</div>
+        <div className="line-clamp-2 font-semibold leading-none">{option.name}</div>
         <div className="flex flex-row items-center gap-2">
           <div className="font-mono text-xs font-semibold leading-none" style={{ color: option.color }}>
             {probability}%

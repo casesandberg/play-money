@@ -1,7 +1,6 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import _ from 'lodash'
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
@@ -14,7 +13,7 @@ import { Input } from '@play-money/ui/input'
 import { Label } from '@play-money/ui/label'
 import { RadioGroup, RadioGroupItem } from '@play-money/ui/radio-group'
 import { toast } from '@play-money/ui/use-toast'
-import { ExtendedMarket } from './MarketOverviewPage'
+import { ExtendedMarket } from '../types'
 
 const FormSchema = z.object({
   optionId: z.string().nonempty({ message: 'You must select an option' }),
