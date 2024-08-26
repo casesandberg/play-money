@@ -1,17 +1,18 @@
 import { z } from 'zod';
+import { TransactionTypeSchema } from '../inputTypeSchemas/TransactionTypeSchema'
 
 /////////////////////////////////////////
 // TRANSACTION SCHEMA
 /////////////////////////////////////////
 
 export const TransactionSchema = z.object({
+  type: TransactionTypeSchema,
   id: z.string().cuid(),
-  type: z.string(),
-  description: z.string().nullable(),
-  marketId: z.string().nullable(),
-  creatorId: z.string(),
+  initiatorId: z.string().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  batchId: z.string().nullable(),
+  marketId: z.string().nullable(),
 })
 
 export type Transaction = z.infer<typeof TransactionSchema>
