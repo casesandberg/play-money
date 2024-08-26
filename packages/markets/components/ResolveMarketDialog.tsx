@@ -72,9 +72,11 @@ export const ResolveMarketDialog = ({
                   <FormControl>
                     <RadioGroup {...field} onValueChange={field.onChange}>
                       {market.options.map((option) => (
-                        <div key={option.id} className="flex items-center space-x-2">
+                        <div key={option.id} className="flex items-center space-x-2" style={{ color: option.color }}>
                           <RadioGroupItem value={option.id} id={option.id} />
-                          <Label htmlFor={option.id}>{option.name}</Label>
+                          <Label htmlFor={option.id}>
+                            {option.name} ({option.probability}%)
+                          </Label>
                         </div>
                       ))}
                     </RadioGroup>
