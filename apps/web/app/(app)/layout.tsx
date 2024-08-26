@@ -42,6 +42,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   } catch (_error) {
     // Ignore
   }
+
   return (
     <div className="flex min-h-screen flex-col">
       <header className="flex w-full flex-col justify-between border-b">
