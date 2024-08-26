@@ -1,6 +1,5 @@
 import Decimal from 'decimal.js'
 import db from '@play-money/database'
-import { getMarketQuote } from '@play-money/markets/lib/getMarketQuote'
 import {
   hasPlacedMarketTradeToday,
   hasCreatedMarketToday,
@@ -8,6 +7,7 @@ import {
   hasBoostedLiquidityToday,
   calculateActiveDayCount,
 } from '@play-money/quests/lib/helpers'
+import { getUserPrimaryAccount } from './getUserPrimaryAccount'
 
 async function getMarketsCountByUser(userId: string) {
   const count = await db.market.count({
@@ -19,32 +19,30 @@ async function getMarketsCountByUser(userId: string) {
 }
 
 async function getTradingVolumeByUser(userId: string) {
-  const buyVolume = await db.transactionItem.aggregate({
+  const buyVolume = await db.transactionEntry.aggregate({
     _sum: {
       amount: true,
     },
     where: {
-      account: {
-        userId,
-      },
-      currencyCode: 'PRIMARY',
+      assetType: 'CURRENCY',
+      assetId: 'PRIMARY',
       transaction: {
-        type: 'MARKET_BUY',
+        type: 'TRADE_BUY',
+        initiatorId: userId,
       },
     },
   })
 
-  const sellVolume = await db.transactionItem.aggregate({
+  const sellVolume = await db.transactionEntry.aggregate({
     _sum: {
       amount: true,
     },
     where: {
-      account: {
-        userId,
-      },
-      currencyCode: 'PRIMARY',
+      assetType: 'CURRENCY',
+      assetId: 'PRIMARY',
       transaction: {
-        type: 'MARKET_SELL',
+        type: 'TRADE_SELL',
+        initiatorId: userId,
       },
     },
   })
@@ -55,99 +53,53 @@ async function getTradingVolumeByUser(userId: string) {
 }
 
 async function getNetWorthByUser(userId: string) {
-  const netWorth = await db.transactionItem.aggregate({
-    _sum: {
-      amount: true,
-    },
+  const userAccount = await getUserPrimaryAccount({ userId })
+  const transactions = await db.transactionEntry.findMany({
     where: {
-      account: {
-        userId,
-      },
-      currencyCode: 'PRIMARY',
+      assetType: 'CURRENCY',
+      assetId: 'PRIMARY',
+      OR: [{ fromAccountId: userAccount.id }, { toAccountId: userAccount.id }],
+    },
+    select: {
+      amount: true,
+      fromAccountId: true,
+      toAccountId: true,
     },
   })
 
-  return netWorth._sum.amount ?? new Decimal(0)
+  const netWorth = transactions.reduce((sum, transaction) => {
+    if (transaction.toAccountId === userAccount.id) {
+      return sum.add(transaction.amount)
+    } else if (transaction.fromAccountId === userAccount.id) {
+      return sum.sub(transaction.amount)
+    }
+    return sum
+  }, new Decimal(0))
+
+  return netWorth
 }
 
-// NOTE: This is temporary as part of the financial re-write. Will be replaced with P&L statements.
 async function getOtherIncomeByUser(userId: string) {
-  const transactions = await db.transaction.findMany({
-    where: {
-      creator: {
-        userId,
-      },
-      type: { in: ['MARKET_BUY', 'MARKET_SELL'] },
+  const userAccount = await getUserPrimaryAccount({ userId })
+
+  const positions = await db.marketOptionPosition.aggregate({
+    _sum: {
+      value: true,
     },
-    include: {
-      transactionItems: true,
+    where: {
+      accountId: userAccount.id,
     },
   })
 
-  const allPositions = transactions.reduce(
-    (acc, transaction) => {
-      if (!transaction.marketId) {
-        return acc
-      }
-
-      const yesOptions = transaction.transactionItems.filter(
-        (item) => item.currencyCode === 'YES' && item.accountId === transaction.creatorId
-      )
-      const yesOptionsSum = yesOptions.reduce((itemSum, item) => itemSum.plus(item.amount), new Decimal(0))
-
-      const noOptions = transaction.transactionItems.filter(
-        (item) => item.currencyCode === 'NO' && item.accountId === transaction.creatorId
-      )
-      const noOptionsSum = noOptions.reduce((itemSum, item) => itemSum.plus(item.amount), new Decimal(0))
-
-      if (!acc[transaction.marketId] && (yesOptionsSum.greaterThan(0) || noOptionsSum.greaterThan(0))) {
-        acc[transaction.marketId] = { YES: 0, NO: 0 }
-      }
-
-      if (yesOptionsSum.greaterThan(0)) {
-        acc[transaction.marketId].YES = yesOptionsSum.plus(acc[transaction.marketId].YES).toNumber()
-      }
-
-      if (noOptionsSum.greaterThan(0)) {
-        acc[transaction.marketId].NO = noOptionsSum.plus(acc[transaction.marketId].NO).toNumber()
-      }
-
-      return acc
-    },
-    {} as Record<string, { YES: number; NO: number }>
-  )
-
-  let totalValue = new Decimal(0)
-
-  for (const [marketId, positions] of Object.entries(allPositions)) {
-    const yesMarketOption = await db.marketOption.findFirst({
-      where: { currencyCode: 'YES', marketId },
-    })
-    const noMarketOption = await db.marketOption.findFirst({
-      where: { currencyCode: 'NO', marketId },
-    })
-
-    for (const [currencyCode, amount] of Object.entries(positions)) {
-      if (amount > 0) {
-        const { shares: quote } = await getMarketQuote({
-          marketId,
-          optionId: (currencyCode === 'YES' ? yesMarketOption?.id : noMarketOption?.id) || '',
-          amount: new Decimal(amount),
-          isBuy: false,
-        })
-        totalValue = totalValue.plus(quote)
-      }
-    }
-  }
-
-  return totalValue.toNumber()
+  return positions._sum.value || new Decimal(0)
 }
 
 async function getLastTradeByUser(userId: string) {
-  const lastTrade = await db.transactionItem.findFirst({
+  const lastTrade = await db.transaction.findFirst({
     where: {
-      account: {
-        userId,
+      initiatorId: userId,
+      type: {
+        in: ['TRADE_BUY', 'TRADE_SELL'],
       },
     },
     orderBy: {

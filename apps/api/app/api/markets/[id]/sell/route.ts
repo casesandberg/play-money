@@ -26,7 +26,7 @@ export async function POST(
     await marketSell({
       marketId: id,
       optionId,
-      creatorId: session.user.id,
+      userId: session.user.id,
       amount: new Decimal(amount),
     })
 

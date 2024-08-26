@@ -7,6 +7,7 @@ import { hasBoostedLiquidityToday } from '@play-money/quests/lib/helpers'
 import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
 import { createMarketLiquidityTransaction } from './createMarketLiquidityTransaction'
 import { getMarket } from './getMarket'
+import { isMarketResolved } from './helpers'
 
 export async function addLiquidity({
   userId,
@@ -17,15 +18,18 @@ export async function addLiquidity({
   amount: Decimal
   marketId: string
 }) {
-  const market = await getMarket({ id: marketId })
+  const [market, userAccount] = await Promise.all([
+    getMarket({ id: marketId, extended: true }),
+    getUserPrimaryAccount({ userId }),
+  ])
 
-  if (market.resolvedAt) {
+  if (isMarketResolved(market)) {
     throw new Error('Market already resolved')
   }
 
-  const userAccount = await getUserPrimaryAccount({ userId })
   const transaction = await createMarketLiquidityTransaction({
     accountId: userAccount.id,
+    initiatorId: userId,
     amount,
     marketId,
   })
@@ -47,7 +51,7 @@ export async function addLiquidity({
   )
 
   if (!(await hasBoostedLiquidityToday({ userId: userId })) && amount.gte(DAILY_LIQUIDITY_BONUS_PRIMARY)) {
-    await createDailyLiquidityBonusTransaction({ accountId: userAccount.id, marketId: market.id })
+    await createDailyLiquidityBonusTransaction({ accountId: userAccount.id, marketId: market.id, initiatorId: userId })
   }
 
   return transaction

@@ -4,23 +4,18 @@ export async function getUniqueTraderIds(marketId: string, ignoreIds: string[] =
   const result = await db.transaction.findMany({
     where: {
       type: {
-        in: ['MARKET_BUY', 'MARKET_SELL'],
+        in: ['TRADE_BUY', 'TRADE_SELL'],
       },
       marketId,
     },
     select: {
-      creatorId: true,
-      creator: {
-        select: {
-          userId: true,
-        },
-      },
+      initiatorId: true,
     },
-    distinct: ['creatorId'],
+    distinct: ['initiatorId'],
   })
 
   const uniqueTraderIds = result
-    .map((transaction) => transaction.creator?.userId)
+    .map((transaction) => transaction.initiatorId)
     .filter((userId): userId is string => userId != null && !ignoreIds.includes(userId))
 
   return uniqueTraderIds

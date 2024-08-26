@@ -27,7 +27,7 @@ export async function POST(
       marketId: id,
       optionId,
       amount: new Decimal(amount),
-      creatorId: session.user.id,
+      userId: session.user.id,
     })
 
     return NextResponse.json({})
