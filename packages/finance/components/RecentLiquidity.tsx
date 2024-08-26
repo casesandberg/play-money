@@ -7,7 +7,7 @@ import React from 'react'
 import { useLiquidity } from '@play-money/api-helpers/client/hooks'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { UserLink } from '@play-money/users/components/UserLink'
-import { summarizeTransaction } from '../lib/helpers'
+import { calculateBalanceChanges, findBalanceChange } from '../lib/helpers'
 
 export function RecentLiquidity() {
   const { data } = useLiquidity()
@@ -15,13 +15,21 @@ export function RecentLiquidity() {
   return (
     <ul className="divide-y divide-muted text-sm">
       {_.take(data?.transactions, 5).map((transaction) => {
-        const summary = summarizeTransaction(transaction)
-        const userSummary = summary[transaction.creatorId]
+        if (!transaction.initiator) {
+          return null
+        }
+        const balanceChanges = calculateBalanceChanges(transaction)
+        const primaryChange = findBalanceChange({
+          balanceChanges,
+          accountId: transaction.initiator.primaryAccountId,
+          assetType: 'CURRENCY',
+          assetId: 'PRIMARY',
+        })
 
         return (
           <li className="py-2" key={transaction.id}>
             <span className="font-medium">
-              <CurrencyDisplay value={userSummary.PRIMARY.abs().toNumber()} isShort />
+              <CurrencyDisplay value={Math.abs(primaryChange?.change ?? 0)} isShort />
             </span>
             <span className="text-muted-foreground"> added to </span>
             {transaction.market ? (
@@ -36,9 +44,9 @@ export function RecentLiquidity() {
               </span>
             ) : null}
             <span className="text-muted-foreground"> by </span>
-            {transaction.creator.user ? (
+            {transaction.initiator ? (
               <div className="inline-flex items-center gap-1 pr-1">
-                <UserLink hideUsername user={transaction.creator.user} />
+                <UserLink hideUsername user={transaction.initiator} />
               </div>
             ) : null}
             <span className="text-muted-foreground">

@@ -5,7 +5,7 @@ import _ from 'lodash'
 import Link from 'next/link'
 import { useRecentTrades } from '@play-money/api-helpers/client/hooks'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
-import { summarizeTransaction } from '@play-money/finance/lib/helpers'
+import { calculateBalanceChanges, findBalanceChange } from '@play-money/finance/lib/helpers'
 import { UserLink } from '@play-money/users/components/UserLink'
 
 export function RecentTrades() {
@@ -14,20 +14,29 @@ export function RecentTrades() {
   return (
     <ul className="divide-y divide-muted text-sm">
       {_.take(data?.transactions, 5).map((transaction) => {
-        const summary = summarizeTransaction(transaction)
-        const userSummary = summary[transaction.creatorId]
+        if (!transaction.initiator) {
+          return null
+        }
+        const balanceChanges = calculateBalanceChanges(transaction)
+        const primaryChange = findBalanceChange({
+          balanceChanges,
+          accountId: transaction.initiator.primaryAccountId,
+          assetType: 'CURRENCY',
+          assetId: 'PRIMARY',
+        })
+        const optionName = transaction.options[0]?.name
 
         return (
           <li className="py-2" key={transaction.id}>
-            {transaction.creator.user ? (
+            {transaction.initiator ? (
               <div className="inline-flex items-center gap-1 pr-1">
-                <UserLink hideUsername user={transaction.creator.user} />
+                <UserLink hideUsername user={transaction.initiator} />
               </div>
             ) : null}
-            {transaction.type === 'MARKET_BUY' ? 'bought' : 'sold'}{' '}
-            <span className="font-medium">
-              <CurrencyDisplay value={userSummary.PRIMARY.abs().toNumber()} isShort />{' '}
-              {!userSummary.YES.eq(0) ? 'Yes' : 'No'}
+            {transaction.type === 'TRADE_BUY' ? 'bought' : 'sold'}{' '}
+            <span className="font-semibold">
+              <CurrencyDisplay value={Math.abs(primaryChange?.change ?? 0)} isShort />{' '}
+              {_.truncate(optionName, { length: 40 })}
             </span>{' '}
             {transaction.market ? (
               <>
