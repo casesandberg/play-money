@@ -18,7 +18,7 @@ export async function createHouseSingupBonusTransaction({ userId }: { userId: st
   ]
 
   const transaction = await executeTransaction({
-    type: 'HOUSE_GIFT',
+    type: 'HOUSE_SIGNUP_BONUS',
     entries,
   })
 

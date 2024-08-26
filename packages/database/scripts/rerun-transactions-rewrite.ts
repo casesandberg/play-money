@@ -6,13 +6,21 @@ import db from '../prisma'
 
 async function main() {
   try {
+    console.log('Starting...')
     const usersWithoutBonus = await db.user.findMany({
       where: {
-        transactions: {
-          none: {
-            type: 'HOUSE_SIGNUP_BONUS',
+        primaryAccount: {
+          toEntries: {
+            none: {
+              transaction: {
+                type: 'HOUSE_SIGNUP_BONUS',
+              },
+            },
           },
         },
+      },
+      include: {
+        primaryAccount: true,
       },
     })
 
@@ -35,6 +43,7 @@ async function main() {
             type: 'LIQUIDITY_INITIALIZE',
           },
         },
+        marketResolution: null,
       },
     })
 

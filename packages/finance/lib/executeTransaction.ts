@@ -25,24 +25,29 @@ export async function executeTransaction({
 }) {
   const balanceChanges = calculateBalanceChanges({ entries })
 
-  return db.$transaction(async (tx) => {
-    const transaction = await tx.transaction.create({
-      data: {
-        type,
-        initiatorId,
-        marketId,
-        entries: { create: entries },
-        options: {
-          connect: optionIds?.map((id) => ({ id })),
+  return db.$transaction(
+    async (tx) => {
+      const transaction = await tx.transaction.create({
+        data: {
+          type,
+          initiatorId,
+          marketId,
+          entries: { create: entries },
+          options: {
+            connect: optionIds?.map((id) => ({ id })),
+          },
         },
-      },
-    })
+      })
 
-    await Promise.all([
-      updateGlobalBalances({ tx, transactionType: type, balanceChanges }),
-      additionalLogic?.({ tx, balanceChanges, transactionType: type }),
-    ])
+      await Promise.all([
+        updateGlobalBalances({ tx, transactionType: type, balanceChanges }),
+        additionalLogic?.({ tx, balanceChanges, transactionType: type }),
+      ])
 
-    return transaction
-  })
+      return transaction
+    },
+    {
+      timeout: 10000,
+    }
+  )
 }
