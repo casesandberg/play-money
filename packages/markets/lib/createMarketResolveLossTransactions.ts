@@ -69,29 +69,25 @@ export async function createMarketResolveLossTransactions({
           entries,
           marketId,
           additionalLogic: async (txParams) => {
-            await Promise.all(
-              Object.entries(summedLosingQuantities).map(async ([accountId, optionQuantities]) => {
-                return Promise.all(
-                  Object.entries(optionQuantities).map(async ([optionId, quantity]) => {
-                    return txParams.tx.marketOptionPosition.update({
-                      where: {
-                        accountId_optionId: {
-                          accountId,
-                          optionId,
-                        },
-                      },
-                      data: {
-                        quantity: {
-                          decrement: quantity.toNumber(),
-                        },
-                        value: 0,
-                      },
-                    })
-                  })
-                )
-              })
-            )
-            return updateMarketBalances({ ...txParams, marketId })
+            return Promise.all([
+              ...Object.entries(optionQuantity).map(([optionId, quantity]) => {
+                return txParams.tx.marketOptionPosition.update({
+                  where: {
+                    accountId_optionId: {
+                      accountId,
+                      optionId,
+                    },
+                  },
+                  data: {
+                    quantity: {
+                      decrement: quantity.toNumber(),
+                    },
+                    value: 0,
+                  },
+                })
+              }),
+              updateMarketBalances({ ...txParams, marketId }),
+            ])
           },
         })
       )

@@ -1,9 +1,15 @@
 import Decimal from 'decimal.js'
-import { mockAccount, mockBalance } from '@play-money/database/mocks'
+import { mockAccount, mockBalance, mockMarketOptionPosition } from '@play-money/database/mocks'
+import * as ECONOMY from '@play-money/finance/economy'
 import { getBalance, getMarketBalances } from '@play-money/finance/lib/getBalances'
+import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
+import { getMarketOptionPosition } from '@play-money/users/lib/getMarketOptionPosition'
 import { executeTrade } from './executeTrade'
 import { getMarketAmmAccount } from './getMarketAmmAccount'
 import { getMarketClearingAccount } from './getMarketClearingAccount'
+
+// TODO: Test for unrealized gains
+Object.defineProperty(ECONOMY, 'REALIZED_GAINS_TAX', { value: 0 })
 
 declare global {
   namespace jest {
@@ -16,6 +22,8 @@ declare global {
 jest.mock('./getMarketAmmAccount')
 jest.mock('./getMarketClearingAccount')
 jest.mock('@play-money/finance/lib/getBalances')
+jest.mock('@play-money/finance/lib/getHouseAccount')
+jest.mock('@play-money/users/lib/getMarketOptionPosition')
 
 describe('executeTrade', () => {
   beforeEach(() => {
@@ -150,8 +158,15 @@ describe('executeTrade', () => {
   })
 
   it('returns transaction entries for a successful trade sell', async () => {
+    jest.mocked(getHouseAccount).mockResolvedValue(mockAccount({ id: 'HOUSE' }))
     jest.mocked(getMarketAmmAccount).mockResolvedValue(mockAccount({ id: 'ammAccountId' }))
     jest.mocked(getMarketClearingAccount).mockResolvedValue(mockAccount({ id: 'clearingAccountId' }))
+    jest.mocked(getMarketOptionPosition).mockResolvedValue(
+      mockMarketOptionPosition({
+        accountId: 'account-1',
+        optionId: 'option-1',
+      })
+    )
     jest.mocked(getBalance).mockResolvedValue(
       mockBalance({
         accountId: 'user-account-1',

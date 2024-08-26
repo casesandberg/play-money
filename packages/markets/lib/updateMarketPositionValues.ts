@@ -1,6 +1,7 @@
 import Decimal from 'decimal.js'
 import { TransactionClient } from '@play-money/database'
 import { quote } from '@play-money/finance/amms/maniswap-v1.1'
+import { REALIZED_GAINS_TAX } from '@play-money/finance/economy'
 import { getMarketBalances } from '@play-money/finance/lib/getBalances'
 import { BalanceChange, findBalanceChange } from '@play-money/finance/lib/helpers'
 import { getMarketAmmAccount } from './getMarketAmmAccount'
@@ -48,10 +49,13 @@ export async function updateMarketPositionValues({
         return
       }
 
+      const taxedValue = newValue.shares.sub(newValue.shares.times(REALIZED_GAINS_TAX))
+      const valueTaxedIfGains = taxedValue.gt(position.cost) ? taxedValue : newValue.shares
+
       return tx.marketOptionPosition.update({
         where: { id: position.id },
         data: {
-          value: newValue.shares,
+          value: valueTaxedIfGains,
         },
       })
     })

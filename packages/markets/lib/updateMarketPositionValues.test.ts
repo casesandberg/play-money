@@ -1,10 +1,14 @@
 import { Decimal } from 'decimal.js'
 import { TransactionClient } from '@play-money/database'
 import { mockAccount, mockBalance, mockMarketOptionPosition } from '@play-money/database/mocks'
+import * as ECONOMY from '@play-money/finance/economy'
 import { getMarketBalances } from '@play-money/finance/lib/getBalances'
 import { BalanceChange, findBalanceChange } from '@play-money/finance/lib/helpers'
 import { getMarketAmmAccount } from './getMarketAmmAccount'
 import { updateMarketPositionValues } from './updateMarketPositionValues'
+
+// TODO: Test for unrealized gains
+Object.defineProperty(ECONOMY, 'REALIZED_GAINS_TAX', { value: 0 })
 
 // TODO: Figure out fix for not having to include this
 declare global {

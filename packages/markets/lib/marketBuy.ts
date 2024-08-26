@@ -57,7 +57,7 @@ export async function marketBuy({
         amount: new Decimal(UNIQUE_TRADER_LIQUIDITY_PRIMARY),
         marketId,
       }),
-      createMarketTraderBonusTransactions({ marketId, initiatorId: userId }),
+      createMarketTraderBonusTransactions({ marketId }),
     ])
   }
 

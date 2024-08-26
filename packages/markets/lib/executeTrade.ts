@@ -1,7 +1,10 @@
 import Decimal from 'decimal.js'
 import { trade, quote } from '@play-money/finance/amms/maniswap-v1.1'
+import { REALIZED_GAINS_TAX } from '@play-money/finance/economy'
 import { getBalance, getMarketBalances } from '@play-money/finance/lib/getBalances'
+import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
 import { TransactionEntryInput } from '@play-money/finance/types'
+import { getMarketOptionPosition } from '@play-money/users/lib/getMarketOptionPosition'
 import { getMarketAmmAccount } from './getMarketAmmAccount'
 import { getMarketClearingAccount } from './getMarketClearingAccount'
 
@@ -113,6 +116,21 @@ export async function executeTrade({
   }
 
   if (!isBuy) {
+    const [position, houseAccount] = await Promise.all([
+      getMarketOptionPosition({ accountId, optionId }),
+      getHouseAccount(),
+    ])
+
+    if (!position) {
+      throw new Error('User does not have position in market')
+    }
+
+    const taxedValue = receivedShares.sub(receivedShares.times(REALIZED_GAINS_TAX))
+    const valueTaxedIfGains = taxedValue.gt(position.cost) ? taxedValue : receivedShares
+
+    const amountTaxed = receivedShares.sub(valueTaxedIfGains)
+    const isTaxed = amountTaxed.toDecimalPlaces(4).gt(0)
+
     entries.push(
       ...ammAssetBalances.map((balance) => {
         return {
@@ -124,13 +142,23 @@ export async function executeTrade({
         } as const
       }),
       {
-        amount: receivedShares,
+        amount: isTaxed ? valueTaxedIfGains : receivedShares,
         assetType: 'CURRENCY',
         assetId: 'PRIMARY',
         fromAccountId: clearingAccount.id,
         toAccountId: accountId,
       }
     )
+
+    if (isTaxed) {
+      entries.push({
+        amount: amountTaxed,
+        assetType: 'CURRENCY',
+        assetId: 'PRIMARY',
+        fromAccountId: clearingAccount.id,
+        toAccountId: houseAccount.id,
+      })
+    }
   }
 
   return entries

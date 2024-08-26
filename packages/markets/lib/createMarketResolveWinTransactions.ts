@@ -1,6 +1,8 @@
 import Decimal from 'decimal.js'
 import db, { Transaction } from '@play-money/database'
+import { REALIZED_GAINS_TAX } from '@play-money/finance/economy'
 import { executeTransaction } from '@play-money/finance/lib/executeTransaction'
+import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
 import { getMarket } from './getMarket'
 import { getMarketAmmAccount } from './getMarketAmmAccount'
 import { getMarketClearingAccount } from './getMarketClearingAccount'
@@ -15,7 +17,7 @@ export async function createMarketResolveWinTransactions({
   marketId: string
   winningOptionId: string
 }) {
-  const [ammAccount, clearingAccount, winningPositions, market] = await Promise.all([
+  const [ammAccount, clearingAccount, winningPositions, market, houseAccount] = await Promise.all([
     getMarketAmmAccount({ marketId }),
     getMarketClearingAccount({ marketId }),
     db.marketOptionPosition.findMany({
@@ -25,32 +27,26 @@ export async function createMarketResolveWinTransactions({
       },
     }),
     getMarket({ id: marketId, extended: true }),
+    getHouseAccount(),
   ])
-
-  const summedWinningQuantities = winningPositions.reduce(
-    (acc, position) => {
-      if (!acc[position.accountId]) {
-        acc[position.accountId] = new Decimal(0)
-      }
-
-      acc[position.accountId] = acc[position.accountId].add(position.quantity)
-
-      return acc
-    },
-    {} as Record<string, Decimal>
-  )
 
   const transactions: Array<Promise<Transaction>> = []
 
   // Transfer winning shares back to the AMM and convert to primary currency
-  for (const [accountId, quantity] of Object.entries(summedWinningQuantities)) {
+  for (const position of winningPositions) {
+    const taxedValue = position.quantity.sub(position.quantity.times(REALIZED_GAINS_TAX))
+    const valueTaxedIfGains = taxedValue.gt(position.cost) ? taxedValue : position.quantity
+
+    const amountTaxed = position.quantity.sub(valueTaxedIfGains)
+    const isTaxed = amountTaxed.toDecimalPlaces(4).gt(0)
+
     const entries = [
       {
-        fromAccountId: accountId,
+        fromAccountId: position.accountId,
         toAccountId: clearingAccount.id,
         assetType: 'MARKET_OPTION',
         assetId: winningOptionId,
-        amount: quantity,
+        amount: position.quantity,
       } as const,
       ...(market.options || [])
         .filter(({ id }) => id !== winningOptionId)
@@ -60,17 +56,27 @@ export async function createMarketResolveWinTransactions({
             toAccountId: clearingAccount.id,
             assetType: 'MARKET_OPTION',
             assetId: option.id,
-            amount: quantity,
+            amount: position.quantity,
           } as const
         }),
       {
         fromAccountId: clearingAccount.id,
-        toAccountId: accountId,
+        toAccountId: position.accountId,
         assetType: 'CURRENCY',
         assetId: 'PRIMARY',
-        amount: quantity,
+        amount: isTaxed ? valueTaxedIfGains : position.quantity,
       } as const,
     ]
+
+    if (isTaxed) {
+      entries.push({
+        amount: amountTaxed,
+        assetType: 'CURRENCY',
+        assetId: 'PRIMARY',
+        fromAccountId: clearingAccount.id,
+        toAccountId: houseAccount.id,
+      })
+    }
 
     transactions.push(
       executeTransaction({
@@ -78,29 +84,24 @@ export async function createMarketResolveWinTransactions({
         entries,
         marketId,
         additionalLogic: async (txParams) => {
-          await Promise.all(
-            Object.entries(summedWinningQuantities).map(async ([accountId, quantity]) => {
-              return txParams.tx.marketOptionPosition.update({
-                where: {
-                  accountId_optionId: {
-                    accountId,
-                    optionId: winningOptionId,
-                  },
+          return Promise.all([
+            txParams.tx.marketOptionPosition.update({
+              where: {
+                id: position.id,
+              },
+              data: {
+                quantity: {
+                  decrement: position.quantity.toNumber(),
                 },
-                data: {
-                  quantity: {
-                    decrement: quantity.toNumber(),
-                  },
-                  value: 0,
-                },
-              })
-            })
-          )
-          return updateMarketBalances({ ...txParams, marketId })
+                value: 0,
+              },
+            }),
+            updateMarketBalances({ ...txParams, marketId }),
+          ])
         },
       })
     )
   }
 
-  return transactions
+  return Promise.all([...transactions])
 }
