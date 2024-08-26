@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
-import { getAssetBalance } from '@play-money/finance/lib/getBalances'
+import { getBalance } from '@play-money/finance/lib/getBalances'
 import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
 import type schema from './schema'
 
@@ -16,13 +16,13 @@ export async function GET(_req: Request): Promise<SchemaResponse<typeof schema.G
     }
 
     const userAccount = await getUserPrimaryAccount({ userId: session.user.id })
-    const primaryBalance = await getAssetBalance({
+    const primaryBalance = await getBalance({
       accountId: userAccount.id,
       assetType: 'CURRENCY',
       assetId: 'PRIMARY',
     })
 
-    return NextResponse.json({ balance: primaryBalance.amount.toNumber() })
+    return NextResponse.json({ balance: primaryBalance.total.toNumber() })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
 

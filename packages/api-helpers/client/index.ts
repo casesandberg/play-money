@@ -1,7 +1,7 @@
 import { CommentWithReactions } from '@play-money/comments/lib/getComment'
 import { Market, User } from '@play-money/database'
-import type { TransactionWithItems } from '@play-money/finance/lib/getTransactions'
-import type { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
+import { TransactionWithEntries } from '@play-money/finance/types'
+import { ExtendedMarket } from '@play-money/markets/types'
 
 // TODO: @casesandberg Generate this from OpenAPI schema
 
@@ -34,8 +34,8 @@ async function apiHandler<T>(
 }
 
 export async function getMarketTransactions({ marketId }: { marketId: string }) {
-  return apiHandler<{ transactions: Array<TransactionWithItems> }>(
-    `${process.env.NEXT_PUBLIC_API_URL}/v1/transactions?marketId=${marketId}&transactionType=MARKET_BUY,MARKET_SELL`
+  return apiHandler<{ transactions: Array<TransactionWithEntries> }>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/transactions?marketId=${marketId}&transactionType=TRADE_BUY,TRADE_SELL`
   )
 }
 
@@ -291,8 +291,8 @@ export async function getUserTransactions({
   userId,
 }: {
   userId: string
-}): Promise<{ transactions: Array<TransactionWithItems> }> {
-  return apiHandler<{ transactions: Array<TransactionWithItems> }>(
+}): Promise<{ transactions: Array<TransactionWithEntries> }> {
+  return apiHandler<{ transactions: Array<TransactionWithEntries> }>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/transactions`
   )
 }

@@ -1,13 +1,14 @@
 import Decimal from 'decimal.js'
-import { mockAccount } from '@play-money/database/mocks'
-import { getAssetBalance, getBalances } from '@play-money/finance/lib/getBalances'
+import { mockAccount, mockBalance } from '@play-money/database/mocks'
+import { getBalance, getMarketBalances } from '@play-money/finance/lib/getBalances'
+import { getMarket } from '@play-money/markets/lib/getMarket'
 import { getMarketClearingAccount } from '@play-money/markets/lib/getMarketClearingAccount'
 import { convertMarketSharesToPrimary, convertPrimaryToMarketShares } from './exchanger'
 import { getHouseAccount } from './getHouseAccount'
 
-jest.mock('@play-money/finance/lib/getBalances', () => ({ getBalances: jest.fn(), getAssetBalance: jest.fn() }))
-jest.mock('@play-money/finance/lib/getHouseAccount', () => ({ getHouseAccount: jest.fn() }))
-jest.mock('@play-money/markets/lib/getMarketClearingAccount', () => ({ getMarketClearingAccount: jest.fn() }))
+jest.mock('@play-money/finance/lib/getBalances')
+jest.mock('@play-money/finance/lib/getHouseAccount')
+jest.mock('@play-money/markets/lib/getMarketClearingAccount')
 
 describe('convertPrimaryToMarketShares', () => {
   beforeEach(() => {
@@ -28,13 +29,14 @@ describe('convertPrimaryToMarketShares', () => {
   })
 
   it('throws an error if user does not have enough primary balance and is not the house account', async () => {
-    jest.mocked(getAssetBalance).mockResolvedValue({
-      accountId: 'user-1',
-      assetType: 'CURRENCY',
-      assetId: 'PRIMARY',
-      amount: new Decimal(10),
-      subtotals: {},
-    })
+    jest.mocked(getBalance).mockResolvedValue(
+      mockBalance({
+        accountId: 'user-1',
+        assetType: 'CURRENCY',
+        assetId: 'PRIMARY',
+        total: new Decimal(10),
+      })
+    )
 
     await expect(
       convertPrimaryToMarketShares({
@@ -46,13 +48,14 @@ describe('convertPrimaryToMarketShares', () => {
   })
 
   it('allows conversion if the user has exactly enough primary balance', async () => {
-    jest.mocked(getAssetBalance).mockResolvedValue({
-      accountId: 'user-1',
-      assetType: 'CURRENCY',
-      assetId: 'PRIMARY',
-      amount: new Decimal(20),
-      subtotals: {},
-    })
+    jest.mocked(getBalance).mockResolvedValue(
+      mockBalance({
+        accountId: 'user-1',
+        assetType: 'CURRENCY',
+        assetId: 'PRIMARY',
+        total: new Decimal(20),
+      })
+    )
 
     const result = await convertPrimaryToMarketShares({
       fromAccountId: 'user-1',
@@ -95,13 +98,14 @@ describe('convertPrimaryToMarketShares', () => {
   })
 
   it('allows conversion if the from account is the house account, even with insufficient balance', async () => {
-    jest.mocked(getAssetBalance).mockResolvedValue({
-      accountId: 'user-1',
-      assetType: 'CURRENCY',
-      assetId: 'PRIMARY',
-      amount: new Decimal(5),
-      subtotals: {},
-    })
+    jest.mocked(getBalance).mockResolvedValue(
+      mockBalance({
+        accountId: 'user-1',
+        assetType: 'CURRENCY',
+        assetId: 'PRIMARY',
+        total: new Decimal(5),
+      })
+    )
 
     const result = await convertPrimaryToMarketShares({
       fromAccountId: 'HOUSE',
@@ -164,10 +168,12 @@ describe('convertMarketSharesToPrimary', () => {
   })
 
   it('throws an error if user does not have enough shares and inflight transactions do not cover it', async () => {
-    jest.mocked(getBalances).mockResolvedValue([
-      { assetType: 'MARKET_OPTION', amount: new Decimal(10), accountId: 'user-1', assetId: 'option-1', subtotals: {} },
-      { assetType: 'MARKET_OPTION', amount: new Decimal(10), accountId: 'user-1', assetId: 'option-2', subtotals: {} },
-    ])
+    jest
+      .mocked(getMarketBalances)
+      .mockResolvedValue([
+        mockBalance({ assetType: 'MARKET_OPTION', total: new Decimal(10), accountId: 'user-1', assetId: 'option-1' }),
+        mockBalance({ assetType: 'MARKET_OPTION', total: new Decimal(10), accountId: 'user-1', assetId: 'option-2' }),
+      ])
 
     await expect(
       convertMarketSharesToPrimary({
@@ -179,10 +185,12 @@ describe('convertMarketSharesToPrimary', () => {
   })
 
   it('does not throw an error if inflight transactions cover the insufficient balance', async () => {
-    jest.mocked(getBalances).mockResolvedValue([
-      { assetType: 'MARKET_OPTION', amount: new Decimal(30), accountId: 'user-1', assetId: 'option-1', subtotals: {} },
-      { assetType: 'MARKET_OPTION', amount: new Decimal(0), accountId: 'user-1', assetId: 'option-2', subtotals: {} },
-    ])
+    jest
+      .mocked(getMarketBalances)
+      .mockResolvedValue([
+        mockBalance({ assetType: 'MARKET_OPTION', total: new Decimal(30), accountId: 'user-1', assetId: 'option-1' }),
+        mockBalance({ assetType: 'MARKET_OPTION', total: new Decimal(0), accountId: 'user-1', assetId: 'option-2' }),
+      ])
 
     const inflightTransactionItems = [
       { accountId: 'user-1', currencyCode: 'YES' as const, amount: new Decimal(-10) },

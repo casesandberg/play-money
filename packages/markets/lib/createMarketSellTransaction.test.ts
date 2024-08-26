@@ -1,133 +1,108 @@
 import Decimal from 'decimal.js'
 import '@play-money/config/jest/jest-setup'
-import { mockAccount, mockMarket, mockMarketOption } from '@play-money/database/mocks'
-import { createTransaction } from '@play-money/finance/lib/createTransaction'
-import { getBalances } from '@play-money/finance/lib/getBalances'
+import { mockAccount, mockBalance, mockMarketOptionPosition } from '@play-money/database/mocks'
+import * as ECONOMY from '@play-money/finance/economy'
+import { executeTransaction } from '@play-money/finance/lib/executeTransaction'
+import { getMarketBalances, getBalance } from '@play-money/finance/lib/getBalances'
+import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
+import { getMarketOptionPosition } from '@play-money/users/lib/getMarketOptionPosition'
 import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
 import { createMarketSellTransaction } from './createMarketSellTransaction'
-import { getMarket } from './getMarket'
 import { getMarketAmmAccount } from './getMarketAmmAccount'
 import { getMarketClearingAccount } from './getMarketClearingAccount'
-import { getMarketOption } from './getMarketOption'
 
-jest.mock('./getMarketAmmAccount', () => ({ getMarketAmmAccount: jest.fn() }))
-jest.mock('./getMarketClearingAccount', () => ({ getMarketClearingAccount: jest.fn() }))
-jest.mock('@play-money/users/lib/getUserPrimaryAccount', () => ({ getUserPrimaryAccount: jest.fn() }))
-jest.mock('@play-money/finance/lib/createTransaction', () => ({ createTransaction: jest.fn() }))
-jest.mock('./getMarketOption', () => ({ getMarketOption: jest.fn() }))
-jest.mock('@play-money/finance/lib/getBalances', () => ({ getBalances: jest.fn() }))
-jest.mock('./getMarket', () => ({ getMarket: jest.fn() }))
+// TODO: Test for unrealized gains
+Object.defineProperty(ECONOMY, 'REALIZED_GAINS_TAX', { value: 0 })
+
+jest.mock('./getMarketAmmAccount')
+jest.mock('./getMarketClearingAccount')
+jest.mock('@play-money/users/lib/getUserPrimaryAccount')
+jest.mock('@play-money/finance/lib/executeTransaction')
+jest.mock('@play-money/finance/lib/getBalances')
+jest.mock('@play-money/finance/lib/getHouseAccount')
+jest.mock('@play-money/users/lib/getMarketOptionPosition')
 
 describe('createMarketSellTransaction', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+
+    jest.mocked(getUserPrimaryAccount).mockResolvedValue(mockAccount({ id: 'user-1-account' }))
+    jest.mocked(getMarketAmmAccount).mockResolvedValue(mockAccount({ id: 'amm-1-account' }))
+    jest.mocked(getMarketClearingAccount).mockResolvedValue(mockAccount({ id: 'EXCHANGER' }))
+    jest.mocked(getHouseAccount).mockResolvedValue(mockAccount({ id: 'HOUSE' }))
   })
 
-  it('should call createTransaction with approperate transactionItems', async () => {
-    jest.mocked(getUserPrimaryAccount).mockResolvedValue(mockAccount({ id: 'user-1-account' }))
-    jest.mocked(getMarketClearingAccount).mockResolvedValue(mockAccount({ id: 'EXCHANGER' }))
-    jest.mocked(getMarketAmmAccount).mockResolvedValue(mockAccount({ id: 'amm-1-account' }))
-    jest.mocked(getMarketOption).mockResolvedValue(mockMarketOption({ id: 'option-1', currencyCode: 'YES' }))
-
-    jest.mocked(getMarket).mockResolvedValue({
-      ...mockMarket(),
-      options: [
-        mockMarketOption({ id: 'option-1', liquidityProbability: new Decimal(0.5) }),
-        mockMarketOption({ id: 'option-2', liquidityProbability: new Decimal(0.5) }),
-      ],
-    })
-
-    jest.mocked(getBalances).mockImplementation(async ({ accountId }) => {
-      if (accountId === 'amm-1-account') {
-        return [
-          {
-            accountId,
-            assetType: 'MARKET_OPTION',
-            assetId: 'option-1',
-            amount: new Decimal(85.71),
-            subtotals: {},
-          },
-          {
-            accountId,
-            assetType: 'MARKET_OPTION',
-            assetId: 'option-2',
-            amount: new Decimal(350),
-            subtotals: {},
-          },
-        ]
-      }
-      return []
-    })
+  it('should call executeTransaction with approperate entries', async () => {
+    jest.mocked(getMarketOptionPosition).mockResolvedValue(
+      mockMarketOptionPosition({
+        accountId: 'account-1',
+        optionId: 'option-1',
+      })
+    )
+    jest.mocked(getBalance).mockResolvedValue(
+      mockBalance({
+        accountId: 'user-1',
+        assetType: 'CURRENCY',
+        assetId: 'PRIMARY',
+        total: new Decimal(200),
+        subtotals: {},
+      })
+    )
+    jest.mocked(getMarketBalances).mockResolvedValue([
+      mockBalance({
+        accountId: 'ammAccountId',
+        assetType: 'MARKET_OPTION',
+        assetId: 'option-1',
+        total: new Decimal(85.71),
+        subtotals: {},
+      }),
+      mockBalance({
+        accountId: 'ammAccountId',
+        assetType: 'MARKET_OPTION',
+        assetId: 'option-2',
+        total: new Decimal(350),
+        subtotals: {},
+      }),
+    ])
 
     await createMarketSellTransaction({
-      userId: 'user-1',
+      initiatorId: 'user-1',
+      accountId: 'account-1',
       amount: new Decimal(64.29),
-      optionId: 'option-1',
       marketId: 'market-1',
+      optionId: 'option-1',
     })
 
-    expect(createTransaction).toHaveBeenCalledWith(
+    expect(executeTransaction).toHaveBeenCalledWith(
       expect.objectContaining({
-        transactionItems: expect.arrayContaining([
-          {
-            amount: expect.closeToDecimal(-64.29),
-            currencyCode: 'YES',
-            accountId: 'user-1-account',
-          },
+        entries: expect.arrayContaining([
           {
             amount: expect.closeToDecimal(64.29),
-            currencyCode: 'YES',
-            accountId: 'amm-1-account',
+            assetType: 'MARKET_OPTION',
+            assetId: 'option-1',
+            fromAccountId: 'account-1',
+            toAccountId: 'amm-1-account',
           },
           {
             amount: expect.closeToDecimal(50),
-            currencyCode: 'YES',
-            accountId: 'user-1-account',
+            assetType: 'MARKET_OPTION',
+            assetId: 'option-1',
+            fromAccountId: 'amm-1-account',
+            toAccountId: 'EXCHANGER',
           },
           {
             amount: expect.closeToDecimal(50),
-            currencyCode: 'NO',
-            accountId: 'user-1-account',
-          },
-          {
-            amount: expect.closeToDecimal(-50),
-            currencyCode: 'YES',
-            accountId: 'amm-1-account',
-          },
-          {
-            amount: expect.closeToDecimal(-50),
-            currencyCode: 'NO',
-            accountId: 'amm-1-account',
-          },
-          {
-            amount: expect.closeToDecimal(-50),
-            currencyCode: 'YES',
-            accountId: 'user-1-account',
-          },
-          {
-            amount: expect.closeToDecimal(-50),
-            currencyCode: 'NO',
-            accountId: 'user-1-account',
+            assetType: 'MARKET_OPTION',
+            assetId: 'option-2',
+            fromAccountId: 'amm-1-account',
+            toAccountId: 'EXCHANGER',
           },
           {
             amount: expect.closeToDecimal(50),
-            currencyCode: 'YES',
-            accountId: 'EXCHANGER',
-          },
-          {
-            amount: expect.closeToDecimal(50),
-            currencyCode: 'NO',
-            accountId: 'EXCHANGER',
-          },
-          {
-            amount: expect.closeToDecimal(-50),
-            currencyCode: 'PRIMARY',
-            accountId: 'EXCHANGER',
-          },
-          {
-            amount: expect.closeToDecimal(50),
-            currencyCode: 'PRIMARY',
-            accountId: 'user-1-account',
+            assetType: 'CURRENCY',
+            assetId: 'PRIMARY',
+            fromAccountId: 'EXCHANGER',
+            toAccountId: 'account-1',
           },
         ]),
       })

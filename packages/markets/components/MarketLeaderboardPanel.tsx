@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Badge } from '@play-money/ui/badge'
-import { ExtendedMarket } from './MarketOverviewPage'
+import { ExtendedMarket } from '../types'
 
 export function MarketLeaderboardPanel({ market }: { market: ExtendedMarket }) {
   return null

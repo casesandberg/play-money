@@ -1,37 +1,32 @@
 import Decimal from 'decimal.js'
-import _ from 'lodash'
 import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
 import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
-import { createTransaction } from './createTransaction'
+import { executeTransaction } from './executeTransaction'
 
-interface HouseUserGiftTransactionInput {
+export async function createHouseUserGiftTransaction({
+  userId,
+  amount,
+  initiatorId,
+}: {
   userId: string
   amount: Decimal // in dollars
-  creatorId: string
-}
+  initiatorId: string
+}) {
+  const [userAccount, houseAccount] = await Promise.all([getUserPrimaryAccount({ userId }), getHouseAccount()])
 
-export async function createHouseUserGiftTransaction({ userId, amount, creatorId }: HouseUserGiftTransactionInput) {
-  const userAccount = await getUserPrimaryAccount({ userId })
-  const creatorAccount = await getUserPrimaryAccount({ userId: creatorId })
-  const houseAccount = await getHouseAccount()
+  const entries = [
+    {
+      amount: amount,
+      assetType: 'CURRENCY',
+      assetId: 'PRIMARY',
+      fromAccountId: houseAccount.id,
+      toAccountId: userAccount.id,
+    } as const,
+  ]
 
-  const transaction = await createTransaction({
-    creatorId: creatorAccount.id,
-    type: 'HOUSE_USER_GIFT',
-    description: `House gift of ${amount} dollars`,
-    marketId: null,
-    transactionItems: [
-      {
-        accountId: houseAccount.id,
-        currencyCode: 'PRIMARY',
-        amount: amount.neg(),
-      },
-      {
-        accountId: userAccount.id,
-        currencyCode: 'PRIMARY',
-        amount: amount,
-      },
-    ],
+  const transaction = await executeTransaction({
+    type: 'HOUSE_GIFT',
+    entries,
   })
 
   return transaction

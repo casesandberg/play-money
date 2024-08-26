@@ -2,18 +2,19 @@ import { faker } from '@faker-js/faker'
 import cuid from 'cuid'
 import Decimal from 'decimal.js'
 import _ from 'lodash'
-import type { TransactionWithItems } from '@play-money/finance/lib/getTransactions'
-import { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
+import { NetBalance } from '@play-money/finance/lib/getBalances'
+import { TransactionWithEntries } from '@play-money/finance/types'
+import { ExtendedMarket } from '@play-money/markets/types'
 import {
   Market,
   User,
   Account,
-  TransactionItem,
-  Currency,
   MarketOption,
   Comment,
   MarketResolution,
   Notification,
+  TransactionEntry,
+  MarketOptionPosition,
 } from './zod'
 
 // Monkey patch for es2022
@@ -46,6 +47,7 @@ export function mockUser(overrides?: Partial<User>): User {
     website: faker.helpers.maybe(faker.internet.domainName, { probability: 0.3 }) ?? null,
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
+    primaryAccountId: faker.string.uuid(),
     timezone: faker.helpers.arrayElement(Intl.supportedValuesOf('timeZone')),
     ...overrides,
   }
@@ -61,6 +63,8 @@ export function mockMarket(overrides?: Partial<Market>): Market {
     description,
     slug: faker.helpers.slugify(question),
     closeDate,
+    ammAccountId: faker.string.uuid(),
+    clearingAccountId: faker.string.uuid(),
     resolvedAt: faker.helpers.maybe(faker.date.past, { probability: 0.2 }) ?? null,
     createdBy: faker.string.uuid(),
     createdAt: faker.date.past(),
@@ -75,8 +79,8 @@ export function mockExtendedMarket(overrides?: Partial<ExtendedMarket>): Extende
     createdBy: user.id,
   })
 
-  const yesOption = mockMarketOption({ id: '1', name: 'Yes', marketId: market.id, currencyCode: 'YES' })
-  const noOption = mockMarketOption({ id: '2', name: 'No', marketId: market.id, currencyCode: 'NO' })
+  const yesOption = { ...mockMarketOption({ id: '1', name: 'Yes', marketId: market.id }), probability: 0.65 }
+  const noOption = { ...mockMarketOption({ id: '2', name: 'No', marketId: market.id }), probability: 0.35 }
 
   return {
     ...market,
@@ -109,6 +113,7 @@ export function mockMarketResolution(overrides?: Partial<MarketResolution>): Mar
 export function mockAccount(overrides?: Partial<Account>): Account {
   return {
     id: faker.string.uuid(),
+    type: 'USER',
     userId: null,
     marketId: null,
     internalType: null,
@@ -118,61 +123,47 @@ export function mockAccount(overrides?: Partial<Account>): Account {
   }
 }
 
-export function mockCurrency(overrides?: Partial<Currency>): Currency {
-  return {
-    id: faker.string.uuid(),
-    symbol: faker.finance.currencySymbol(),
-    code: faker.helpers.arrayElement(['YES', 'NO']),
-    name: faker.finance.currencyName(),
-    imageUrl: null,
-    createdAt: faker.date.past(),
-    updatedAt: faker.date.recent(),
-    ...overrides,
-  }
-}
-
-export function mockTransactionItem(overrides?: Partial<TransactionItem>): TransactionItem {
+export function mockTransactionEntry(overrides?: Partial<TransactionEntry>): TransactionEntry {
   return {
     id: faker.string.uuid(),
     createdAt: faker.date.past(),
-    currencyCode: faker.helpers.arrayElement(['YES', 'NO', 'PRIMARY']),
-    accountId: faker.string.uuid(),
+    assetType: 'CURRENCY',
+    assetId: 'PRIMARY',
+    fromAccountId: faker.string.uuid(),
+    toAccountId: faker.string.uuid(),
     transactionId: faker.string.uuid(),
     amount: new Decimal(faker.finance.amount()),
     ...overrides,
   }
 }
 
-export function mockTransactionWithItems(overrides?: Partial<TransactionWithItems>): TransactionWithItems {
+export function mockTransactionWithEntries(overrides?: Partial<TransactionWithEntries>): TransactionWithEntries {
   const transactionId = faker.string.uuid()
   const market = mockMarket()
-  const creatorId = faker.string.uuid()
+  const initiatorId = faker.string.uuid()
   const user = mockUser()
 
   return {
     id: transactionId,
-    type: faker.helpers.arrayElement(['MARKET_BUY', 'MARKET_SELL']),
-    description: faker.lorem.sentence(),
+    type: faker.helpers.arrayElement(['TRADE_BUY', 'TRADE_SELL']),
     createdAt: faker.date.past(),
     updatedAt: faker.date.past(),
-    creatorId,
+    initiatorId,
     marketId: market.id,
-    transactionItems: _.times(faker.number.int({ min: 1, max: 5 }), () => mockTransactionItem({ transactionId })),
+    entries: _.times(faker.number.int({ min: 1, max: 5 }), () => mockTransactionEntry({ transactionId })),
+    options: [],
+    batchId: null,
     market,
-    creator: {
-      user,
-    },
+    initiator: user,
     ...overrides,
   }
 }
 
 export function mockMarketOption(overrides?: Partial<MarketOption>): MarketOption {
-  const currencyCode = faker.helpers.arrayElement(['YES', 'NO']) as Currency['code']
   return {
     id: faker.string.uuid(),
-    name: currencyCode === 'YES' ? 'Yes' : 'No',
-    currencyCode,
-    color: currencyCode === 'YES' ? '#3B82F6' : '#EC4899',
+    name: 'Yes',
+    color: '#3B82F6',
     liquidityProbability: new Decimal(0.5),
     marketId: faker.string.uuid(),
     createdAt: faker.date.past(),
@@ -218,6 +209,36 @@ export function mockNotification(overrides?: Partial<Notification>): ExtendedNot
     content: null,
     actionUrl: '/market/1',
     readAt: null,
+    createdAt: faker.date.past(),
+    updatedAt: faker.date.past(),
+    ...overrides,
+  }
+}
+
+export function mockBalance(overrides?: Partial<NetBalance>): NetBalance {
+  return {
+    id: faker.string.uuid(),
+    accountId: faker.string.uuid(),
+    assetType: 'CURRENCY',
+    assetId: 'PRIMARY',
+    total: new Decimal(50),
+    subtotals: {},
+    marketId: faker.string.uuid(),
+    createdAt: faker.date.past(),
+    updatedAt: faker.date.past(),
+    ...overrides,
+  }
+}
+
+export function mockMarketOptionPosition(overrides?: Partial<MarketOptionPosition>): MarketOptionPosition {
+  return {
+    id: faker.string.uuid(),
+    accountId: faker.string.uuid(),
+    optionId: faker.string.uuid(),
+    marketId: faker.string.uuid(),
+    value: new Decimal(0),
+    cost: new Decimal(0),
+    quantity: new Decimal(0),
     createdAt: faker.date.past(),
     updatedAt: faker.date.past(),
     ...overrides,

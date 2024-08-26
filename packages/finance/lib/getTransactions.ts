@@ -1,17 +1,11 @@
-import db, { Market, Transaction, TransactionItem, User } from '@play-money/database'
-
-export type TransactionWithItems = Transaction & {
-  transactionItems: Array<TransactionItem>
-  market: Market | null
-  creator: {
-    user: User | null
-  }
-}
+import db from '@play-money/database'
+import { TransactionTypeType } from '@play-money/database/zod/inputTypeSchemas/TransactionTypeSchema'
+import { TransactionWithEntries } from '../types'
 
 interface TransactionFilterOptions {
   marketId?: string
   userId?: string
-  transactionType?: string[]
+  transactionType?: Array<TransactionTypeType>
 }
 
 interface SortOptions {
@@ -28,23 +22,18 @@ export async function getTransactions(
   filters: TransactionFilterOptions = {},
   sort: SortOptions = { field: 'createdAt', direction: 'desc' },
   pagination: PaginationOptions = { skip: 0, take: 10 }
-): Promise<Array<TransactionWithItems>> {
+): Promise<Array<TransactionWithEntries>> {
   const transactions = await db.transaction.findMany({
     where: {
       marketId: filters.marketId,
-      creator: {
-        userId: filters.userId,
-      },
+      initiatorId: filters.userId,
       type: filters.transactionType ? { in: filters.transactionType } : undefined,
     },
     include: {
-      transactionItems: true,
+      entries: true,
       market: true,
-      creator: {
-        include: {
-          user: true,
-        },
-      },
+      initiator: true,
+      options: true,
     },
     orderBy: {
       [sort.field]: sort.direction,

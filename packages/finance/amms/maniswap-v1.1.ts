@@ -62,7 +62,13 @@ function sumShares(shares: Array<Decimal>) {
   return shares.reduce((sum, share) => sum.add(share), new Decimal(0))
 }
 
-function calculateProbability({ targetShare, totalShares }: { targetShare: Decimal; totalShares: Decimal }): Decimal {
+export function calculateProbability({
+  targetShare,
+  totalShares,
+}: {
+  targetShare: Decimal
+  totalShares: Decimal
+}): Decimal {
   return totalShares.sub(targetShare).div(totalShares)
 }
 

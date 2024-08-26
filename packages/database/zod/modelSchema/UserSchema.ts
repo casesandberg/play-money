@@ -14,6 +14,7 @@ export const UserSchema = z.object({
   website: z.string().nullable(),
   bio: z.string().nullable(),
   timezone: z.string(),
+  primaryAccountId: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   // omitted: email: z.string(),

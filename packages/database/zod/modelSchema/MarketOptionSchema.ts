@@ -1,13 +1,11 @@
 import { z } from 'zod';
 import { Prisma } from '@prisma/client'
-import { CurrencyCodeSchema } from '../inputTypeSchemas/CurrencyCodeSchema'
 
 /////////////////////////////////////////
 // MARKET OPTION SCHEMA
 /////////////////////////////////////////
 
 export const MarketOptionSchema = z.object({
-  currencyCode: CurrencyCodeSchema,
   id: z.string().cuid(),
   name: z.string(),
   marketId: z.string(),

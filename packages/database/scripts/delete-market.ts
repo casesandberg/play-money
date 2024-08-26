@@ -7,7 +7,7 @@ const marketId = 'clyb4y767001087vumwtp1t0o'
 async function main() {
   try {
     await db.$transaction([
-      db.transactionItem.deleteMany({
+      db.transactionEntry.deleteMany({
         where: {
           transaction: {
             marketId: marketId,

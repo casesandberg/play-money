@@ -1,5 +1,7 @@
 import Decimal from 'decimal.js'
 import db from '@play-money/database'
+import { TransactionTypeType } from '@play-money/database/zod/inputTypeSchemas/TransactionTypeSchema'
+import { calculateProbability } from '@play-money/finance/amms/maniswap-v1.1'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import { getMarketAmmAccount } from './getMarketAmmAccount'
 import { MarketTransaction } from './getMarketTransactions'
@@ -8,9 +10,11 @@ type Bucket = {
   startAt: Date
   endAt: Date
   transactions: Array<MarketTransaction>
-  yShares: Decimal
-  nShares: Decimal
-  probability: number
+  options: Array<{
+    id: string
+    probability: Decimal
+    shares: Decimal
+  }>
 }
 
 export async function getMarketTransactionsTimeSeries({
@@ -24,9 +28,9 @@ export async function getMarketTransactionsTimeSeries({
   startAt?: Date
   endAt?: Date
   tickInterval?: number
-  excludeTransactionTypes?: string[]
+  excludeTransactionTypes?: Array<TransactionTypeType>
 }) {
-  const market = await getMarket({ id: marketId })
+  const market = await getMarket({ id: marketId, extended: true })
   const ammAccount = await getMarketAmmAccount({ marketId: marketId })
 
   if (!startAt) {
@@ -43,9 +47,11 @@ export async function getMarketTransactionsTimeSeries({
         startAt: new Date(startAt.getTime() + i * tickIntervalMs),
         endAt: new Date(startAt.getTime() + (i + 1) * tickIntervalMs),
         transactions: [],
-        yShares: new Decimal(0),
-        nShares: new Decimal(0),
-        probability: 0,
+        options: market.options.map((option) => ({
+          shares: new Decimal(0),
+          probability: new Decimal(0),
+          id: option.id,
+        })),
       }) as Bucket
   )
 
@@ -61,7 +67,7 @@ export async function getMarketTransactionsTimeSeries({
       },
     },
     include: {
-      transactionItems: true,
+      entries: true,
     },
   })
 
@@ -76,30 +82,52 @@ export async function getMarketTransactionsTimeSeries({
   buckets.forEach((bucket, i) => {
     // Start with the previous bucket's shares
     if (i > 0) {
-      bucket.yShares = buckets[i - 1].yShares
-      bucket.nShares = buckets[i - 1].nShares
+      const lastBucket = buckets[i - 1]
+      bucket.options = bucket.options.map((option) => {
+        const lastBucketOption = lastBucket.options.find((o) => option.id === o.id)!
+        return {
+          ...option,
+          shares: lastBucketOption.shares,
+        }
+      })
     }
 
     bucket.transactions.forEach((transaction) => {
-      transaction.transactionItems.forEach((item) => {
-        if (item.accountId === ammAccount.id) {
-          if (item.currencyCode === 'YES') {
-            bucket.yShares = bucket.yShares.plus(item.amount)
-          } else if (item.currencyCode === 'NO') {
-            bucket.nShares = bucket.nShares.plus(item.amount)
-          }
+      transaction.entries.forEach((item) => {
+        const option = bucket.options.find((o) => o.id === item.assetId)
+
+        if (!option) {
+          return
+        }
+
+        if (item.toAccountId === ammAccount.id) {
+          option.shares = option.shares.plus(item.amount)
+        }
+        if (item.fromAccountId === ammAccount.id) {
+          option.shares = option.shares.minus(item.amount)
         }
       })
     })
 
-    const totalShares = bucket.yShares.plus(bucket.nShares)
-    bucket.probability = totalShares.isZero() ? 0 : bucket.nShares.div(totalShares).toNumber()
+    const totalShares = bucket.options.reduce((sum, option) => sum.plus(option.shares), new Decimal(0))
+
+    bucket.options = bucket.options.map((option) => {
+      return {
+        ...option,
+        probability: option.shares.eq(0)
+          ? new Decimal(0)
+          : calculateProbability({ targetShare: option.shares, totalShares }).times(100).round(),
+      }
+    })
   })
 
   const timeSeriesData = buckets.map((bucket) => ({
     startAt: bucket.startAt,
     endAt: bucket.endAt,
-    probability: bucket.probability,
+    options: bucket.options.map((option) => ({
+      id: option.id,
+      probability: option.probability.toNumber(),
+    })),
   }))
 
   return timeSeriesData

@@ -1,155 +1,107 @@
 import Decimal from 'decimal.js'
-import _ from 'lodash'
 import db from '@play-money/database'
-import {
-  mockAccount,
-  mockMarket,
-  mockMarketOption,
-  mockTransactionItem,
-  mockTransactionWithItems,
-} from '@play-money/database/mocks'
-import { createTransaction } from '@play-money/finance/lib/createTransaction'
-import { getBalances } from '@play-money/finance/lib/getBalances'
+import { mockAccount, mockBalance, mockTransactionEntry, mockTransactionWithEntries } from '@play-money/database/mocks'
+import { executeTransaction } from '@play-money/finance/lib/executeTransaction'
+import { getMarketBalances } from '@play-money/finance/lib/getBalances'
 import { createMarketExcessLiquidityTransactions } from './createMarketExcessLiquidityTransactions'
-import { getMarket } from './getMarket'
 import { getMarketAmmAccount } from './getMarketAmmAccount'
 import { getMarketClearingAccount } from './getMarketClearingAccount'
 
-jest.mock('./getMarketAmmAccount', () => ({ getMarketAmmAccount: jest.fn() }))
-jest.mock('./getMarketClearingAccount', () => ({ getMarketClearingAccount: jest.fn() }))
-jest.mock('@play-money/finance/lib/createTransaction', () => ({ createTransaction: jest.fn() }))
-jest.mock('@play-money/finance/lib/getBalances', () => ({ getBalances: jest.fn() }))
-jest.mock('./getMarket', () => ({ getMarket: jest.fn() }))
+jest.mock('./getMarketAmmAccount')
+jest.mock('./getMarketClearingAccount')
+jest.mock('@play-money/finance/lib/executeTransaction')
+jest.mock('@play-money/finance/lib/getBalances')
 
-jest.mock('@play-money/database', () => ({
-  transactionItem: {
-    findMany: jest.fn(),
-  },
-  transaction: {
-    findMany: jest.fn(),
-  },
-}))
+jest.mock('@play-money/database')
 
 describe('createMarketExcessLiquidityTransactions', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
-  it('should handle no remaining shares', async () => {
-    jest.mocked(getMarketAmmAccount).mockResolvedValue(mockAccount({ id: 'amm-1-account' }))
-    jest.mocked(getMarketClearingAccount).mockResolvedValue(mockAccount({ id: 'exchanger-account-id' }))
-    jest.mocked(db.transactionItem.findMany).mockResolvedValue([])
-
-    jest.mocked(getBalances).mockImplementation(async ({ accountId }) => {
-      if (accountId === 'amm-1-account') {
-        return []
-      }
-      return []
-    })
-
-    jest.mocked(getMarket).mockResolvedValue({
-      ...mockMarket(),
-      options: [mockMarketOption({ id: 'option-1' }), mockMarketOption({ id: 'option-2' })],
-    })
-
-    await createMarketExcessLiquidityTransactions({
-      marketId: 'market-1',
-    })
-
-    expect(createTransaction).not.toHaveBeenCalled()
-  })
-
   it('should handle remaining shares of zero', async () => {
     jest.mocked(getMarketAmmAccount).mockResolvedValue(mockAccount({ id: 'amm-1-account' }))
     jest.mocked(getMarketClearingAccount).mockResolvedValue(mockAccount({ id: 'exchanger-account-id' }))
 
-    jest.mocked(getBalances).mockImplementation(async ({ accountId }) => {
+    jest.mocked(getMarketBalances).mockImplementation(async ({ accountId }) => {
       if (accountId === 'amm-1-account') {
         return [
-          {
+          mockBalance({
             accountId,
             assetType: 'MARKET_OPTION',
             assetId: 'option-1',
-            amount: new Decimal(0),
-            subtotals: {},
-          },
-          {
+            total: new Decimal(0),
+          }),
+          mockBalance({
             accountId,
             assetType: 'MARKET_OPTION',
             assetId: 'option-2',
-            amount: new Decimal(0),
-            subtotals: {},
-          },
+            total: new Decimal(0),
+          }),
         ]
       }
       return []
     })
 
-    jest.mocked(getMarket).mockResolvedValue({
-      ...mockMarket(),
-      options: [mockMarketOption({ id: 'option-1' }), mockMarketOption({ id: 'option-2' })],
-    })
-
     await createMarketExcessLiquidityTransactions({
       marketId: 'market-1',
+      initiatorId: 'user-1',
     })
 
-    expect(createTransaction).not.toHaveBeenCalled()
+    expect(executeTransaction).not.toHaveBeenCalled()
   })
 
   it('should handle a single LP', async () => {
     jest.mocked(getMarketAmmAccount).mockResolvedValue(mockAccount({ id: 'amm-1-account' }))
     jest.mocked(getMarketClearingAccount).mockResolvedValue(mockAccount({ id: 'exchanger-account-id' }))
     jest.mocked(db.transaction.findMany).mockResolvedValue([
-      mockTransactionWithItems({
-        type: 'MARKET_LIQUIDITY',
-        creatorId: 'user-1',
-        transactionItems: [
-          mockTransactionItem({ accountId: 'user-1', currencyCode: 'PRIMARY', amount: new Decimal(-50) }),
+      mockTransactionWithEntries({
+        type: 'LIQUIDITY_DEPOSIT',
+        initiatorId: 'user-1',
+        entries: [
+          mockTransactionEntry({
+            fromAccountId: 'user-1',
+            toAccountId: 'exchanger-account-id',
+            amount: new Decimal(50),
+          }),
         ],
       }),
     ])
 
-    jest.mocked(getBalances).mockImplementation(async ({ accountId }) => {
+    jest.mocked(getMarketBalances).mockImplementation(async ({ accountId }) => {
       if (accountId === 'amm-1-account') {
         return [
-          {
+          mockBalance({
             accountId,
             assetType: 'MARKET_OPTION',
             assetId: 'option-1',
-            amount: new Decimal(25),
-            subtotals: {},
-          },
-          {
+            total: new Decimal(25),
+          }),
+          mockBalance({
             accountId,
             assetType: 'MARKET_OPTION',
             assetId: 'option-2',
-            amount: new Decimal(25),
-            subtotals: {},
-          },
+            total: new Decimal(25),
+          }),
         ]
       }
       return []
     })
 
-    jest.mocked(getMarket).mockResolvedValue({
-      ...mockMarket(),
-      options: [mockMarketOption({ id: 'option-1' }), mockMarketOption({ id: 'option-2' })],
-    })
-
     await createMarketExcessLiquidityTransactions({
       marketId: 'market-1',
+      initiatorId: 'user-1',
     })
 
-    expect(createTransaction).toHaveBeenCalledWith(
+    expect(executeTransaction).toHaveBeenCalledWith(
       expect.objectContaining({
-        creatorId: 'amm-1-account',
-        type: 'MARKET_EXCESS_LIQUIDITY',
-        marketId: 'market-1',
-        transactionItems: expect.arrayContaining([
+        type: 'LIQUIDITY_RETURNED',
+        entries: expect.arrayContaining([
           {
-            accountId: 'user-1',
-            currencyCode: 'PRIMARY',
+            toAccountId: 'user-1',
+            fromAccountId: 'exchanger-account-id',
+            assetType: 'CURRENCY',
+            assetId: 'PRIMARY',
             amount: new Decimal(25),
           },
         ]),
@@ -161,78 +113,80 @@ describe('createMarketExcessLiquidityTransactions', () => {
     jest.mocked(getMarketAmmAccount).mockResolvedValue(mockAccount({ id: 'amm-1-account' }))
     jest.mocked(getMarketClearingAccount).mockResolvedValue(mockAccount({ id: 'exchanger-account-id' }))
     jest.mocked(db.transaction.findMany).mockResolvedValue([
-      mockTransactionWithItems({
-        type: 'MARKET_LIQUIDITY',
-        creatorId: 'user-1',
-        transactionItems: [
-          mockTransactionItem({ accountId: 'user-1', currencyCode: 'PRIMARY', amount: new Decimal(-50) }),
+      mockTransactionWithEntries({
+        type: 'LIQUIDITY_DEPOSIT',
+        initiatorId: 'user-1',
+        entries: [
+          mockTransactionEntry({
+            fromAccountId: 'user-1',
+            toAccountId: 'exchanger-account-id',
+            amount: new Decimal(50),
+          }),
         ],
       }),
-      mockTransactionWithItems({
-        type: 'MARKET_LIQUIDITY',
-        creatorId: 'user-2',
-        transactionItems: [
-          mockTransactionItem({ accountId: 'user-2', currencyCode: 'PRIMARY', amount: new Decimal(-150) }),
+      mockTransactionWithEntries({
+        type: 'LIQUIDITY_DEPOSIT',
+        initiatorId: 'user-2',
+        entries: [
+          mockTransactionEntry({
+            fromAccountId: 'user-2',
+            toAccountId: 'exchanger-account-id',
+            amount: new Decimal(50),
+          }),
         ],
       }),
     ])
 
-    jest.mocked(getBalances).mockImplementation(async ({ accountId }) => {
+    jest.mocked(getMarketBalances).mockImplementation(async ({ accountId }) => {
       if (accountId === 'amm-1-account') {
         return [
-          {
+          mockBalance({
             accountId,
             assetType: 'MARKET_OPTION',
             assetId: 'option-1',
-            amount: new Decimal(20),
-            subtotals: {},
-          },
-          {
+            total: new Decimal(20),
+          }),
+          mockBalance({
             accountId,
             assetType: 'MARKET_OPTION',
             assetId: 'option-2',
-            amount: new Decimal(20),
-            subtotals: {},
-          },
+            total: new Decimal(20),
+          }),
         ]
       }
       return []
     })
 
-    jest.mocked(getMarket).mockResolvedValue({
-      ...mockMarket(),
-      options: [mockMarketOption({ id: 'option-1' }), mockMarketOption({ id: 'option-2' })],
-    })
-
     await createMarketExcessLiquidityTransactions({
       marketId: 'market-1',
+      initiatorId: 'user-1',
     })
 
-    expect(createTransaction).toHaveBeenCalledWith(
+    expect(executeTransaction).toHaveBeenCalledWith(
       expect.objectContaining({
-        creatorId: 'amm-1-account',
-        type: 'MARKET_EXCESS_LIQUIDITY',
-        marketId: 'market-1',
-        transactionItems: expect.arrayContaining([
+        type: 'LIQUIDITY_RETURNED',
+        entries: expect.arrayContaining([
           {
-            accountId: 'user-1',
-            currencyCode: 'PRIMARY',
-            amount: new Decimal(5),
+            toAccountId: 'user-1',
+            fromAccountId: 'exchanger-account-id',
+            assetType: 'CURRENCY',
+            assetId: 'PRIMARY',
+            amount: new Decimal(10),
           },
         ]),
       })
     )
 
-    expect(createTransaction).toHaveBeenCalledWith(
+    expect(executeTransaction).toHaveBeenCalledWith(
       expect.objectContaining({
-        creatorId: 'amm-1-account',
-        type: 'MARKET_EXCESS_LIQUIDITY',
-        marketId: 'market-1',
-        transactionItems: expect.arrayContaining([
+        type: 'LIQUIDITY_RETURNED',
+        entries: expect.arrayContaining([
           {
-            accountId: 'user-2',
-            currencyCode: 'PRIMARY',
-            amount: new Decimal(15),
+            toAccountId: 'user-2',
+            fromAccountId: 'exchanger-account-id',
+            assetType: 'CURRENCY',
+            assetId: 'PRIMARY',
+            amount: new Decimal(10),
           },
         ]),
       })

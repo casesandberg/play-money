@@ -132,7 +132,11 @@ export async function UserProfileLayout({
             </div>
             <div className="text-center">
               <div className="font-semibold">
-                <time dateTime={stats.lastTradeAt.toString()}>{format(stats.lastTradeAt, 'MMM d, yyyy')}</time>
+                {stats.lastTradeAt ? (
+                  <time dateTime={stats.lastTradeAt.toString()}>{format(stats.lastTradeAt, 'MMM d, yyyy')}</time>
+                ) : (
+                  '-'
+                )}
               </div>
               <div className="text-muted-foreground">Last traded</div>
             </div>

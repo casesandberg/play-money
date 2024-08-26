@@ -63,7 +63,7 @@ export async function createComment({
 
   if (!(await hasCommentedToday({ userId: authorId }))) {
     const userAccount = await getUserPrimaryAccount({ userId: authorId })
-    await createDailyCommentBonusTransaction({ accountId: userAccount.id, marketId: market.id })
+    await createDailyCommentBonusTransaction({ accountId: userAccount.id, marketId: market.id, initiatorId: authorId })
   }
 
   return comment

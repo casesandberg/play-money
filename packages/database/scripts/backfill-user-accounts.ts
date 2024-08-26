@@ -17,8 +17,10 @@ async function main() {
         await db.user.update({
           where: { id: user.id },
           data: {
-            accounts: {
-              create: {},
+            primaryAccount: {
+              create: {
+                type: 'USER',
+              },
             },
           },
         })

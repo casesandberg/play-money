@@ -1,8 +1,9 @@
 import Decimal from 'decimal.js'
-import { getAssetBalance, getBalances } from '@play-money/finance/lib/getBalances'
+import { getBalance, getMarketBalances } from '@play-money/finance/lib/getBalances'
 import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
 import { getMarketClearingAccount } from '@play-money/markets/lib/getMarketClearingAccount'
-import { TransactionItemInput } from './createTransaction'
+
+type TransactionItemInput = { accountId: string; currencyCode: string; amount: Decimal }
 
 export async function convertPrimaryToMarketShares({
   fromAccountId,
@@ -20,13 +21,13 @@ export async function convertPrimaryToMarketShares({
     throw new Error('Exchange amount must be greater than 0')
   }
 
-  const accountPrimaryBalance = await getAssetBalance({
+  const accountPrimaryBalance = await getBalance({
     accountId: fromAccountId,
     assetType: 'CURRENCY',
     assetId: 'PRIMARY',
   })
 
-  if (!accountPrimaryBalance.amount.gte(amount) && fromAccountId !== houseAccount.id) {
+  if (!accountPrimaryBalance.total.gte(amount) && fromAccountId !== houseAccount.id) {
     throw new Error('User does not have enough balance.')
   }
 
@@ -83,7 +84,7 @@ export async function convertMarketSharesToPrimary({
     throw new Error('Exchange amount must be greater than 0')
   }
 
-  const balances = await getBalances({
+  const balances = await getMarketBalances({
     accountId: fromAccountId,
     marketId,
   })
@@ -104,7 +105,7 @@ export async function convertMarketSharesToPrimary({
 
   const hasSufficientShares = optionBalances.every((balance, i) => {
     const inflightAdjustment = inflightAdjustments[i === 0 ? 'YES' : 'NO'] || new Decimal(0)
-    return balance.amount.add(inflightAdjustment).gte(amount)
+    return balance.total.add(inflightAdjustment).gte(amount)
   })
 
   if (!hasSufficientShares) {

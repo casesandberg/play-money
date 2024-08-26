@@ -18,17 +18,15 @@ async function main() {
 
       const nonWinningOptions = market.options.filter((o) => o.id !== resolution.id)
 
-      const lossTransactions = await Promise.all(
-        nonWinningOptions.map((option) => {
-          return createMarketResolveLossTransactions({
-            marketId,
-            losingOptionId: option.id,
-          })
-        })
-      )
+      const lossTransactions = await createMarketResolveLossTransactions({
+        marketId,
+        initiatorId: '',
+        winningOptionId: resolution.id,
+      })
 
       const winTransactions = await createMarketResolveWinTransactions({
         marketId,
+        initiatorId: '',
         winningOptionId: resolution.id,
       })
 
