@@ -35,7 +35,13 @@ function MainNav({
 }
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const { balance } = await getMyBalance()
+  let initialBalance
+  try {
+    const { balance } = await getMyBalance()
+    initialBalance = balance
+  } catch (_error) {
+    // Ignore
+  }
   return (
     <div className="flex min-h-screen flex-col">
       <header className="flex w-full flex-col justify-between border-b">
@@ -72,7 +78,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
           <div className="ml-auto flex items-center space-x-2">
             <NotificationDropdown />
-            <UserNav initialBalance={balance} />
+            <UserNav initialBalance={initialBalance} />
           </div>
         </div>
       </header>
