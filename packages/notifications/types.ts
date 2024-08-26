@@ -3,7 +3,7 @@ import {
   Market,
   MarketOption,
   Transaction,
-  TransactionItem,
+  TransactionEntry,
   User,
   Comment,
 } from '@play-money/database'
@@ -44,7 +44,7 @@ export interface MarketTradeNotificationContent extends NotificationContentBase 
   market: Market
   marketOption: MarketOption
   transaction: Transaction & {
-    transactionItems: Array<TransactionItem>
+    entries: Array<TransactionEntry>
   }
 }
 
@@ -61,7 +61,7 @@ export interface MarketLiquidityAddedNotificationContent extends NotificationCon
   actor: User
   market: Market
   transaction: Transaction & {
-    transactionItems: Array<TransactionItem>
+    entries: Array<TransactionEntry>
   }
 }
 

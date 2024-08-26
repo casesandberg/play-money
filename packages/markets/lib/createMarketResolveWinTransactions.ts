@@ -1,83 +1,105 @@
 import Decimal from 'decimal.js'
-import _ from 'lodash'
 import db, { Transaction } from '@play-money/database'
-import { createTransaction } from '@play-money/finance/lib/createTransaction'
-import { convertMarketSharesToPrimary } from '@play-money/finance/lib/exchanger'
+import { executeTransaction } from '@play-money/finance/lib/executeTransaction'
+import { getMarket } from './getMarket'
 import { getMarketAmmAccount } from './getMarketAmmAccount'
 import { getMarketClearingAccount } from './getMarketClearingAccount'
-import { getMarketOption } from './getMarketOption'
+import { updateMarketBalances } from './updateMarketBalances'
 
 export async function createMarketResolveWinTransactions({
+  initiatorId,
   marketId,
   winningOptionId,
 }: {
+  initiatorId: string
   marketId: string
   winningOptionId: string
 }) {
-  const ammAccount = await getMarketAmmAccount({ marketId })
-  const exchangerAccount = await getMarketClearingAccount({ marketId })
-  const marketOption = await getMarketOption({ id: winningOptionId, marketId })
-  const systemAccountIds = [ammAccount.id, exchangerAccount.id]
+  const [ammAccount, clearingAccount, winningPositions, market] = await Promise.all([
+    getMarketAmmAccount({ marketId }),
+    getMarketClearingAccount({ marketId }),
+    db.marketOptionPosition.findMany({
+      where: {
+        marketId,
+        optionId: winningOptionId,
+      },
+    }),
+    getMarket({ id: marketId, extended: true }),
+  ])
 
-  const winningShares = await db.transactionItem.findMany({
-    where: {
-      transaction: { marketId },
-      currencyCode: marketOption.currencyCode,
-      accountId: { notIn: systemAccountIds },
+  const summedWinningQuantities = winningPositions.reduce(
+    (acc, position) => {
+      if (!acc[position.accountId]) {
+        acc[position.accountId] = new Decimal(0)
+      }
+
+      acc[position.accountId] = acc[position.accountId].add(position.quantity)
+
+      return acc
     },
-  })
+    {} as Record<string, Decimal>
+  )
 
-  const groupedWinningShares = _.groupBy(winningShares, 'accountId')
-  const summedWinningShares = _.mapValues(groupedWinningShares, (transactions) => {
-    return transactions.reduce((sum, item) => sum.plus(item.amount), new Decimal(0))
-  })
-
-  const transactions: Array<Transaction> = []
+  const transactions: Array<Promise<Transaction>> = []
 
   // Transfer winning shares back to the AMM and convert to primary currency
-  for (const [accountId, amount] of Object.entries(summedWinningShares)) {
-    if (amount.gt(0)) {
-      const inflightTransactionItems = [
-        {
-          accountId: accountId,
-          currencyCode: marketOption.currencyCode,
-          amount: amount.negated(),
-        },
-        {
-          accountId: ammAccount.id,
-          currencyCode: marketOption.currencyCode,
-          amount,
-        },
-      ]
+  for (const [accountId, quantity] of Object.entries(summedWinningQuantities)) {
+    const entries = [
+      {
+        fromAccountId: accountId,
+        toAccountId: clearingAccount.id,
+        assetType: 'MARKET_OPTION',
+        assetId: winningOptionId,
+        amount: quantity,
+      } as const,
+      ...(market.options || [])
+        .filter(({ id }) => id !== winningOptionId)
+        .map((option) => {
+          return {
+            fromAccountId: ammAccount.id,
+            toAccountId: clearingAccount.id,
+            assetType: 'MARKET_OPTION',
+            assetId: option.id,
+            amount: quantity,
+          } as const
+        }),
+      {
+        fromAccountId: clearingAccount.id,
+        toAccountId: accountId,
+        assetType: 'CURRENCY',
+        assetId: 'PRIMARY',
+        amount: quantity,
+      } as const,
+    ]
 
-      transactions.push(
-        await createTransaction({
-          creatorId: ammAccount.id,
-          type: 'MARKET_RESOLVE_WIN',
-          description: `Returning winning shares for market ${marketId} and converting to primary currency`,
-          marketId,
-          transactionItems: [
-            ...inflightTransactionItems,
-            ...(await convertMarketSharesToPrimary({
-              fromAccountId: ammAccount.id,
-              amount,
-              marketId,
-              inflightTransactionItems,
-            })),
-            {
-              accountId: ammAccount.id,
-              currencyCode: 'PRIMARY',
-              amount: amount.negated(),
-            },
-            {
-              accountId: accountId,
-              currencyCode: 'PRIMARY',
-              amount: amount,
-            },
-          ],
-        })
-      )
-    }
+    transactions.push(
+      executeTransaction({
+        type: 'TRADE_WIN',
+        entries,
+        marketId,
+        additionalLogic: async (txParams) => {
+          await Promise.all(
+            Object.entries(summedWinningQuantities).map(async ([accountId, quantity]) => {
+              return txParams.tx.marketOptionPosition.update({
+                where: {
+                  accountId_optionId: {
+                    accountId,
+                    optionId: winningOptionId,
+                  },
+                },
+                data: {
+                  quantity: {
+                    decrement: quantity.toNumber(),
+                  },
+                  value: 0,
+                },
+              })
+            })
+          )
+          return updateMarketBalances({ ...txParams, marketId })
+        },
+      })
+    )
   }
 
   return transactions

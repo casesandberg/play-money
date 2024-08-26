@@ -1,16 +1,21 @@
 import Decimal from 'decimal.js'
-import _ from 'lodash'
 import { Transaction } from '@play-money/database'
 import { UNIQUE_TRADER_BONUS_PRIMARY } from '@play-money/finance/economy'
-import { createTransaction } from '@play-money/finance/lib/createTransaction'
+import { executeTransaction } from '@play-money/finance/lib/executeTransaction'
 import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
 import { getMarketLiquidity } from './getMarketLiquidity'
+import { updateMarketBalances } from './updateMarketBalances'
 
-export async function createMarketTraderBonusTransactions({ marketId }: { marketId: string }) {
-  const houseAccount = await getHouseAccount()
+export async function createMarketTraderBonusTransactions({
+  marketId,
+  initiatorId,
+}: {
+  marketId: string
+  initiatorId: string
+}) {
+  const [houseAccount, liquidity] = await Promise.all([getHouseAccount(), getMarketLiquidity(marketId)])
   const amountToDistribute = new Decimal(UNIQUE_TRADER_BONUS_PRIMARY)
-  const liquidity = await getMarketLiquidity(marketId)
-  const transactions: Array<Transaction> = []
+  const transactions: Array<Promise<Transaction>> = []
 
   for (const [accountId, providedAmount] of Object.entries(liquidity.providers)) {
     if (providedAmount.isZero()) continue
@@ -20,24 +25,22 @@ export async function createMarketTraderBonusTransactions({ marketId }: { market
 
     if (payout.isZero()) continue
 
+    const entries = [
+      {
+        amount: payout,
+        assetType: 'CURRENCY',
+        assetId: 'PRIMARY',
+        fromAccountId: houseAccount.id,
+        toAccountId: accountId,
+      } as const,
+    ]
+
     transactions.push(
-      await createTransaction({
-        creatorId: houseAccount.id,
-        type: 'MARKET_TRADER_BONUS',
-        description: `Unique trader bonus for market ${marketId}`,
+      executeTransaction({
+        type: 'LIQUIDITY_VOLUME_BONUS',
+        entries,
         marketId,
-        transactionItems: [
-          {
-            accountId: houseAccount.id,
-            currencyCode: 'PRIMARY',
-            amount: payout.negated(),
-          },
-          {
-            accountId: accountId,
-            currencyCode: 'PRIMARY',
-            amount: payout,
-          },
-        ],
+        additionalLogic: async (txParams) => updateMarketBalances({ ...txParams, marketId }),
       })
     )
   }

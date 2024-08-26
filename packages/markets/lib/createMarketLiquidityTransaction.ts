@@ -1,77 +1,72 @@
 import Decimal from 'decimal.js'
-import _ from 'lodash'
 import { addLiquidity } from '@play-money/finance/amms/maniswap-v1.1'
-import { createTransaction } from '@play-money/finance/lib/createTransaction'
-import { convertPrimaryToMarketShares } from '@play-money/finance/lib/exchanger'
-import { getBalances } from '@play-money/finance/lib/getBalances'
+import { executeTransaction } from '@play-money/finance/lib/executeTransaction'
+import { getMarketBalances } from '@play-money/finance/lib/getBalances'
 import { getMarket } from './getMarket'
 import { getMarketAmmAccount } from './getMarketAmmAccount'
-
-interface MarketLiquidityTransactionInput {
-  accountId: string
-  amount: Decimal // in dollars
-  marketId: string
-}
+import { getMarketClearingAccount } from './getMarketClearingAccount'
+import { updateMarketBalances } from './updateMarketBalances'
 
 export async function createMarketLiquidityTransaction({
+  type = 'LIQUIDITY_DEPOSIT',
+  initiatorId,
   accountId,
   marketId,
   amount,
-}: MarketLiquidityTransactionInput) {
-  const ammAccount = await getMarketAmmAccount({ marketId })
-  const market = await getMarket({ id: marketId, extended: true })
+}: {
+  type?: 'LIQUIDITY_DEPOSIT' | 'LIQUIDITY_INITIALIZE'
+  initiatorId?: string
+  accountId: string
+  amount: Decimal // in dollars
+  marketId: string
+}) {
+  const [ammAccount, clearingAccount, market] = await Promise.all([
+    getMarketAmmAccount({ marketId }),
+    getMarketClearingAccount({ marketId }),
+    getMarket({ id: marketId, extended: true }),
+  ])
 
-  const ammBalances = await getBalances({ accountId: ammAccount.id, marketId })
-  const ammAssetBalances = ammBalances.filter(({ assetType }) => assetType === 'MARKET_OPTION')
-
-  const exchangerTransactions = await convertPrimaryToMarketShares({
-    fromAccountId: accountId,
-    amount,
-    marketId,
-  })
+  const ammBalances = await getMarketBalances({ accountId: ammAccount.id, marketId })
+  const ammOptionBalances = ammBalances.filter(({ assetType }) => assetType === 'MARKET_OPTION')
 
   // TODO
   const liquidityAdditions = await addLiquidity({
     amount,
     options: market.options.map((option) => {
-      const optionBalance = ammAssetBalances.find(({ assetId }) => assetId === option.id)!
+      const optionBalance = ammOptionBalances.find(({ assetId }) => assetId === option.id)
 
       return {
         ...option,
-        shares: optionBalance.amount,
+        shares: optionBalance?.total || new Decimal(0),
       }
     }),
   })
 
-  const ammTransactions = [
+  const entries = [
     {
-      accountId: accountId,
-      currencyCode: 'YES',
-      amount: amount.neg(),
-    },
-    {
-      accountId: ammAccount.id,
-      currencyCode: 'YES',
       amount: amount,
-    },
-    {
-      accountId: accountId,
-      currencyCode: 'NO',
-      amount: amount.neg(),
-    },
-    {
-      accountId: ammAccount.id,
-      currencyCode: 'NO',
-      amount: amount,
-    },
-  ] as const
+      assetType: 'CURRENCY',
+      assetId: 'PRIMARY',
+      fromAccountId: accountId,
+      toAccountId: clearingAccount.id,
+    } as const,
+    ...market.options.map((option) => {
+      return {
+        amount: amount,
+        assetType: 'MARKET_OPTION',
+        assetId: option.id,
+        fromAccountId: clearingAccount.id,
+        toAccountId: ammAccount.id,
+      } as const
+    }),
+  ]
 
-  const transaction = await createTransaction({
-    creatorId: accountId,
-    type: 'MARKET_LIQUIDITY',
-    description: `Add ${amount} worth of liquidity to market ${marketId}`,
+  const transaction = await executeTransaction({
+    type,
+    initiatorId,
+    entries,
     marketId,
-    transactionItems: [...exchangerTransactions, ...ammTransactions],
+    additionalLogic: async (txParams) => updateMarketBalances({ ...txParams, marketId }),
   })
 
   return transaction
