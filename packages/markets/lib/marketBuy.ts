@@ -1,7 +1,6 @@
 import Decimal from 'decimal.js'
 import db from '@play-money/database'
 import { DAILY_TRADE_BONUS_PRIMARY, UNIQUE_TRADER_LIQUIDITY_PRIMARY } from '@play-money/finance/economy'
-import { getAssetBalance } from '@play-money/finance/lib/getBalances'
 import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
 import { getUniqueLiquidityProviderIds } from '@play-money/markets/lib/getUniqueLiquidityProviderIds'
 import { createNotification } from '@play-money/notifications/lib/createNotification'
@@ -17,34 +16,25 @@ import { isMarketTradable } from './helpers'
 export async function marketBuy({
   marketId,
   optionId,
-  creatorId,
+  userId,
   amount,
 }: {
   marketId: string
   optionId: string
-  creatorId: string
+  userId: string
   amount: Decimal
 }) {
-  const market = await getMarket({ id: marketId })
+  const [market, userAccount] = await Promise.all([getMarket({ id: marketId }), getUserPrimaryAccount({ userId })])
+
   if (!isMarketTradable(market)) {
     throw new Error('Market is closed')
   }
 
-  const userAccount = await getUserPrimaryAccount({ userId: creatorId })
-  const userPrimaryBalance = await getAssetBalance({
-    accountId: userAccount.id,
-    assetType: 'CURRENCY',
-    assetId: 'PRIMARY',
-  })
-
-  if (!userPrimaryBalance.amount.gte(amount)) {
-    throw new Error('User does not have enough balance to purchase')
-  }
-
   const transaction = await createMarketBuyTransaction({
-    userId: creatorId,
+    initiatorId: userId,
+    accountId: userAccount.id,
     marketId,
-    amount: new Decimal(amount),
+    amount,
     optionId,
   })
 
@@ -52,30 +42,31 @@ export async function marketBuy({
     where: {
       id: { not: transaction.id },
       marketId,
-      type: 'MARKET_BUY',
-      creatorId,
+      type: 'TRADE_BUY',
+      initiatorId: userId,
     },
   })
 
-  if (creatorId !== market.createdBy && !existingTradeInMarket) {
+  if (userId !== market.createdBy && !existingTradeInMarket) {
     const houseAccount = await getHouseAccount()
 
-    await createMarketLiquidityTransaction({
-      accountId: houseAccount.id,
-      amount: new Decimal(UNIQUE_TRADER_LIQUIDITY_PRIMARY),
-      marketId,
-    })
-
-    await createMarketTraderBonusTransactions({ marketId })
+    await Promise.all([
+      createMarketLiquidityTransaction({
+        accountId: houseAccount.id,
+        amount: new Decimal(UNIQUE_TRADER_LIQUIDITY_PRIMARY),
+        marketId,
+      }),
+      createMarketTraderBonusTransactions({ marketId, initiatorId: userId }),
+    ])
   }
 
-  const recipientIds = await getUniqueLiquidityProviderIds(marketId, [creatorId])
+  const recipientIds = await getUniqueLiquidityProviderIds(marketId, [userId])
 
   await Promise.all(
     recipientIds.map((recipientId) =>
       createNotification({
         type: 'MARKET_TRADE',
-        actorId: creatorId,
+        actorId: userId,
         marketId: market.id,
         marketOptionId: optionId,
         transactionId: transaction.id,
@@ -87,7 +78,7 @@ export async function marketBuy({
   )
 
   // TODO: Look into returning multiple messages to let the user know toast of the bonus.
-  if (!(await hasPlacedMarketTradeToday({ userId: creatorId })) && amount.gte(DAILY_TRADE_BONUS_PRIMARY)) {
-    await createDailyTradeBonusTransaction({ accountId: userAccount.id, marketId })
+  if (!(await hasPlacedMarketTradeToday({ userId })) && amount.gte(DAILY_TRADE_BONUS_PRIMARY)) {
+    await createDailyTradeBonusTransaction({ accountId: userAccount.id, marketId, initiatorId: userId })
   }
 }

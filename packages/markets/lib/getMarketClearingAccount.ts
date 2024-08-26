@@ -1,14 +1,15 @@
 import db from '@play-money/database'
 
 export async function getMarketClearingAccount({ marketId }: { marketId: string }) {
-  const account = await db.account.findUnique({
+  const account = await db.account.findFirst({
     where: {
-      internalType: 'EXCHANGER',
+      type: 'MARKET_CLEARING',
+      marketId,
     },
   })
 
   if (!account) {
-    throw new Error('Exchanger account does not exist')
+    throw new Error('Market clearing account does not exist')
   }
 
   return account

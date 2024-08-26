@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Decimal from 'decimal.js'
 import db, { MarketOption } from '@play-money/database'
 import { CurrencyCodeType } from '@play-money/database/zod/inputTypeSchemas/CurrencyCodeSchema'

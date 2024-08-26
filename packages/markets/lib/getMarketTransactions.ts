@@ -1,7 +1,7 @@
-import db, { Transaction, TransactionItem } from '@play-money/database'
+import db, { Transaction, TransactionEntry } from '@play-money/database'
 
 export type MarketTransaction = Transaction & {
-  transactionItems: Array<TransactionItem>
+  entries: Array<TransactionEntry>
 }
 
 export async function getMarketTransactions({ marketId }: { marketId: string }) {
@@ -10,7 +10,7 @@ export async function getMarketTransactions({ marketId }: { marketId: string }) 
       marketId: marketId,
     },
     include: {
-      transactionItems: true,
+      entries: true,
     },
   })
 
