@@ -67,7 +67,7 @@ export function MarketPositionsPage({
                 assetType: 'CURRENCY',
                 assetId: 'PRIMARY',
               })
-              const optionName = transaction.options[0].name
+              const optionName = transaction.options[0]?.name
 
               return (
                 <li className="flex flex-wrap items-center gap-1 py-3" key={transaction.id}>
