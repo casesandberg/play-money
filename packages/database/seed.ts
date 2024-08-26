@@ -13,58 +13,6 @@ import { mockUser } from './mocks'
 import { OmittedUserFields } from './prisma'
 
 async function main() {
-  await db.currency.upsert({
-    where: { code: 'PRIMARY' },
-    update: {},
-    create: {
-      name: 'Dollars',
-      symbol: '$',
-      code: 'PRIMARY',
-      imageUrl: '/images/dollars.svg',
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-  })
-
-  await db.currency.upsert({
-    where: { code: 'YES' },
-    update: {},
-    create: {
-      name: 'Yes Shares',
-      symbol: 'Y',
-      code: 'YES',
-      imageUrl: '/images/yes-shares.svg',
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-  })
-
-  await db.currency.upsert({
-    where: { code: 'NO' },
-    update: {},
-    create: {
-      name: 'No Shares',
-      symbol: 'N',
-      code: 'NO',
-      imageUrl: '/images/no-shares.svg',
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-  })
-
-  await db.currency.upsert({
-    where: { code: 'LPB' },
-    update: {},
-    create: {
-      name: 'LP Bonuses',
-      symbol: 'LPB',
-      code: 'LPB',
-      imageUrl: '/images/lp-bonuses.svg',
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.recent(),
-    },
-  })
-
   await db.account.upsert({
     where: { internalType: 'HOUSE' },
     update: {},

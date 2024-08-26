@@ -8,7 +8,6 @@ export { MarketOptionScalarFieldEnumSchema } from './MarketOptionScalarFieldEnum
 export { VerificationTokenScalarFieldEnumSchema } from './VerificationTokenScalarFieldEnumSchema';
 export { CommentScalarFieldEnumSchema } from './CommentScalarFieldEnumSchema';
 export { CommentReactionScalarFieldEnumSchema } from './CommentReactionScalarFieldEnumSchema';
-export { CurrencyScalarFieldEnumSchema } from './CurrencyScalarFieldEnumSchema';
 export { TransactionScalarFieldEnumSchema } from './TransactionScalarFieldEnumSchema';
 export { TransactionItemScalarFieldEnumSchema } from './TransactionItemScalarFieldEnumSchema';
 export { AccountScalarFieldEnumSchema } from './AccountScalarFieldEnumSchema';
@@ -20,7 +19,6 @@ export { QueryModeSchema } from './QueryModeSchema';
 export { NullsOrderSchema } from './NullsOrderSchema';
 export { JsonNullValueFilterSchema } from './JsonNullValueFilterSchema';
 export { CommentEntityTypeSchema } from './CommentEntityTypeSchema';
-export { CurrencyCodeSchema } from './CurrencyCodeSchema';
 export { NotificationTypeSchema } from './NotificationTypeSchema';
 export { InputJsonValueSchema } from './InputJsonValueSchema';
 export { JsonValueSchema } from './JsonValueSchema';

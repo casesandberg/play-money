@@ -1,13 +1,11 @@
 import { z } from 'zod';
 import { Prisma } from '@prisma/client'
-import { CurrencyCodeSchema } from '../inputTypeSchemas/CurrencyCodeSchema'
 
 /////////////////////////////////////////
 // TRANSACTION ITEM SCHEMA
 /////////////////////////////////////////
 
 export const TransactionItemSchema = z.object({
-  currencyCode: CurrencyCodeSchema,
   id: z.string().cuid(),
   accountId: z.string(),
   transactionId: z.string(),

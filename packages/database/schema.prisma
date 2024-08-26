@@ -117,8 +117,6 @@ model MarketOption {
   name                 String
   marketId             String
   market               Market             @relation(fields: [marketId], references: [id])
-  currencyCode         CurrencyCode
-  currency             Currency           @relation(fields: [currencyCode], references: [code])
   color                String             @default("#FF00FF") /// @zod.string.regex(/^#[0-9A-Fa-f]{6}$/)
   liquidityProbability Decimal            @default(0.5)
   resolutions          MarketResolution[]
@@ -174,25 +172,6 @@ model CommentReaction {
   notifications Notification[] @relation()
 }
 
-enum CurrencyCode {
-  PRIMARY
-  YES
-  NO
-  LPB
-}
-
-model Currency {
-  id               String            @id @default(cuid())
-  name             String
-  symbol           String
-  code             CurrencyCode      @unique
-  imageUrl         String?
-  transactionItems TransactionItem[]
-  marketOptions    MarketOption[]    @relation()
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-}
-
 model Transaction {
   id               String            @id @default(cuid())
   type             String
@@ -213,8 +192,6 @@ model TransactionItem {
   id            String       @id @default(cuid())
   accountId     String
   account       Account      @relation(fields: [accountId], references: [id])
-  currencyCode  CurrencyCode
-  currency      Currency     @relation(fields: [currencyCode], references: [code])
   transactionId String
   transaction   Transaction  @relation(fields: [transactionId], references: [id])
   amount        Decimal
