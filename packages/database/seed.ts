@@ -45,64 +45,57 @@ async function main() {
     })
   )
 
-  await Promise.all(
-    _.times(20, async () => {
-      const market = await createMarket({
-        question: `Will ${faker.lorem.sentence().toLowerCase().slice(0, -1)}?`,
-        description: `<p>${faker.lorem.paragraph()}</p>`,
-        closeDate: faker.date.future(),
-        createdBy: faker.helpers.arrayElement(user_ids),
-      })
+  for (let i = 0; i < 10; i++) {
+    const market = await createMarket({
+      question: `Will ${faker.lorem.sentence().toLowerCase().slice(0, -1)}?`,
+      description: `<p>${faker.lorem.paragraph()}</p>`,
+      closeDate: faker.date.future(),
+      createdBy: faker.helpers.arrayElement(user_ids),
+    })
 
-      for (let j = 0; j < 10; j++) {
-        const userId = faker.helpers.arrayElement(user_ids)
-        await marketBuy({
-          marketId: market.id,
-          optionId: market.options[faker.helpers.arrayElement([0, 1])].id,
-          userId,
-          amount: new Decimal(faker.string.numeric({ length: { min: 3, max: 3 } })),
-        })
-
-        await faker.helpers.maybe(
-          async () => {
-            return await createComment({
-              content: `<p>${faker.lorem.paragraph()}</p>`,
-              authorId: userId,
-              parentId: null,
-              entityType: 'MARKET',
-              entityId: market.id,
-            })
-          },
-          { probability: 0.5 }
-        )
-      }
-
-      await createComment({
-        content: `<p>${faker.lorem.paragraph()}</p>`,
-        authorId: faker.helpers.arrayElement(user_ids),
-        parentId: null,
-        entityType: 'MARKET',
-        entityId: market.id,
+    for (let j = 0; j < 10; j++) {
+      const userId = faker.helpers.arrayElement(user_ids)
+      await marketBuy({
+        marketId: market.id,
+        optionId: market.options[faker.helpers.arrayElement([0, 1])].id,
+        userId,
+        amount: new Decimal(faker.string.numeric({ length: { min: 3, max: 3 } })),
       })
 
       await faker.helpers.maybe(
         async () => {
-          return await resolveMarket({
-            resolverId: market.createdBy,
-            marketId: market.id,
-            optionId: market.options[faker.helpers.arrayElement([0, 1])].id,
-            supportingLink: faker.internet.url(),
+          return await createComment({
+            content: `<p>${faker.lorem.paragraph()}</p>`,
+            authorId: userId,
+            parentId: null,
+            entityType: 'MARKET',
+            entityId: market.id,
           })
         },
-        { probability: 0.2 }
+        { probability: 0.5 }
       )
+    }
 
-      // TODO: hunt down race condition that causes disconnect to throw an error
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      return market
+    await createComment({
+      content: `<p>${faker.lorem.paragraph()}</p>`,
+      authorId: faker.helpers.arrayElement(user_ids),
+      parentId: null,
+      entityType: 'MARKET',
+      entityId: market.id,
     })
-  )
+
+    await faker.helpers.maybe(
+      async () => {
+        return await resolveMarket({
+          resolverId: market.createdBy,
+          marketId: market.id,
+          optionId: market.options[faker.helpers.arrayElement([0, 1])].id,
+          supportingLink: faker.internet.url(),
+        })
+      },
+      { probability: 0.2 }
+    )
+  }
 }
 
 main()
