@@ -1,11 +1,11 @@
 'use client'
 
 import { format, isPast } from 'date-fns'
-import { CircleCheckBig, ChevronDown, Diamond } from 'lucide-react'
+import _ from 'lodash'
+import { CircleCheckBig, ChevronDown } from 'lucide-react'
 import React from 'react'
 import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip as ChartTooltip } from 'recharts'
 import { useMarketBalance, useMarketGraph } from '@play-money/api-helpers/client/hooks'
-import { Market, MarketOption, MarketResolution, User } from '@play-money/database'
 import { marketOptionBalancesToProbabilities } from '@play-money/finance/lib/helpers'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Alert, AlertDescription, AlertTitle } from '@play-money/ui/alert'
@@ -17,22 +17,13 @@ import { ReadMoreEditor } from '@play-money/ui/editor'
 import { UserLink } from '@play-money/users/components/UserLink'
 import { useUser } from '@play-money/users/context/UserContext'
 import { useSearchParam } from '../../ui/src/hooks/useSearchParam'
+import { ExtendedMarket } from '../types'
 import { EditMarketDialog } from './EditMarketDialog'
 import { LiquidityBoostAlert } from './LiquidityBoostAlert'
-import { LiquidityBoostDialog, MarketStats } from './LiquidityBoostDialog'
-import { MarketLikelyOption } from './MarketLikelyOption'
+import { LiquidityBoostDialog } from './LiquidityBoostDialog'
 import { MarketOptionRow } from './MarketOptionRow'
 import { MarketToolbar } from './MarketToolbar'
 import { useSidebar } from './SidebarContext'
-
-export type ExtendedMarket = Market & {
-  user: User
-  options: Array<MarketOption & { color: string; value?: number; cost?: number }>
-  marketResolution?: MarketResolution & {
-    resolution: MarketOption & { color: string }
-    resolvedBy: User
-  }
-}
 
 function getTextContrast(hex: string): string {
   const r = parseInt(hex.substring(1, 3), 16)
@@ -63,6 +54,10 @@ export function MarketOverviewPage({
   const isCreator = user?.id === market.createdBy
   const probabilities = marketOptionBalancesToProbabilities(balance?.amm)
 
+  const mostLikelyOption = market.options.reduce((prev, current) =>
+    prev.probability > current.probability ? prev : current
+  )
+
   return (
     <Card className="flex-1">
       <MarketToolbar
@@ -75,7 +70,11 @@ export function MarketOverviewPage({
       <CardHeader className="pt-0 md:pt-0">
         <CardTitle className="leading-relaxed">{market.question}</CardTitle>
         <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 font-mono text-sm text-muted-foreground md:flex-nowrap">
-          {!market.marketResolution ? <MarketLikelyOption market={market} /> : null}
+          {!market.marketResolution ? (
+            <div style={{ color: mostLikelyOption.color }} className="flex-shrink-0 font-medium">
+              {mostLikelyOption.probability}% {_.truncate(mostLikelyOption.name, { length: 30 })}
+            </div>
+          ) : null}
           {market.closeDate ? (
             <div className="flex-shrink-0">
               {isPast(market.closeDate) ? 'Ended' : 'Ending'} {format(market.closeDate, 'MMM d, yyyy')}
@@ -102,18 +101,18 @@ export function MarketOverviewPage({
                     if (data) {
                       return (
                         <Card className="p-1 text-sm">
-                          {format(data.startAt, 'MMM d, yyyy')} · {Math.round(data.probability * 100)}%
+                          {format(data.startAt, 'MMM d, yyyy')} · {data.options[0].probability}%
                         </Card>
                       )
                     }
                     return null
                   }}
                 />
-                <YAxis type="number" domain={[0, 1]} hide />
+                <YAxis type="number" domain={[0, 100]} hide />
                 <Line
                   type="step"
                   dot={false}
-                  dataKey="probability"
+                  dataKey={(data) => data.options[0].probability}
                   stroke={market.options[0]?.color}
                   strokeWidth={2.5}
                   strokeLinejoin="round"
@@ -172,7 +171,7 @@ export function MarketOverviewPage({
                         key={option.id}
                         option={option}
                         active={option.id === activeOptionId}
-                        probability={probabilities[option.id] || 0}
+                        probability={probabilities[option.id] || option.probability}
                         className={i > 0 ? 'border-t' : ''}
                         onSelect={() => {
                           setOption(option.id)
@@ -192,7 +191,7 @@ export function MarketOverviewPage({
                 key={option.id}
                 option={option}
                 active={option.id === activeOptionId}
-                probability={probabilities[option.id] || 0}
+                probability={probabilities[option.id] || option.probability}
                 className={i > 0 ? 'border-t' : ''}
                 onSelect={() => {
                   setOption(option.id)

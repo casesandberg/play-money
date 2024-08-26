@@ -1,11 +1,12 @@
 import { Decimal } from 'decimal.js'
-import db, { TransactionItem } from '@play-money/database'
+import db, { TransactionEntry } from '@play-money/database'
+import { TransactionTypeType } from '@play-money/database/zod/inputTypeSchemas/TransactionTypeSchema'
 
 type Bucket = {
   startAt: Date
   endAt: Date
-  transactionItems: Array<TransactionItem>
-  totalAmount: Decimal
+  transactionEntries: Array<TransactionEntry>
+  balance: Decimal
 }
 
 export async function getUserTotalTimeSeries({
@@ -19,11 +20,20 @@ export async function getUserTotalTimeSeries({
   startAt?: Date
   endAt?: Date
   tickInterval?: number
-  excludeTransactionTypes?: string[]
+  excludeTransactionTypes?: Array<TransactionTypeType>
 }) {
   if (!startAt) {
-    const firstTransactionItem = await db.transactionItem.findFirst({
-      where: { accountId },
+    const firstTransactionItem = await db.transactionEntry.findFirst({
+      where: {
+        OR: [
+          {
+            fromAccountId: accountId,
+          },
+          {
+            toAccountId: accountId,
+          },
+        ],
+      },
       orderBy: { createdAt: 'asc' },
     })
     startAt = firstTransactionItem?.createdAt || new Date()
@@ -35,18 +45,26 @@ export async function getUserTotalTimeSeries({
   const buckets: Bucket[] = Array.from({ length: numBuckets }, (_, i) => ({
     startAt: new Date(startAt.getTime() + i * tickIntervalMs),
     endAt: new Date(startAt.getTime() + (i + 1) * tickIntervalMs),
-    transactionItems: [],
-    totalAmount: new Decimal(0),
+    transactionEntries: [],
+    balance: new Decimal(0),
   }))
 
-  const transactionItems = await db.transactionItem.findMany({
+  const transactionEntries = await db.transactionEntry.findMany({
     where: {
-      accountId: accountId,
+      OR: [
+        {
+          fromAccountId: accountId,
+        },
+        {
+          toAccountId: accountId,
+        },
+      ],
       createdAt: {
         gte: startAt,
         lte: endAt,
       },
-      currencyCode: 'PRIMARY',
+      assetType: 'CURRENCY',
+      assetId: 'PRIMARY',
       transaction: {
         type: {
           notIn: excludeTransactionTypes,
@@ -58,29 +76,33 @@ export async function getUserTotalTimeSeries({
     },
   })
 
-  transactionItems.forEach((transactionItem) => {
-    const transactionTime = transactionItem.createdAt.getTime()
+  transactionEntries.forEach((entry) => {
+    const transactionTime = entry.createdAt.getTime()
     const bucketIndex = Math.floor((transactionTime - startAt.getTime()) / tickIntervalMs)
     if (bucketIndex >= 0 && bucketIndex < numBuckets) {
-      buckets[bucketIndex].transactionItems.push(transactionItem)
+      buckets[bucketIndex].transactionEntries.push(entry)
     }
   })
 
   buckets.forEach((bucket, i) => {
-    // Start with the previous bucket's totalAmount
+    // Start with the previous bucket's balance
     if (i > 0) {
-      bucket.totalAmount = buckets[i - 1].totalAmount
+      bucket.balance = buckets[i - 1].balance
     }
 
-    bucket.transactionItems.forEach((transactionItem) => {
-      bucket.totalAmount = bucket.totalAmount.plus(transactionItem.amount)
+    bucket.transactionEntries.forEach((entry) => {
+      if (entry.fromAccountId === accountId) {
+        bucket.balance = bucket.balance.sub(entry.amount)
+      } else if (entry.toAccountId === accountId) {
+        bucket.balance = bucket.balance.add(entry.amount)
+      }
     })
   })
 
   const timeSeriesData = buckets.map((bucket) => ({
     startAt: bucket.startAt,
     endAt: bucket.endAt,
-    totalAmount: bucket.totalAmount.toNumber(),
+    balance: bucket.balance.toNumber(),
   }))
 
   return timeSeriesData

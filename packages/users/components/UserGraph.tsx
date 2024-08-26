@@ -9,7 +9,7 @@ import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { Card } from '@play-money/ui/card'
 import { cn } from '@play-money/ui/utils'
 
-export function getTotalAmountChange(data: Array<{ endAt: Date; startAt: Date; totalAmount: number }>) {
+export function getTotalAmountChange(data: Array<{ endAt: Date; startAt: Date; balance: number }>) {
   data.forEach((point) => {
     point.endAt = new Date(point.endAt)
     point.startAt = new Date(point.startAt)
@@ -22,16 +22,16 @@ export function getTotalAmountChange(data: Array<{ endAt: Date; startAt: Date; t
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
 
   let latestAmount = 0
-  let oneWeekAgoAmount = data[0]?.totalAmount ?? 0
+  let oneWeekAgoAmount = data[0]?.balance ?? 0
 
   // Find the latest probability
   if (data.length > 0) {
-    latestAmount = data[data.length - 1].totalAmount
+    latestAmount = data[data.length - 1].balance
   }
 
   for (const item of data) {
     if (item.endAt <= oneWeekAgo) {
-      oneWeekAgoAmount = item.totalAmount
+      oneWeekAgoAmount = item.balance
       break
     }
   }
@@ -75,7 +75,7 @@ export function UserGraph({ userId }: { userId: string }) {
                   if (data) {
                     return (
                       <Card className="p-1 text-sm">
-                        {format(data.startAt, 'MMM d, yyyy')} · <CurrencyDisplay value={data.totalAmount} />
+                        {format(data.startAt, 'MMM d, yyyy')} · <CurrencyDisplay value={data.balance} />
                       </Card>
                     )
                   }
@@ -86,7 +86,7 @@ export function UserGraph({ userId }: { userId: string }) {
               <Line
                 type="step"
                 dot={false}
-                dataKey="totalAmount"
+                dataKey="balance"
                 stroke={'#333'}
                 strokeWidth={2.5}
                 strokeLinejoin="round"
