@@ -1,51 +1,30 @@
 import Decimal from 'decimal.js'
-import { Transaction } from '@play-money/database'
 import { UNIQUE_TRADER_BONUS_PRIMARY } from '@play-money/finance/economy'
 import { executeTransaction } from '@play-money/finance/lib/executeTransaction'
 import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
-import { getMarketLiquidity } from './getMarketLiquidity'
+import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
+import { getMarket } from './getMarket'
 import { updateMarketBalances } from './updateMarketBalances'
 
-export async function createMarketTraderBonusTransactions({
-  marketId,
-  initiatorId,
-}: {
-  marketId: string
-  initiatorId: string
-}) {
-  const [houseAccount, liquidity] = await Promise.all([getHouseAccount(), getMarketLiquidity(marketId)])
+export async function createMarketTraderBonusTransactions({ marketId }: { marketId: string }) {
+  const [houseAccount, market] = await Promise.all([getHouseAccount(), getMarket({ id: marketId })])
+  const creatorAccount = await getUserPrimaryAccount({ userId: market.createdBy })
   const amountToDistribute = new Decimal(UNIQUE_TRADER_BONUS_PRIMARY)
-  const transactions: Array<Promise<Transaction>> = []
 
-  for (const [accountId, providedAmount] of Object.entries(liquidity.providers)) {
-    if (providedAmount.isZero()) continue
+  const entries = [
+    {
+      amount: amountToDistribute,
+      assetType: 'CURRENCY',
+      assetId: 'PRIMARY',
+      fromAccountId: houseAccount.id,
+      toAccountId: creatorAccount.id,
+    } as const,
+  ]
 
-    const proportion = providedAmount.div(liquidity.total)
-    const payout = amountToDistribute.mul(proportion).toDecimalPlaces(4)
-
-    if (payout.isZero()) continue
-
-    const entries = [
-      {
-        amount: payout,
-        assetType: 'CURRENCY',
-        assetId: 'PRIMARY',
-        fromAccountId: houseAccount.id,
-        toAccountId: accountId,
-      } as const,
-    ]
-
-    transactions.push(
-      executeTransaction({
-        type: 'LIQUIDITY_VOLUME_BONUS',
-        entries,
-        marketId,
-        additionalLogic: async (txParams) => updateMarketBalances({ ...txParams, marketId }),
-      })
-    )
-  }
-
-  // TODO: Handle dust
-
-  return transactions
+  return executeTransaction({
+    type: 'CREATOR_TRADER_BONUS',
+    entries,
+    marketId,
+    additionalLogic: async (txParams) => updateMarketBalances({ ...txParams, marketId }),
+  })
 }
