@@ -36,9 +36,7 @@ export function MarketTradePanel({
   const [option, setOption] = useSearchParam('option')
   const { effect, resetEffect } = useSidebar()
   const activeOption = market.options.find((o) => o.id === (option || activeOptionId))
-  const activeOptionUserBalance = balance?.user.find(
-    (balance) => balance.assetType === 'MARKET_OPTION' && balance.assetId === activeOption?.id
-  )
+  const activePosition = balance?.userPositions.find((p) => p.optionId === activeOption?.id)
 
   const handleComplete = async () => {
     void mutate(MY_BALANCE_PATH)
@@ -79,9 +77,9 @@ export function MarketTradePanel({
                 {activeOption ? (
                   <MarketSellForm
                     marketId={market.id}
+                    position={activePosition}
                     option={activeOption}
                     onComplete={handleComplete}
-                    max={activeOptionUserBalance?.total}
                   />
                 ) : null}
               </TabsContent>
