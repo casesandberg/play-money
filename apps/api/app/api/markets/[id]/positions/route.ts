@@ -4,7 +4,7 @@ import type { SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
 import db from '@play-money/database'
 import type { NetBalance } from '@play-money/finance/lib/getBalances'
-import { getBalance, getMarketBalances, transformMarketBalancesToNumbers } from '@play-money/finance/lib/getBalances'
+import { transformMarketBalancesToNumbers } from '@play-money/finance/lib/getBalances'
 import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
 import schema from './schema'
 
