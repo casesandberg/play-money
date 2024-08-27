@@ -1,5 +1,6 @@
 import Decimal from 'decimal.js'
 import { DAILY_LIQUIDITY_BONUS_PRIMARY } from '@play-money/finance/economy'
+import { getBalance } from '@play-money/finance/lib/getBalances'
 import { getUniqueLiquidityProviderIds } from '@play-money/markets/lib/getUniqueLiquidityProviderIds'
 import { createNotification } from '@play-money/notifications/lib/createNotification'
 import { createDailyLiquidityBonusTransaction } from '@play-money/quests/lib/createDailyLiquidityBonusTransaction'
@@ -22,6 +23,12 @@ export async function addLiquidity({
     getMarket({ id: marketId, extended: true }),
     getUserPrimaryAccount({ userId }),
   ])
+
+  const balance = await getBalance({ accountId: userAccount.id, assetType: 'CURRENCY', assetId: 'PRIMARY' })
+
+  if (!balance.total.gte(amount)) {
+    throw new Error('User does not have enough balance')
+  }
 
   if (isMarketResolved(market)) {
     throw new Error('Market already resolved')

@@ -76,7 +76,9 @@ export function MarketList({
                   </Tooltip>
                 ) : null}
 
-                <UserAvatar user={market.user} size="sm" />
+                <Link href={`/${market.user.username}`}>
+                  <UserAvatar user={market.user} size="sm" />
+                </Link>
               </div>
             </div>
           </div>
