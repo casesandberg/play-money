@@ -123,7 +123,7 @@ model MarketResolution {
 
 model MarketOption {
   id                   String                 @id @default(cuid())
-  name                 String
+  name                 String /// @zod.string.min(1, { message: "Name is required" })
   marketId             String
   market               Market                 @relation(fields: [marketId], references: [id])
   color                String                 @default("#FF00FF") /// @zod.string.regex(/^#[0-9A-Fa-f]{6}$/)
