@@ -47,7 +47,7 @@ export async function GET(
         take: 5,
       }) as unknown as Array<NetBalance>,
       userAccount
-        ? db.balance.findFirst({
+        ? (db.balance.findFirst({
             where: {
               accountId: userAccount.id,
               assetType: 'CURRENCY',
@@ -61,7 +61,7 @@ export async function GET(
                 },
               },
             },
-          })
+          }) as unknown as NetBalance | undefined)
         : undefined,
     ])
 
