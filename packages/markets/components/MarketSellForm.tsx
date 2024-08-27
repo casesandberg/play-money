@@ -36,6 +36,9 @@ export function MarketSellForm({
   const [quote, setQuote] = useState<{ newProbability: number; potentialReturn: number } | null>(null)
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
+    defaultValues: {
+      amount: '' as unknown as number, // Fix uncontrolled component error
+    },
   })
 
   useEffect(() => {

@@ -6,10 +6,10 @@ const sidebarNavItems = [
     title: 'Profile',
     href: '/settings',
   },
-  {
-    title: 'Notifications',
-    href: '/settings/notifications',
-  },
+  // {
+  //   title: 'Notifications',
+  //   href: '/settings/notifications',
+  // },
 ]
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {

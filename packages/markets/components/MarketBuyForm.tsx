@@ -33,6 +33,9 @@ export function MarketBuyForm({
   const [quote, setQuote] = useState<{ newProbability: number; potentialReturn: number } | null>(null)
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
+    defaultValues: {
+      amount: 100,
+    },
   })
 
   const onSubmit = async (data: FormData) => {

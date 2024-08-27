@@ -31,7 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const user = session?.user?.id ? await getUserById({ id: session.user.id }) : null
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" disableTransitionOnChange enableSystem>
           <SWRProvider>
