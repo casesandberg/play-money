@@ -2,8 +2,10 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PopoverClose } from '@radix-ui/react-popover'
+import { ToggleLeftIcon, XIcon, CircleIcon, CircleDotIcon, PlusIcon } from 'lucide-react'
 import moment from 'moment'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { CirclePicker } from 'react-color'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { mutate } from 'swr'
@@ -20,10 +22,17 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@play-money/ui/input'
 import { Label } from '@play-money/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@play-money/ui/popover'
+import { RadioGroup, RadioGroupItem } from '@play-money/ui/radio-group'
 import { toast } from '@play-money/ui/use-toast'
+import { cn } from '@play-money/ui/utils'
+
+const COLORS = ['#03a9f4', '#e91e63', '#ff9800', '#8bc34a', '#9c27b0', '#ffc107', '#607d8b', '#009688', '#795548']
 
 const marketCreateFormSchema = MarketSchema.pick({ question: true, description: true, closeDate: true }).and(
-  z.object({ options: z.array(MarketOptionSchema.pick({ name: true, color: true })) })
+  z.object({
+    options: z.array(MarketOptionSchema.pick({ name: true, color: true })),
+    type: z.enum(['binary', 'multi']),
+  })
 )
 type MarketCreateFormValues = z.infer<typeof marketCreateFormSchema>
 
@@ -35,11 +44,12 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
     resolver: zodResolver(marketCreateFormSchema),
     defaultValues: {
       question: '',
+      type: 'binary',
       description: '',
       closeDate: moment().add(1, 'month').endOf('day').toDate(),
       options: [
-        { name: 'Yes', color: '#3B82F6' },
-        { name: 'No', color: '#EC4899' },
+        { name: 'Yes', color: COLORS[0] },
+        { name: 'No', color: COLORS[1] },
       ],
     },
   })
@@ -64,10 +74,30 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
 
   const handleSubmit = form.handleSubmit(onSubmit)
 
-  const { fields } = useFieldArray({
+  const { fields, replace, append, remove } = useFieldArray({
     control: form.control,
     name: 'options',
   })
+
+  const type = form.watch('type')
+
+  useEffect(
+    function replaceOptionsIfMulti() {
+      if (type === 'binary') {
+        replace([
+          { name: 'Yes', color: COLORS[0] },
+          { name: 'No', color: COLORS[1] },
+        ])
+      } else if (type === 'multi') {
+        replace([
+          { name: '', color: COLORS[0] },
+          { name: '', color: COLORS[1] },
+          { name: '', color: COLORS[2] },
+        ])
+      }
+    },
+    [type]
+  )
 
   return (
     <Card className="mx-auto flex max-w-screen-sm flex-1 p-6">
@@ -75,12 +105,76 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
         <form autoComplete="off" className="flex-1 space-y-6" onSubmit={(e) => void handleSubmit(e)}>
           <FormField
             control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem className="space-y-3">
+                <FormLabel>Market type</FormLabel>
+                <FormControl>
+                  <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex flex-row gap-4">
+                    <Card className="flex flex-row">
+                      <FormItem
+                        className={cn(
+                          'm-0.5 flex w-40',
+                          field.value === 'binary' && 'bg-primary/10 ring-2 ring-inset ring-primary'
+                        )}
+                      >
+                        <FormControl>
+                          <RadioGroupItem value="binary" className="hidden" />
+                        </FormControl>
+                        <FormLabel className="flex w-full cursor-pointer flex-col items-center justify-center p-2 pt-0">
+                          <div className="flex h-6 items-center">
+                            <ToggleLeftIcon className="size-6" />
+                          </div>
+                          <div className="flex flex-col items-center">
+                            <div className="text-base">Binary</div>
+                            <div className="text-xs text-muted-foreground">Yes/no questions</div>
+                          </div>
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem
+                        className={cn(
+                          'm-0.5 flex w-40',
+                          field.value === 'multi' && 'bg-primary/10 ring-2 ring-inset ring-primary'
+                        )}
+                      >
+                        <FormControl>
+                          <RadioGroupItem value="multi" className="hidden" />
+                        </FormControl>
+                        <FormLabel className="flex w-full cursor-pointer flex-col items-center justify-center p-2 pt-0">
+                          <div className="flex h-6 items-center">
+                            <CircleIcon className="size-4 stroke-[3px]" />
+                            <CircleDotIcon className="size-4 stroke-[3px]" />
+                            <CircleIcon className="size-4 stroke-[3px]" />
+                          </div>
+                          <div className="flex flex-col items-center">
+                            <div className="text-base">Multiple choice</div>
+                            <div className="text-xs text-muted-foreground">Many options</div>
+                          </div>
+                        </FormLabel>
+                      </FormItem>
+                    </Card>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="question"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Question</FormLabel>
                 <FormControl>
-                  <Input placeholder="Will bitcoin hit $76,543.21 by the end of 2024?" {...field} />
+                  <Input
+                    placeholder={
+                      type === 'binary'
+                        ? 'Will bitcoin hit $76,543.21 by the end of 2024?'
+                        : 'Who will win the 2024 US Presidential Election?'
+                    }
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -92,17 +186,44 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
 
             <Card className="divide-y">
               {fields.map((fieldItem, index) => (
-                <div className="flex items-center gap-1 p-2" key={index}>
-                  <div className="ml-2 w-8 text-sm font-medium text-muted-foreground">#{index + 1}</div>
+                <div className="relative flex gap-1 p-2" key={fieldItem.id}>
+                  {type === 'multi' && index > 2 ? (
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="absolute -left-3 mt-2 size-6"
+                      onClick={() => {
+                        remove(index)
+                      }}
+                    >
+                      <XIcon className="size-4" />
+                    </Button>
+                  ) : null}
+                  <div className="ml-2 mt-2.5 w-8 text-sm font-medium text-muted-foreground">#{index + 1}</div>
                   <FormField
                     control={form.control}
                     name={`options.${index}.name`}
                     render={({ field }) => (
                       <FormItem className="flex-1">
                         <FormControl>
-                          <Input placeholder={index === 0 ? 'Yes' : 'No'} {...field} />
+                          <Input
+                            placeholder={
+                              type === 'binary'
+                                ? index === 0
+                                  ? 'Yes'
+                                  : 'No'
+                                : index === 0
+                                  ? 'Kamala Harris'
+                                  : index === 1
+                                    ? 'Donald Trump'
+                                    : index === 2
+                                      ? 'Nikki Haley'
+                                      : ''
+                            }
+                            {...field}
+                          />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-xs" />
                       </FormItem>
                     )}
                   />
@@ -136,6 +257,20 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
                 </div>
               ))}
             </Card>
+
+            {type === 'multi' ? (
+              <Button
+                variant="ghost"
+                type="button"
+                disabled={fields.length >= 9}
+                onClick={() => {
+                  append({ name: '', color: COLORS[fields.length] })
+                }}
+              >
+                <PlusIcon className="size-4" />
+                Add option
+              </Button>
+            ) : null}
           </div>
 
           <FormField

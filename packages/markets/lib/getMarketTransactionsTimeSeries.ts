@@ -111,12 +111,15 @@ export async function getMarketTransactionsTimeSeries({
 
     const totalShares = bucket.options.reduce((sum, option) => sum.plus(option.shares), new Decimal(0))
 
-    bucket.options = bucket.options.map((option) => {
+    bucket.options = bucket.options.map((option, i) => {
       return {
         ...option,
-        probability: option.shares.eq(0)
-          ? new Decimal(0)
-          : calculateProbability({ targetShare: option.shares, totalShares }).times(100).round(),
+        probability: calculateProbability({
+          index: i,
+          shares: bucket.options.map((option) => option.shares),
+        })
+          .times(100)
+          .round(),
       }
     })
   })

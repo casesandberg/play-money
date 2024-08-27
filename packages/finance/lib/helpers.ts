@@ -1,6 +1,7 @@
 import Decimal from 'decimal.js'
 import { TransactionClient } from '@play-money/database'
 import { AssetTypeType } from '@play-money/database/zod/inputTypeSchemas/AssetTypeSchema'
+import { calculateProbability } from '../amms/maniswap-v1.1'
 import { TransactionEntryInput } from '../types'
 import { NetBalance, NetBalanceAsNumbers } from './getBalances'
 
@@ -95,11 +96,16 @@ export async function calculateBalanceSubtotals({
 
 export function marketOptionBalancesToProbabilities(balances: Array<NetBalance | NetBalanceAsNumbers> = []) {
   const assetBalances = balances.filter((balance) => balance?.assetType === 'MARKET_OPTION')
-  const sum = assetBalances.reduce((sum, balance) => new Decimal(balance.total || 0).plus(sum).toNumber(), 0)
 
   return assetBalances.reduce(
-    (result, assetBalance) => {
-      result[assetBalance.assetId] = new Decimal(sum).minus(assetBalance.total).div(sum).times(100).round().toNumber()
+    (result, assetBalance, i) => {
+      result[assetBalance.assetId] = calculateProbability({
+        index: i,
+        shares: assetBalances.map((balance) => balance.total),
+      })
+        .times(100)
+        .round()
+        .toNumber()
       return result
     },
     {} as Record<string, number>

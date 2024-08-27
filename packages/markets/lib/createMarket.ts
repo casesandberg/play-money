@@ -30,10 +30,6 @@ export async function createMarket({
 
   let parsedOptions: Array<PartialOptions>
 
-  if (options && options.length > 2) {
-    throw new Error('Only 2 options are currently supported')
-  }
-
   if (options?.length) {
     parsedOptions = options.map((data) => MarketOptionSchema.pick({ name: true, color: true }).parse(data))
   } else {

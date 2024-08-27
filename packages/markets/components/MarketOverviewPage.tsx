@@ -4,8 +4,7 @@ import { format, isPast } from 'date-fns'
 import _ from 'lodash'
 import { CircleCheckBig, ChevronDown } from 'lucide-react'
 import React from 'react'
-import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip as ChartTooltip } from 'recharts'
-import { useMarketBalance, useMarketGraph } from '@play-money/api-helpers/client/hooks'
+import { useMarketBalance } from '@play-money/api-helpers/client/hooks'
 import { marketOptionBalancesToProbabilities } from '@play-money/finance/lib/helpers'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Alert, AlertDescription, AlertTitle } from '@play-money/ui/alert'
@@ -21,6 +20,7 @@ import { ExtendedMarket } from '../types'
 import { EditMarketDialog } from './EditMarketDialog'
 import { LiquidityBoostAlert } from './LiquidityBoostAlert'
 import { LiquidityBoostDialog } from './LiquidityBoostDialog'
+import { MarketGraph } from './MarketGraph'
 import { MarketOptionRow } from './MarketOptionRow'
 import { MarketToolbar } from './MarketToolbar'
 import { useSidebar } from './SidebarContext'
@@ -46,7 +46,6 @@ export function MarketOverviewPage({
   const { user } = useUser()
   const { triggerEffect } = useSidebar()
   const { data: balance } = useMarketBalance({ marketId: market.id })
-  const { data: graph } = useMarketGraph({ marketId: market.id })
   const [option, setOption] = useSearchParam('option', 'replace')
   const [isEditing, setIsEditing] = useSearchParam('edit')
   const [isBoosting, setIsBoosting] = useSearchParam('boost')
@@ -91,37 +90,7 @@ export function MarketOverviewPage({
         </div>
       </CardHeader>
       <CardContent>
-        <Card className="h-32 p-4">
-          {graph?.data ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart width={300} height={128} data={graph.data}>
-                <ChartTooltip
-                  content={({ payload }) => {
-                    const data = payload?.[0]?.payload
-                    if (data) {
-                      return (
-                        <Card className="p-1 text-sm">
-                          {format(data.startAt, 'MMM d, yyyy')} · {data.options[0].probability}%
-                        </Card>
-                      )
-                    }
-                    return null
-                  }}
-                />
-                <YAxis type="number" domain={[0, 100]} hide />
-                <Line
-                  type="step"
-                  dot={false}
-                  dataKey={(data) => data.options[0].probability}
-                  stroke={market.options[0]?.color}
-                  strokeWidth={2.5}
-                  strokeLinejoin="round"
-                  animationDuration={750}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          ) : null}
-        </Card>
+        <MarketGraph market={market} activeOptionId={activeOptionId} />
       </CardContent>
 
       <CardContent>
