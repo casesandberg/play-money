@@ -17,6 +17,7 @@ import { cn } from '@play-money/ui/utils'
 import { ExtendedMarket } from '../types'
 import { MarketBalanceBreakdown } from './MarketBalanceBreakdown'
 import { MarketBuyForm } from './MarketBuyForm'
+import { MarketLeaderboardPanel } from './MarketLeaderboardPanel'
 import { MarketSellForm } from './MarketSellForm'
 import { useSidebar } from './SidebarContext'
 
@@ -86,7 +87,9 @@ export function MarketTradePanel({
             </CardContent>
           </Tabs>
         </Card>
-      ) : null}
+      ) : (
+        <MarketLeaderboardPanel market={market} />
+      )}
 
       {total ? (
         <Card>

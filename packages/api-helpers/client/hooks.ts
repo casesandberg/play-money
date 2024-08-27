@@ -1,4 +1,5 @@
 import useSWR from 'swr'
+import { User } from '@play-money/database'
 import { MarketOptionPositionAsNumbers, NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
 import { TransactionWithEntries } from '@play-money/finance/types'
 import { NotificationGroupWithLastNotification } from '@play-money/notifications/lib/getNotifications'
@@ -33,6 +34,13 @@ export function useMarketBalance({ marketId }: { marketId: string }) {
   }>(MARKET_BALANCE_PATH(marketId), {
     refreshInterval: SIXTY_SECONDS,
   })
+}
+
+export function useMarketPositions({ marketId }: { marketId: string }) {
+  return useSWR<{
+    balances: Array<NetBalanceAsNumbers & { account: { userPrimary: User } }>
+    user: NetBalanceAsNumbers & { account: { userPrimary: User } }
+  }>(`/v1/markets/${marketId}/positions`)
 }
 
 export function MARKET_GRAPH_PATH(marketId: string) {
