@@ -116,6 +116,21 @@ export async function updateMarket({ marketId, body }: { marketId: string; body:
   })
 }
 
+export async function updateMarketOption({
+  marketId,
+  optionId,
+  body,
+}: {
+  marketId: string
+  optionId: string
+  body: Record<string, unknown>
+}) {
+  return apiHandler<Market>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/options/${optionId}`, {
+    method: 'PATCH',
+    body: body,
+  })
+}
+
 export async function createLiquidity({ marketId, amount }: { marketId: string; amount: number }) {
   return apiHandler<unknown>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/liquidity`, {
     method: 'POST',
