@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PopoverClose } from '@radix-ui/react-popover'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { CirclePicker } from 'react-color'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
@@ -56,10 +56,7 @@ export const EditMarketOptionDialog = ({
   const selectedOption = market.options.find((o) => o.id === optionId)
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      name: selectedOption?.name,
-      color: selectedOption?.color,
-    },
+    defaultValues: selectedOption,
   })
 
   const {
@@ -83,6 +80,12 @@ export const EditMarketOptionDialog = ({
       })
     }
   }
+
+  useEffect(() => {
+    if (selectedOption) {
+      form.reset(selectedOption)
+    }
+  }, [optionId])
 
   return (
     <Dialog open={open} onOpenChange={onClose}>

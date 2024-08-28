@@ -68,6 +68,7 @@ export async function createMarket({
             name: option.name,
             color: option.color || (i === 0 ? '#3B82F6' : '#EC4899'),
             liquidityProbability: new Decimal(1).div(parsedOptions.length),
+            createdAt: new Date(new Date().getTime() + i), // Stagger createdAt so that they can be ordered by creation
           })),
         },
       },

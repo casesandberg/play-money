@@ -59,6 +59,8 @@ export function MarketOverviewPage({
     prev.probability > current.probability ? prev : current
   )
 
+  const orderedMarketOptions = _.orderBy(market.options, 'createdAt')
+
   return (
     <Card className="flex-1">
       <MarketToolbar
@@ -128,7 +130,7 @@ export function MarketOverviewPage({
                 </AlertDescription>
               ) : null}
             </Alert>
-            {market.options.length ? (
+            {orderedMarketOptions.length ? (
               <Collapsible>
                 <CollapsibleTrigger asChild>
                   <Button variant="ghost" className="text-muted-foreground" size="sm">
@@ -137,7 +139,7 @@ export function MarketOverviewPage({
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <Card>
-                    {market.options.map((option, i) => (
+                    {orderedMarketOptions.map((option, i) => (
                       <MarketOptionRow
                         key={option.id}
                         option={option}
@@ -157,9 +159,9 @@ export function MarketOverviewPage({
               </Collapsible>
             ) : null}
           </>
-        ) : market.options.length ? (
+        ) : orderedMarketOptions.length ? (
           <Card>
-            {market.options.map((option, i) => (
+            {orderedMarketOptions.map((option, i) => (
               <MarketOptionRow
                 key={option.id}
                 option={option}
