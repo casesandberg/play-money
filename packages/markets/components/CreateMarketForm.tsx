@@ -262,6 +262,7 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
               <Button
                 variant="ghost"
                 type="button"
+                size="sm"
                 disabled={fields.length >= 9}
                 onClick={() => {
                   append({ name: '', color: COLORS[fields.length] })
@@ -276,7 +277,7 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
           <FormField
             control={form.control}
             name="description"
-            render={({ field }) => (
+            render={({ field: { ref, ...field } }) => (
               <FormItem>
                 <FormLabel>Resolution criteria</FormLabel>
                 <FormControl>

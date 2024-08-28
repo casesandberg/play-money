@@ -13,6 +13,7 @@ import {
   CommandGroup,
   CommandItem,
 } from '@play-money/ui/command'
+import { DialogDescription, DialogTitle } from '@play-money/ui/dialog'
 
 export function GlobalSearchMenu({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const router = useRouter()
@@ -32,6 +33,8 @@ export function GlobalSearchMenu({ open, onOpenChange }: { open: boolean; onOpen
 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange} commandProps={{ shouldFilter: false }}>
+      <DialogTitle className="sr-only">Search</DialogTitle>
+      <DialogDescription className="sr-only">Global search for users and markets</DialogDescription>
       <CommandInput
         placeholder="Search..."
         value={query}

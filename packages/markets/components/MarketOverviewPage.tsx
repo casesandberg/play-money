@@ -18,6 +18,7 @@ import { useUser } from '@play-money/users/context/UserContext'
 import { useSearchParam } from '../../ui/src/hooks/useSearchParam'
 import { ExtendedMarket } from '../types'
 import { EditMarketDialog } from './EditMarketDialog'
+import { EditMarketOptionDialog } from './EditMarketOptionDialog'
 import { LiquidityBoostAlert } from './LiquidityBoostAlert'
 import { LiquidityBoostDialog } from './LiquidityBoostDialog'
 import { MarketGraph } from './MarketGraph'
@@ -48,6 +49,7 @@ export function MarketOverviewPage({
   const { data: balance } = useMarketBalance({ marketId: market.id })
   const [option, setOption] = useSearchParam('option', 'replace')
   const [isEditing, setIsEditing] = useSearchParam('edit')
+  const [isEditOption, setIsEditOption] = useSearchParam('editOption')
   const [isBoosting, setIsBoosting] = useSearchParam('boost')
   const activeOptionId = option || market.options[0]?.id || ''
   const isCreator = user?.id === market.createdBy
@@ -142,6 +144,8 @@ export function MarketOverviewPage({
                         active={option.id === activeOptionId}
                         probability={probabilities[option.id] || option.probability}
                         className={i > 0 ? 'border-t' : ''}
+                        canEdit={user?.id === market.createdBy}
+                        onEdit={() => setIsEditOption(option.id)}
                         onSelect={() => {
                           setOption(option.id)
                           triggerEffect()
@@ -162,6 +166,8 @@ export function MarketOverviewPage({
                 active={option.id === activeOptionId}
                 probability={probabilities[option.id] || option.probability}
                 className={i > 0 ? 'border-t' : ''}
+                canEdit={user?.id === market.createdBy}
+                onEdit={() => setIsEditOption(option.id)}
                 onSelect={() => {
                   setOption(option.id)
                   triggerEffect()
@@ -189,6 +195,13 @@ export function MarketOverviewPage({
         market={market}
         open={isEditing === 'true'}
         onClose={() => setIsEditing(undefined)}
+        onSuccess={onRevalidate}
+      />
+      <EditMarketOptionDialog
+        market={market}
+        optionId={isEditOption!}
+        open={isEditOption != null}
+        onClose={() => setIsEditOption(undefined)}
         onSuccess={onRevalidate}
       />
       <LiquidityBoostDialog
