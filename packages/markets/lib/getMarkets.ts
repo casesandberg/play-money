@@ -6,6 +6,7 @@ import { getMarketClearingAccount } from './getMarketClearingAccount'
 
 interface MarketFilterOptions {
   createdBy?: string
+  tag?: string
 }
 
 interface SortOptions {
@@ -26,6 +27,7 @@ export async function getMarkets(
   const markets = await db.market.findMany({
     where: {
       createdBy: filters.createdBy,
+      tags: filters.tag ? { has: filters.tag } : undefined,
     },
     include: {
       user: true,

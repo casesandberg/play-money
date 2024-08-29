@@ -3,6 +3,7 @@
 import { format, isPast } from 'date-fns'
 import _ from 'lodash'
 import { CircleCheckBig, ChevronDown } from 'lucide-react'
+import Link from 'next/link'
 import React from 'react'
 import { useMarketBalance } from '@play-money/api-helpers/client/hooks'
 import { marketOptionBalancesToProbabilities } from '@play-money/finance/lib/helpers'
@@ -182,6 +183,16 @@ export function MarketOverviewPage({
 
       <CardContent>
         <ReadMoreEditor value={market.description} maxLines={6} />
+
+        {market.tags.length ? (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {market.tags.map((tag) => (
+              <Link href={`/questions/tagged/${tag}`}>
+                <Badge variant="secondary">{tag}</Badge>
+              </Link>
+            ))}
+          </div>
+        ) : null}
       </CardContent>
 
       {!market.resolvedAt ? (

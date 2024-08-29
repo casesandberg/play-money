@@ -88,10 +88,10 @@ export async function getMyBalance() {
   return apiHandler<{ balance: number }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/balance`)
 }
 
-export async function getMarkets() {
+export async function getMarkets({ tag }: { tag?: string } = {}) {
   return apiHandler<{
     markets: Array<ExtendedMarket & { commentCount: number; liquidityCount: number; uniqueTraderCount: number }>
-  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets`, {
+  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets${tag ? `?tag=${tag}` : ''}`, {
     next: { tags: ['markets'] },
   })
 }
@@ -316,4 +316,13 @@ export async function getUserMarkets({ userId }: { userId: string }): Promise<{ 
   return apiHandler<{ markets: Array<ExtendedMarket> }>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/markets?createdBy=${userId}`
   )
+}
+
+export async function createMarketGenerateTags({ question }: { question: string }) {
+  return apiHandler<{ tags: Array<string> }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/generate-tags`, {
+    method: 'POST',
+    body: {
+      question,
+    },
+  })
 }

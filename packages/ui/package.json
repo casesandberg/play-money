@@ -24,6 +24,7 @@
     "./form": "./src/components/ui/form.tsx",
     "./input": "./src/components/ui/input.tsx",
     "./label": "./src/components/ui/label.tsx",
+    "./multi-select": "./src/components/ui/multi-select.tsx",
     "./popover": "./src/components/ui/popover.tsx",
     "./progress": "./src/components/ui/progress.tsx",
     "./radio-group": "./src/components/ui/radio-group.tsx",

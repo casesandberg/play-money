@@ -51,6 +51,7 @@ async function main() {
       description: `<p>${faker.lorem.paragraph()}</p>`,
       closeDate: faker.date.future(),
       createdBy: faker.helpers.arrayElement(user_ids),
+      tags: [faker.word.noun(), faker.word.noun(), faker.word.noun(), faker.word.noun(), faker.word.noun()],
     })
 
     for (let j = 0; j < 10; j++) {
