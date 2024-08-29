@@ -1,4 +1,5 @@
 import Decimal from 'decimal.js'
+import db from '@play-money/database'
 import { LeaderboardUser } from '../types'
 
 function transformUserOutput(input: LeaderboardUser): LeaderboardUser {
@@ -11,7 +12,7 @@ function transformUserOutput(input: LeaderboardUser): LeaderboardUser {
 
 export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, userId?: string) {
   const [topTraders, topCreators, topPromoters, topQuesters] = await Promise.all([
-    prisma.$queryRaw<Array<LeaderboardUser>>`
+    db.$queryRaw<Array<LeaderboardUser>>`
     WITH trader_transactions AS (
         SELECT 
         a.id AS "accountId",
@@ -86,7 +87,7 @@ export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, user
     -- WHERE COALESCE(total, 0) > 0
     ORDER BY total DESC;
   `,
-    prisma.$queryRaw<Array<LeaderboardUser>>`
+    db.$queryRaw<Array<LeaderboardUser>>`
       WITH creator_bonuses AS (
         SELECT 
           a.id AS "accountId",
@@ -116,7 +117,7 @@ export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, user
     --   WHERE COALESCE(cb.total, 0) > 0
       ORDER BY total DESC
     `,
-    prisma.$queryRaw<Array<LeaderboardUser>>`
+    db.$queryRaw<Array<LeaderboardUser>>`
       WITH promoter_bonuses AS (
         SELECT 
           a.id AS "accountId",
@@ -146,7 +147,7 @@ export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, user
     --   WHERE COALESCE(pb.total, 0) > 0
       ORDER BY total DESC
     `,
-    prisma.$queryRaw<Array<LeaderboardUser>>`
+    db.$queryRaw<Array<LeaderboardUser>>`
       WITH quester_bonuses AS (
         SELECT 
           a.id AS "accountId",
@@ -192,8 +193,6 @@ export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, user
       quester: quester ? transformUserOutput(quester) : undefined,
     }
   }
-
-  const first = topTraders[0]
 
   return {
     topTraders: topTraders.slice(0, 10).map(transformUserOutput),
