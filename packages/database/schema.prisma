@@ -87,6 +87,7 @@ model Market {
   resolvedAt        DateTime?
   transactions      Transaction[]
   createdBy         String
+  tags              String[] /// @zod.string.array(.max(5))
   user              User                   @relation(fields: [createdBy], references: [id])
   ammAccountId      String                 @unique
   ammAccount        Account                @relation("MarketAMMAccount", fields: [ammAccountId], references: [id])

@@ -88,10 +88,11 @@ export async function getMyBalance() {
   return apiHandler<{ balance: number }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/balance`)
 }
 
-export async function getMarkets() {
+export async function getMarkets(params: { tag?: string } | undefined) {
+  const { tag } = params || {}
   return apiHandler<{
     markets: Array<ExtendedMarket & { commentCount: number; liquidityCount: number; uniqueTraderCount: number }>
-  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets`, {
+  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets${tag ? `?tag=${tag}` : ''}`, {
     next: { tags: ['markets'] },
   })
 }

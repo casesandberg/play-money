@@ -13,7 +13,7 @@ export default createSchema({
   },
   patch: {
     parameters: MarketSchema.pick({ id: true }),
-    requestBody: MarketSchema.pick({ question: true, description: true, closeDate: true }).partial(),
+    requestBody: MarketSchema.pick({ question: true, description: true, closeDate: true, tags: true }).partial(),
     responses: {
       200: MarketSchema,
       404: ServerErrorSchema,

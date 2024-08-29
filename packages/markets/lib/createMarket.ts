@@ -17,6 +17,7 @@ export async function createMarket({
   closeDate,
   createdBy,
   options,
+  tags,
   subsidyAmount = new Decimal(INITIAL_MARKET_LIQUIDITY_PRIMARY),
 }: {
   question: string
@@ -24,6 +25,7 @@ export async function createMarket({
   closeDate: Date | null
   createdBy: string
   options?: Array<PartialOptions>
+  tags?: Array<string>
   subsidyAmount?: Decimal
 }) {
   let slug = slugifyTitle(question)
@@ -62,6 +64,7 @@ export async function createMarket({
       description,
       closeDate,
       slug,
+      tags: tags?.map((tag) => slugifyTitle(tag)),
       options: {
         createMany: {
           data: parsedOptions.map((option, i) => ({

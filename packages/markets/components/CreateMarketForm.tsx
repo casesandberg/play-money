@@ -21,6 +21,7 @@ import { Editor } from '@play-money/ui/editor'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
 import { Label } from '@play-money/ui/label'
+import { MultiSelect } from '@play-money/ui/multi-select'
 import { Popover, PopoverContent, PopoverTrigger } from '@play-money/ui/popover'
 import { RadioGroup, RadioGroupItem } from '@play-money/ui/radio-group'
 import { toast } from '@play-money/ui/use-toast'
@@ -28,7 +29,12 @@ import { cn } from '@play-money/ui/utils'
 
 const COLORS = ['#03a9f4', '#e91e63', '#ff9800', '#8bc34a', '#9c27b0', '#ffc107', '#607d8b', '#009688', '#795548']
 
-const marketCreateFormSchema = MarketSchema.pick({ question: true, description: true, closeDate: true }).and(
+const marketCreateFormSchema = MarketSchema.pick({
+  question: true,
+  description: true,
+  closeDate: true,
+  tags: true,
+}).and(
   z.object({
     options: z.array(MarketOptionSchema.pick({ name: true, color: true })),
     type: z.enum(['binary', 'multi']),
@@ -293,6 +299,25 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field: { value, onChange, ...field } }) => (
+              <FormItem>
+                <FormLabel>Tags</FormLabel>
+                <FormControl>
+                  <MultiSelect
+                    value={value?.map((v) => ({ value: v, label: v }))}
+                    onChange={(values) => onChange(values?.map((v) => v.value))}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="closeDate"

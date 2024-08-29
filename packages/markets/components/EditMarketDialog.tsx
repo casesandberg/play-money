@@ -12,9 +12,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@play-money/ui
 import { Editor } from '@play-money/ui/editor'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
+import { MultiSelect } from '@play-money/ui/multi-select'
 import { toast } from '@play-money/ui/use-toast'
 
-const FormSchema = MarketSchema.pick({ question: true, description: true, closeDate: true })
+const FormSchema = MarketSchema.pick({ question: true, description: true, closeDate: true, tags: true })
 
 type FormData = z.infer<typeof FormSchema>
 
@@ -55,6 +56,7 @@ export const EditMarketDialog = ({
       question: market.question,
       description: market.description || '<p></p>',
       closeDate: market.closeDate,
+      tags: market.tags,
     },
   })
 
@@ -122,6 +124,25 @@ export const EditMarketDialog = ({
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="tags"
+              render={({ field: { value, onChange, ...field } }) => (
+                <FormItem>
+                  <FormLabel>Tags</FormLabel>
+                  <FormControl>
+                    <MultiSelect
+                      value={value?.map((v) => ({ value: v, label: v }))}
+                      onChange={(values) => onChange(values?.map((v) => v.value))}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="closeDate"

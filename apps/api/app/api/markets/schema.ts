@@ -8,6 +8,7 @@ export default createSchema({
       .object({
         createdBy: z.string().optional(),
         limit: z.coerce.number().optional(),
+        tag: z.string().optional(),
       })
       .optional(),
     responses: {
@@ -23,6 +24,7 @@ export default createSchema({
       question: true,
       description: true,
       closeDate: true,
+      tags: true,
     }).extend({
       options: z.array(
         MarketOptionSchema.pick({

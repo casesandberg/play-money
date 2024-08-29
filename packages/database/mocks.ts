@@ -63,6 +63,7 @@ export function mockMarket(overrides?: Partial<Market>): Market {
     description,
     slug: faker.helpers.slugify(question),
     closeDate,
+    tags: [faker.word.noun(), faker.word.noun(), faker.word.noun(), faker.word.noun(), faker.word.noun()],
     ammAccountId: faker.string.uuid(),
     clearingAccountId: faker.string.uuid(),
     resolvedAt: faker.helpers.maybe(faker.date.past, { probability: 0.2 }) ?? null,
