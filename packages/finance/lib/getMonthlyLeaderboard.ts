@@ -1,10 +1,7 @@
 import Decimal from 'decimal.js'
 import { LeaderboardUser } from '../types'
 
-function transformUserOutput(input?: LeaderboardUser): LeaderboardUser | undefined {
-  if (!input) {
-    return
-  }
+function transformUserOutput(input: LeaderboardUser): LeaderboardUser {
   return {
     ...input,
     total: new Decimal(input.total).round().toNumber(),
@@ -183,11 +180,16 @@ export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, user
 
   let userRankings = null
   if (userId) {
+    const traderRanking = topTraders.find((t) => t.userId === userId)
+    const creatorRanking = topCreators.find((c) => c.userId === userId)
+    const promoterRanking = topPromoters.find((p) => p.userId === userId)
+    const quester = topQuesters.find((q) => q.userId === userId)
+
     userRankings = {
-      trader: transformUserOutput(topTraders.find((t) => t.userId === userId)) || { rank: null, total: 0 },
-      creator: transformUserOutput(topCreators.find((c) => c.userId === userId)) || { rank: null, total: 0 },
-      promoter: transformUserOutput(topPromoters.find((p) => p.userId === userId)) || { rank: null, total: 0 },
-      quester: transformUserOutput(topQuesters.find((q) => q.userId === userId)) || { rank: null, total: 0 },
+      trader: traderRanking ? transformUserOutput(traderRanking) : undefined,
+      creator: creatorRanking ? transformUserOutput(creatorRanking) : undefined,
+      promoter: promoterRanking ? transformUserOutput(promoterRanking) : undefined,
+      quester: quester ? transformUserOutput(quester) : undefined,
     }
   }
 

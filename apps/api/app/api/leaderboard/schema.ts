@@ -20,10 +20,10 @@ export default createSchema({
         topQuesters: z.array(LeaderboardUserSchema),
         userRankings: z
           .object({
-            trader: LeaderboardUserSchema,
-            creator: LeaderboardUserSchema,
-            promoter: LeaderboardUserSchema,
-            quester: LeaderboardUserSchema,
+            trader: LeaderboardUserSchema.optional(),
+            creator: LeaderboardUserSchema.optional(),
+            promoter: LeaderboardUserSchema.optional(),
+            quester: LeaderboardUserSchema.optional(),
           })
           .or(z.null())
           .optional(),
