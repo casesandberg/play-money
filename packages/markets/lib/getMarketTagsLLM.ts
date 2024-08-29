@@ -25,7 +25,7 @@ export async function getMarketTagsLLM({ question }: { question: string }) {
       : {}
 
     if (content.tags && Array.isArray(content.tags)) {
-      return content.tags.map((tag: string) => slugifyTitle(tag))
+      return content.tags.map((tag: string) => slugifyTitle(tag)) as Array<string>
     }
 
     return []
