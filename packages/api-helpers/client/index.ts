@@ -1,6 +1,6 @@
 import { CommentWithReactions } from '@play-money/comments/lib/getComment'
 import { Market, User } from '@play-money/database'
-import { TransactionWithEntries } from '@play-money/finance/types'
+import { TransactionWithEntries, LeaderboardUser } from '@play-money/finance/types'
 import { ExtendedMarket } from '@play-money/markets/types'
 
 // TODO: @casesandberg Generate this from OpenAPI schema
@@ -323,6 +323,25 @@ export async function createMarketGenerateTags({ question }: { question: string 
     method: 'POST',
     body: {
       question,
+    },
+  })
+}
+
+export async function getLeaderboard() {
+  return apiHandler<{
+    topTraders: Array<LeaderboardUser>
+    topCreators: Array<LeaderboardUser>
+    topPromoters: Array<LeaderboardUser>
+    topQuesters: Array<LeaderboardUser>
+    userRankings?: {
+      trader: LeaderboardUser
+      creator: LeaderboardUser
+      promoter: LeaderboardUser
+      quester: LeaderboardUser
+    }
+  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/leaderboard`, {
+    next: {
+      revalidate: 1000 * 60 * 10,
     },
   })
 }
