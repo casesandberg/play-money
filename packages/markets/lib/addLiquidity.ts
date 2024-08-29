@@ -1,5 +1,6 @@
 import Decimal from 'decimal.js'
 import { DAILY_LIQUIDITY_BONUS_PRIMARY } from '@play-money/finance/economy'
+import { getBalance } from '@play-money/finance/lib/getBalances'
 import { getUniqueLiquidityProviderIds } from '@play-money/markets/lib/getUniqueLiquidityProviderIds'
 import { createNotification } from '@play-money/notifications/lib/createNotification'
 import { createDailyLiquidityBonusTransaction } from '@play-money/quests/lib/createDailyLiquidityBonusTransaction'
@@ -7,6 +8,7 @@ import { hasBoostedLiquidityToday } from '@play-money/quests/lib/helpers'
 import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
 import { createMarketLiquidityTransaction } from './createMarketLiquidityTransaction'
 import { getMarket } from './getMarket'
+import { isMarketResolved } from './helpers'
 
 export async function addLiquidity({
   userId,
@@ -17,15 +19,24 @@ export async function addLiquidity({
   amount: Decimal
   marketId: string
 }) {
-  const market = await getMarket({ id: marketId })
+  const [market, userAccount] = await Promise.all([
+    getMarket({ id: marketId, extended: true }),
+    getUserPrimaryAccount({ userId }),
+  ])
 
-  if (market.resolvedAt) {
+  const balance = await getBalance({ accountId: userAccount.id, assetType: 'CURRENCY', assetId: 'PRIMARY' })
+
+  if (!balance.total.gte(amount)) {
+    throw new Error('User does not have enough balance')
+  }
+
+  if (isMarketResolved(market)) {
     throw new Error('Market already resolved')
   }
 
-  const userAccount = await getUserPrimaryAccount({ userId })
   const transaction = await createMarketLiquidityTransaction({
     accountId: userAccount.id,
+    initiatorId: userId,
     amount,
     marketId,
   })
@@ -47,7 +58,7 @@ export async function addLiquidity({
   )
 
   if (!(await hasBoostedLiquidityToday({ userId: userId })) && amount.gte(DAILY_LIQUIDITY_BONUS_PRIMARY)) {
-    await createDailyLiquidityBonusTransaction({ accountId: userAccount.id, marketId: market.id })
+    await createDailyLiquidityBonusTransaction({ accountId: userAccount.id, marketId: market.id, initiatorId: userId })
   }
 
   return transaction

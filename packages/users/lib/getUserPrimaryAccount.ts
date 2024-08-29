@@ -7,7 +7,7 @@ export async function getUserPrimaryAccount({ userId }: { userId: string }) {
       id: userId,
     },
     include: {
-      accounts: true,
+      primaryAccount: true,
     },
   })
 
@@ -15,10 +15,10 @@ export async function getUserPrimaryAccount({ userId }: { userId: string }) {
     throw new UserNotFoundError(`User with id "${userId}" not found`)
   }
 
-  const account = user.accounts[0]
+  const account = user.primaryAccount
 
   if (!account) {
-    throw new Error('User does not have an account')
+    throw new Error('User does not have a primary account')
   }
 
   return account

@@ -1,11 +1,11 @@
 'use client'
 
 import { format, isPast } from 'date-fns'
-import { CircleCheckBig, ChevronDown, Diamond } from 'lucide-react'
+import _ from 'lodash'
+import { CircleCheckBig, ChevronDown } from 'lucide-react'
+import Link from 'next/link'
 import React from 'react'
-import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip as ChartTooltip } from 'recharts'
-import { useMarketBalance, useMarketGraph } from '@play-money/api-helpers/client/hooks'
-import { Market, MarketOption, MarketResolution, User } from '@play-money/database'
+import { useMarketBalance } from '@play-money/api-helpers/client/hooks'
 import { marketOptionBalancesToProbabilities } from '@play-money/finance/lib/helpers'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Alert, AlertDescription, AlertTitle } from '@play-money/ui/alert'
@@ -17,22 +17,15 @@ import { ReadMoreEditor } from '@play-money/ui/editor'
 import { UserLink } from '@play-money/users/components/UserLink'
 import { useUser } from '@play-money/users/context/UserContext'
 import { useSearchParam } from '../../ui/src/hooks/useSearchParam'
+import { ExtendedMarket } from '../types'
 import { EditMarketDialog } from './EditMarketDialog'
+import { EditMarketOptionDialog } from './EditMarketOptionDialog'
 import { LiquidityBoostAlert } from './LiquidityBoostAlert'
-import { LiquidityBoostDialog, MarketStats } from './LiquidityBoostDialog'
-import { MarketLikelyOption } from './MarketLikelyOption'
+import { LiquidityBoostDialog } from './LiquidityBoostDialog'
+import { MarketGraph } from './MarketGraph'
 import { MarketOptionRow } from './MarketOptionRow'
 import { MarketToolbar } from './MarketToolbar'
 import { useSidebar } from './SidebarContext'
-
-export type ExtendedMarket = Market & {
-  user: User
-  options: Array<MarketOption & { color: string; value?: number; cost?: number }>
-  marketResolution?: MarketResolution & {
-    resolution: MarketOption & { color: string }
-    resolvedBy: User
-  }
-}
 
 function getTextContrast(hex: string): string {
   const r = parseInt(hex.substring(1, 3), 16)
@@ -55,13 +48,19 @@ export function MarketOverviewPage({
   const { user } = useUser()
   const { triggerEffect } = useSidebar()
   const { data: balance } = useMarketBalance({ marketId: market.id })
-  const { data: graph } = useMarketGraph({ marketId: market.id })
   const [option, setOption] = useSearchParam('option', 'replace')
   const [isEditing, setIsEditing] = useSearchParam('edit')
+  const [isEditOption, setIsEditOption] = useSearchParam('editOption')
   const [isBoosting, setIsBoosting] = useSearchParam('boost')
   const activeOptionId = option || market.options[0]?.id || ''
   const isCreator = user?.id === market.createdBy
   const probabilities = marketOptionBalancesToProbabilities(balance?.amm)
+
+  const mostLikelyOption = market.options.reduce((prev, current) =>
+    prev.probability > current.probability ? prev : current
+  )
+
+  const orderedMarketOptions = _.orderBy(market.options, 'createdAt')
 
   return (
     <Card className="flex-1">
@@ -75,7 +74,11 @@ export function MarketOverviewPage({
       <CardHeader className="pt-0 md:pt-0">
         <CardTitle className="leading-relaxed">{market.question}</CardTitle>
         <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 font-mono text-sm text-muted-foreground md:flex-nowrap">
-          {!market.marketResolution ? <MarketLikelyOption market={market} /> : null}
+          {!market.marketResolution ? (
+            <div style={{ color: mostLikelyOption.color }} className="flex-shrink-0 font-medium">
+              {mostLikelyOption.probability}% {_.truncate(mostLikelyOption.name, { length: 30 })}
+            </div>
+          ) : null}
           {market.closeDate ? (
             <div className="flex-shrink-0">
               {isPast(market.closeDate) ? 'Ended' : 'Ending'} {format(market.closeDate, 'MMM d, yyyy')}
@@ -92,37 +95,7 @@ export function MarketOverviewPage({
         </div>
       </CardHeader>
       <CardContent>
-        <Card className="h-32 p-4">
-          {graph?.data ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart width={300} height={128} data={graph.data}>
-                <ChartTooltip
-                  content={({ payload }) => {
-                    const data = payload?.[0]?.payload
-                    if (data) {
-                      return (
-                        <Card className="p-1 text-sm">
-                          {format(data.startAt, 'MMM d, yyyy')} · {Math.round(data.probability * 100)}%
-                        </Card>
-                      )
-                    }
-                    return null
-                  }}
-                />
-                <YAxis type="number" domain={[0, 1]} hide />
-                <Line
-                  type="step"
-                  dot={false}
-                  dataKey="probability"
-                  stroke={market.options[0]?.color}
-                  strokeWidth={2.5}
-                  strokeLinejoin="round"
-                  animationDuration={750}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          ) : null}
-        </Card>
+        <MarketGraph market={market} activeOptionId={activeOptionId} />
       </CardContent>
 
       <CardContent>
@@ -158,7 +131,7 @@ export function MarketOverviewPage({
                 </AlertDescription>
               ) : null}
             </Alert>
-            {market.options.length ? (
+            {orderedMarketOptions.length ? (
               <Collapsible>
                 <CollapsibleTrigger asChild>
                   <Button variant="ghost" className="text-muted-foreground" size="sm">
@@ -167,13 +140,15 @@ export function MarketOverviewPage({
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <Card>
-                    {market.options.map((option, i) => (
+                    {orderedMarketOptions.map((option, i) => (
                       <MarketOptionRow
                         key={option.id}
                         option={option}
                         active={option.id === activeOptionId}
-                        probability={probabilities[option.id] || 0}
+                        probability={probabilities[option.id] || option.probability}
                         className={i > 0 ? 'border-t' : ''}
+                        canEdit={user?.id === market.createdBy}
+                        onEdit={() => setIsEditOption(option.id)}
                         onSelect={() => {
                           setOption(option.id)
                           triggerEffect()
@@ -185,15 +160,17 @@ export function MarketOverviewPage({
               </Collapsible>
             ) : null}
           </>
-        ) : market.options.length ? (
+        ) : orderedMarketOptions.length ? (
           <Card>
-            {market.options.map((option, i) => (
+            {orderedMarketOptions.map((option, i) => (
               <MarketOptionRow
                 key={option.id}
                 option={option}
                 active={option.id === activeOptionId}
-                probability={probabilities[option.id] || 0}
+                probability={probabilities[option.id] || option.probability}
                 className={i > 0 ? 'border-t' : ''}
+                canEdit={user?.id === market.createdBy}
+                onEdit={() => setIsEditOption(option.id)}
                 onSelect={() => {
                   setOption(option.id)
                   triggerEffect()
@@ -206,6 +183,16 @@ export function MarketOverviewPage({
 
       <CardContent>
         <ReadMoreEditor value={market.description} maxLines={6} />
+
+        {market.tags.length ? (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {market.tags.map((tag) => (
+              <Link href={`/questions/tagged/${tag}`}>
+                <Badge variant="secondary">{tag}</Badge>
+              </Link>
+            ))}
+          </div>
+        ) : null}
       </CardContent>
 
       {!market.resolvedAt ? (
@@ -221,6 +208,13 @@ export function MarketOverviewPage({
         market={market}
         open={isEditing === 'true'}
         onClose={() => setIsEditing(undefined)}
+        onSuccess={onRevalidate}
+      />
+      <EditMarketOptionDialog
+        market={market}
+        optionId={isEditOption!}
+        open={isEditOption != null}
+        onClose={() => setIsEditOption(undefined)}
         onSuccess={onRevalidate}
       />
       <LiquidityBoostDialog

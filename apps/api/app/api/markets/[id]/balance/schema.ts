@@ -9,6 +9,7 @@ export default createSchema({
         // TODO: Hookup with NetBalance
         amm: z.array(z.object({})),
         user: z.array(z.object({})),
+        userPositions: z.array(z.object({})),
       }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,

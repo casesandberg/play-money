@@ -8,7 +8,7 @@ export default createSchema({
       200: z.object({
         data: z.array(
           z.object({
-            totalAmount: z.number(),
+            balance: z.number(),
             startAt: z.date(),
             endAt: z.date(),
           })

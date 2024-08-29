@@ -6,11 +6,13 @@ export async function updateMarket({
   question,
   description,
   closeDate,
+  tags,
 }: {
   id: string
   question?: string
   description?: string
   closeDate?: Date
+  tags?: Array<string>
 }) {
   const updatedData: Partial<Market> = {}
 
@@ -25,6 +27,10 @@ export async function updateMarket({
 
   if (closeDate) {
     updatedData.closeDate = closeDate
+  }
+
+  if (tags) {
+    updatedData.tags = tags.map((tag) => slugifyTitle(tag))
   }
 
   const updatedMarket = await db.market.update({

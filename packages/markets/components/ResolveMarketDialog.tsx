@@ -1,7 +1,6 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import _ from 'lodash'
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
@@ -14,7 +13,7 @@ import { Input } from '@play-money/ui/input'
 import { Label } from '@play-money/ui/label'
 import { RadioGroup, RadioGroupItem } from '@play-money/ui/radio-group'
 import { toast } from '@play-money/ui/use-toast'
-import { ExtendedMarket } from './MarketOverviewPage'
+import { ExtendedMarket } from '../types'
 
 const FormSchema = z.object({
   optionId: z.string().nonempty({ message: 'You must select an option' }),
@@ -73,9 +72,11 @@ export const ResolveMarketDialog = ({
                   <FormControl>
                     <RadioGroup {...field} onValueChange={field.onChange}>
                       {market.options.map((option) => (
-                        <div key={option.id} className="flex items-center space-x-2">
+                        <div key={option.id} className="flex items-center space-x-2" style={{ color: option.color }}>
                           <RadioGroupItem value={option.id} id={option.id} />
-                          <Label htmlFor={option.id}>{option.name}</Label>
+                          <Label htmlFor={option.id}>
+                            {option.name} ({option.probability}%)
+                          </Label>
                         </div>
                       ))}
                     </RadioGroup>

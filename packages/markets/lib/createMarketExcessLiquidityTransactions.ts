@@ -1,26 +1,30 @@
 import Decimal from 'decimal.js'
-import _ from 'lodash'
 import { Transaction } from '@play-money/database'
-import { createTransaction } from '@play-money/finance/lib/createTransaction'
-import { convertMarketSharesToPrimary } from '@play-money/finance/lib/exchanger'
-import { getBalances } from '@play-money/finance/lib/getBalances'
-import { getMarket } from './getMarket'
+import { executeTransaction } from '@play-money/finance/lib/executeTransaction'
+import { getMarketBalances } from '@play-money/finance/lib/getBalances'
 import { getMarketAmmAccount } from './getMarketAmmAccount'
+import { getMarketClearingAccount } from './getMarketClearingAccount'
 import { getMarketLiquidity } from './getMarketLiquidity'
+import { updateMarketBalances } from './updateMarketBalances'
 
-export async function createMarketExcessLiquidityTransactions({ marketId }: { marketId: string }) {
-  const ammAccount = await getMarketAmmAccount({ marketId })
-  const market = await getMarket({ id: marketId, extended: true })
+export async function createMarketExcessLiquidityTransactions({
+  initiatorId,
+  marketId,
+}: {
+  initiatorId: string
+  marketId: string
+}) {
+  const [ammAccount, clearingAccount] = await Promise.all([
+    getMarketAmmAccount({ marketId }),
+    getMarketClearingAccount({ marketId }),
+  ])
 
-  const balances = await getBalances({ accountId: ammAccount.id, marketId: market.id })
-  const amounts = balances.filter(({ assetType }) => assetType === 'MARKET_OPTION').map((b) => b.amount)
+  const balances = await getMarketBalances({ accountId: ammAccount.id, marketId })
+  const ammOptionBalances = balances.filter(({ assetType }) => assetType === 'MARKET_OPTION')
+  const amountToDistribute = Decimal.min(...ammOptionBalances.map((b) => b.total))
 
-  if (!amounts.length) {
-    return
-  }
-  const amountToDistribute = Decimal.min(...amounts)
   const liquidity = await getMarketLiquidity(marketId)
-  const transactions: Array<Transaction> = []
+  const transactions: Array<Promise<Transaction>> = []
 
   for (const [accountId, providedAmount] of Object.entries(liquidity.providers)) {
     if (providedAmount.isZero()) continue
@@ -30,34 +34,36 @@ export async function createMarketExcessLiquidityTransactions({ marketId }: { ma
 
     if (payout.isZero()) continue
 
+    const entries = [
+      ...ammOptionBalances.map((balance) => {
+        return {
+          amount: payout,
+          assetType: 'MARKET_OPTION',
+          assetId: balance.assetId,
+          fromAccountId: ammAccount.id,
+          toAccountId: clearingAccount.id,
+        } as const
+      }),
+      {
+        amount: payout,
+        assetType: 'CURRENCY',
+        assetId: 'PRIMARY',
+        fromAccountId: clearingAccount.id,
+        toAccountId: accountId,
+      } as const,
+    ]
+
     transactions.push(
-      await createTransaction({
-        creatorId: ammAccount.id,
-        type: 'MARKET_EXCESS_LIQUIDITY',
-        description: `Distributing excess liquidity for market ${marketId} to ${accountId}`,
+      executeTransaction({
+        type: 'LIQUIDITY_RETURNED',
+        entries,
         marketId,
-        transactionItems: [
-          ...(await convertMarketSharesToPrimary({
-            fromAccountId: ammAccount.id,
-            amount: payout,
-            marketId,
-          })),
-          {
-            accountId: ammAccount.id,
-            currencyCode: 'PRIMARY',
-            amount: payout.negated(),
-          },
-          {
-            accountId: accountId,
-            currencyCode: 'PRIMARY',
-            amount: payout,
-          },
-        ],
+        additionalLogic: async (txParams) => updateMarketBalances({ ...txParams, marketId }),
       })
     )
   }
 
   // TODO: Handle dust
 
-  return transactions
+  return Promise.all(transactions)
 }

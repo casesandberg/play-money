@@ -1,10 +1,9 @@
 import { MessageSquareIcon, UsersIcon, DiamondIcon } from 'lucide-react'
 import Link from 'next/link'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
-import { MarketLikelyOption } from '@play-money/markets/components/MarketLikelyOption'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@play-money/ui/tooltip'
-import { ExtendedMarket } from './MarketOverviewPage'
+import { ExtendedMarket } from '../types'
 
 export function MarketList({
   markets,
@@ -14,6 +13,10 @@ export function MarketList({
   return (
     <div className="flex-1 space-y-4">
       {markets.map((market) => {
+        const mostLikelyOption = market.options.reduce((prev, current) =>
+          prev.probability > current.probability ? prev : current
+        )
+
         return (
           <div className="border p-4" key={market.id}>
             <Link
@@ -30,7 +33,9 @@ export function MarketList({
                     Resolved {market.marketResolution.resolution.name}
                   </div>
                 ) : (
-                  <MarketLikelyOption market={market} />
+                  <div style={{ color: mostLikelyOption.color }} className="flex-shrink-0 font-medium">
+                    {mostLikelyOption.probability}% {mostLikelyOption.name}
+                  </div>
                 )}
               </div>
 
@@ -71,7 +76,9 @@ export function MarketList({
                   </Tooltip>
                 ) : null}
 
-                <UserAvatar user={market.user} size="sm" />
+                <Link href={`/${market.user.username}`}>
+                  <UserAvatar user={market.user} size="sm" />
+                </Link>
               </div>
             </div>
           </div>

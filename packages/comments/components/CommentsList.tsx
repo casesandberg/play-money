@@ -1,6 +1,5 @@
 'use client'
 
-import _ from 'lodash'
 import React, { useState, useEffect } from 'react'
 import { createComment, createCommentReaction, deleteComment, updateComment } from '@play-money/api-helpers/client'
 import { CommentWithReactions } from '@play-money/comments/lib/getComment'

@@ -1,9 +1,12 @@
 import db, { Market } from '@play-money/database'
-import { ExtendedMarket } from '../components/MarketOverviewPage'
+import { getBalance } from '@play-money/finance/lib/getBalances'
+import { marketOptionBalancesToProbabilities } from '@play-money/finance/lib/helpers'
+import { ExtendedMarket } from '../types'
 import { getMarketClearingAccount } from './getMarketClearingAccount'
 
 interface MarketFilterOptions {
   createdBy?: string
+  tag?: string
 }
 
 interface SortOptions {
@@ -24,6 +27,7 @@ export async function getMarkets(
   const markets = await db.market.findMany({
     where: {
       createdBy: filters.createdBy,
+      tags: filters.tag ? { has: filters.tag } : undefined,
     },
     include: {
       user: true,
@@ -45,37 +49,56 @@ export async function getMarkets(
   return Promise.all(
     markets.map(async (market) => {
       const clearingAccount = await getMarketClearingAccount({ marketId: market.id })
-      const [commentCount, liquidityCount, uniqueTraders] = await Promise.all([
+      const [commentCount, liquidityCount, uniqueTraders, balances] = await Promise.all([
         db.comment.count({
           where: {
             entityType: 'MARKET',
             entityId: market.id,
           },
         }),
-        db.transactionItem.aggregate({
+        db.transactionEntry.aggregate({
           _sum: {
             amount: true,
           },
           where: {
-            accountId: clearingAccount.id,
-            currencyCode: 'PRIMARY',
+            toAccountId: clearingAccount.id,
+            assetType: 'CURRENCY',
+            assetId: 'PRIMARY',
             transaction: {
               marketId: market.id,
             },
           },
         }),
         db.transaction.groupBy({
-          by: ['creatorId'],
+          by: ['initiatorId'],
           where: {
             marketId: market.id,
-            type: 'MARKET_BUY',
+            type: 'TRADE_BUY',
           },
           _count: true,
         }),
+        await Promise.all(
+          market.options.map((option) => {
+            return getBalance({
+              accountId: market.ammAccountId,
+              assetType: 'MARKET_OPTION',
+              assetId: option.id,
+              marketId: market.id,
+            })
+          })
+        ),
       ])
+
+      const probabilities = marketOptionBalancesToProbabilities(balances)
 
       return {
         ...market,
+        options: market.options.map((option) => {
+          return {
+            ...option,
+            probability: probabilities[option.id],
+          }
+        }),
         commentCount,
         liquidityCount: liquidityCount._sum.amount?.toNumber(),
         uniqueTraderCount: uniqueTraders.length,

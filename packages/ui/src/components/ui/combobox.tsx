@@ -44,7 +44,9 @@ export function Combobox({
           role="combobox"
           variant="outline"
         >
-          {innerValue ? items.find((item) => item.value === innerValue)?.label : placeholderLabel}
+          <div className="truncate">
+            {innerValue ? items.find((item) => item.value === innerValue)?.label : placeholderLabel}
+          </div>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>

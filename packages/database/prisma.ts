@@ -29,4 +29,6 @@ if (process.env.NODE_ENV === 'production') {
   prisma = global.prisma
 }
 
+export type TransactionClient = Prisma.TransactionClient
+
 export default prisma

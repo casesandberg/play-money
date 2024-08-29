@@ -62,8 +62,24 @@ function sumShares(shares: Array<Decimal>) {
   return shares.reduce((sum, share) => sum.add(share), new Decimal(0))
 }
 
-function calculateProbability({ targetShare, totalShares }: { targetShare: Decimal; totalShares: Decimal }): Decimal {
-  return totalShares.sub(targetShare).div(totalShares)
+export function calculateProbability({ index, shares }: { index: number; shares: Array<Decimal | number> }): Decimal {
+  // Calculate the product of all shares except for the one at the given index
+  const productOfOtherShares = shares.reduce<Decimal>((acc, share, idx) => {
+    return idx !== index ? acc.mul(share) : acc
+  }, new Decimal(1))
+
+  // Calculate the sum of all products for each index
+  const sumOfProducts = shares.reduce<Decimal>((sum, _, currentIndex) => {
+    const productExcludingCurrent = shares.reduce<Decimal>((acc, share, idx) => {
+      return idx !== currentIndex ? acc.mul(share) : acc
+    }, new Decimal(1))
+    return sum.plus(productExcludingCurrent)
+  }, new Decimal(0))
+
+  // The probability for the given index is the product of other shares divided by the sum of all products
+  const probability = productOfOtherShares.div(sumOfProducts)
+
+  return probability
 }
 
 export function trade({
@@ -94,7 +110,7 @@ export async function quote({
 }): Promise<{ probability: Decimal; shares: Decimal; cost: Decimal }> {
   const targetIndex = findShareIndex(shares, targetShare)
   const totalShares = sumShares(shares)
-  const currentProbability = calculateProbability({ targetShare, totalShares })
+  const currentProbability = calculateProbability({ index: targetIndex, shares })
   const isBuy = currentProbability.lt(probability)
 
   let costToHitProbability = calculateProbabilityCost({ probability, targetShare, totalShares, isBuy })
@@ -105,10 +121,12 @@ export async function quote({
   const updatedShares = shares.map((share, i) =>
     i === targetIndex ? share.sub(returnedShares).add(cost) : isBuy ? share.add(cost) : share.sub(returnedShares)
   )
-  const updatedTotalShares = sumShares(updatedShares)
 
   return {
-    probability: calculateProbability({ targetShare: updatedShares[targetIndex], totalShares: updatedTotalShares }),
+    probability: calculateProbability({
+      index: targetIndex,
+      shares: updatedShares,
+    }),
     shares: returnedShares,
     cost,
   }

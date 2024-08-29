@@ -3,8 +3,7 @@ import { generateFromEmail } from 'unique-username-generator'
 import db from '@play-money/database'
 import { User } from '@play-money/database'
 import { OmittedUserFields } from '@play-money/database/prisma'
-import { INITIAL_USER_BALANCE_PRIMARY } from '@play-money/finance/economy'
-import { createHouseUserGiftTransaction } from '@play-money/finance/lib/createHouseUserGiftTransaction'
+import { createHouseSingupBonusTransaction } from '@play-money/finance/lib/createHouseSingupBonusTransaction'
 import { UserExistsError } from './exceptions'
 
 export async function createUser({ email }: { email: string }): Promise<User & OmittedUserFields> {
@@ -25,16 +24,16 @@ export async function createUser({ email }: { email: string }): Promise<User & O
       email: email,
       username: name,
       displayName: name,
-      accounts: {
-        create: {},
+      primaryAccount: {
+        create: {
+          type: 'USER',
+        },
       },
     },
   })
 
-  await createHouseUserGiftTransaction({
+  await createHouseSingupBonusTransaction({
     userId: user.id,
-    creatorId: user.id,
-    amount: new Decimal(INITIAL_USER_BALANCE_PRIMARY),
   })
 
   return user as User & OmittedUserFields

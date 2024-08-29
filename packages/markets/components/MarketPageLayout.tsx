@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import React from 'react'
 import { useTrackResourceViewed } from '@play-money/notifications/hooks/useTrackResourceViewed'
 import { Tabs, TabsList, TabsTrigger } from '@play-money/ui/tabs'
-import { ExtendedMarket } from './MarketOverviewPage'
+import { ExtendedMarket } from '../types'
 import { MarketPageSidebar } from './MarketPageSidebar'
 import { SidebarProvider } from './SidebarContext'
 
@@ -13,10 +13,12 @@ export function MarketPageLayout({
   market,
   children,
   activeOptionId,
+  onRevalidate,
 }: {
   market: ExtendedMarket
   children: React.ReactNode
   activeOptionId: string
+  onRevalidate: () => Promise<void>
 }) {
   const router = useRouter()
   const pathname = usePathname()
@@ -47,7 +49,7 @@ export function MarketPageLayout({
         </div>
 
         <div className="w-full md:w-80">
-          <MarketPageSidebar market={market} activeOptionId={activeOptionId} />
+          <MarketPageSidebar market={market} activeOptionId={activeOptionId} onTradeComplete={onRevalidate} />
         </div>
       </main>
     </SidebarProvider>

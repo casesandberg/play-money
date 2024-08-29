@@ -1,15 +1,15 @@
 'use client'
 
 import { format, isPast, formatDistanceToNow } from 'date-fns'
+import _ from 'lodash'
 import React from 'react'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
-import type { TransactionWithItems } from '@play-money/finance/lib/getTransactions'
-import { summarizeTransaction } from '@play-money/finance/lib/helpers'
+import { calculateBalanceChanges, findBalanceChange } from '@play-money/finance/lib/helpers'
+import { TransactionWithEntries } from '@play-money/finance/types'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
 import { UserLink } from '@play-money/users/components/UserLink'
-import { MarketLikelyOption } from './MarketLikelyOption'
-import { ExtendedMarket } from './MarketOverviewPage'
+import { ExtendedMarket } from '../types'
 import { MarketToolbar } from './MarketToolbar'
 
 export function MarketPositionsPage({
@@ -17,9 +17,13 @@ export function MarketPositionsPage({
   transactions,
 }: {
   market: ExtendedMarket
-  transactions: Array<TransactionWithItems>
+  transactions: Array<TransactionWithEntries>
 }) {
   const simplyIfTwoOptions = market.options.length === 2
+
+  const mostLikelyOption = market.options.reduce((prev, current) =>
+    prev.probability > current.probability ? prev : current
+  )
 
   return (
     <Card className="flex-1">
@@ -28,7 +32,11 @@ export function MarketPositionsPage({
       <CardHeader className="pt-0 md:pt-0">
         <CardTitle className="leading-relaxed">{market.question}</CardTitle>
         <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 font-mono text-sm text-muted-foreground md:flex-nowrap">
-          {!market.marketResolution ? <MarketLikelyOption market={market} /> : null}
+          {!market.marketResolution ? (
+            <div style={{ color: mostLikelyOption.color }} className="flex-shrink-0 font-medium">
+              {mostLikelyOption.probability}% {_.truncate(mostLikelyOption.name, { length: 30 })}
+            </div>
+          ) : null}
 
           {market.closeDate ? (
             <div className="flex-shrink-0">
@@ -49,21 +57,30 @@ export function MarketPositionsPage({
         <ul className="divide-y divide-muted">
           {transactions.length ? (
             transactions.map((transaction) => {
-              const summary = summarizeTransaction(transaction)
-              const userSummary = summary[transaction.creatorId]
+              if (!transaction.initiator) {
+                return null
+              }
+              const balanceChanges = calculateBalanceChanges(transaction)
+              const primaryChange = findBalanceChange({
+                balanceChanges,
+                accountId: transaction.initiator.primaryAccountId,
+                assetType: 'CURRENCY',
+                assetId: 'PRIMARY',
+              })
+              const optionName = transaction.options[0]?.name
 
               return (
                 <li className="flex flex-wrap items-center gap-1 py-3" key={transaction.id}>
-                  {transaction.creator.user ? (
+                  {transaction.initiator ? (
                     <div className="inline-flex items-center gap-2">
-                      <UserAvatar user={transaction.creator.user} size="sm" />
-                      <UserLink hideUsername user={transaction.creator.user} />
+                      <UserAvatar user={transaction.initiator} size="sm" />
+                      <UserLink hideUsername user={transaction.initiator} />
                     </div>
                   ) : null}
-                  {transaction.type === 'MARKET_BUY' ? 'bought' : 'sold'}{' '}
+                  {transaction.type === 'TRADE_BUY' ? 'bought' : 'sold'}{' '}
                   <span className="font-semibold">
-                    <CurrencyDisplay value={userSummary?.PRIMARY.abs().toNumber()} />{' '}
-                    {!userSummary?.YES.eq(0) ? 'Yes' : 'No'}
+                    <CurrencyDisplay value={Math.abs(primaryChange?.change ?? 0)} isShort />{' '}
+                    {_.truncate(optionName, { length: 30 })}
                   </span>{' '}
                   <span className="text-sm text-muted-foreground md:ml-auto">
                     {formatDistanceToNow(transaction.createdAt, { addSuffix: true })}

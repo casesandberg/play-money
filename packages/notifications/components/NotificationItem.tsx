@@ -2,7 +2,7 @@ import { formatDistanceToNow } from 'date-fns'
 import Link from 'next/link'
 import React from 'react'
 import { formatNumber } from '@play-money/finance/lib/formatCurrency'
-import { summarizeTransaction } from '@play-money/finance/lib/helpers'
+import { calculateBalanceChanges, findBalanceChange } from '@play-money/finance/lib/helpers'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { cn } from '@play-money/ui/utils'
 import { NotificationGroupWithLastNotification } from '../lib/getNotifications'
@@ -53,19 +53,41 @@ export function NotificationItem({
       break
     }
     case 'MARKET_TRADE': {
-      const summary = summarizeTransaction(notification.transaction)
-      const userSummary = summary[notification.transaction.creatorId]
+      // Transactions Rewrite blew away old transactions.
+      if (!notification.transaction) {
+        topLine = notification.market.question
+        bottomLine = 'Old bet'
+        break
+      }
+      const balanceChanges = calculateBalanceChanges(notification.transaction)
+      const primaryChange = findBalanceChange({
+        balanceChanges,
+        accountId: notification.actor.primaryAccountId,
+        assetType: 'CURRENCY',
+        assetId: 'PRIMARY',
+      })
 
       topLine = notification.market.question
-      bottomLine = `${notification.actor.displayName} bet: ${formatNumber(Math.abs(userSummary[notification.marketOption.currencyCode].toNumber()))} ${notification.marketOption.name}${othersCount}`
+      bottomLine = `${notification.actor.displayName} bet: ${formatNumber(Math.abs(primaryChange?.change ?? 0))} ${notification.marketOption.name}${othersCount}`
       break
     }
     case 'MARKET_LIQUIDITY_ADDED': {
-      const summary = summarizeTransaction(notification.transaction)
-      const userSummary = summary[notification.transaction.creatorId]
+      // Transactions Rewrite blew away old transactions.
+      if (!notification.transaction) {
+        topLine = notification.market.question
+        bottomLine = 'Old bet'
+        break
+      }
+      const balanceChanges = calculateBalanceChanges(notification.transaction)
+      const primaryChange = findBalanceChange({
+        balanceChanges,
+        accountId: notification.actor.primaryAccountId,
+        assetType: 'CURRENCY',
+        assetId: 'PRIMARY',
+      })
 
       topLine = notification.market.question
-      bottomLine = `${formatNumber(Math.abs(userSummary.PRIMARY.toNumber()))} liquidity added by ${notification.actor.displayName}${othersCount}`
+      bottomLine = `${formatNumber(Math.abs(primaryChange?.change ?? 0))} liquidity added by ${notification.actor.displayName}${othersCount}`
       break
     }
     case 'MARKET_COMMENT': {

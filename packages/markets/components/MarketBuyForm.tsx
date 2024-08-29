@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@play-money/ui/input'
 import { toast } from '@play-money/ui/use-toast'
 import { cn } from '@play-money/ui/utils'
-import { ExtendedMarket } from './MarketOverviewPage'
+import { ExtendedMarketOption } from '../types'
 
 const FormSchema = z.object({
   amount: z.coerce.number().min(1, { message: 'Amount must be greater than zero' }),
@@ -26,13 +26,16 @@ export function MarketBuyForm({
   onComplete,
 }: {
   marketId: string
-  option: ExtendedMarket['options'][0]
+  option: ExtendedMarketOption
   hasOutcome?: boolean
   onComplete?: () => void
 }) {
   const [quote, setQuote] = useState<{ newProbability: number; potentialReturn: number } | null>(null)
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
+    defaultValues: {
+      amount: 100,
+    },
   })
 
   const onSubmit = async (data: FormData) => {

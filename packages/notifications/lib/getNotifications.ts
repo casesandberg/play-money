@@ -38,7 +38,7 @@ export async function getNotifications(
           parentComment: true,
           transaction: {
             include: {
-              transactionItems: true,
+              entries: true,
             },
           },
           marketOption: true,

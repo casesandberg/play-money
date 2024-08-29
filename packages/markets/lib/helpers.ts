@@ -1,5 +1,5 @@
 import { Market } from '@play-money/database'
-import { ExtendedMarket } from '../components/MarketOverviewPage'
+import { ExtendedMarket } from '../types'
 
 export function canResolveMarket({ market, userId }: { market: Market; userId?: string }) {
   return market.createdBy === userId

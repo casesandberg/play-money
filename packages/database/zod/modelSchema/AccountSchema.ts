@@ -1,10 +1,12 @@
 import { z } from 'zod';
+import { AccountTypeSchema } from '../inputTypeSchemas/AccountTypeSchema'
 
 /////////////////////////////////////////
 // ACCOUNT SCHEMA
 /////////////////////////////////////////
 
 export const AccountSchema = z.object({
+  type: AccountTypeSchema,
   id: z.string().cuid(),
   internalType: z.string().nullable(),
   userId: z.string().nullable(),

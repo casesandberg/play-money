@@ -6,13 +6,14 @@ import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
 import { createMarketSell, getMarketQuote } from '@play-money/api-helpers/client'
+import { MarketOptionPositionAsNumbers } from '@play-money/finance/lib/getBalances'
 import { Button } from '@play-money/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
 import { Slider } from '@play-money/ui/slider'
 import { toast } from '@play-money/ui/use-toast'
+import { ExtendedMarketOption } from '../types'
 import { QuoteItem, calculateReturnPercentage, formatCurrency, formatPercentage } from './MarketBuyForm'
-import { ExtendedMarket } from './MarketOverviewPage'
 
 const FormSchema = z.object({
   amount: z.coerce.number().min(1, { message: 'Amount must be greater than zero' }),
@@ -23,28 +24,31 @@ type FormData = z.infer<typeof FormSchema>
 export function MarketSellForm({
   marketId,
   option,
-  max: initialMax,
+  position,
   onComplete,
 }: {
   marketId: string
-  option: ExtendedMarket['options'][0]
-  max?: number
+  option: ExtendedMarketOption
+  position?: MarketOptionPositionAsNumbers
   onComplete?: () => void
 }) {
-  const [max, setMax] = useState(initialMax)
+  const [max, setMax] = useState(position?.quantity)
   const [quote, setQuote] = useState<{ newProbability: number; potentialReturn: number } | null>(null)
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
+    defaultValues: {
+      amount: '' as unknown as number, // Fix uncontrolled component error
+    },
   })
 
   useEffect(() => {
-    if (initialMax) {
-      setMax(initialMax)
-      form.setValue('amount', Math.round(initialMax / 2))
+    if (position?.quantity) {
+      setMax(position.quantity)
+      form.setValue('amount', Math.round(position.quantity / 2))
     } else {
       form.setValue('amount', 0)
     }
-  }, [option.id, initialMax])
+  }, [option.id, position])
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -85,6 +89,8 @@ export function MarketSellForm({
     })
     return () => subscription.unsubscribe()
   }, [form, option.id])
+
+  const proportionateCost = (form.getValues('amount') * (position?.cost || 0)) / (position?.quantity || 0)
 
   return (
     <Form {...form}>
@@ -133,7 +139,7 @@ export function MarketSellForm({
             label="Potential return"
             value={quote?.potentialReturn}
             formatter={formatCurrency}
-            percent={calculateReturnPercentage(quote?.potentialReturn, form.getValues('amount'))}
+            percent={calculateReturnPercentage(quote?.potentialReturn, proportionateCost)}
           />
           <QuoteItem label="New probability" value={quote?.newProbability} formatter={formatPercentage} />
         </ul>

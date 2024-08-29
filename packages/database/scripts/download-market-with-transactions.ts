@@ -15,7 +15,7 @@ async function main() {
         options: true,
         transactions: {
           include: {
-            transactionItems: true,
+            entries: true,
           },
         },
       },

@@ -6,22 +6,17 @@ export async function getUniqueLiquidityProviderIds(
 ): Promise<string[]> {
   const result = await db.transaction.findMany({
     where: {
-      type: 'MARKET_LIQUIDITY',
+      type: 'LIQUIDITY_DEPOSIT',
       marketId,
     },
     select: {
-      creatorId: true,
-      creator: {
-        select: {
-          userId: true,
-        },
-      },
+      initiatorId: true,
     },
-    distinct: ['creatorId'],
+    distinct: ['initiatorId'],
   })
 
   const uniqueProviderIds = result
-    .map((transaction) => transaction.creator?.userId)
+    .map((transaction) => transaction.initiatorId)
     .filter((userId): userId is string => userId != null && !ignoreIds.includes(userId))
 
   return uniqueProviderIds

@@ -55,17 +55,19 @@ export const WithLongText: Story = {
         ...mockExtendedMarket({
           question: faker.lorem.sentence(30),
           options: [
-            mockMarketOption({ id: '1', name: faker.lorem.sentence(8), currencyCode: 'YES' }),
-            mockMarketOption({ id: '2', name: faker.lorem.sentence(8), currencyCode: 'NO' }),
+            { ...mockMarketOption({ id: '1', name: faker.lorem.sentence(8) }), probability: 0.65 },
+            { ...mockMarketOption({ id: '2', name: faker.lorem.sentence(8) }), probability: 0.35 },
           ],
           marketResolution: {
             ...mockMarketResolution(),
-            resolution: mockMarketOption({
-              id: '2',
-              name: faker.lorem.sentence(8),
-              currencyCode: 'NO',
-              color: '#EC4899',
-            }),
+            resolution: {
+              ...mockMarketOption({
+                id: '2',
+                name: faker.lorem.sentence(8),
+                color: '#EC4899',
+              }),
+              probability: 0.65,
+            },
             resolvedBy: mockUser(),
           },
         }),
@@ -77,12 +79,19 @@ export const WithLongText: Story = {
         ...mockExtendedMarket({
           question: faker.lorem.sentence(30),
           options: [
-            mockMarketOption({ id: '1', name: faker.lorem.sentence(8), currencyCode: 'YES' }),
-            mockMarketOption({ id: '2', name: faker.lorem.sentence(8), currencyCode: 'NO' }),
+            { ...mockMarketOption({ id: '1', name: faker.lorem.sentence(8) }), probability: 0.65 },
+            { ...mockMarketOption({ id: '2', name: faker.lorem.sentence(8) }), probability: 0.35 },
           ],
           marketResolution: {
             ...mockMarketResolution(),
-            resolution: mockMarketOption({ id: '2', name: faker.lorem.sentence(8), currencyCode: 'YES' }),
+            resolution: {
+              ...mockMarketOption({
+                id: '2',
+                name: faker.lorem.sentence(8),
+                color: '#EC4899',
+              }),
+              probability: 0.65,
+            },
             resolvedBy: mockUser(),
           },
         }),

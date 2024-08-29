@@ -33,8 +33,11 @@ model User {
   comments         Comment[]
   commentReactions CommentReaction[]
   resolvedMarkets  MarketResolution[]
-  markets          Market[]           @relation()
-  accounts         Account[]          @relation()
+  markets          Market[]
+  primaryAccountId String             @unique
+  primaryAccount   Account            @relation("UserPrimaryAccount", fields: [primaryAccountId], references: [id])
+  accounts         Account[]
+  transactions     Transaction[]
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
 
@@ -76,18 +79,25 @@ model Session {
 }
 
 model Market {
-  id               String            @id @default(cuid())
-  question         String /// @zod.string.min(1, { message: "Question is required" })
-  description      String
-  slug             String /// @zod.string.min(1, { message: "Slug is required" })
-  closeDate        DateTime?
-  resolvedAt       DateTime?
-  transactions     Transaction[]
-  createdBy        String
-  user             User              @relation(fields: [createdBy], references: [id])
-  accounts         Account[]         @relation()
-  options          MarketOption[]    @relation()
-  marketResolution MarketResolution?
+  id                String                 @id @default(cuid())
+  question          String /// @zod.string.min(1, { message: "Question is required" })
+  description       String
+  slug              String /// @zod.string.min(1, { message: "Slug is required" })
+  closeDate         DateTime?
+  resolvedAt        DateTime?
+  transactions      Transaction[]
+  createdBy         String
+  tags              String[]               @default([]) /// @zod.string.array(.max(5))
+  user              User                   @relation(fields: [createdBy], references: [id])
+  ammAccountId      String                 @unique
+  ammAccount        Account                @relation("MarketAMMAccount", fields: [ammAccountId], references: [id])
+  clearingAccountId String                 @unique
+  clearingAccount   Account                @relation("MarketClearingAccount", fields: [clearingAccountId], references: [id])
+  accounts          Account[]              @relation("MarketAccounts")
+  options           MarketOption[]         @relation()
+  marketResolution  MarketResolution?
+  balances          Balance[]
+  positions         MarketOptionPosition[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -113,17 +123,17 @@ model MarketResolution {
 }
 
 model MarketOption {
-  id                   String             @id @default(cuid())
-  name                 String
+  id                   String                 @id @default(cuid())
+  name                 String /// @zod.string.min(1, { message: "Name is required" })
   marketId             String
-  market               Market             @relation(fields: [marketId], references: [id])
-  currencyCode         CurrencyCode
-  currency             Currency           @relation(fields: [currencyCode], references: [code])
-  color                String             @default("#FF00FF") /// @zod.string.regex(/^#[0-9A-Fa-f]{6}$/)
-  liquidityProbability Decimal            @default(0.5)
+  market               Market                 @relation(fields: [marketId], references: [id])
+  color                String                 @default("#FF00FF") /// @zod.string.regex(/^#[0-9A-Fa-f]{6}$/)
+  liquidityProbability Decimal                @default(0.5)
   resolutions          MarketResolution[]
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  positions            MarketOptionPosition[]
+  transactions         Transaction[]
 
   // Unnecessary reverse relations
   notifications Notification[] @relation()
@@ -174,64 +184,131 @@ model CommentReaction {
   notifications Notification[] @relation()
 }
 
-enum CurrencyCode {
-  PRIMARY
-  YES
-  NO
-  LPB
-}
+enum TransactionType {
+  TRADE_BUY
+  TRADE_SELL
+  TRADE_WIN
+  TRADE_LOSS
 
-model Currency {
-  id               String            @id @default(cuid())
-  name             String
-  symbol           String
-  code             CurrencyCode      @unique
-  imageUrl         String?
-  transactionItems TransactionItem[]
-  marketOptions    MarketOption[]    @relation()
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  CREATOR_TRADER_BONUS
+
+  LIQUIDITY_INITIALIZE
+  LIQUIDITY_DEPOSIT
+  LIQUIDITY_WITHDRAWAL
+  LIQUIDITY_RETURNED
+  LIQUIDITY_VOLUME_BONUS
+
+  DAILY_TRADE_BONUS
+  DAILY_MARKET_BONUS
+  DAILY_COMMENT_BONUS
+  DAILY_LIQUIDITY_BONUS
+
+  HOUSE_GIFT
+  HOUSE_SIGNUP_BONUS
 }
 
 model Transaction {
-  id               String            @id @default(cuid())
-  type             String
-  description      String?
-  marketId         String?
-  market           Market?           @relation(fields: [marketId], references: [id])
-  transactionItems TransactionItem[]
-  creatorId        String
-  creator          Account           @relation(fields: [creatorId], references: [id])
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @default(now())
+  id          String             @id @default(cuid())
+  type        TransactionType
+  entries     TransactionEntry[]
+  initiatorId String?
+  initiator   User?              @relation(fields: [initiatorId], references: [id])
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @default(now())
+  batchId     String?
+  batch       TransactionBatch?  @relation(fields: [batchId], references: [id])
+  marketId    String?
+  market      Market?            @relation(fields: [marketId], references: [id])
+  options     MarketOption[]
 
   // Unnecessary reverse relations
   notifications Notification[] @relation()
 }
 
-model TransactionItem {
-  id            String       @id @default(cuid())
-  accountId     String
-  account       Account      @relation(fields: [accountId], references: [id])
-  currencyCode  CurrencyCode
-  currency      Currency     @relation(fields: [currencyCode], references: [code])
-  transactionId String
-  transaction   Transaction  @relation(fields: [transactionId], references: [id])
+model TransactionBatch {
+  id           String        @id @default(cuid())
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+enum AssetType {
+  CURRENCY
+  MARKET_OPTION
+}
+
+model TransactionEntry {
+  id            String      @id @default(cuid())
   amount        Decimal
-  createdAt     DateTime     @default(now())
+  assetType     AssetType
+  assetId       String
+  fromAccountId String
+  fromAccount   Account     @relation("FromAccount", fields: [fromAccountId], references: [id])
+  toAccountId   String
+  toAccount     Account     @relation("ToAccount", fields: [toAccountId], references: [id])
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  createdAt     DateTime    @default(now())
+}
+
+enum AccountType {
+  USER
+  MARKET_AMM
+  MARKET_CLEARING
+  HOUSE
 }
 
 model Account {
-  id               String            @id @default(cuid())
-  internalType     String?           @unique
-  userId           String?
-  user             User?             @relation(fields: [userId], references: [id])
-  marketId         String?
-  market           Market?           @relation(fields: [marketId], references: [id])
-  transactionItems TransactionItem[]
-  transactions     Transaction[]
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @default(now())
+  id             String                 @id @default(cuid())
+  type           AccountType
+  internalType   String?                @unique
+  userId         String?
+  user           User?                  @relation(fields: [userId], references: [id])
+  userPrimary    User?                  @relation("UserPrimaryAccount")
+  ammMarket      Market?                @relation("MarketAMMAccount")
+  clearingMarket Market?                @relation("MarketClearingAccount")
+  marketId       String?
+  market         Market?                @relation("MarketAccounts", fields: [marketId], references: [id])
+  fromEntries    TransactionEntry[]     @relation("FromAccount")
+  toEntries      TransactionEntry[]     @relation("ToAccount")
+  balances       Balance[]
+  positions      MarketOptionPosition[]
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @default(now())
+}
+
+model Balance {
+  id        String    @id @default(cuid())
+  accountId String
+  account   Account   @relation(fields: [accountId], references: [id])
+  assetType AssetType
+  assetId   String
+  total     Decimal
+  subtotals Json
+  marketId  String?
+  market    Market?   @relation(fields: [marketId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
+
+  @@index(fields: [accountId, assetType, assetId, marketId])
+}
+
+model MarketOptionPosition {
+  id        String       @id @default(cuid())
+  accountId String
+  account   Account      @relation(fields: [accountId], references: [id])
+  marketId  String
+  market    Market       @relation(fields: [marketId], references: [id])
+  optionId  String
+  option    MarketOption @relation(fields: [optionId], references: [id])
+  cost      Decimal
+  quantity  Decimal
+  value     Decimal
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @default(now())
+
+  @@unique(fields: [accountId, optionId])
+  @@index(fields: [accountId, optionId])
 }
 
 enum NotificationType {

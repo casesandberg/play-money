@@ -56,23 +56,19 @@ export async function resolveMarket({
     })
   })
 
-  const nonWinningOptions = market.options.filter((o) => o.id !== optionId)
-
-  await Promise.all(
-    nonWinningOptions.map((option) => {
-      return createMarketResolveLossTransactions({
-        marketId,
-        losingOptionId: option.id,
-      })
-    })
-  )
-
-  await createMarketResolveWinTransactions({
+  await createMarketResolveLossTransactions({
     marketId,
+    initiatorId: resolverId,
     winningOptionId: optionId,
   })
 
-  await createMarketExcessLiquidityTransactions({ marketId })
+  await createMarketResolveWinTransactions({
+    marketId,
+    initiatorId: resolverId,
+    winningOptionId: optionId,
+  })
+
+  await createMarketExcessLiquidityTransactions({ marketId, initiatorId: resolverId })
 
   const user = await getUserById({ id: resolverId })
   const recipientIds = await getUniqueTraderIds(marketId, [user.id])

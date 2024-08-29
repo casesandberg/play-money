@@ -4,8 +4,6 @@ import { auth } from '@play-money/auth'
 import { CommentNotFoundError } from '@play-money/comments/lib/exceptions'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import { updateMarket } from '@play-money/markets/lib/updateMarket'
-import { getUserMarketOptionIncome } from '@play-money/users/lib/getUserMarketOptionIncome'
-import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'
@@ -27,34 +25,7 @@ export async function GET(
 
     const { id, extended } = schema.get.parameters.parse({ ...params, ...idParams })
 
-    const session = await auth()
-    const userAccount = session?.user?.id ? await getUserPrimaryAccount({ userId: session.user.id }) : undefined
-
-    if (extended) {
-      const market = await getMarket({ id, extended })
-
-      // TODO: Move cost and value into P&L document
-      market.options = await Promise.all(
-        market.options.map(async (option) => {
-          if (userAccount) {
-            const { cost, value } = await getUserMarketOptionIncome({
-              accountId: userAccount.id,
-              marketId: id,
-              optionId: option.id,
-            })
-
-            option.cost = cost
-            option.value = value
-          }
-
-          return option
-        })
-      )
-
-      return NextResponse.json(market)
-    }
-
-    const market = await getMarket({ id })
+    const market = await getMarket({ id, extended })
     return NextResponse.json(market)
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
@@ -75,14 +46,14 @@ export async function PATCH(
 
     const { id } = schema.patch.parameters.parse(params)
     const body = (await req.json()) as unknown
-    const { question, description, closeDate } = schema.patch.requestBody.transform(stripUndefined).parse(body)
+    const { question, description, closeDate, tags } = schema.patch.requestBody.transform(stripUndefined).parse(body)
 
     const market = await getMarket({ id })
     if (market.createdBy !== session.user.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const updatedComment = await updateMarket({ id, question, description, closeDate })
+    const updatedComment = await updateMarket({ id, question, description, closeDate, tags })
 
     return NextResponse.json(updatedComment)
   } catch (error) {

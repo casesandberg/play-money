@@ -13,9 +13,9 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.ge
     const searchParams = new URLSearchParams(url.search)
     const params = Object.fromEntries(searchParams)
 
-    const { createdBy, limit } = schema.get.parameters.parse(params) ?? {}
+    const { createdBy, limit, tag } = schema.get.parameters.parse(params) ?? {}
 
-    const markets = await getMarkets({ createdBy }, undefined, { skip: 0, take: limit ?? 50 })
+    const markets = await getMarkets({ createdBy, tag }, undefined, { skip: 0, take: limit ?? 50 })
 
     return NextResponse.json({
       markets,

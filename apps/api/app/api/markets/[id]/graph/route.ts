@@ -18,7 +18,7 @@ export async function GET(
       marketId: id,
       tickInterval: 1,
       endAt: market.resolvedAt || new Date(),
-      excludeTransactionTypes: ['MARKET_RESOLVE_LOSS', 'MARKET_RESOLVE_WIN', 'MARKET_EXCESS_LIQUIDITY'],
+      excludeTransactionTypes: ['TRADE_LOSS', 'TRADE_WIN', 'LIQUIDITY_RETURNED'],
     })
 
     return NextResponse.json({

@@ -15,7 +15,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@play-money/ui/tooltip'
 import { toast } from '@play-money/ui/use-toast'
 import { useUser } from '@play-money/users/context/UserContext'
 import { canResolveMarket } from '../lib/helpers'
-import { ExtendedMarket } from './MarketOverviewPage'
+import { ExtendedMarket } from '../types'
 import { ResolveMarketDialog } from './ResolveMarketDialog'
 
 function useQueryString(key: string) {

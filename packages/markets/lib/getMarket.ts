@@ -1,5 +1,7 @@
 import db, { Market } from '@play-money/database'
-import { ExtendedMarket } from '../components/MarketOverviewPage'
+import { getBalance, getMarketBalances } from '@play-money/finance/lib/getBalances'
+import { marketOptionBalancesToProbabilities } from '@play-money/finance/lib/helpers'
+import { ExtendedMarket } from '../types'
 
 export function getMarket(params: { id: string; extended: true }): Promise<ExtendedMarket>
 export function getMarket(params: { id: string; extended?: false }): Promise<Market>
@@ -32,6 +34,26 @@ export async function getMarket({
     if (!market) {
       throw new Error('Market not found')
     }
+
+    const balances = await Promise.all(
+      market.options.map((option) => {
+        return getBalance({
+          accountId: market.ammAccountId,
+          assetType: 'MARKET_OPTION',
+          assetId: option.id,
+          marketId: id,
+        })
+      })
+    )
+
+    const probabilities = marketOptionBalancesToProbabilities(balances)
+
+    market.options = market.options.map((option) => {
+      return {
+        ...option,
+        probability: probabilities[option.id],
+      }
+    })
 
     return market
   }

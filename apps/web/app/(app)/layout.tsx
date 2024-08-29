@@ -28,6 +28,11 @@ function MainNav({
         </Link>
       )}
       {renderItemWrap(
+        <Link className="font-medium transition-colors hover:text-primary" href="/leaderboard">
+          Leaderboard
+        </Link>
+      )}
+      {renderItemWrap(
         <GlobalSearchTriggerLink className="h-auto text-[length:inherit] text-foreground transition-colors hover:text-primary" />
       )}
     </nav>

@@ -17,8 +17,15 @@ async function main() {
         await db.market.update({
           where: { id: market.id },
           data: {
-            accounts: {
-              create: {},
+            ammAccount: {
+              create: {
+                type: 'MARKET_AMM' as const,
+              },
+            },
+            clearingAccount: {
+              create: {
+                type: 'MARKET_CLEARING' as const,
+              },
             },
           },
         })

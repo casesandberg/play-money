@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 import { toBeDeepCloseTo, toMatchCloseTo } from 'jest-matcher-deep-close-to'
 import '@play-money/config/jest/jest-setup'
-import { addLiquidity, trade, quote } from './maniswap-v1.1'
+import { addLiquidity, trade, quote, calculateProbability } from './maniswap-v1.1'
 
 expect.extend({ toBeDeepCloseTo, toMatchCloseTo })
 
@@ -176,6 +176,18 @@ describe('maniswap-v1.1', () => {
       expect(result.shares).toBeCloseToDecimal(69.72)
       expect(result.cost).toBeCloseToDecimal(100)
     })
+
+    it('should return correct quote for buying option in multiple choice', async () => {
+      const result = await quote({
+        amount: new Decimal(50),
+        probability: new Decimal(0.99),
+        targetShare: new Decimal(200),
+        shares: [new Decimal(200), new Decimal(200), new Decimal(200)],
+      })
+
+      expect(result.probability).toBeCloseToDecimal(0.41)
+      expect(result.shares).toBeCloseToDecimal(72.22)
+    })
   })
 
   describe('addLiquidity', () => {
@@ -196,5 +208,24 @@ describe('maniswap-v1.1', () => {
 
       expect(result).toEqual([expect.closeToDecimal(50), expect.closeToDecimal(50)])
     })
+  })
+
+  describe('calculateProbability', () => {
+    const testCases = [
+      { index: 0, shares: [100, 300], expected: 0.75 },
+      { index: 0, shares: [200, 200], expected: 0.5 },
+      { index: 0, shares: [200, 200, 200], expected: 0.3333 },
+      { index: 0, shares: [25, 200, 200], expected: 0.8 },
+      { index: 0, shares: [200, 200, 200, 200], expected: 0.25 },
+      { index: 0, shares: [11.11, 300, 300, 300], expected: 0.9 },
+    ]
+
+    test.each(testCases)(
+      'calculates probability correctly for index: $index, shares: $shares',
+      ({ index, shares, expected }) => {
+        const result = calculateProbability({ index, shares })
+        expect(result.toNumber()).toBeCloseTo(expected, 4)
+      }
+    )
   })
 })

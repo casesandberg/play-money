@@ -1,7 +1,7 @@
 import { CommentWithReactions } from '@play-money/comments/lib/getComment'
 import { Market, User } from '@play-money/database'
-import type { TransactionWithItems } from '@play-money/finance/lib/getTransactions'
-import type { ExtendedMarket } from '@play-money/markets/components/MarketOverviewPage'
+import { TransactionWithEntries, LeaderboardUser } from '@play-money/finance/types'
+import { ExtendedMarket } from '@play-money/markets/types'
 
 // TODO: @casesandberg Generate this from OpenAPI schema
 
@@ -34,8 +34,8 @@ async function apiHandler<T>(
 }
 
 export async function getMarketTransactions({ marketId }: { marketId: string }) {
-  return apiHandler<{ transactions: Array<TransactionWithItems> }>(
-    `${process.env.NEXT_PUBLIC_API_URL}/v1/transactions?marketId=${marketId}&transactionType=MARKET_BUY,MARKET_SELL`
+  return apiHandler<{ transactions: Array<TransactionWithEntries> }>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/transactions?marketId=${marketId}&transactionType=TRADE_BUY,TRADE_SELL`
   )
 }
 
@@ -88,10 +88,10 @@ export async function getMyBalance() {
   return apiHandler<{ balance: number }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/balance`)
 }
 
-export async function getMarkets() {
+export async function getMarkets({ tag }: { tag?: string } = {}) {
   return apiHandler<{
     markets: Array<ExtendedMarket & { commentCount: number; liquidityCount: number; uniqueTraderCount: number }>
-  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets`, {
+  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets${tag ? `?tag=${tag}` : ''}`, {
     next: { tags: ['markets'] },
   })
 }
@@ -111,6 +111,21 @@ export async function createMarket(body: Record<string, unknown>) {
 
 export async function updateMarket({ marketId, body }: { marketId: string; body: Record<string, unknown> }) {
   return apiHandler<Market>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}`, {
+    method: 'PATCH',
+    body: body,
+  })
+}
+
+export async function updateMarketOption({
+  marketId,
+  optionId,
+  body,
+}: {
+  marketId: string
+  optionId: string
+  body: Record<string, unknown>
+}) {
+  return apiHandler<Market>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/options/${optionId}`, {
     method: 'PATCH',
     body: body,
   })
@@ -291,8 +306,8 @@ export async function getUserTransactions({
   userId,
 }: {
   userId: string
-}): Promise<{ transactions: Array<TransactionWithItems> }> {
-  return apiHandler<{ transactions: Array<TransactionWithItems> }>(
+}): Promise<{ transactions: Array<TransactionWithEntries> }> {
+  return apiHandler<{ transactions: Array<TransactionWithEntries> }>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/transactions`
   )
 }
@@ -301,4 +316,32 @@ export async function getUserMarkets({ userId }: { userId: string }): Promise<{ 
   return apiHandler<{ markets: Array<ExtendedMarket> }>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/markets?createdBy=${userId}`
   )
+}
+
+export async function createMarketGenerateTags({ question }: { question: string }) {
+  return apiHandler<{ tags: Array<string> }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/generate-tags`, {
+    method: 'POST',
+    body: {
+      question,
+    },
+  })
+}
+
+export async function getLeaderboard() {
+  return apiHandler<{
+    topTraders: Array<LeaderboardUser>
+    topCreators: Array<LeaderboardUser>
+    topPromoters: Array<LeaderboardUser>
+    topQuesters: Array<LeaderboardUser>
+    userRankings?: {
+      trader: LeaderboardUser
+      creator: LeaderboardUser
+      promoter: LeaderboardUser
+      quester: LeaderboardUser
+    }
+  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/leaderboard`, {
+    next: {
+      revalidate: 1000 * 60 * 10,
+    },
+  })
 }

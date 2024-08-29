@@ -41,7 +41,7 @@ export async function GET(
       totalMarkets,
       lastTradeAt,
       activeDayCount,
-      otherIncome,
+      otherIncome: otherIncome.toNumber(),
       quests: [
         {
           title: 'Bet in a market',

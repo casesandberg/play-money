@@ -8,9 +8,14 @@ export default createSchema({
       200: z.object({
         data: z.array(
           z.object({
-            probability: z.number(),
             startAt: z.date(),
             endAt: z.date(),
+            options: z.array(
+              z.object({
+                id: z.string(),
+                probability: z.number(),
+              })
+            ),
           })
         ),
       }),

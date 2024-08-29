@@ -130,7 +130,7 @@ export function SettingsProfileForm() {
         <FormField
           control={form.control}
           name="timezone"
-          render={({ field }) => (
+          render={({ field: { ref, ...field } }) => (
             <FormItem>
               <FormLabel>Timezone</FormLabel>
               <FormControl>

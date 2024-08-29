@@ -1,9 +1,10 @@
 import { format } from 'date-fns'
+import _ from 'lodash'
 import Link from 'next/link'
 import React from 'react'
 import { getUserMarkets, getUserTransactions, getUserUsername } from '@play-money/api-helpers/client'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
-import { summarizeTransaction } from '@play-money/finance/lib/helpers'
+import { calculateBalanceChanges, findBalanceChange } from '@play-money/finance/lib/helpers'
 import { Card, CardContent } from '@play-money/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@play-money/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@play-money/ui/tabs'
@@ -49,8 +50,18 @@ export async function UserProfilePage({ username }: { username: string }) {
                 <TableBody>
                   {transactions.length ? (
                     transactions.map((transaction) => {
-                      const summary = summarizeTransaction(transaction)
-                      const userSummary = summary[transaction.creatorId]
+                      if (!transaction.initiator) {
+                        return null
+                      }
+                      const balanceChanges = calculateBalanceChanges(transaction)
+                      const primaryChange = findBalanceChange({
+                        balanceChanges,
+                        accountId: transaction.initiator.primaryAccountId,
+                        assetType: 'CURRENCY',
+                        assetId: 'PRIMARY',
+                      })
+                      const optionName = transaction.options[0]?.name
+
                       return transaction.market ? (
                         <Link
                           href={`/questions/${transaction.market.id}/${transaction.market.slug}`}
@@ -62,22 +73,22 @@ export async function UserProfilePage({ username }: { username: string }) {
                               <div
                                 className={cn(
                                   'font-semibold',
-                                  transaction.type === 'MARKET_BUY'
+                                  transaction.type === 'TRADE_BUY'
                                     ? 'text-green-600'
-                                    : transaction.type === 'MARKET_SELL'
+                                    : transaction.type === 'TRADE_SELL'
                                       ? 'text-red-600'
                                       : ''
                                 )}
                               >
-                                {transaction.type === 'MARKET_BUY'
+                                {transaction.type === 'TRADE_BUY'
                                   ? 'Buy'
-                                  : transaction.type === 'MARKET_SELL'
+                                  : transaction.type === 'TRADE_SELL'
                                     ? 'Sell'
                                     : ''}{' '}
-                                {!userSummary.YES.eq(0) ? 'Yes' : 'No'}
+                                {_.truncate(optionName, { length: 30 })}
                               </div>
                               <div>
-                                <CurrencyDisplay value={userSummary.PRIMARY.abs().toNumber()} />
+                                <CurrencyDisplay value={Math.abs(primaryChange?.change ?? 0)} isShort />
                               </div>
                             </TableCell>
                             <TableCell>
