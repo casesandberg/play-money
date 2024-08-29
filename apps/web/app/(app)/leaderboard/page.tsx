@@ -21,7 +21,7 @@ function LeaderboardUserTable({
         return (
           <li
             className={cn(
-              'flex items-center gap-2 px-4 py-2 even:bg-gray-50',
+              'flex items-center gap-2 px-4 py-2 even:bg-muted/50',
               leaderboardUser.userId === activeUserRank?.userId && 'bg-primary/10 ring-2 ring-inset ring-primary'
             )}
             key={leaderboardUser.userId}
