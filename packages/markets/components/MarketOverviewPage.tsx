@@ -185,7 +185,7 @@ export function MarketOverviewPage({
         <ReadMoreEditor value={market.description} maxLines={6} />
 
         {market.tags.length ? (
-          <div className="mt-2 flex gap-2">
+          <div className="mt-2 flex flex-wrap gap-2">
             {market.tags.map((tag) => (
               <Link href={`/questions/tagged/${tag}`}>
                 <Badge variant="secondary">{tag}</Badge>

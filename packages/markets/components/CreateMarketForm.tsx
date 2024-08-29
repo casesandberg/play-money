@@ -10,7 +10,7 @@ import { CirclePicker } from 'react-color'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { mutate } from 'swr'
 import { z } from 'zod'
-import { createMarket } from '@play-money/api-helpers/client'
+import { createMarket, createMarketGenerateTags } from '@play-money/api-helpers/client'
 import { MY_BALANCE_PATH } from '@play-money/api-helpers/client/hooks'
 import { MarketSchema, MarketOptionSchema } from '@play-money/database'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
@@ -105,6 +105,13 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
     [type]
   )
 
+  async function handleQuestionBlur() {
+    if (!form.getValues('tags')?.length) {
+      const { tags } = await createMarketGenerateTags({ question: form.getValues('question') })
+      form.setValue('tags', tags)
+    }
+  }
+
   return (
     <Card className="mx-auto flex max-w-screen-sm flex-1 p-6">
       <Form {...form}>
@@ -169,7 +176,7 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
           <FormField
             control={form.control}
             name="question"
-            render={({ field }) => (
+            render={({ field: { onBlur, ...field } }) => (
               <FormItem>
                 <FormLabel>Question</FormLabel>
                 <FormControl>
@@ -179,6 +186,10 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
                         ? 'Will bitcoin hit $76,543.21 by the end of 2024?'
                         : 'Who will win the 2024 US Presidential Election?'
                     }
+                    onBlur={() => {
+                      handleQuestionBlur()
+                      onBlur()
+                    }}
                     {...field}
                   />
                 </FormControl>
@@ -290,7 +301,11 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
                   <div className="min-h-[80px]">
                     <Editor
                       inputClassName="border text-sm p-3 min-h-[80px]"
-                      placeholder="Resolves to the price listed on coindesk at mightnight on Dec 31st."
+                      placeholder={
+                        type === 'binary'
+                          ? 'Resolves to the price listed on coindesk at mightnight on Dec 31st.'
+                          : 'Resolves to credible reporting on news sites such as CNN.'
+                      }
                       {...field}
                     />
                   </div>
@@ -310,6 +325,7 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
                   <MultiSelect
                     value={value?.map((v) => ({ value: v, label: v }))}
                     onChange={(values) => onChange(values?.map((v) => v.value))}
+                    hideClearAllButton
                     {...field}
                   />
                 </FormControl>

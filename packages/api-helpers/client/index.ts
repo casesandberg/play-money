@@ -318,3 +318,12 @@ export async function getUserMarkets({ userId }: { userId: string }): Promise<{ 
     `${process.env.NEXT_PUBLIC_API_URL}/v1/markets?createdBy=${userId}`
   )
 }
+
+export async function createMarketGenerateTags({ question }: { question: string }) {
+  return apiHandler<{ tags: Array<string> }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/generate-tags`, {
+    method: 'POST',
+    body: {
+      question,
+    },
+  })
+}

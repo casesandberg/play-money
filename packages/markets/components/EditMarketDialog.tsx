@@ -135,6 +135,7 @@ export const EditMarketDialog = ({
                     <MultiSelect
                       value={value?.map((v) => ({ value: v, label: v }))}
                       onChange={(values) => onChange(values?.map((v) => v.value))}
+                      hideClearAllButton
                       {...field}
                     />
                   </FormControl>
