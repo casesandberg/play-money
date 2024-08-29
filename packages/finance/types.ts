@@ -11,3 +11,12 @@ export type TransactionWithEntries = Transaction & {
   initiator: User | null
   options: Array<MarketOption>
 }
+
+export type LeaderboardUser = {
+  userId: string
+  displayName: string
+  username: string
+  avatarUrl?: string | null
+  total: number
+  rank: number
+}

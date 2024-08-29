@@ -8,7 +8,7 @@ export function UserLink({
   hideUsername = false,
   className,
 }: {
-  user: User
+  user: Pick<User, 'username' | 'displayName' | 'id'>
   hideUsername?: boolean
   className?: string
 }) {
