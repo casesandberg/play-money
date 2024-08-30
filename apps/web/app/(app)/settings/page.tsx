@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { auth } from '@play-money/auth'
 import { SettingsProfileForm } from '@play-money/users/components/SettingsProfileForm'
 
-const HAS_IMAGE_UPLOAD = Boolean(process.env.BLOB_READ_WRITE_TOKEN)
+const HAS_IMAGE_UPLOAD = Boolean(process.env['BLOB_READ_WRITE_TOKEN'])
 
 export default async function AppSettingsPage() {
   const session = await auth()
