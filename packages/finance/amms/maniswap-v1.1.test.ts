@@ -247,7 +247,93 @@ describe('maniswap-v1.1', () => {
         ],
       })
 
-      expect(result).toEqual([expect.closeToDecimal(50), expect.closeToDecimal(50)])
+      expect(result).toEqual([
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.5) },
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.5) },
+      ])
+    })
+
+    it('should correctly add liquidity to an imbalanced market', async () => {
+      const result = await addLiquidity({
+        amount: new Decimal(50),
+        options: [
+          {
+            shares: new Decimal(100),
+            liquidityProbability: new Decimal(0.3),
+          },
+          {
+            shares: new Decimal(300),
+            liquidityProbability: new Decimal(0.7),
+          },
+        ],
+      })
+
+      expect(result).toEqual([
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.25) },
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.75) },
+      ])
+    })
+
+    it('should correctly add liquidity to a balanced 4 option market', async () => {
+      const result = await addLiquidity({
+        amount: new Decimal(50),
+        options: [
+          {
+            shares: new Decimal(1000),
+            liquidityProbability: new Decimal(0.25),
+          },
+          {
+            shares: new Decimal(1000),
+            liquidityProbability: new Decimal(0.25),
+          },
+          {
+            shares: new Decimal(1000),
+            liquidityProbability: new Decimal(0.25),
+          },
+          {
+            shares: new Decimal(1000),
+            liquidityProbability: new Decimal(0.25),
+          },
+        ],
+      })
+
+      expect(result).toEqual([
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.25) },
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.25) },
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.25) },
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.25) },
+      ])
+    })
+
+    it('should correctly add liquidity to an imbalanced 4 option market', async () => {
+      const result = await addLiquidity({
+        amount: new Decimal(50),
+        options: [
+          {
+            shares: new Decimal(100),
+            liquidityProbability: new Decimal(0.25),
+          },
+          {
+            shares: new Decimal(300),
+            liquidityProbability: new Decimal(0.25),
+          },
+          {
+            shares: new Decimal(300),
+            liquidityProbability: new Decimal(0.25),
+          },
+          {
+            shares: new Decimal(300),
+            liquidityProbability: new Decimal(0.25),
+          },
+        ],
+      })
+
+      expect(result).toEqual([
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.205) },
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.265) },
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.265) },
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.265) },
+      ])
     })
   })
 
