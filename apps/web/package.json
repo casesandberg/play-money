@@ -23,6 +23,7 @@
     "@play-money/search": "*",
     "@play-money/ui": "*",
     "@play-money/users": "*",
+    "@vercel/blob": "^0.23.4",
     "lodash": "^4.17.21",
     "lucide-react": "^0.378.0",
     "moment": "^2.30.1",

@@ -7,4 +7,13 @@ module.exports = {
       allowedOrigins: [process.env.NEXT_PUBLIC_API_URL],
     },
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'bijbnpk9x6qrvjzj.public.blob.vercel-storage.com',
+        port: '',
+      },
+    ],
+  },
 }
