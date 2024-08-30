@@ -172,7 +172,7 @@ export function MarketBuyForm({
 }
 
 // TODO: Create format components and using existing currency component
-export const formatCurrency = (value: number) => `$${Math.round(value)}`
+export const formatCurrency = (value: number) => `¤${Math.round(value)}`
 
 export const formatPercentage = (value: number) => `${Math.round(value * 100)}%`
 
