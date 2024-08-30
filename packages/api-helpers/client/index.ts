@@ -341,7 +341,7 @@ export async function getLeaderboard() {
     }
   }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/leaderboard`, {
     next: {
-      revalidate: 1000 * 60 * 10,
+      revalidate: 600, // Ten mins
     },
   })
 }
