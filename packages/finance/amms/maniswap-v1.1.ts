@@ -63,21 +63,13 @@ function sumShares(shares: Array<Decimal>) {
 }
 
 export function calculateProbability({ index, shares }: { index: number; shares: Array<Decimal | number> }): Decimal {
-  // Calculate the product of all shares except for the one at the given index
-  const productOfOtherShares = shares.reduce<Decimal>((acc, share, idx) => {
-    return idx !== index ? acc.mul(share) : acc
-  }, new Decimal(1))
+  const indexShares = shares[index]
 
-  // Calculate the sum of all products for each index
-  const sumOfProducts = shares.reduce<Decimal>((sum, _, currentIndex) => {
-    const productExcludingCurrent = shares.reduce<Decimal>((acc, share, idx) => {
-      return idx !== currentIndex ? acc.mul(share) : acc
-    }, new Decimal(1))
-    return sum.plus(productExcludingCurrent)
-  }, new Decimal(0))
+  // Calculate the sum of the shares of each index
+  const sum = shares.reduce<Decimal>((sum, share) => sum.plus(share), new Decimal(0))
 
-  // The probability for the given index is the product of other shares divided by the sum of all products
-  const probability = productOfOtherShares.div(sumOfProducts)
+  // The probability for the given index is one minus the share count at the index times the number of dimensions divided by the sum of all shares
+  const probability = new Decimal(1).sub(new Decimal(indexShares).mul(shares.length - 1).div(sum))
 
   return probability
 }
