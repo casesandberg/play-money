@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { auth } from '@play-money/auth'
 import { SettingsProfileForm } from '@play-money/users/components/SettingsProfileForm'
 
+// eslint-disable-next-line @typescript-eslint/dot-notation -- Use bracket to prevent runtime errors
 const HAS_IMAGE_UPLOAD = Boolean(process.env['BLOB_READ_WRITE_TOKEN'])
 
 export default async function AppSettingsPage() {
