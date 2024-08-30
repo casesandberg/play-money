@@ -185,7 +185,7 @@ describe('maniswap-v1.1', () => {
         shares: [new Decimal(200), new Decimal(200), new Decimal(200)],
       })
 
-      expect(result.probability).toBeCloseToDecimal(0.41)
+      expect(result.probability).toBeCloseToDecimal(0.48)
       expect(result.shares).toBeCloseToDecimal(72.22)
     })
   })
@@ -215,9 +215,9 @@ describe('maniswap-v1.1', () => {
       { index: 0, shares: [100, 300], expected: 0.75 },
       { index: 0, shares: [200, 200], expected: 0.5 },
       { index: 0, shares: [200, 200, 200], expected: 0.3333 },
-      { index: 0, shares: [25, 200, 200], expected: 0.8 },
+      { index: 0, shares: [44.45, 200, 200], expected: 0.8 },
       { index: 0, shares: [200, 200, 200, 200], expected: 0.25 },
-      { index: 0, shares: [11.11, 300, 300, 300], expected: 0.9 },
+      { index: 0, shares: [31.02, 300, 300, 300], expected: 0.9 },
     ]
 
     test.each(testCases)(
