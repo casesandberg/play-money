@@ -5,7 +5,7 @@
   "pipeline": {
     "build": {
       "dependsOn": ["^test", "^build", "^db:generate"],
-      "env": ["NEXT_PUBLIC_API_URL"],
+      "env": ["NEXT_PUBLIC_API_URL", "BLOB_READ_WRITE_TOKEN"],
       "inputs": ["$TURBO_DEFAULT$", "!**/*.stories.{tsx,jsx,mdx}"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "storybook-static/**"]
     },

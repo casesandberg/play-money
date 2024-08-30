@@ -5,6 +5,7 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 import { getUserCheckUsername, updateMe } from '@play-money/api-helpers/client'
 import { User } from '@play-money/database'
+import { Avatar, AvatarFallback, AvatarImage } from '@play-money/ui/avatar'
 import { Button } from '@play-money/ui/button'
 import { Combobox } from '@play-money/ui/combobox'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
@@ -31,7 +32,13 @@ declare namespace Intl {
 
 type ProfileFormValues = Pick<User, 'username' | 'bio' | 'avatarUrl' | 'displayName' | 'timezone'>
 
-export function SettingsProfileForm() {
+export function SettingsProfileForm({
+  hasImageUpload = false,
+  onImageUpload,
+}: {
+  hasImageUpload?: boolean
+  onImageUpload?: (file: FormData) => Promise<string>
+}) {
   const { user, setUser } = useUser()
   const form = useForm<ProfileFormValues>({
     defaultValues: {
@@ -39,6 +46,7 @@ export function SettingsProfileForm() {
       bio: user?.bio ?? '',
       displayName: user?.displayName ?? '',
       timezone: user?.timezone ?? '',
+      avatarUrl: user?.avatarUrl ?? '',
     },
   })
 
@@ -65,6 +73,49 @@ export function SettingsProfileForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {hasImageUpload ? (
+          <FormField
+            control={form.control}
+            name="avatarUrl"
+            render={({ field: { value, ...field } }) => (
+              <FormItem>
+                <FormLabel>Avatar</FormLabel>
+                <FormControl>
+                  <div className="flex items-center gap-4">
+                    <Avatar className="size-32">
+                      <AvatarImage
+                        alt={`@${user?.username}`}
+                        src={value || `https://api.dicebear.com/8.x/initials/svg?seed=${user?.username}&scale=75`}
+                      />
+                      <AvatarFallback />
+                    </Avatar>
+                    <Input
+                      {...field}
+                      onChange={async (event) => {
+                        const file = event.target.files?.[0]
+
+                        if (file) {
+                          const formData = new FormData()
+                          formData.append('image', file)
+
+                          const img = await onImageUpload?.(formData)
+                          if (img) {
+                            form.setValue('avatarUrl', img, { shouldValidate: true, shouldDirty: true })
+                          }
+                        }
+                      }}
+                      type="file"
+                      className="w-64"
+                    />
+                  </div>
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        ) : null}
+
         <FormField
           control={form.control}
           name="displayName"
