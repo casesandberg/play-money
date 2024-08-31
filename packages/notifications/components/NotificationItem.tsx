@@ -96,7 +96,9 @@ export function NotificationItem({
       break
     }
     case 'COMMENT_REPLY': {
-      topLine = createSnippet(notification.parentComment.content)
+      topLine = notification.parentComment?.content
+        ? createSnippet(notification.parentComment.content)
+        : notification.market.question
       bottomLine = `${notification.actor.displayName}${othersCount} replied: ${createSnippet(notification.comment.content)}`
       break
     }

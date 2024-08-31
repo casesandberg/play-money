@@ -11,6 +11,7 @@ export async function createNotification({
   marketId,
   commentId,
   commentReactionId,
+  parentCommentId,
   transactionId,
   marketOptionId,
 }: {
@@ -30,6 +31,7 @@ export async function createNotification({
       marketId,
       commentId,
       commentReactionId,
+      parentCommentId,
       transactionId,
       marketOptionId,
     },
