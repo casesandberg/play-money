@@ -33,8 +33,9 @@ export function MarketBalanceBreakdown({
   options: Array<MarketOption>
 }) {
   const traderTransactions = ['TRADE_BUY', 'TRADE_SELL', 'TRADE_WIN', 'TRADE_LOSS']
-  const creatorTransactions = ['LIQUIDITY_INITIALIZE', 'CREATOR_TRADER_BONUS']
+  const creatorTransactions = ['CREATOR_TRADER_BONUS']
   const promoterTransactions = [
+    'LIQUIDITY_INITIALIZE',
     'LIQUIDITY_DEPOSIT',
     'LIQUIDITY_WITHDRAWAL',
     'LIQUIDITY_RETURNED',
