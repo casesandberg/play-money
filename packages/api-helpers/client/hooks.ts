@@ -80,6 +80,8 @@ export function useUserGraph({ userId }: { userId: string }) {
   return useSWR<{
     data: Array<{
       balance: number
+      liquidity: number
+      markets: number
       startAt: Date
       endAt: Date
     }>
