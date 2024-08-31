@@ -1,12 +1,14 @@
 import { Decimal } from 'decimal.js'
-import db, { TransactionEntry } from '@play-money/database'
+import db, { Transaction, TransactionEntry } from '@play-money/database'
 import { TransactionTypeType } from '@play-money/database/zod/inputTypeSchemas/TransactionTypeSchema'
 
 type Bucket = {
   startAt: Date
   endAt: Date
-  transactionEntries: Array<TransactionEntry>
+  transactionEntries: Array<TransactionEntry & { transaction: Transaction }>
   balance: Decimal
+  liquidity: Decimal
+  markets: Decimal
 }
 
 export async function getUserTotalTimeSeries({
@@ -47,6 +49,8 @@ export async function getUserTotalTimeSeries({
     endAt: new Date(startAt.getTime() + (i + 1) * tickIntervalMs),
     transactionEntries: [],
     balance: new Decimal(0),
+    liquidity: new Decimal(0),
+    markets: new Decimal(0),
   }))
 
   const transactionEntries = await db.transactionEntry.findMany({
@@ -71,6 +75,9 @@ export async function getUserTotalTimeSeries({
         },
       },
     },
+    include: {
+      transaction: true,
+    },
     orderBy: {
       createdAt: 'asc',
     },
@@ -88,13 +95,31 @@ export async function getUserTotalTimeSeries({
     // Start with the previous bucket's balance
     if (i > 0) {
       bucket.balance = buckets[i - 1].balance
+      bucket.liquidity = buckets[i - 1].liquidity
+      bucket.markets = buckets[i - 1].markets
     }
 
     bucket.transactionEntries.forEach((entry) => {
       if (entry.fromAccountId === accountId) {
         bucket.balance = bucket.balance.sub(entry.amount)
+
+        if (entry.transaction.type === 'LIQUIDITY_DEPOSIT' || entry.transaction.type === 'LIQUIDITY_INITIALIZE') {
+          bucket.liquidity = bucket.liquidity.add(entry.amount)
+        }
+
+        if (entry.transaction.type === 'TRADE_BUY') {
+          bucket.markets = bucket.markets.add(entry.amount)
+        }
       } else if (entry.toAccountId === accountId) {
         bucket.balance = bucket.balance.add(entry.amount)
+
+        if (entry.transaction.type === 'LIQUIDITY_WITHDRAWAL' || entry.transaction.type === 'LIQUIDITY_RETURNED') {
+          bucket.liquidity = bucket.liquidity.sub(entry.amount)
+        }
+
+        if (entry.transaction.type === 'TRADE_SELL' || entry.transaction.type === 'TRADE_WIN') {
+          bucket.markets = bucket.markets.sub(entry.amount)
+        }
       }
     })
   })
@@ -103,6 +128,8 @@ export async function getUserTotalTimeSeries({
     startAt: bucket.startAt,
     endAt: bucket.endAt,
     balance: bucket.balance.toNumber(),
+    liquidity: bucket.liquidity.toNumber(),
+    markets: bucket.markets.toNumber(),
   }))
 
   return timeSeriesData
