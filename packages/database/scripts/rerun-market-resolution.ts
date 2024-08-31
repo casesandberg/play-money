@@ -1,9 +1,10 @@
+import { createMarketExcessLiquidityTransactions } from '@play-money/markets/lib/createMarketExcessLiquidityTransactions'
 import { createMarketResolveLossTransactions } from '@play-money/markets/lib/createMarketResolveLossTransactions'
 import { createMarketResolveWinTransactions } from '@play-money/markets/lib/createMarketResolveWinTransactions'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import db from '../prisma'
 
-const marketId = 'clyc6m3yr000gwrsrtrvkt9yj'
+const marketId = 'cm0amvq8v001910v7iq2mvf4m'
 
 async function main() {
   try {
@@ -15,8 +16,6 @@ async function main() {
       if (!resolution) {
         return
       }
-
-      const nonWinningOptions = market.options.filter((o) => o.id !== resolution.id)
 
       const lossTransactions = await createMarketResolveLossTransactions({
         marketId,
@@ -30,8 +29,10 @@ async function main() {
         winningOptionId: resolution.id,
       })
 
+      const liquidityTransactions = await createMarketExcessLiquidityTransactions({ marketId, initiatorId: '' })
+
       console.log(
-        `Market ${marketId} resolution re-run. ${lossTransactions.flat().length} losses, ${winTransactions.length} wins.`
+        `Market ${marketId} resolution re-run. ${lossTransactions.flat().length} losses, ${winTransactions.length} wins. ${liquidityTransactions.length} liquidity accounts returned.`
       )
       return
     }

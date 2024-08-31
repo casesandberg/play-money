@@ -14,7 +14,7 @@ export async function getMarketLiquidity(
       where: {
         marketId,
         type: {
-          in: ['LIQUIDITY_DEPOSIT', 'LIQUIDITY_WITHDRAWAL'],
+          in: ['LIQUIDITY_INITIALIZE', 'LIQUIDITY_DEPOSIT', 'LIQUIDITY_WITHDRAWAL'],
         },
       },
       select: {
@@ -33,7 +33,7 @@ export async function getMarketLiquidity(
 
   await Promise.all(
     (result || []).map(async (transaction) => {
-      const isDeposit = transaction.type === 'LIQUIDITY_DEPOSIT'
+      const isDeposit = transaction.type === 'LIQUIDITY_DEPOSIT' || transaction.type === 'LIQUIDITY_INITIALIZE'
       const balanceChanges = await calculateBalanceChanges({ entries: transaction.entries })
 
       balanceChanges.map(async ({ accountId, change }) => {

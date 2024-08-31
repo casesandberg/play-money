@@ -33,7 +33,7 @@ export function MarketTradePanel({
   onTradeComplete?: () => void
 }) {
   // We can SSR this now, since the P&L will be the one thats updated externally and this one will only ever be updated by a user!
-  const { data: balance } = useMarketBalance({ marketId: market.id })
+  const { data: balance, mutate: revalidate } = useMarketBalance({ marketId: market.id })
   const [option, setOption] = useSearchParam('option')
   const { effect, resetEffect } = useSidebar()
   const activeOption = market.options.find((o) => o.id === (option || activeOptionId))
@@ -43,6 +43,7 @@ export function MarketTradePanel({
     void mutate(MY_BALANCE_PATH)
     void mutate(MARKET_BALANCE_PATH(market.id))
     void mutate(MARKET_GRAPH_PATH(market.id))
+    void revalidate()
     void onTradeComplete?.()
   }
 

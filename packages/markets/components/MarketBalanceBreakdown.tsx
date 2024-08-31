@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js'
 import React from 'react'
 import { MarketOption } from '@play-money/database'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
@@ -33,8 +34,9 @@ export function MarketBalanceBreakdown({
   options: Array<MarketOption>
 }) {
   const traderTransactions = ['TRADE_BUY', 'TRADE_SELL', 'TRADE_WIN', 'TRADE_LOSS']
-  const creatorTransactions = ['LIQUIDITY_INITIALIZE', 'CREATOR_TRADER_BONUS']
+  const creatorTransactions = ['CREATOR_TRADER_BONUS']
   const promoterTransactions = [
+    'LIQUIDITY_INITIALIZE',
     'LIQUIDITY_DEPOSIT',
     'LIQUIDITY_WITHDRAWAL',
     'LIQUIDITY_RETURNED',
@@ -53,10 +55,12 @@ export function MarketBalanceBreakdown({
         <div>
           {positions.map((position) => {
             const option = options.find((option) => option.id === position.optionId)!
-            const change = Math.round(((position.value - position.cost) / position.cost) * 100)
+            const value = new Decimal(position.value).toDecimalPlaces(4)
+            const cost = new Decimal(position.value).toDecimalPlaces(4)
+            const change = value.sub(cost).div(cost).times(100).toNumber()
             const changeLabel = `(${change > 0 ? '+' : ''}${change}%)`
 
-            return position.value ? (
+            return value.toNumber() ? (
               <div key={position.optionId} className="flex justify-between text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <div className="size-2 rounded-md" style={{ backgroundColor: option.color }} />
