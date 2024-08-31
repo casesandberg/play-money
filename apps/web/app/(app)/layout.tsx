@@ -71,14 +71,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </Sheet>
           <Link className="flex items-center gap-2" href="/">
             <span className="text-lg font-bold tracking-tight text-muted-foreground">PlayMoney</span>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge className="hidden md:block" variant="outline">
-                  ALPHA
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>All markets and balances are temporary</TooltipContent>
-            </Tooltip>
           </Link>
           <MainNav className="hidden gap-6 md:flex" />
 
