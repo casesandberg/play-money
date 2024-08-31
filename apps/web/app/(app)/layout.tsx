@@ -3,10 +3,8 @@ import Link from 'next/link'
 import { getMyBalance } from '@play-money/api-helpers/client'
 import { NotificationDropdown } from '@play-money/notifications/components/NotificationDropdown'
 import { GlobalSearchTriggerLink } from '@play-money/search/components/GlobalSearchTriggerLink'
-import { Badge } from '@play-money/ui/badge'
 import { Button } from '@play-money/ui/button'
 import { Sheet, SheetTrigger, SheetContent, SheetClose } from '@play-money/ui/sheet'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@play-money/ui/tooltip'
 import { cn } from '@play-money/ui/utils'
 import { UserNav } from '@play-money/users/components/UserNav'
 
@@ -71,14 +69,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </Sheet>
           <Link className="flex items-center gap-2" href="/">
             <span className="text-lg font-bold tracking-tight text-muted-foreground">PlayMoney</span>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge className="hidden md:block" variant="outline">
-                  ALPHA
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>All markets and balances are temporary</TooltipContent>
-            </Tooltip>
           </Link>
           <MainNav className="hidden gap-6 md:flex" />
 
