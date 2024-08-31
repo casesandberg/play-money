@@ -187,7 +187,7 @@ export function MarketOverviewPage({
         {market.tags.length ? (
           <div className="mt-2 flex flex-wrap gap-2">
             {market.tags.map((tag) => (
-              <Link href={`/questions/tagged/${tag}`}>
+              <Link href={`/questions/tagged/${tag}`} key={tag}>
                 <Badge variant="secondary">{tag}</Badge>
               </Link>
             ))}
