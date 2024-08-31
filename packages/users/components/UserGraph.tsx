@@ -2,7 +2,7 @@
 
 import { format } from 'date-fns'
 import React from 'react'
-import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip as ChartTooltip, Area } from 'recharts'
+import { AreaChart, ResponsiveContainer, YAxis, Tooltip as ChartTooltip, Area } from 'recharts'
 import useSWR from 'swr'
 import { useUserGraph } from '@play-money/api-helpers/client/hooks'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
@@ -42,6 +42,10 @@ export function getTotalAmountChange(data: Array<{ endAt: Date; startAt: Date; b
   }
 }
 
+const BALANCE_COLOR = '#333'
+const LIQUIDITY_COLOR = '#7c3aed'
+const MARKET_COLOR = '#facc15'
+
 export function UserGraph({ userId }: { userId: string }) {
   const { data: graph } = useUserGraph({ userId })
   const change = getTotalAmountChange(graph?.data || [])
@@ -68,14 +72,23 @@ export function UserGraph({ userId }: { userId: string }) {
       <div className="h-32 p-4">
         {graph?.data ? (
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart width={300} height={128} data={graph.data}>
+            <AreaChart width={300} height={128} data={graph.data}>
               <ChartTooltip
                 content={({ payload }) => {
                   const data = payload?.[0]?.payload
                   if (data) {
                     return (
-                      <Card className="p-1 text-sm">
-                        {format(data.startAt, 'MMM d, yyyy')} · <CurrencyDisplay value={data.balance} />
+                      <Card className="p-1 font-mono text-xs">
+                        <div>{format(data.startAt, 'MMM d, yyyy')}</div>
+                        <div style={{ color: MARKET_COLOR }}>
+                          In markets: <CurrencyDisplay value={data.markets} />
+                        </div>
+                        <div style={{ color: LIQUIDITY_COLOR }}>
+                          In liquidity: <CurrencyDisplay value={data.liquidity} />
+                        </div>
+                        <div style={{ color: BALANCE_COLOR }}>
+                          Balance: <CurrencyDisplay value={data.balance} />
+                        </div>
                       </Card>
                     )
                   }
@@ -83,17 +96,57 @@ export function UserGraph({ userId }: { userId: string }) {
                 }}
               />
               <YAxis type="number" domain={[0, 1]} hide />
-              <Line
+
+              <defs>
+                <linearGradient id="fillLiquidity" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={LIQUIDITY_COLOR} stopOpacity={0.8} />
+                  <stop offset="95%" stopColor={LIQUIDITY_COLOR} stopOpacity={0.0} />
+                </linearGradient>
+                <linearGradient id="fillBalance" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={BALANCE_COLOR} stopOpacity={0.8} />
+                  <stop offset="95%" stopColor={BALANCE_COLOR} stopOpacity={0.0} />
+                </linearGradient>
+                <linearGradient id="fillMarket" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={MARKET_COLOR} stopOpacity={0.8} />
+                  <stop offset="95%" stopColor={MARKET_COLOR} stopOpacity={0.0} />
+                </linearGradient>
+              </defs>
+
+              <Area
                 type="step"
-                dot={false}
                 dataKey="balance"
-                stroke={'#333'}
-                strokeWidth={2.5}
+                fillOpacity={0.4}
+                fill="url(#fillBalance)"
+                stroke={BALANCE_COLOR}
+                strokeWidth={2}
                 strokeLinejoin="round"
                 animationDuration={750}
+                stackId={1}
+              />
+              <Area
+                type="step"
+                dataKey="liquidity"
+                fill="url(#fillLiquidity)"
+                fillOpacity={0.4}
+                stroke={LIQUIDITY_COLOR}
+                strokeWidth={2}
+                strokeLinejoin="round"
+                animationDuration={750}
+                stackId={1}
+              />
+              <Area
+                type="step"
+                dataKey="markets"
+                fill="url(#fillMarket)"
+                fillOpacity={0.4}
+                stroke={MARKET_COLOR}
+                strokeWidth={2}
+                strokeLinejoin="round"
+                animationDuration={750}
+                stackId={1}
               />
               <Area dataKey="totalAmount" />
-            </LineChart>
+            </AreaChart>
           </ResponsiveContainer>
         ) : null}
       </div>
