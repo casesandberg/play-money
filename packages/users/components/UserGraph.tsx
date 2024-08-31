@@ -3,44 +3,10 @@
 import { format } from 'date-fns'
 import React from 'react'
 import { AreaChart, ResponsiveContainer, YAxis, Tooltip as ChartTooltip, Area } from 'recharts'
-import useSWR from 'swr'
 import { useUserGraph } from '@play-money/api-helpers/client/hooks'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { Card } from '@play-money/ui/card'
 import { cn } from '@play-money/ui/utils'
-
-export function getTotalAmountChange(data: Array<{ endAt: Date; startAt: Date; balance: number }>) {
-  data.forEach((point) => {
-    point.endAt = new Date(point.endAt)
-    point.startAt = new Date(point.startAt)
-  })
-
-  data.sort((a, b) => a.endAt.getTime() - b.endAt.getTime())
-
-  const now = new Date()
-  const oneWeekAgo = new Date(now)
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
-
-  let latestAmount = 0
-  let oneWeekAgoAmount = data[0]?.balance ?? 0
-
-  // Find the latest probability
-  if (data.length > 0) {
-    latestAmount = data[data.length - 1].balance
-  }
-
-  for (const item of data) {
-    if (item.endAt <= oneWeekAgo) {
-      oneWeekAgoAmount = item.balance
-      break
-    }
-  }
-
-  return {
-    latestAmount,
-    difference: (latestAmount - oneWeekAgoAmount) / oneWeekAgoAmount,
-  }
-}
 
 const BALANCE_COLOR = '#333'
 const LIQUIDITY_COLOR = '#7c3aed'
@@ -48,24 +14,24 @@ const MARKET_COLOR = '#facc15'
 
 export function UserGraph({ userId }: { userId: string }) {
   const { data: graph } = useUserGraph({ userId })
-  const change = getTotalAmountChange(graph?.data || [])
+  const latestData = graph?.data[graph.data.length - 1]
 
   return (
     <Card>
       <div className="flex flex-wrap items-center gap-x-4 px-4 pt-4">
         <div className="text-lg font-medium text-muted-foreground">
-          {change ? <CurrencyDisplay value={change.latestAmount} /> : null} Balance
+          {latestData ? <CurrencyDisplay value={latestData.balance} /> : null} Balance
         </div>
 
-        {change.difference !== 0 && !Number.isNaN(change.difference) ? (
-          <div
-            className={cn(
-              'flex-shrink-0 font-mono text-sm text-muted-foreground',
-              change.difference > 0 ? 'text-primary' : 'text-destructive'
-            )}
-          >
-            {change.difference > 0 ? '+' : ''}
-            {Math.round(change.difference * 100)}% this week
+        {latestData?.liquidity ? (
+          <div className="flex-shrink-0 font-mono text-sm" style={{ color: LIQUIDITY_COLOR }}>
+            <CurrencyDisplay value={latestData.liquidity} /> in liquidity
+          </div>
+        ) : null}
+
+        {latestData?.markets ? (
+          <div className="flex-shrink-0 font-mono text-sm" style={{ color: MARKET_COLOR }}>
+            <CurrencyDisplay value={latestData.markets} /> in markets
           </div>
         ) : null}
       </div>
