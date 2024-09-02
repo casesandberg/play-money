@@ -12,19 +12,22 @@ function calculateTrade({
   targetShare,
   totalShares,
   isBuy,
+  numOptions,
 }: {
   amount: Decimal
   targetShare: Decimal
   totalShares: Decimal
   isBuy: boolean
+  numOptions: number
 }) {
+  const avg = totalShares.div(numOptions - 1)
   if (isBuy) {
-    return amount.times(amount.add(totalShares)).div(amount.add(totalShares.sub(targetShare)))
+    return amount.times(amount.add(avg)).div(amount.add(avg.sub(targetShare)))
   }
 
-  return totalShares
+  return avg
     .add(amount)
-    .sub(Decimal.sqrt(totalShares.add(amount).pow(2).sub(totalShares.sub(targetShare).times(4).times(amount))))
+    .sub(Decimal.sqrt(avg.add(amount).pow(2).sub(avg.sub(targetShare).times(4).times(amount))))
     .times(0.5)
 }
 
@@ -86,7 +89,7 @@ export function trade({
   isBuy: boolean
 }) {
   const totalShares = sumShares(shares)
-  return calculateTrade({ amount, targetShare, totalShares, isBuy })
+  return calculateTrade({ amount, targetShare, totalShares, numOptions: shares.length, isBuy })
 }
 
 export async function quote({
@@ -108,7 +111,7 @@ export async function quote({
   let costToHitProbability = calculateProbabilityCost({ probability, targetShare, totalShares, isBuy })
   const cost = Decimal.min(costToHitProbability, amount)
 
-  const returnedShares = calculateTrade({ amount: cost, targetShare, totalShares, isBuy })
+  const returnedShares = calculateTrade({ amount: cost, targetShare, totalShares, isBuy, numOptions: shares.length })
 
   const updatedShares = shares.map((share, i) =>
     i === targetIndex ? share.sub(returnedShares).add(cost) : isBuy ? share.add(cost) : share.sub(returnedShares)
