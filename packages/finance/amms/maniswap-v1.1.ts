@@ -7,41 +7,88 @@ import Decimal from 'decimal.js'
 
  For more information, see https://manifoldmarkets.notion.site/Maniswap-ce406e1e897d417cbd491071ea8a0c39
 */
+
+function getSellDifference({
+  amount,
+  targetShareIndex,
+  shares,
+  amountReturning,
+}: {
+  amount: Decimal
+  targetShareIndex: number
+  shares: Array<Decimal>
+  amountReturning: Decimal
+}) {
+  const sharesProduct = multiplyShares(shares)
+  return sharesProduct.sub(
+    multiplyShares(
+      shares.map((share, i) =>
+        i === targetShareIndex ? share.sub(amountReturning).plus(amount) : share.sub(amountReturning)
+      )
+    )
+  )
+}
+
 function calculateTrade({
   amount,
   targetShare,
-  totalShares,
+  shares,
   isBuy,
-  numOptions,
 }: {
   amount: Decimal
   targetShare: Decimal
-  totalShares: Decimal
+  shares: Array<Decimal>
   isBuy: boolean
-  numOptions: number
 }) {
-  const avg = totalShares.div(numOptions - 1)
+  const targetShareIndex = findShareIndex(shares, targetShare)
+  const sharesWithoutTarget = shares.filter((_, i) => i !== targetShareIndex)
+
   if (isBuy) {
-    return amount.times(amount.add(avg)).div(amount.add(avg.sub(targetShare)))
+    const sharesProduct = multiplyShares(shares)
+    const sharesProductAdded = multiplyShares(sharesWithoutTarget.map((share) => share.plus(amount)))
+
+    return targetShare.plus(amount).sub(sharesProduct.div(sharesProductAdded))
   }
 
-  return avg
-    .add(amount)
-    .sub(Decimal.sqrt(avg.add(amount).pow(2).sub(avg.sub(targetShare).times(4).times(amount))))
-    .times(0.5)
+  let lowerBound = new Decimal(0)
+  let upperBound = amount
+  let amountReturning = lowerBound.plus(upperBound).div(2)
+  let difference = getSellDifference({ amount, targetShareIndex, shares, amountReturning })
+
+  let iterationCount = 0
+
+  while (upperBound.minus(lowerBound).gt(0.0001)) {
+    if (iterationCount >= 100) {
+      throw new Error('Failed to converge. Max iterations reached.')
+    }
+
+    if (difference.lessThan(0)) {
+      lowerBound = amountReturning
+    } else {
+      upperBound = amountReturning
+    }
+
+    amountReturning = lowerBound.plus(upperBound).div(2)
+    difference = getSellDifference({ amount, targetShareIndex, shares, amountReturning })
+
+    iterationCount++
+  }
+
+  return amountReturning
 }
 
 function calculateProbabilityCost({
   probability,
   targetShare,
-  totalShares,
+  shares,
   isBuy,
 }: {
   probability: Decimal
   targetShare: Decimal
-  totalShares: Decimal
+  shares: Array<Decimal>
   isBuy: boolean
 }): Decimal {
+  const totalShares = sumShares(shares)
   const totalOppositeShares = totalShares.sub(targetShare)
 
   const factor = isBuy ? probability.neg().div(probability.sub(1)) : probability.sub(1).neg().div(probability)
@@ -63,6 +110,10 @@ function findShareIndex(shares: Array<Decimal>, targetShare: Decimal): number {
 
 function sumShares(shares: Array<Decimal>) {
   return shares.reduce((sum, share) => sum.add(share), new Decimal(0))
+}
+
+function multiplyShares(shares: Array<Decimal>) {
+  return shares.reduce((sum, share) => sum.times(share), new Decimal(1))
 }
 
 export function calculateProbability({ index, shares }: { index: number; shares: Array<Decimal | number> }): Decimal {
@@ -88,8 +139,7 @@ export function trade({
   shares: Array<Decimal>
   isBuy: boolean
 }) {
-  const totalShares = sumShares(shares)
-  return calculateTrade({ amount, targetShare, totalShares, numOptions: shares.length, isBuy })
+  return calculateTrade({ amount, targetShare, shares, isBuy })
 }
 
 export async function quote({
@@ -104,14 +154,13 @@ export async function quote({
   shares: Array<Decimal>
 }): Promise<{ probability: Decimal; shares: Decimal; cost: Decimal }> {
   const targetIndex = findShareIndex(shares, targetShare)
-  const totalShares = sumShares(shares)
   const currentProbability = calculateProbability({ index: targetIndex, shares })
   const isBuy = currentProbability.lt(probability)
 
-  let costToHitProbability = calculateProbabilityCost({ probability, targetShare, totalShares, isBuy })
+  let costToHitProbability = calculateProbabilityCost({ probability, targetShare, shares, isBuy })
   const cost = Decimal.min(costToHitProbability, amount)
 
-  const returnedShares = calculateTrade({ amount: cost, targetShare, totalShares, isBuy, numOptions: shares.length })
+  const returnedShares = calculateTrade({ amount: cost, targetShare, shares, isBuy })
 
   const updatedShares = shares.map((share, i) =>
     i === targetIndex ? share.sub(returnedShares).add(cost) : isBuy ? share.add(cost) : share.sub(returnedShares)

@@ -11,8 +11,8 @@ describe('maniswap-v1.1', () => {
   describe('trade', () => {
     test.each([
       { targetShare: 100, shares: [100, 300], expected: 64.29 },
-      { targetShare: 100, shares: [100, 400, 400, 400], expected: 63.04 },
-      { targetShare: 100, shares: [100, 400, 400, 400, 400, 400, 400, 400, 400], expected: 63.79 },
+      { targetShare: 100, shares: [100, 400, 400, 400], expected: 79.76 },
+      { targetShare: 100, shares: [100, 400, 400, 400, 400, 400, 400, 400, 400], expected: 111.02 },
     ])(
       'should return $expected for buying high targetShare: $targetShare of shares: $shares',
       async ({ targetShare, shares, expected }) => {
@@ -30,8 +30,8 @@ describe('maniswap-v1.1', () => {
 
     test.each([
       { targetShare: 300, shares: [100, 300], expected: 150 },
-      { targetShare: 400, shares: [100, 400, 400, 400], expected: 290 },
-      { targetShare: 400, shares: [100, 400, 400, 400, 400, 400, 400, 400, 400], expected: 370 },
+      { targetShare: 400, shares: [100, 400, 400, 400], expected: 239.3 },
+      { targetShare: 400, shares: [100, 400, 400, 400, 400, 400, 400, 400, 400], expected: 333.07 },
     ])(
       'should return $expected for buying low targetShare: $targetShare of shares: $shares',
       async ({ targetShare, shares, expected }) => {
@@ -50,8 +50,8 @@ describe('maniswap-v1.1', () => {
     // This is the inverse of the test for buying high
     test.each([
       { targetShare: 85.71, shares: [85.71, 350], expected: 50 },
-      { targetShare: 85.71, shares: [85.71, 400, 400, 400], expected: 49.74 },
-      { targetShare: 85.71, shares: [85.71, 400, 400, 400, 400, 400, 400, 400, 400], expected: 49.05 },
+      { targetShare: 85.71, shares: [85.71, 400, 400, 400], expected: 36.13 },
+      { targetShare: 85.71, shares: [85.71, 400, 400, 400, 400, 400, 400, 400, 400], expected: 20.21 },
     ])(
       'should return $expected for selling high targetShare: $targetShare of shares: $shares',
       async ({ targetShare, shares, expected }) => {
@@ -70,8 +70,8 @@ describe('maniswap-v1.1', () => {
     // This is the inverse of the test for buying low
     test.each([
       { targetShare: 200, shares: [150, 200], expected: 50 },
-      { targetShare: 200, shares: [150, 200, 450, 450], expected: 64.75 },
-      { targetShare: 200, shares: [150, 200, 450, 450, 450, 450, 450, 450, 450], expected: 68.66 },
+      { targetShare: 200, shares: [150, 200, 450, 450], expected: 36.58 },
+      { targetShare: 200, shares: [150, 200, 450, 450, 450, 450, 450, 450, 450], expected: 21.45 },
     ])(
       'should return $expected for selling low targetShare: $targetShare of shares: $shares',
       async ({ targetShare, shares, expected }) => {
@@ -213,8 +213,8 @@ describe('maniswap-v1.1', () => {
         shares: [new Decimal(200), new Decimal(200), new Decimal(200)],
       })
 
-      expect(result.probability).toBeCloseToDecimal(0.57)
-      expect(result.shares).toBeCloseToDecimal(116.66)
+      expect(result.probability).toBeCloseToDecimal(0.59)
+      expect(result.shares).toBeCloseToDecimal(122)
     })
 
     // Inverse of previous buy
@@ -222,12 +222,12 @@ describe('maniswap-v1.1', () => {
       const result = await quote({
         amount: new Decimal(116.66),
         probability: new Decimal(0.01),
-        targetShare: new Decimal(133.34),
-        shares: [new Decimal(133.34), new Decimal(250), new Decimal(250)],
+        targetShare: new Decimal(128),
+        shares: [new Decimal(128), new Decimal(250), new Decimal(250)],
       })
 
-      expect(result.probability).toBeCloseToDecimal(0.33)
-      expect(result.shares).toBeCloseToDecimal(56.8)
+      expect(result.probability).toBeCloseToDecimal(0.34)
+      expect(result.shares).toBeCloseToDecimal(48.2)
     })
   })
 
