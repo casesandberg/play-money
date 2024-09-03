@@ -8,7 +8,7 @@ import Decimal from 'decimal.js'
  For more information, see https://manifoldmarkets.notion.site/Maniswap-ce406e1e897d417cbd491071ea8a0c39
 */
 
-function getSellDifference({
+function calculateSellDifference({
   amount,
   targetShareIndex,
   shares,
@@ -27,54 +27,6 @@ function getSellDifference({
       )
     )
   )
-}
-
-function calculateTrade({
-  amount,
-  targetShare,
-  shares,
-  isBuy,
-}: {
-  amount: Decimal
-  targetShare: Decimal
-  shares: Array<Decimal>
-  isBuy: boolean
-}) {
-  const targetShareIndex = findShareIndex(shares, targetShare)
-  const sharesWithoutTarget = shares.filter((_, i) => i !== targetShareIndex)
-
-  if (isBuy) {
-    const sharesProduct = multiplyShares(shares)
-    const sharesProductAdded = multiplyShares(sharesWithoutTarget.map((share) => share.plus(amount)))
-
-    return targetShare.plus(amount).sub(sharesProduct.div(sharesProductAdded))
-  }
-
-  let lowerBound = new Decimal(0)
-  let upperBound = amount
-  let amountReturning = lowerBound.plus(upperBound).div(2)
-  let difference = getSellDifference({ amount, targetShareIndex, shares, amountReturning })
-
-  let iterationCount = 0
-
-  while (upperBound.minus(lowerBound).gt(0.0001)) {
-    if (iterationCount >= 100) {
-      throw new Error('Failed to converge. Max iterations reached.')
-    }
-
-    if (difference.lessThan(0)) {
-      lowerBound = amountReturning
-    } else {
-      upperBound = amountReturning
-    }
-
-    amountReturning = lowerBound.plus(upperBound).div(2)
-    difference = getSellDifference({ amount, targetShareIndex, shares, amountReturning })
-
-    iterationCount++
-  }
-
-  return amountReturning
 }
 
 function calculateProbabilityCost({
@@ -108,8 +60,8 @@ function findShareIndex(shares: Array<Decimal>, targetShare: Decimal): number {
   return shares.findIndex((share) => share.eq(targetShare))
 }
 
-function sumShares(shares: Array<Decimal>) {
-  return shares.reduce((sum, share) => sum.add(share), new Decimal(0))
+function sumShares(shares: Array<Decimal | number>) {
+  return shares.reduce<Decimal>((sum, share) => sum.add(share), new Decimal(0))
 }
 
 function multiplyShares(shares: Array<Decimal>) {
@@ -118,14 +70,42 @@ function multiplyShares(shares: Array<Decimal>) {
 
 export function calculateProbability({ index, shares }: { index: number; shares: Array<Decimal | number> }): Decimal {
   const indexShares = shares[index]
-
-  // Calculate the sum of the shares of each index
-  const sum = shares.reduce<Decimal>((sum, share) => sum.plus(share), new Decimal(0))
+  const sum = sumShares(shares)
 
   // The probability for the given index is one minus the share count at the index times the number of dimensions divided by the sum of all shares
-  const probability = new Decimal(1).sub(new Decimal(indexShares).mul(shares.length - 1).div(sum))
+  return new Decimal(1).sub(new Decimal(indexShares).mul(shares.length - 1).div(sum))
+}
 
-  return probability
+function binarySearch(
+  evaluate: (mid: Decimal) => Decimal,
+  low: Decimal,
+  high: Decimal,
+  tolerance: Decimal = new Decimal('0.0001'),
+  maxIterations: number = 100
+): Decimal {
+  let iterationCount = 0
+  while (high.minus(low).gt(tolerance)) {
+    if (iterationCount >= maxIterations) {
+      throw new Error('Failed to converge. Max iterations reached.')
+    }
+
+    const mid = low.plus(high).div(2)
+    const result = evaluate(mid)
+
+    if (result.abs().lte(tolerance)) {
+      // If we're very close to zero, favor the upper bound
+      return high
+    } else if (result.lessThan(0)) {
+      low = mid
+    } else {
+      high = mid
+    }
+
+    iterationCount++
+  }
+
+  // Return the upper bound to ensure largest possible value
+  return high
 }
 
 export function trade({
@@ -139,7 +119,21 @@ export function trade({
   shares: Array<Decimal>
   isBuy: boolean
 }) {
-  return calculateTrade({ amount, targetShare, shares, isBuy })
+  const targetShareIndex = findShareIndex(shares, targetShare)
+  const sharesWithoutTarget = shares.filter((_, i) => i !== targetShareIndex)
+
+  if (isBuy) {
+    const sharesProduct = multiplyShares(shares)
+    const sharesProductAdded = multiplyShares(sharesWithoutTarget.map((share) => share.plus(amount)))
+
+    return targetShare.plus(amount).sub(sharesProduct.div(sharesProductAdded))
+  }
+
+  return binarySearch(
+    (amountReturning: Decimal) => calculateSellDifference({ amount, targetShareIndex, shares, amountReturning }),
+    new Decimal(0),
+    amount
+  )
 }
 
 export async function quote({
@@ -160,7 +154,7 @@ export async function quote({
   let costToHitProbability = calculateProbabilityCost({ probability, targetShare, shares, isBuy })
   const cost = Decimal.min(costToHitProbability, amount)
 
-  const returnedShares = calculateTrade({ amount: cost, targetShare, shares, isBuy })
+  const returnedShares = trade({ amount: cost, targetShare, shares, isBuy })
 
   const updatedShares = shares.map((share, i) =>
     i === targetIndex ? share.sub(returnedShares).add(cost) : isBuy ? share.add(cost) : share.sub(returnedShares)
