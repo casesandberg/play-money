@@ -120,15 +120,18 @@ export function trade({
   isBuy: boolean
 }) {
   const targetShareIndex = findShareIndex(shares, targetShare)
-  const sharesWithoutTarget = shares.filter((_, i) => i !== targetShareIndex)
 
+  // (num shares of buying) + (amount of currency buying) - (product of all share nums)/(product of for each option, sum of option and the amount of currency buying)
+  // When buying x: returnAmount = x + a - xyz/((y+a)(z+a))
   if (isBuy) {
     const sharesProduct = multiplyShares(shares)
+    const sharesWithoutTarget = shares.filter((_, i) => i !== targetShareIndex)
     const sharesProductAdded = multiplyShares(sharesWithoutTarget.map((share) => share.plus(amount)))
 
     return targetShare.plus(amount).sub(sharesProduct.div(sharesProductAdded))
   }
 
+  // When selling n dimensions doesn't have a closed form, so we use binary search to find the amount to sell
   return binarySearch(
     (amountReturning: Decimal) => calculateSellDifference({ amount, targetShareIndex, shares, amountReturning }),
     new Decimal(0),
