@@ -57,7 +57,7 @@ export async function addLiquidity({
     await db.market.update({
       where: { id: marketId },
       data: {
-        uniquePromotersCount: { increment: amount },
+        uniquePromotersCount: { increment: amount.toNumber() },
       },
     })
   }

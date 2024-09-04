@@ -59,7 +59,7 @@ async function main() {
             id: market.id,
           },
           data: {
-            liquidityCount: data._sum.amount,
+            liquidityCount: data._sum.amount?.toNumber(),
           },
         })
         console.log(`Successfully added liquidity count to market with id: ${market.id}`)

@@ -11,9 +11,9 @@ export const MarketOptionSchema = z.object({
   marketId: z.string(),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
   liquidityProbability: z.instanceof(Prisma.Decimal, { message: "Field 'liquidityProbability' must be a Decimal. Location: ['Models', 'MarketOption']"}),
-  probability: z.instanceof(Prisma.Decimal, { message: "Field 'probability' must be a Decimal. Location: ['Models', 'MarketOption']"}).nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  probability: z.number().int().nullable(),
 })
 
 export type MarketOption = z.infer<typeof MarketOptionSchema>

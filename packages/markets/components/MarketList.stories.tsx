@@ -30,38 +30,34 @@ export const WithLongText: Story = {
       mockExtendedMarket({
         question: faker.lorem.sentence(30),
         options: [
-          { ...mockMarketOption({ id: '1', name: faker.lorem.sentence(8) }), probability: new Decimal(0.65) },
-          { ...mockMarketOption({ id: '2', name: faker.lorem.sentence(8) }), probability: new Decimal(0.35) },
+          mockMarketOption({ id: '1', name: faker.lorem.sentence(8), probability: 0.65 }),
+          mockMarketOption({ id: '2', name: faker.lorem.sentence(8), probability: 0.35 }),
         ],
         marketResolution: {
           ...mockMarketResolution(),
-          resolution: {
-            ...mockMarketOption({
-              id: '2',
-              name: faker.lorem.sentence(8),
-              color: '#EC4899',
-            }),
-            probability: new Decimal(0.65),
-          },
+          resolution: mockMarketOption({
+            id: '2',
+            name: faker.lorem.sentence(8),
+            color: '#EC4899',
+            probability: 0.65,
+          }),
           resolvedBy: mockUser(),
         },
       }),
       mockExtendedMarket({
         question: faker.lorem.sentence(30),
         options: [
-          { ...mockMarketOption({ id: '1', name: faker.lorem.sentence(8) }), probability: new Decimal(0.65) },
-          { ...mockMarketOption({ id: '2', name: faker.lorem.sentence(8) }), probability: new Decimal(0.35) },
+          mockMarketOption({ id: '1', name: faker.lorem.sentence(8), probability: 0.65 }),
+          mockMarketOption({ id: '2', name: faker.lorem.sentence(8), probability: 0.35 }),
         ],
         marketResolution: {
           ...mockMarketResolution(),
-          resolution: {
-            ...mockMarketOption({
-              id: '2',
-              name: faker.lorem.sentence(8),
-              color: '#EC4899',
-            }),
-            probability: new Decimal(0.65),
-          },
+          resolution: mockMarketOption({
+            id: '2',
+            name: faker.lorem.sentence(8),
+            color: '#EC4899',
+            probability: 0.65,
+          }),
           resolvedBy: mockUser(),
         },
       }),
