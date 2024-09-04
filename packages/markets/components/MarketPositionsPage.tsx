@@ -22,7 +22,7 @@ export function MarketPositionsPage({
   const simplyIfTwoOptions = market.options.length === 2
 
   const mostLikelyOption = market.options.reduce((prev, current) =>
-    prev.probability > current.probability ? prev : current
+    (prev.probability || 0) > (current.probability || 0) ? prev : current
   )
 
   return (
@@ -34,7 +34,7 @@ export function MarketPositionsPage({
         <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 font-mono text-sm text-muted-foreground md:flex-nowrap">
           {!market.marketResolution ? (
             <div style={{ color: mostLikelyOption.color }} className="flex-shrink-0 font-medium">
-              {mostLikelyOption.probability}% {_.truncate(mostLikelyOption.name, { length: 30 })}
+              {Math.round(mostLikelyOption.probability || 0)}% {_.truncate(mostLikelyOption.name, { length: 30 })}
             </div>
           ) : null}
 
