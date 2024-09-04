@@ -40,6 +40,17 @@ export async function createMarketBuyTransaction({
       const [balances] = await Promise.all([
         updateMarketBalances({ ...txParams, marketId }),
         updateMarketPositionValues({ ...txParams, marketId }),
+        // Update the liquidity count cache
+        txParams.tx.market.update({
+          where: {
+            id: marketId,
+          },
+          data: {
+            liquidityCount: {
+              increment: amount,
+            },
+          },
+        }),
       ])
 
       await updateMarketOptionProbabilities({ ...txParams, balances })

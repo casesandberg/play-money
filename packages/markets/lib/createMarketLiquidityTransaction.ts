@@ -68,6 +68,16 @@ export async function createMarketLiquidityTransaction({
     entries,
     marketId,
     additionalLogic: async (txParams) => {
+      txParams.tx.market.update({
+        where: {
+          id: marketId,
+        },
+        data: {
+          liquidityCount: {
+            increment: amount,
+          },
+        },
+      })
       const balances = await updateMarketBalances({ ...txParams, marketId })
       await updateMarketOptionProbabilities({ ...txParams, balances })
     },

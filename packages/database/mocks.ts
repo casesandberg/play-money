@@ -70,6 +70,10 @@ export function mockMarket(overrides?: Partial<Market>): Market {
     createdBy: faker.string.uuid(),
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
+    liquidityCount: new Decimal(faker.string.numeric({ length: { min: 4, max: 5 } })),
+    commentCount: new Decimal(faker.string.numeric({ length: { min: 0, max: 1 } })),
+    uniqueTradersCount: new Decimal(faker.string.numeric({ length: { min: 0, max: 1 } })),
+    uniquePromotersCount: new Decimal(faker.string.numeric({ length: { min: 0, max: 1 } })),
     ...overrides,
   }
 }
@@ -80,8 +84,14 @@ export function mockExtendedMarket(overrides?: Partial<ExtendedMarket>): Extende
     createdBy: user.id,
   })
 
-  const yesOption = { ...mockMarketOption({ id: '1', name: 'Yes', marketId: market.id }), probability: 0.65 }
-  const noOption = { ...mockMarketOption({ id: '2', name: 'No', marketId: market.id }), probability: 0.35 }
+  const yesOption = {
+    ...mockMarketOption({ id: '1', name: 'Yes', marketId: market.id }),
+    probability: new Decimal(0.65),
+  }
+  const noOption = {
+    ...mockMarketOption({ id: '2', name: 'No', marketId: market.id }),
+    probability: new Decimal(0.35),
+  }
 
   return {
     ...market,
@@ -169,6 +179,7 @@ export function mockMarketOption(overrides?: Partial<MarketOption>): MarketOptio
     marketId: faker.string.uuid(),
     createdAt: faker.date.past(),
     updatedAt: faker.date.past(),
+    probability: new Decimal(0.5),
     ...overrides,
   }
 }

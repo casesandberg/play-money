@@ -1,6 +1,5 @@
 import db, { Market } from '@play-money/database'
 import { ExtendedMarket } from '../types'
-import { getMarketClearingAccount } from './getMarketClearingAccount'
 
 interface MarketFilterOptions {
   createdBy?: string
@@ -46,25 +45,11 @@ export async function getMarkets(
 
   return Promise.all(
     markets.map(async (market) => {
-      const clearingAccount = await getMarketClearingAccount({ marketId: market.id })
-      const [commentCount, liquidityCount, uniqueTraders] = await Promise.all([
+      const [commentCount, uniqueTraders] = await Promise.all([
         db.comment.count({
           where: {
             entityType: 'MARKET',
             entityId: market.id,
-          },
-        }),
-        db.transactionEntry.aggregate({
-          _sum: {
-            amount: true,
-          },
-          where: {
-            toAccountId: clearingAccount.id,
-            assetType: 'CURRENCY',
-            assetId: 'PRIMARY',
-            transaction: {
-              marketId: market.id,
-            },
           },
         }),
         db.transaction.groupBy({
@@ -80,7 +65,6 @@ export async function getMarkets(
       return {
         ...market,
         commentCount,
-        liquidityCount: liquidityCount._sum.amount?.toNumber(),
         uniqueTraderCount: uniqueTraders.length,
       }
     })

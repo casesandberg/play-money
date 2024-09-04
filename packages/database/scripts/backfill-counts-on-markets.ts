@@ -4,7 +4,7 @@ import db from '../prisma'
 
 async function main() {
   try {
-    const markets = await db.market.findMany({
+    const marketsWithoutProbabilities = await db.market.findMany({
       where: {
         options: {
           some: {
@@ -14,9 +14,9 @@ async function main() {
       },
     })
 
-    console.log(`Found ${markets.length} markets without probabilities.`)
+    console.log(`Found ${marketsWithoutProbabilities.length} markets without probabilities.`)
 
-    for await (const market of markets) {
+    for await (const market of marketsWithoutProbabilities) {
       try {
         const balances = await getMarketBalances({ marketId: market.id, accountId: market.ammAccountId })
 
@@ -27,6 +27,45 @@ async function main() {
       } catch (updateError) {
         const error = updateError as Error
         console.error(`Failed to add probabilities to id: ${market.id}. Error: ${error.message}`)
+      }
+    }
+
+    const marketsWithoutLiquidity = await db.market.findMany({
+      where: {
+        liquidityCount: null,
+      },
+    })
+
+    console.log(`Found ${marketsWithoutLiquidity.length} markets without liquidity count.`)
+
+    for await (const market of marketsWithoutLiquidity) {
+      try {
+        const data = await db.transactionEntry.aggregate({
+          _sum: {
+            amount: true,
+          },
+          where: {
+            toAccountId: market.clearingAccountId,
+            assetType: 'CURRENCY',
+            assetId: 'PRIMARY',
+            transaction: {
+              marketId: market.id,
+            },
+          },
+        })
+
+        await db.market.update({
+          where: {
+            id: market.id,
+          },
+          data: {
+            liquidityCount: data._sum.amount,
+          },
+        })
+        console.log(`Successfully added liquidity count to market with id: ${market.id}`)
+      } catch (updateError) {
+        const error = updateError as Error
+        console.error(`Failed to add liquidity count to id: ${market.id}. Error: ${error.message}`)
       }
     }
   } catch (fetchError) {
