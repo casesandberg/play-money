@@ -79,7 +79,7 @@ export async function createMarketLiquidityTransaction({
         },
       })
       const balances = await updateMarketBalances({ ...txParams, marketId })
-      await updateMarketOptionProbabilities({ ...txParams, balances })
+      await updateMarketOptionProbabilities({ ...txParams, balances, marketId })
     },
   })
 

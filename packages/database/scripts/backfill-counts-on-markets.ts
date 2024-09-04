@@ -21,7 +21,7 @@ async function main() {
         const balances = await getMarketBalances({ marketId: market.id, accountId: market.ammAccountId })
 
         await db.$transaction(async (tx) => {
-          await updateMarketOptionProbabilities({ tx, balances })
+          await updateMarketOptionProbabilities({ tx, balances, marketId: market.id })
         })
         console.log(`Successfully added probabilities to market with id: ${market.id}`)
       } catch (updateError) {

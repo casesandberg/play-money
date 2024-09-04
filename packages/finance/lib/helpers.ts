@@ -105,12 +105,11 @@ export function marketOptionBalancesToProbabilities(balances: Array<NetBalance |
       })
         .times(100)
         .toDecimalPlaces(2)
-        .toNumber()
 
-      if (isNaN(probability)) {
+      if (probability.isNaN()) {
         result[assetBalance.assetId] = 0
       } else {
-        result[assetBalance.assetId] = probability
+        result[assetBalance.assetId] = probability.toNumber()
       }
 
       return result

@@ -53,7 +53,7 @@ export async function createMarketBuyTransaction({
         }),
       ])
 
-      await updateMarketOptionProbabilities({ ...txParams, balances })
+      await updateMarketOptionProbabilities({ ...txParams, balances, marketId })
     },
   })
 
