@@ -138,6 +138,38 @@ async function main() {
         console.error(`Failed to add unique promoters count to id: ${market.id}. Error: ${error.message}`)
       }
     }
+
+    const marketsWithoutCommentsCount = await db.market.findMany({
+      where: {
+        commentCount: null,
+      },
+    })
+
+    console.log(`Found ${marketsWithoutCommentsCount.length} markets without comments count.`)
+
+    for await (const market of marketsWithoutCommentsCount) {
+      try {
+        const data = await db.comment.aggregate({
+          where: {
+            entityId: market.id,
+          },
+          _count: true,
+        })
+
+        await db.market.update({
+          where: {
+            id: market.id,
+          },
+          data: {
+            commentCount: data._count,
+          },
+        })
+        console.log(`Successfully added comments count to market with id: ${market.id}`)
+      } catch (updateError) {
+        const error = updateError as Error
+        console.error(`Failed to add comments count to id: ${market.id}. Error: ${error.message}`)
+      }
+    }
   } catch (fetchError) {
     const error = fetchError as Error
     console.error(`An error occurred while fetching markets: ${error.message}`)

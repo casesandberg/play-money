@@ -21,7 +21,7 @@ export async function getMarkets(
   sort: SortOptions = { field: 'createdAt', direction: 'desc' },
   pagination: PaginationOptions = { skip: 0, take: 10 }
 ): Promise<Array<Market | ExtendedMarket>> {
-  const markets = await db.market.findMany({
+  return db.market.findMany({
     where: {
       createdBy: filters.createdBy,
       tags: filters.tag ? { has: filters.tag } : undefined,
@@ -42,22 +42,4 @@ export async function getMarkets(
     skip: pagination.skip,
     take: pagination.take,
   })
-
-  return Promise.all(
-    markets.map(async (market) => {
-      const [commentCount] = await Promise.all([
-        db.comment.count({
-          where: {
-            entityType: 'MARKET',
-            entityId: market.id,
-          },
-        }),
-      ])
-
-      return {
-        ...market,
-        commentCount,
-      }
-    })
-  )
 }

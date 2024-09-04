@@ -43,6 +43,19 @@ export async function createComment({
     })
   }
 
+  if (entityType === 'MARKET') {
+    await db.market.update({
+      where: {
+        id: entityId,
+      },
+      data: {
+        commentCount: {
+          increment: 1,
+        },
+      },
+    })
+  }
+
   // TODO switch this to watchers of the market.
   const recipientIds = await getUniqueLiquidityProviderIds(market.id, [authorId, comment.parent?.authorId])
 
