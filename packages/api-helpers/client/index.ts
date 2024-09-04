@@ -90,7 +90,7 @@ export async function getMyBalance() {
 
 export async function getMarkets({ tag }: { tag?: string } = {}) {
   return apiHandler<{
-    markets: Array<ExtendedMarket & { commentCount: number; uniqueTraderCount: number }>
+    markets: Array<ExtendedMarket & { commentCount: number }>
   }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets${tag ? `?tag=${tag}` : ''}`, {
     next: { tags: ['markets'] },
   })

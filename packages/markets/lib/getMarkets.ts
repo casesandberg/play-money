@@ -45,27 +45,18 @@ export async function getMarkets(
 
   return Promise.all(
     markets.map(async (market) => {
-      const [commentCount, uniqueTraders] = await Promise.all([
+      const [commentCount] = await Promise.all([
         db.comment.count({
           where: {
             entityType: 'MARKET',
             entityId: market.id,
           },
         }),
-        db.transaction.groupBy({
-          by: ['initiatorId'],
-          where: {
-            marketId: market.id,
-            type: 'TRADE_BUY',
-          },
-          _count: true,
-        }),
       ])
 
       return {
         ...market,
         commentCount,
-        uniqueTraderCount: uniqueTraders.length,
       }
     })
   )

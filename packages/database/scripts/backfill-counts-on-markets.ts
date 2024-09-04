@@ -68,6 +68,40 @@ async function main() {
         console.error(`Failed to add liquidity count to id: ${market.id}. Error: ${error.message}`)
       }
     }
+
+    const marketsWithoutUniqueTraders = await db.market.findMany({
+      where: {
+        uniqueTradersCount: null,
+      },
+    })
+
+    console.log(`Found ${marketsWithoutUniqueTraders.length} markets without unique traders count.`)
+
+    for await (const market of marketsWithoutUniqueTraders) {
+      try {
+        const data = await db.transaction.groupBy({
+          by: ['initiatorId'],
+          where: {
+            marketId: market.id,
+            type: 'TRADE_BUY',
+          },
+          _count: true,
+        })
+
+        await db.market.update({
+          where: {
+            id: market.id,
+          },
+          data: {
+            uniqueTradersCount: data.length,
+          },
+        })
+        console.log(`Successfully added unique traders count to market with id: ${market.id}`)
+      } catch (updateError) {
+        const error = updateError as Error
+        console.error(`Failed to add unique traders count to id: ${market.id}. Error: ${error.message}`)
+      }
+    }
   } catch (fetchError) {
     const error = fetchError as Error
     console.error(`An error occurred while fetching markets: ${error.message}`)

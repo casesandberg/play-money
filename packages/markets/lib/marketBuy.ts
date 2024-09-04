@@ -58,6 +58,12 @@ export async function marketBuy({
         marketId,
       }),
       createMarketTraderBonusTransactions({ marketId }),
+      db.market.update({
+        where: { id: marketId },
+        data: {
+          uniqueTradersCount: { increment: 1 },
+        },
+      }),
     ])
   }
 

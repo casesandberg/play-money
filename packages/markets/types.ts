@@ -2,11 +2,11 @@ import { Market, MarketOption, MarketResolution, User } from '@play-money/databa
 
 export type ExtendedMarket = Omit<
   Market,
-  'liquidityCount' | 'commentCount' | 'uniqueTraderCount' | 'uniquePromotersCount'
+  'liquidityCount' | 'commentCount' | 'uniqueTradersCount' | 'uniquePromotersCount'
 > & {
   liquidityCount?: number
   commentCount?: number
-  uniqueTraderCount?: number
+  uniqueTradersCount?: number
   uniquePromotersCount?: number
 
   user: User

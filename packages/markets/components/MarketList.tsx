@@ -48,12 +48,12 @@ export function MarketList({ markets }: { markets: Array<ExtendedMarket> }) {
                   </Tooltip>
                 ) : null}
 
-                {market.uniqueTraderCount ? (
+                {market.uniqueTradersCount ? (
                   <Tooltip>
                     <TooltipTrigger>
                       <div className="flex items-center gap-1">
                         <UsersIcon className="size-3" strokeWidth={3} />
-                        {market.uniqueTraderCount}
+                        {market.uniqueTradersCount}
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>Traders</TooltipContent>
