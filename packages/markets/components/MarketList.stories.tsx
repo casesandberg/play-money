@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker'
 import type { Meta, StoryObj } from '@storybook/react'
+import Decimal from 'decimal.js'
 import { mockExtendedMarket, mockMarketOption, mockMarketResolution, mockUser } from '@play-money/database/mocks'
 import { MarketList } from './MarketList'
 
@@ -14,36 +15,11 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   args: {
     markets: [
-      {
-        ...mockExtendedMarket(),
-        commentCount: 4,
-        liquidityCount: 4200,
-        uniqueTraderCount: 4,
-      },
-      {
-        ...mockExtendedMarket(),
-        commentCount: 0,
-        liquidityCount: 1000,
-        uniqueTraderCount: 0,
-      },
-      {
-        ...mockExtendedMarket(),
-        commentCount: 0,
-        liquidityCount: 1200,
-        uniqueTraderCount: 1,
-      },
-      {
-        ...mockExtendedMarket(),
-        commentCount: 2,
-        liquidityCount: 1400200,
-        uniqueTraderCount: 4124,
-      },
-      {
-        ...mockExtendedMarket(),
-        commentCount: 70,
-        liquidityCount: 1295,
-        uniqueTraderCount: 3,
-      },
+      mockExtendedMarket(),
+      mockExtendedMarket(),
+      mockExtendedMarket(),
+      mockExtendedMarket(),
+      mockExtendedMarket(),
     ],
   },
 }
@@ -51,54 +27,40 @@ export const Default: Story = {
 export const WithLongText: Story = {
   args: {
     markets: [
-      {
-        ...mockExtendedMarket({
-          question: faker.lorem.sentence(30),
-          options: [
-            { ...mockMarketOption({ id: '1', name: faker.lorem.sentence(8) }), probability: 0.65 },
-            { ...mockMarketOption({ id: '2', name: faker.lorem.sentence(8) }), probability: 0.35 },
-          ],
-          marketResolution: {
-            ...mockMarketResolution(),
-            resolution: {
-              ...mockMarketOption({
-                id: '2',
-                name: faker.lorem.sentence(8),
-                color: '#EC4899',
-              }),
-              probability: 0.65,
-            },
-            resolvedBy: mockUser(),
-          },
-        }),
-        commentCount: 4,
-        liquidityCount: 4200,
-        uniqueTraderCount: 4,
-      },
-      {
-        ...mockExtendedMarket({
-          question: faker.lorem.sentence(30),
-          options: [
-            { ...mockMarketOption({ id: '1', name: faker.lorem.sentence(8) }), probability: 0.65 },
-            { ...mockMarketOption({ id: '2', name: faker.lorem.sentence(8) }), probability: 0.35 },
-          ],
-          marketResolution: {
-            ...mockMarketResolution(),
-            resolution: {
-              ...mockMarketOption({
-                id: '2',
-                name: faker.lorem.sentence(8),
-                color: '#EC4899',
-              }),
-              probability: 0.65,
-            },
-            resolvedBy: mockUser(),
-          },
-        }),
-        commentCount: 0,
-        liquidityCount: 1000,
-        uniqueTraderCount: 0,
-      },
+      mockExtendedMarket({
+        question: faker.lorem.sentence(30),
+        options: [
+          mockMarketOption({ id: '1', name: faker.lorem.sentence(8), probability: 0.65 }),
+          mockMarketOption({ id: '2', name: faker.lorem.sentence(8), probability: 0.35 }),
+        ],
+        marketResolution: {
+          ...mockMarketResolution(),
+          resolution: mockMarketOption({
+            id: '2',
+            name: faker.lorem.sentence(8),
+            color: '#EC4899',
+            probability: 0.65,
+          }),
+          resolvedBy: mockUser(),
+        },
+      }),
+      mockExtendedMarket({
+        question: faker.lorem.sentence(30),
+        options: [
+          mockMarketOption({ id: '1', name: faker.lorem.sentence(8), probability: 0.65 }),
+          mockMarketOption({ id: '2', name: faker.lorem.sentence(8), probability: 0.35 }),
+        ],
+        marketResolution: {
+          ...mockMarketResolution(),
+          resolution: mockMarketOption({
+            id: '2',
+            name: faker.lorem.sentence(8),
+            color: '#EC4899',
+            probability: 0.65,
+          }),
+          resolvedBy: mockUser(),
+        },
+      }),
     ],
   },
 }

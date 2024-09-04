@@ -5,16 +5,12 @@ import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@play-money/ui/tooltip'
 import { ExtendedMarket } from '../types'
 
-export function MarketList({
-  markets,
-}: {
-  markets: Array<ExtendedMarket & { commentCount: number; liquidityCount: number; uniqueTraderCount: number }>
-}) {
+export function MarketList({ markets }: { markets: Array<ExtendedMarket> }) {
   return (
     <div className="flex-1 space-y-4">
       {markets.map((market) => {
         const mostLikelyOption = market.options.reduce((prev, current) =>
-          prev.probability > current.probability ? prev : current
+          (prev.probability || 0) > (current.probability || 0) ? prev : current
         )
 
         return (
@@ -34,7 +30,7 @@ export function MarketList({
                   </div>
                 ) : (
                   <div style={{ color: mostLikelyOption.color }} className="flex-shrink-0 font-medium">
-                    {mostLikelyOption.probability}% {mostLikelyOption.name}
+                    {Math.round(mostLikelyOption.probability || 0)}% {mostLikelyOption.name}
                   </div>
                 )}
               </div>
@@ -52,12 +48,12 @@ export function MarketList({
                   </Tooltip>
                 ) : null}
 
-                {market.uniqueTraderCount ? (
+                {market.uniqueTradersCount ? (
                   <Tooltip>
                     <TooltipTrigger>
                       <div className="flex items-center gap-1">
                         <UsersIcon className="size-3" strokeWidth={3} />
-                        {market.uniqueTraderCount}
+                        {market.uniqueTradersCount}
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>Traders</TooltipContent>

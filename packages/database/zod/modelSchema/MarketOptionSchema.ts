@@ -13,6 +13,7 @@ export const MarketOptionSchema = z.object({
   liquidityProbability: z.instanceof(Prisma.Decimal, { message: "Field 'liquidityProbability' must be a Decimal. Location: ['Models', 'MarketOption']"}),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  probability: z.number().int().nullable(),
 })
 
 export type MarketOption = z.infer<typeof MarketOptionSchema>

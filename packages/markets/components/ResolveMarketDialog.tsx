@@ -75,7 +75,7 @@ export const ResolveMarketDialog = ({
                         <div key={option.id} className="flex items-center space-x-2" style={{ color: option.color }}>
                           <RadioGroupItem value={option.id} id={option.id} />
                           <Label htmlFor={option.id}>
-                            {option.name} ({option.probability}%)
+                            {option.name} ({Math.round(option.probability || 0)}%)
                           </Label>
                         </div>
                       ))}
