@@ -6,12 +6,12 @@ import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
 import { createMarketBuy, getMarketQuote } from '@play-money/api-helpers/client'
+import { MarketOption } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
 import { toast } from '@play-money/ui/use-toast'
 import { cn } from '@play-money/ui/utils'
-import { ExtendedMarketOption } from '../types'
 
 const FormSchema = z.object({
   amount: z.coerce.number().min(1, { message: 'Amount must be greater than zero' }),
@@ -26,7 +26,7 @@ export function MarketBuyForm({
   onComplete,
 }: {
   marketId: string
-  option: ExtendedMarketOption
+  option: MarketOption
   hasOutcome?: boolean
   onComplete?: () => void
 }) {

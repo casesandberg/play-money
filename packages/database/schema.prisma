@@ -79,25 +79,29 @@ model Session {
 }
 
 model Market {
-  id                String                 @id @default(cuid())
-  question          String /// @zod.string.min(1, { message: "Question is required" })
-  description       String
-  slug              String /// @zod.string.min(1, { message: "Slug is required" })
-  closeDate         DateTime?
-  resolvedAt        DateTime?
-  transactions      Transaction[]
-  createdBy         String
-  tags              String[]               @default([]) /// @zod.string.array(.max(5))
-  user              User                   @relation(fields: [createdBy], references: [id])
-  ammAccountId      String                 @unique
-  ammAccount        Account                @relation("MarketAMMAccount", fields: [ammAccountId], references: [id])
-  clearingAccountId String                 @unique
-  clearingAccount   Account                @relation("MarketClearingAccount", fields: [clearingAccountId], references: [id])
-  accounts          Account[]              @relation("MarketAccounts")
-  options           MarketOption[]         @relation()
-  marketResolution  MarketResolution?
-  balances          Balance[]
-  positions         MarketOptionPosition[]
+  id                   String                 @id @default(cuid())
+  question             String /// @zod.string.min(1, { message: "Question is required" })
+  description          String
+  slug                 String /// @zod.string.min(1, { message: "Slug is required" })
+  closeDate            DateTime?
+  resolvedAt           DateTime?
+  transactions         Transaction[]
+  createdBy            String
+  tags                 String[]               @default([]) /// @zod.string.array(.max(5))
+  user                 User                   @relation(fields: [createdBy], references: [id])
+  ammAccountId         String                 @unique
+  ammAccount           Account                @relation("MarketAMMAccount", fields: [ammAccountId], references: [id])
+  clearingAccountId    String                 @unique
+  clearingAccount      Account                @relation("MarketClearingAccount", fields: [clearingAccountId], references: [id])
+  accounts             Account[]              @relation("MarketAccounts")
+  options              MarketOption[]         @relation()
+  marketResolution     MarketResolution?
+  balances             Balance[]
+  positions            MarketOptionPosition[]
+  commentCount         Decimal?
+  uniqueTradersCount   Decimal?
+  uniquePromotersCount Decimal?
+  liquidityCount       Decimal?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -129,6 +133,7 @@ model MarketOption {
   market               Market                 @relation(fields: [marketId], references: [id])
   color                String                 @default("#FF00FF") /// @zod.string.regex(/^#[0-9A-Fa-f]{6}$/)
   liquidityProbability Decimal                @default(0.5)
+  probability          Decimal?
   resolutions          MarketResolution[]
   createdAt            DateTime               @default(now())
   updatedAt            DateTime               @updatedAt

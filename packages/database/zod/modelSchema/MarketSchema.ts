@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Prisma } from '@prisma/client'
 
 /////////////////////////////////////////
 // MARKET SCHEMA
@@ -15,6 +16,10 @@ export const MarketSchema = z.object({
   tags: z.string().array().max(5),
   ammAccountId: z.string(),
   clearingAccountId: z.string(),
+  commentCount: z.instanceof(Prisma.Decimal, { message: "Field 'commentCount' must be a Decimal. Location: ['Models', 'Market']"}).nullable(),
+  uniqueTradersCount: z.instanceof(Prisma.Decimal, { message: "Field 'uniqueTradersCount' must be a Decimal. Location: ['Models', 'Market']"}).nullable(),
+  uniquePromotersCount: z.instanceof(Prisma.Decimal, { message: "Field 'uniquePromotersCount' must be a Decimal. Location: ['Models', 'Market']"}).nullable(),
+  liquidityCount: z.instanceof(Prisma.Decimal, { message: "Field 'liquidityCount' must be a Decimal. Location: ['Models', 'Market']"}).nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

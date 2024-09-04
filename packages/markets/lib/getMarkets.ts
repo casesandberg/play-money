@@ -1,6 +1,4 @@
 import db, { Market } from '@play-money/database'
-import { getBalance } from '@play-money/finance/lib/getBalances'
-import { marketOptionBalancesToProbabilities } from '@play-money/finance/lib/helpers'
 import { ExtendedMarket } from '../types'
 import { getMarketClearingAccount } from './getMarketClearingAccount'
 
@@ -49,7 +47,7 @@ export async function getMarkets(
   return Promise.all(
     markets.map(async (market) => {
       const clearingAccount = await getMarketClearingAccount({ marketId: market.id })
-      const [commentCount, liquidityCount, uniqueTraders, balances] = await Promise.all([
+      const [commentCount, liquidityCount, uniqueTraders] = await Promise.all([
         db.comment.count({
           where: {
             entityType: 'MARKET',
@@ -77,28 +75,10 @@ export async function getMarkets(
           },
           _count: true,
         }),
-        await Promise.all(
-          market.options.map((option) => {
-            return getBalance({
-              accountId: market.ammAccountId,
-              assetType: 'MARKET_OPTION',
-              assetId: option.id,
-              marketId: market.id,
-            })
-          })
-        ),
       ])
-
-      const probabilities = marketOptionBalancesToProbabilities(balances)
 
       return {
         ...market,
-        options: market.options.map((option) => {
-          return {
-            ...option,
-            probability: probabilities[option.id],
-          }
-        }),
         commentCount,
         liquidityCount: liquidityCount._sum.amount?.toNumber(),
         uniqueTraderCount: uniqueTraders.length,

@@ -1,11 +1,10 @@
 import { Market, MarketOption, MarketResolution, User } from '@play-money/database'
 
-export type ExtendedMarketOption = MarketOption & { probability: number }
 export type ExtendedMarket = Market & {
   user: User
-  options: Array<ExtendedMarketOption>
+  options: Array<MarketOption>
   marketResolution?: MarketResolution & {
-    resolution: ExtendedMarketOption
+    resolution: MarketOption
     resolvedBy: User
   }
 }

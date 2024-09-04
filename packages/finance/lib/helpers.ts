@@ -99,13 +99,20 @@ export function marketOptionBalancesToProbabilities(balances: Array<NetBalance |
 
   return assetBalances.reduce(
     (result, assetBalance, i) => {
-      result[assetBalance.assetId] = calculateProbability({
+      const probability = calculateProbability({
         index: i,
         shares: assetBalances.map((balance) => balance.total),
       })
         .times(100)
-        .round()
+        .toDecimalPlaces(2)
         .toNumber()
+
+      if (isNaN(probability)) {
+        result[assetBalance.assetId] = 0
+      } else {
+        result[assetBalance.assetId] = probability
+      }
+
       return result
     },
     {} as Record<string, number>
