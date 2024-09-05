@@ -44,7 +44,7 @@ export default async function AppPage() {
                   </Link>
 
                   <div className="flex flex-1">
-                    <div className="flex-1 p-2">
+                    <Link href={`/questions/${market.id}/${market.slug}`} className="flex-1 p-2">
                       {isBinaryMarket ? (
                         <div className="flex flex-row items-center gap-2">
                           <div style={{ color: market.options[0].color }}>{market.options[0].probability}%</div>
@@ -65,7 +65,7 @@ export default async function AppPage() {
               </span> */}
                         </div>
                       )}
-                    </div>
+                    </Link>
                     <div className="p-2 pr-3">
                       {market.closeDate ? (
                         <div className="text-muted-foreground">{`in ${formatDistanceToNow(market.closeDate)}`}</div>
@@ -106,7 +106,7 @@ export default async function AppPage() {
                   </Link>
 
                   <div className="flex flex-1">
-                    <div className="flex-1 p-2">
+                    <Link href={`/questions/${market.id}/${market.slug}`} className="flex-1 p-2">
                       {isBinaryMarket ? (
                         <div className="flex flex-row items-center gap-2">
                           <div style={{ color: market.options[0].color }}>{market.options[0].probability}%</div>
@@ -127,7 +127,7 @@ export default async function AppPage() {
               </span> */}
                         </div>
                       )}
-                    </div>
+                    </Link>
                     <div className="p-2 pr-3">
                       <Link href={`/${market.user.username}`}>
                         <UserAvatar size="sm" user={market.user} />
