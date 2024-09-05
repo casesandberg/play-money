@@ -1,6 +1,7 @@
 import Decimal from 'decimal.js'
 import { TransactionClient } from '@play-money/database'
 import { AssetTypeType } from '@play-money/database/zod/inputTypeSchemas/AssetTypeSchema'
+import { NetBalance } from './getBalances'
 
 export async function updateBalance({
   tx,
@@ -46,5 +47,5 @@ export async function updateBalance({
       subtotals,
       createdAt: new Date(),
     },
-  })
+  }) as unknown as NetBalance
 }

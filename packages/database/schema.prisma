@@ -98,9 +98,14 @@ model Market {
   marketResolution  MarketResolution?
   balances          Balance[]
   positions         MarketOptionPosition[]
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // Cached values
+  commentCount         Int?
+  uniqueTradersCount   Int?
+  uniquePromotersCount Int?
+  liquidityCount       Int?
 
   // Unnecessary reverse relations
   notifications Notification[] @relation()
@@ -134,6 +139,9 @@ model MarketOption {
   updatedAt            DateTime               @updatedAt
   positions            MarketOptionPosition[]
   transactions         Transaction[]
+
+  // Cached values
+  probability Int?
 
   // Unnecessary reverse relations
   notifications Notification[] @relation()

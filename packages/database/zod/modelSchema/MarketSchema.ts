@@ -17,6 +17,10 @@ export const MarketSchema = z.object({
   clearingAccountId: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  commentCount: z.number().int().nullable(),
+  uniqueTradersCount: z.number().int().nullable(),
+  uniquePromotersCount: z.number().int().nullable(),
+  liquidityCount: z.number().int().nullable(),
 })
 
 export type Market = z.infer<typeof MarketSchema>

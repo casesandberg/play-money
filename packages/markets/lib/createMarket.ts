@@ -71,10 +71,15 @@ export async function createMarket({
             name: option.name,
             color: option.color || (i === 0 ? '#3B82F6' : '#EC4899'),
             liquidityProbability: new Decimal(1).div(parsedOptions.length),
+            probability: new Decimal(1).div(parsedOptions.length).toNumber(),
             createdAt: new Date(new Date().getTime() + i), // Stagger createdAt so that they can be ordered by creation
           })),
         },
       },
+      commentCount: 0,
+      liquidityCount: 0,
+      uniquePromotersCount: 0,
+      uniqueTradersCount: 0,
 
       // @case: Borked the TS for these relations during the financial rewrite, not sure how to fix.
       ammAccountId: undefined as unknown as string,

@@ -15,7 +15,7 @@ export async function updateMarketBalances({
   balanceChanges: Array<BalanceChange>
   marketId: string
 }) {
-  await Promise.all(
+  return Promise.all(
     balanceChanges.map(async ({ accountId, assetType, assetId, change }) => {
       const subtotals = await calculateBalanceSubtotals({
         tx,

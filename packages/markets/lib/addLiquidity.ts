@@ -1,4 +1,5 @@
 import Decimal from 'decimal.js'
+import db from '@play-money/database'
 import { DAILY_LIQUIDITY_BONUS_PRIMARY } from '@play-money/finance/economy'
 import { getBalance } from '@play-money/finance/lib/getBalances'
 import { getUniqueLiquidityProviderIds } from '@play-money/markets/lib/getUniqueLiquidityProviderIds'
@@ -40,6 +41,26 @@ export async function addLiquidity({
     amount,
     marketId,
   })
+
+  const existingLiquidityInMarket = await db.transaction.findFirst({
+    where: {
+      id: { not: transaction.id },
+      marketId,
+      type: {
+        in: ['LIQUIDITY_DEPOSIT', 'LIQUIDITY_INITIALIZE'],
+      },
+      initiatorId: userId,
+    },
+  })
+
+  if (!existingLiquidityInMarket) {
+    await db.market.update({
+      where: { id: marketId },
+      data: {
+        uniquePromotersCount: { increment: amount.toNumber() },
+      },
+    })
+  }
 
   const recipientIds = await getUniqueLiquidityProviderIds(marketId, [userId])
 

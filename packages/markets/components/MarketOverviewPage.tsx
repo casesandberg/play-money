@@ -57,7 +57,7 @@ export function MarketOverviewPage({
   const probabilities = marketOptionBalancesToProbabilities(balance?.amm)
 
   const mostLikelyOption = market.options.reduce((prev, current) =>
-    prev.probability > current.probability ? prev : current
+    (prev.probability || 0) > (current.probability || 0) ? prev : current
   )
 
   const orderedMarketOptions = _.orderBy(market.options, 'createdAt')
@@ -76,7 +76,7 @@ export function MarketOverviewPage({
         <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 font-mono text-sm text-muted-foreground md:flex-nowrap">
           {!market.marketResolution ? (
             <div style={{ color: mostLikelyOption.color }} className="flex-shrink-0 font-medium">
-              {mostLikelyOption.probability}% {_.truncate(mostLikelyOption.name, { length: 30 })}
+              {Math.round(mostLikelyOption.probability || 0)}% {_.truncate(mostLikelyOption.name, { length: 30 })}
             </div>
           ) : null}
           {market.closeDate ? (
@@ -145,7 +145,7 @@ export function MarketOverviewPage({
                         key={option.id}
                         option={option}
                         active={option.id === activeOptionId}
-                        probability={probabilities[option.id] || option.probability}
+                        probability={probabilities[option.id] || option.probability || 0}
                         className={i > 0 ? 'border-t' : ''}
                         canEdit={user?.id === market.createdBy}
                         onEdit={() => setIsEditOption(option.id)}
@@ -167,7 +167,7 @@ export function MarketOverviewPage({
                 key={option.id}
                 option={option}
                 active={option.id === activeOptionId}
-                probability={probabilities[option.id] || option.probability}
+                probability={probabilities[option.id] || option.probability || 0}
                 className={i > 0 ? 'border-t' : ''}
                 canEdit={user?.id === market.createdBy}
                 onEdit={() => setIsEditOption(option.id)}

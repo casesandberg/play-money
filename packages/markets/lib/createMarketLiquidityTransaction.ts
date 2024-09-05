@@ -6,6 +6,7 @@ import { getMarket } from './getMarket'
 import { getMarketAmmAccount } from './getMarketAmmAccount'
 import { getMarketClearingAccount } from './getMarketClearingAccount'
 import { updateMarketBalances } from './updateMarketBalances'
+import { updateMarketOptionProbabilities } from './updateMarketOptionProbabilities'
 
 export async function createMarketLiquidityTransaction({
   type = 'LIQUIDITY_DEPOSIT',
@@ -66,7 +67,20 @@ export async function createMarketLiquidityTransaction({
     initiatorId,
     entries,
     marketId,
-    additionalLogic: async (txParams) => updateMarketBalances({ ...txParams, marketId }),
+    additionalLogic: async (txParams) => {
+      txParams.tx.market.update({
+        where: {
+          id: marketId,
+        },
+        data: {
+          liquidityCount: {
+            increment: amount.toNumber(),
+          },
+        },
+      })
+      const balances = await updateMarketBalances({ ...txParams, marketId })
+      await updateMarketOptionProbabilities({ ...txParams, balances, marketId })
+    },
   })
 
   return transaction

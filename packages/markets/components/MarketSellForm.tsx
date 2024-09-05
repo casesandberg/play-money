@@ -6,13 +6,13 @@ import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
 import { createMarketSell, getMarketQuote } from '@play-money/api-helpers/client'
+import { MarketOption } from '@play-money/database'
 import { MarketOptionPositionAsNumbers } from '@play-money/finance/lib/getBalances'
 import { Button } from '@play-money/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
 import { Slider } from '@play-money/ui/slider'
 import { toast } from '@play-money/ui/use-toast'
-import { ExtendedMarketOption } from '../types'
 import { QuoteItem, calculateReturnPercentage, formatCurrency, formatPercentage } from './MarketBuyForm'
 
 const FormSchema = z.object({
@@ -28,7 +28,7 @@ export function MarketSellForm({
   onComplete,
 }: {
   marketId: string
-  option: ExtendedMarketOption
+  option: MarketOption
   position?: MarketOptionPositionAsNumbers
   onComplete?: () => void
 }) {

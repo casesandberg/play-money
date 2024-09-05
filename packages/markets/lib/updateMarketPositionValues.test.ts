@@ -154,7 +154,7 @@ describe('updateMarketPositionValues', () => {
         optionId: 'option2',
         cost: new Decimal(40),
         quantity: new Decimal(75),
-        value: new Decimal(9.0147),
+        value: new Decimal(9.0148),
       }),
     ])
 

@@ -9,55 +9,83 @@ jest.mock('@play-money/markets/lib/getMarketOption', () => ({ getMarketOption: j
 
 describe('maniswap-v1.1', () => {
   describe('trade', () => {
-    it('should return correct amount for buying YES', async () => {
-      // Current probability = 0.75
-      const amount = await trade({
-        amount: new Decimal(50),
-        targetShare: new Decimal(100),
-        shares: [new Decimal(100), new Decimal(300)],
-        isBuy: true,
-      })
+    test.each([
+      { targetShare: 100, shares: [100, 300], expected: 64.29 },
+      { targetShare: 100, shares: [100, 400, 400, 400], expected: 79.76 },
+      { targetShare: 100, shares: [100, 400, 400, 400, 400, 400, 400, 400, 400], expected: 111.02 },
+    ])(
+      'should return $expected for buying high targetShare: $targetShare of shares: $shares',
+      async ({ targetShare, shares, expected }) => {
+        // Current probability = 0.75
+        const amount = await trade({
+          amount: new Decimal(50),
+          targetShare: new Decimal(targetShare),
+          shares: shares.map((share) => new Decimal(share)),
+          isBuy: true,
+        })
 
-      expect(amount).toBeCloseToDecimal(64.29)
-    })
+        expect(amount).toBeCloseToDecimal(expected)
+      }
+    )
 
-    it('should return correct amount for buying NO', async () => {
-      // Current probability = 0.75
-      const amount = await trade({
-        amount: new Decimal(50),
-        targetShare: new Decimal(300),
-        shares: [new Decimal(100), new Decimal(300)],
-        isBuy: true,
-      })
+    test.each([
+      { targetShare: 300, shares: [100, 300], expected: 150 },
+      { targetShare: 400, shares: [100, 400, 400, 400], expected: 239.3 },
+      { targetShare: 400, shares: [100, 400, 400, 400, 400, 400, 400, 400, 400], expected: 333.07 },
+    ])(
+      'should return $expected for buying low targetShare: $targetShare of shares: $shares',
+      async ({ targetShare, shares, expected }) => {
+        // Current probability = 0.75
+        const amount = await trade({
+          amount: new Decimal(50),
+          targetShare: new Decimal(targetShare),
+          shares: shares.map((share) => new Decimal(share)),
+          isBuy: true,
+        })
 
-      expect(amount).toBeCloseToDecimal(150)
-    })
+        expect(amount).toBeCloseToDecimal(expected)
+      }
+    )
 
-    // This is the inverse of the test for buying YES
-    it('should return correct amount for selling YES', async () => {
-      // Current probability ~= 0.80
-      const amount = await trade({
-        amount: new Decimal(64.29),
-        targetShare: new Decimal(85.71),
-        shares: [new Decimal(85.71), new Decimal(350)],
-        isBuy: false,
-      })
+    // This is the inverse of the test for buying high
+    test.each([
+      { targetShare: 85.71, shares: [85.71, 350], expected: 50 },
+      { targetShare: 85.71, shares: [85.71, 400, 400, 400], expected: 36.13 },
+      { targetShare: 85.71, shares: [85.71, 400, 400, 400, 400, 400, 400, 400, 400], expected: 20.21 },
+    ])(
+      'should return $expected for selling high targetShare: $targetShare of shares: $shares',
+      async ({ targetShare, shares, expected }) => {
+        // Current probability = 0.75
+        const amount = await trade({
+          amount: new Decimal(64.29),
+          targetShare: new Decimal(targetShare),
+          shares: shares.map((share) => new Decimal(share)),
+          isBuy: false,
+        })
 
-      expect(amount).toBeCloseToDecimal(50)
-    })
+        expect(amount).toBeCloseToDecimal(expected)
+      }
+    )
 
-    // This is the inverse of the test for buying NO
-    it('should return correct amount for selling NO', async () => {
-      // Current probability ~= 0.57
-      const amount = await trade({
-        amount: new Decimal(150),
-        targetShare: new Decimal(200),
-        shares: [new Decimal(150), new Decimal(200)],
-        isBuy: false,
-      })
+    // This is the inverse of the test for buying low
+    test.each([
+      { targetShare: 200, shares: [150, 200], expected: 50 },
+      { targetShare: 200, shares: [150, 200, 450, 450], expected: 36.58 },
+      { targetShare: 200, shares: [150, 200, 450, 450, 450, 450, 450, 450, 450], expected: 21.45 },
+    ])(
+      'should return $expected for selling low targetShare: $targetShare of shares: $shares',
+      async ({ targetShare, shares, expected }) => {
+        // Current probability = 0.75
+        const amount = await trade({
+          amount: new Decimal(150),
+          targetShare: new Decimal(targetShare),
+          shares: shares.map((share) => new Decimal(share)),
+          isBuy: false,
+        })
 
-      expect(amount).toBeCloseToDecimal(50)
-    })
+        expect(amount).toBeCloseToDecimal(expected)
+      }
+    )
   })
 
   describe('quote', () => {
@@ -185,8 +213,21 @@ describe('maniswap-v1.1', () => {
         shares: [new Decimal(200), new Decimal(200), new Decimal(200)],
       })
 
-      expect(result.probability).toBeCloseToDecimal(0.48)
-      expect(result.shares).toBeCloseToDecimal(72.22)
+      expect(result.probability).toBeCloseToDecimal(0.59)
+      expect(result.shares).toBeCloseToDecimal(122)
+    })
+
+    // Inverse of previous buy
+    it('should return correct quote for selling option in multiple choice', async () => {
+      const result = await quote({
+        amount: new Decimal(116.66),
+        probability: new Decimal(0.01),
+        targetShare: new Decimal(128),
+        shares: [new Decimal(128), new Decimal(250), new Decimal(250)],
+      })
+
+      expect(result.probability).toBeCloseToDecimal(0.34)
+      expect(result.shares).toBeCloseToDecimal(48.2)
     })
   })
 
@@ -206,7 +247,93 @@ describe('maniswap-v1.1', () => {
         ],
       })
 
-      expect(result).toEqual([expect.closeToDecimal(50), expect.closeToDecimal(50)])
+      expect(result).toEqual([
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.5) },
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.5) },
+      ])
+    })
+
+    it('should correctly add liquidity to an imbalanced market', async () => {
+      const result = await addLiquidity({
+        amount: new Decimal(50),
+        options: [
+          {
+            shares: new Decimal(100),
+            liquidityProbability: new Decimal(0.3),
+          },
+          {
+            shares: new Decimal(300),
+            liquidityProbability: new Decimal(0.7),
+          },
+        ],
+      })
+
+      expect(result).toEqual([
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.25) },
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.75) },
+      ])
+    })
+
+    it('should correctly add liquidity to a balanced 4 option market', async () => {
+      const result = await addLiquidity({
+        amount: new Decimal(50),
+        options: [
+          {
+            shares: new Decimal(1000),
+            liquidityProbability: new Decimal(0.25),
+          },
+          {
+            shares: new Decimal(1000),
+            liquidityProbability: new Decimal(0.25),
+          },
+          {
+            shares: new Decimal(1000),
+            liquidityProbability: new Decimal(0.25),
+          },
+          {
+            shares: new Decimal(1000),
+            liquidityProbability: new Decimal(0.25),
+          },
+        ],
+      })
+
+      expect(result).toEqual([
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.25) },
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.25) },
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.25) },
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.25) },
+      ])
+    })
+
+    it('should correctly add liquidity to an imbalanced 4 option market', async () => {
+      const result = await addLiquidity({
+        amount: new Decimal(50),
+        options: [
+          {
+            shares: new Decimal(100),
+            liquidityProbability: new Decimal(0.25),
+          },
+          {
+            shares: new Decimal(300),
+            liquidityProbability: new Decimal(0.25),
+          },
+          {
+            shares: new Decimal(300),
+            liquidityProbability: new Decimal(0.25),
+          },
+          {
+            shares: new Decimal(300),
+            liquidityProbability: new Decimal(0.25),
+          },
+        ],
+      })
+
+      expect(result).toEqual([
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.205) },
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.265) },
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.265) },
+        { newShares: expect.closeToDecimal(50), liquidityProbability: expect.closeToDecimal(0.265) },
+      ])
     })
   })
 
