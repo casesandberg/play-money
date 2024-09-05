@@ -5,5 +5,6 @@ module.exports = {
     '@typescript-eslint/consistent-type-definitions': 'off',
     'import/no-named-as-default-member': 'off',
     'unicorn/filename-case': 'off',
+    'no-nested-ternary': 'off',
   },
 }

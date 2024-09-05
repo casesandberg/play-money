@@ -1,29 +1,24 @@
 import React from 'react'
 import { getMarkets } from '@play-money/api-helpers/client'
-import { RecentLiquidity } from '@play-money/finance/components/RecentLiquidity'
-import { RecentTrades } from '@play-money/finance/components/RecentTrades'
-import { MarketList } from '@play-money/markets/components/MarketList'
-import { UserQuestCard } from '@play-money/quests/components/UserQuestCard'
+import { MarketsTable } from '@play-money/markets/components/MarketsTable'
 
-export default async function AppQuestionsPage() {
-  const { markets } = await getMarkets()
+export default async function AppQuestionsPage({
+  searchParams,
+}: {
+  searchParams: { pageSize?: string; page?: string; sort?: string; status?: string; tag?: string }
+}) {
+  const { markets, totalPages } = await getMarkets({
+    pageSize: searchParams.pageSize,
+    page: searchParams.page,
+    sortField: searchParams.sort?.split('-')[0],
+    sortDirection: searchParams.sort?.split('-')[1],
+    status: searchParams.status,
+    tag: searchParams.tag,
+  })
 
   return (
     <div className="mx-auto flex max-w-screen-lg flex-1 flex-col gap-8 md:flex-row">
-      <MarketList markets={markets} />
-
-      <div className="space-y-8 md:w-80">
-        <UserQuestCard />
-        <div>
-          <div className="pb-2 text-xs font-semibold uppercase text-muted-foreground">Recent trades</div>
-          <RecentTrades />
-        </div>
-
-        <div>
-          <div className="pb-2 text-xs font-semibold uppercase text-muted-foreground">New liquidity</div>
-          <RecentLiquidity />
-        </div>
-      </div>
+      <MarketsTable data={markets} totalPages={totalPages} />
     </div>
   )
 }

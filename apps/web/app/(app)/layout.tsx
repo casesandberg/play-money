@@ -17,12 +17,12 @@ function MainNav({
     <nav className={cn('flex items-center text-sm', className)} {...props}>
       {renderItemWrap(
         <Link className="font-medium transition-colors hover:text-primary" href="/questions">
-          Markets
+          Questions
         </Link>
       )}
       {renderItemWrap(
         <Link className="font-medium transition-colors hover:text-primary" href="/create-post">
-          Create Market
+          Create Question
         </Link>
       )}
       {renderItemWrap(
