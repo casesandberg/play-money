@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { CommentWithReactions } from '@play-money/comments/lib/getComment'
 import { Market, User } from '@play-money/database'
 import { TransactionWithEntries, LeaderboardUser } from '@play-money/finance/types'
@@ -88,10 +89,32 @@ export async function getMyBalance() {
   return apiHandler<{ balance: number }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/balance`)
 }
 
-export async function getMarkets({ tag }: { tag?: string } = {}) {
+export async function getMarkets({
+  tag,
+  page,
+  pageSize,
+  status,
+  sortField,
+  sortDirection,
+}: {
+  tag?: string
+  page?: string
+  pageSize?: string
+  status?: string
+  sortField?: string
+  sortDirection?: string
+} = {}) {
+  const currentParams = new URLSearchParams(
+    JSON.parse(JSON.stringify({ tag, page, pageSize, status, sortField, sortDirection }))
+  )
+  const search = currentParams.toString()
+
   return apiHandler<{
     markets: Array<ExtendedMarket>
-  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets${tag ? `?tag=${tag}` : ''}`, {
+    page: number
+    pageSize: number
+    totalPages: number
+  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets${search ? `?${search}` : ''}`, {
     next: { tags: ['markets'] },
   })
 }
