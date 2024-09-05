@@ -32,6 +32,7 @@ export default async function AppPage() {
           <div className="divide-y font-mono text-sm">
             {closingMarkets.map((market) => {
               const isBinaryMarket = market.options.length === 2
+              const firstOption = market.options[0]
               const sortedOptions = market.options.sort((a, b) => (b.probability || 0) - (a.probability || 0))
 
               return (
@@ -44,15 +45,15 @@ export default async function AppPage() {
                   </Link>
 
                   <div className="flex flex-1">
-                    <Link href={`/questions/${market.id}/${market.slug}`} className="flex-1 p-2">
+                    <Link className="flex-1 p-2" href={`/questions/${market.id}/${market.slug}`}>
                       {isBinaryMarket ? (
                         <div className="flex flex-row items-center gap-2">
-                          <div style={{ color: market.options[0].color }}>{market.options[0].probability}%</div>
+                          <div style={{ color: firstOption.color }}>{firstOption.probability}%</div>
                           <Progress
                             className="h-2 max-w-[150px] transition-transform"
-                            data-color={market.options[0].color}
-                            indicatorStyle={{ backgroundColor: market.options[0].color }}
-                            value={market.options[0].probability}
+                            data-color={firstOption.color}
+                            indicatorStyle={{ backgroundColor: firstOption.color }}
+                            value={firstOption.probability}
                           />
                         </div>
                       ) : (
@@ -94,6 +95,7 @@ export default async function AppPage() {
           <div className="divide-y font-mono text-sm">
             {newMarkets.map((market) => {
               const isBinaryMarket = market.options.length === 2
+              const firstOption = market.options[0]
               const sortedOptions = market.options.sort((a, b) => (b.probability || 0) - (a.probability || 0))
 
               return (
@@ -106,15 +108,15 @@ export default async function AppPage() {
                   </Link>
 
                   <div className="flex flex-1">
-                    <Link href={`/questions/${market.id}/${market.slug}`} className="flex-1 p-2">
+                    <Link className="flex-1 p-2" href={`/questions/${market.id}/${market.slug}`}>
                       {isBinaryMarket ? (
                         <div className="flex flex-row items-center gap-2">
-                          <div style={{ color: market.options[0].color }}>{market.options[0].probability}%</div>
+                          <div style={{ color: firstOption.color }}>{firstOption.probability}%</div>
                           <Progress
                             className="h-2 max-w-[150px] transition-transform"
-                            data-color={market.options[0].color}
-                            indicatorStyle={{ backgroundColor: market.options[0].color }}
-                            value={market.options[0].probability}
+                            data-color={firstOption.color}
+                            indicatorStyle={{ backgroundColor: firstOption.color }}
+                            value={firstOption.probability}
                           />
                         </div>
                       ) : (
@@ -140,7 +142,6 @@ export default async function AppPage() {
           </div>
         </Card>
       </div>
-      {/* <MarketList markets={markets} /> */}
 
       <div className="space-y-8 md:w-80">
         <UserQuestCard />
