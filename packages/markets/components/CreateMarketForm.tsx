@@ -2,10 +2,11 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PopoverClose } from '@radix-ui/react-popover'
+import _ from 'lodash'
 import { ToggleLeftIcon, XIcon, CircleIcon, CircleDotIcon, PlusIcon } from 'lucide-react'
 import moment from 'moment'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { CirclePicker } from 'react-color'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { mutate } from 'swr'
@@ -27,7 +28,27 @@ import { RadioGroup, RadioGroupItem } from '@play-money/ui/radio-group'
 import { toast } from '@play-money/ui/use-toast'
 import { cn } from '@play-money/ui/utils'
 
-const COLORS = ['#03a9f4', '#e91e63', '#ff9800', '#8bc34a', '#9c27b0', '#ffc107', '#607d8b', '#009688', '#795548']
+const COLORS = [
+  '#f44336',
+  '#e91e63',
+  '#9c27b0',
+  '#673ab7',
+  '#3f51b5',
+  '#2196f3',
+  '#03a9f4',
+  '#00bcd4',
+  '#009688',
+  '#4caf50',
+  '#8bc34a',
+  '#cddc39',
+  '#ffeb3b',
+  '#ffc107',
+  '#ff9800',
+  '#ff5722',
+  '#795548',
+  '#9e9e9e',
+  '#607d8b',
+]
 
 const marketCreateFormSchema = MarketSchema.pick({
   question: true,
@@ -43,6 +64,7 @@ const marketCreateFormSchema = MarketSchema.pick({
 type MarketCreateFormValues = z.infer<typeof marketCreateFormSchema>
 
 export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void> }) {
+  const [SHUFFLED_COLORS] = useState(_.shuffle(COLORS))
   const router = useRouter()
   const tzName = /\((?<tz>[A-Za-z\s].*)\)/.exec(new Date().toString())?.groups?.tz ?? null
 
@@ -54,8 +76,8 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
       description: '',
       closeDate: moment().add(1, 'month').endOf('day').toDate(),
       options: [
-        { name: 'Yes', color: COLORS[0] },
-        { name: 'No', color: COLORS[1] },
+        { name: 'Yes', color: SHUFFLED_COLORS[0] },
+        { name: 'No', color: SHUFFLED_COLORS[1] },
       ],
     },
   })
@@ -91,14 +113,14 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
     function replaceOptionsIfMulti() {
       if (type === 'binary') {
         replace([
-          { name: 'Yes', color: COLORS[0] },
-          { name: 'No', color: COLORS[1] },
+          { name: 'Yes', color: SHUFFLED_COLORS[0] },
+          { name: 'No', color: SHUFFLED_COLORS[1] },
         ])
       } else if (type === 'multi') {
         replace([
-          { name: '', color: COLORS[0] },
-          { name: '', color: COLORS[1] },
-          { name: '', color: COLORS[2] },
+          { name: '', color: SHUFFLED_COLORS[0] },
+          { name: '', color: SHUFFLED_COLORS[1] },
+          { name: '', color: SHUFFLED_COLORS[2] },
         ])
       }
     },
@@ -282,7 +304,7 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
                 size="sm"
                 disabled={fields.length >= 9}
                 onClick={() => {
-                  append({ name: '', color: COLORS[fields.length] })
+                  append({ name: '', color: SHUFFLED_COLORS[fields.length] })
                 }}
               >
                 <PlusIcon className="size-4" />
