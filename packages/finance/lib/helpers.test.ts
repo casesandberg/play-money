@@ -1,6 +1,9 @@
 import Decimal from 'decimal.js'
 import { mockBalance } from '@play-money/database/mocks'
-import { calculateBalanceSubtotals, marketOptionBalancesToProbabilities } from './helpers'
+import * as ECONOMY from '@play-money/finance/economy'
+import { calculateBalanceSubtotals, calculateRealizedGainsTax, marketOptionBalancesToProbabilities } from './helpers'
+
+Object.defineProperty(ECONOMY, 'REALIZED_GAINS_TAX', { value: 0.05 })
 
 describe('calculateBalanceSubtotals', () => {
   const mockTx = {
@@ -114,5 +117,25 @@ describe('marketOptionBalancesToProbabilities', () => {
 
     const result = marketOptionBalancesToProbabilities(balances as any)
     expect(result).toEqual({})
+  })
+})
+
+describe('calculateRealizedGainsTax', () => {
+  it('should calculate tax correctly for a gain', () => {
+    const cost = new Decimal(100)
+    const salePrice = new Decimal(150)
+
+    const result = calculateRealizedGainsTax({ cost, salePrice })
+
+    expect(result).toEqual(new Decimal(2.5))
+  })
+
+  it('should not apply tax for a loss', () => {
+    const cost = new Decimal(150)
+    const salePrice = new Decimal(100)
+
+    const result = calculateRealizedGainsTax({ cost, salePrice })
+
+    expect(result).toEqual(new Decimal(0))
   })
 })
