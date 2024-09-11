@@ -2,6 +2,7 @@ import Decimal from 'decimal.js'
 import { TransactionClient } from '@play-money/database'
 import { AssetTypeType } from '@play-money/database/zod/inputTypeSchemas/AssetTypeSchema'
 import { calculateProbability } from '../amms/maniswap-v1.1'
+import { REALIZED_GAINS_TAX } from '../economy'
 import { TransactionEntryInput } from '../types'
 import { NetBalance, NetBalanceAsNumbers } from './getBalances'
 
@@ -116,4 +117,14 @@ export function marketOptionBalancesToProbabilities(balances: Array<NetBalance |
     },
     {} as Record<string, number>
   )
+}
+
+export function calculateRealizedGainsTax({ cost, salePrice }: { cost: Decimal; salePrice: Decimal }) {
+  const gainOrLoss = salePrice.sub(cost)
+
+  if (gainOrLoss.isNegative()) {
+    return new Decimal(0) // Assuming no tax is applied for a loss scenario
+  }
+
+  return gainOrLoss.times(REALIZED_GAINS_TAX).toDecimalPlaces(4)
 }

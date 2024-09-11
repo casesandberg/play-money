@@ -3,6 +3,7 @@ import React from 'react'
 import { MarketOption } from '@play-money/database'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { MarketOptionPositionAsNumbers, NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@play-money/ui/tooltip'
 
 const transactionLabels: Record<string, string> = {
   TRADE_BUY: 'Bought positions',
@@ -61,16 +62,32 @@ export function MarketBalanceBreakdown({
             const changeLabel = `(${change > 0 ? '+' : ''}${change}%)`
 
             return value.toNumber() ? (
-              <div key={position.optionId} className="flex justify-between text-xs text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <div className="size-2 rounded-md" style={{ backgroundColor: option.color }} />
-                  <span className="font-mono">{option.name}</span>
-                </div>
-                <div className="flex gap-2">
-                  {change ? <span className={change > 0 ? 'text-lime-500' : 'text-red-400'}>{changeLabel}</span> : null}
-                  <CurrencyDisplay value={position.value} />
-                </div>
-              </div>
+              <Tooltip key={position.optionId}>
+                <TooltipTrigger className="flex w-full justify-between text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <div className="size-2 rounded-md" style={{ backgroundColor: option.color }} />
+                    <span className="font-mono">{option.name}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    {change ? (
+                      <span className={change > 0 ? 'text-lime-500' : 'text-red-400'}>{changeLabel}</span>
+                    ) : null}
+                    <CurrencyDisplay value={position.value} />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-sm" align="start">
+                  <div className="line-clamp-2">{option.name}</div>
+                  <div className="text-xs text-muted-foreground">
+                    Cost: {new Decimal(position.cost).toDecimalPlaces(4).toString()}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Quantity: {new Decimal(position.quantity).toDecimalPlaces(4).toString()}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Value: {new Decimal(position.value).toDecimalPlaces(4).toString()}
+                  </div>
+                </TooltipContent>
+              </Tooltip>
             ) : null
           })}
 

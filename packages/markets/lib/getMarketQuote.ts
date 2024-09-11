@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 import { quote } from '@play-money/finance/amms/maniswap-v1.1'
-import { REALIZED_GAINS_TAX } from '@play-money/finance/economy'
 import { getMarketBalances } from '@play-money/finance/lib/getBalances'
+import { calculateRealizedGainsTax } from '@play-money/finance/lib/helpers'
 import { getMarketAmmAccount } from './getMarketAmmAccount'
 
 export async function getMarketQuote({
@@ -30,12 +30,10 @@ export async function getMarketQuote({
     shares: optionsShares,
   })
 
-  if (REALIZED_GAINS_TAX) {
-    shares = shares.sub(shares.times(REALIZED_GAINS_TAX))
-  }
+  const tax = calculateRealizedGainsTax({ cost: amount, salePrice: shares })
 
   return {
     probability,
-    shares,
+    shares: shares.sub(tax),
   }
 }

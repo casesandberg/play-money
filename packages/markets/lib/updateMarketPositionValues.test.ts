@@ -3,7 +3,7 @@ import { TransactionClient } from '@play-money/database'
 import { mockAccount, mockBalance, mockMarketOptionPosition } from '@play-money/database/mocks'
 import * as ECONOMY from '@play-money/finance/economy'
 import { getMarketBalances } from '@play-money/finance/lib/getBalances'
-import { BalanceChange, findBalanceChange } from '@play-money/finance/lib/helpers'
+import { BalanceChange, calculateRealizedGainsTax, findBalanceChange } from '@play-money/finance/lib/helpers'
 import { getMarketAmmAccount } from './getMarketAmmAccount'
 import { updateMarketPositionValues } from './updateMarketPositionValues'
 
@@ -50,6 +50,9 @@ describe('updateMarketPositionValues', () => {
     ] as Array<BalanceChange>
 
     jest.mocked(getMarketAmmAccount).mockResolvedValue(mockAccount({ id: mockAmmAccountId }))
+    jest.mocked(calculateRealizedGainsTax).mockImplementation(() => {
+      return new Decimal(0)
+    })
 
     jest.mocked(getMarketBalances).mockResolvedValue([
       mockBalance({

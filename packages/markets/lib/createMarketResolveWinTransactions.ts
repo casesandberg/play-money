@@ -1,8 +1,7 @@
-import Decimal from 'decimal.js'
 import db, { Transaction } from '@play-money/database'
-import { REALIZED_GAINS_TAX } from '@play-money/finance/economy'
 import { executeTransaction } from '@play-money/finance/lib/executeTransaction'
 import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
+import { calculateRealizedGainsTax } from '@play-money/finance/lib/helpers'
 import { getMarket } from './getMarket'
 import { getMarketAmmAccount } from './getMarketAmmAccount'
 import { getMarketClearingAccount } from './getMarketClearingAccount'
@@ -34,11 +33,7 @@ export async function createMarketResolveWinTransactions({
 
   // Transfer winning shares back to the AMM and convert to primary currency
   for (const position of winningPositions) {
-    const taxedValue = position.quantity.sub(position.quantity.times(REALIZED_GAINS_TAX))
-    const valueTaxedIfGains = taxedValue.gt(position.cost) ? taxedValue : position.quantity
-
-    const amountTaxed = position.quantity.sub(valueTaxedIfGains)
-    const isTaxed = amountTaxed.toDecimalPlaces(4).gt(0)
+    const tax = calculateRealizedGainsTax({ cost: position.cost, salePrice: position.quantity })
 
     const entries = [
       {
@@ -64,13 +59,13 @@ export async function createMarketResolveWinTransactions({
         toAccountId: position.accountId,
         assetType: 'CURRENCY',
         assetId: 'PRIMARY',
-        amount: isTaxed ? valueTaxedIfGains : position.quantity,
+        amount: tax.gt(0) ? position.quantity.sub(tax) : position.quantity,
       } as const,
     ]
 
-    if (isTaxed) {
+    if (tax.gt(0)) {
       entries.push({
-        amount: amountTaxed,
+        amount: tax,
         assetType: 'CURRENCY',
         assetId: 'PRIMARY',
         fromAccountId: clearingAccount.id,
