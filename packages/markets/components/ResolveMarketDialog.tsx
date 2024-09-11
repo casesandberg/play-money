@@ -25,10 +25,12 @@ type FormData = z.infer<typeof FormSchema>
 export const ResolveMarketDialog = ({
   open,
   onClose,
+  onSuccess,
   market,
 }: {
   open: boolean
   onClose: () => void
+  onSuccess?: () => void
   market: ExtendedMarket
 }) => {
   const form = useForm<FormData>({
@@ -42,6 +44,7 @@ export const ResolveMarketDialog = ({
       toast({ title: 'Market resolved successfully' })
       form.reset()
       onClose()
+      onSuccess?.()
     } catch (error: any) {
       console.error('Failed to resolve market:', error)
       toast({
