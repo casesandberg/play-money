@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import Decimal from 'decimal.js'
 import db from '@play-money/database'
 import { LeaderboardUser } from '../types'
@@ -11,6 +12,7 @@ function transformUserOutput(input: LeaderboardUser): LeaderboardUser {
 }
 
 export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, userId?: string) {
+  const usernamesToIgnore = ['house', 'community']
   const [topTraders, topCreators, topPromoters, topQuesters] = await Promise.all([
     db.$queryRaw<Array<LeaderboardUser>>`
     WITH trader_transactions AS (
@@ -74,6 +76,7 @@ export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, user
         FROM "User" u
         LEFT JOIN trader_transactions tt ON u."primaryAccountId" = tt."accountId"
         LEFT JOIN option_holdings oh ON u."primaryAccountId" = oh."accountId"
+        WHERE u."username" NOT IN (${Prisma.join(usernamesToIgnore)})
         GROUP BY u.id, u."displayName", tt.net_amount
     )
     SELECT 
@@ -114,6 +117,7 @@ export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, user
         RANK() OVER (ORDER BY COALESCE(cb.total, 0) DESC) as rank
       FROM "User" u
       LEFT JOIN creator_bonuses cb ON u."primaryAccountId" = cb."accountId"
+      WHERE u."username" NOT IN (${Prisma.join(usernamesToIgnore)})
     --   WHERE COALESCE(cb.total, 0) > 0
       ORDER BY total DESC
     `,
@@ -144,6 +148,7 @@ export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, user
         RANK() OVER (ORDER BY COALESCE(pb.total, 0) DESC) as rank
       FROM "User" u
       LEFT JOIN promoter_bonuses pb ON u."primaryAccountId" = pb."accountId"
+      WHERE u."username" NOT IN (${Prisma.join(usernamesToIgnore)})
     --   WHERE COALESCE(pb.total, 0) > 0
       ORDER BY total DESC
     `,
@@ -174,6 +179,7 @@ export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, user
         RANK() OVER (ORDER BY COALESCE(qb.total, 0) DESC) as rank
       FROM "User" u
       LEFT JOIN quester_bonuses qb ON u."primaryAccountId" = qb."accountId"
+      WHERE u."username" NOT IN (${Prisma.join(usernamesToIgnore)})
     --   WHERE COALESCE(qb.total, 0) > 0
       ORDER BY total DESC
     `,

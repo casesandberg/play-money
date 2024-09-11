@@ -5,7 +5,13 @@ import _ from 'lodash'
 import { CircleCheckBig, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
-import { useMarketBalance } from '@play-money/api-helpers/client/hooks'
+import { mutate } from 'swr'
+import {
+  MARKET_BALANCE_PATH,
+  MARKET_GRAPH_PATH,
+  MY_BALANCE_PATH,
+  useMarketBalance,
+} from '@play-money/api-helpers/client/hooks'
 import { marketOptionBalancesToProbabilities } from '@play-money/finance/lib/helpers'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Alert, AlertDescription, AlertTitle } from '@play-money/ui/alert'
@@ -62,6 +68,13 @@ export function MarketOverviewPage({
 
   const orderedMarketOptions = _.orderBy(market.options, 'createdAt')
 
+  const handleRevalidateBalance = async () => {
+    void onRevalidate?.()
+    void mutate(MY_BALANCE_PATH)
+    void mutate(MARKET_BALANCE_PATH(market.id))
+    void mutate(MARKET_GRAPH_PATH(market.id))
+  }
+
   return (
     <Card className="flex-1">
       <MarketToolbar
@@ -69,6 +82,7 @@ export function MarketOverviewPage({
         canEdit={isCreator}
         onInitiateEdit={() => setIsEditing('true')}
         onInitiateBoost={() => setIsBoosting('true')}
+        onRevalidate={handleRevalidateBalance}
       />
 
       <CardHeader className="pt-0 md:pt-0">
@@ -221,7 +235,7 @@ export function MarketOverviewPage({
         market={market}
         open={isBoosting === 'true'}
         onClose={() => setIsBoosting(undefined)}
-        onSuccess={onRevalidate}
+        onSuccess={handleRevalidateBalance}
       />
     </Card>
   )

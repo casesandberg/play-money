@@ -1,4 +1,3 @@
-import { formatDistanceToNow } from 'date-fns'
 import { Maximize2Icon, MinusIcon } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
@@ -6,6 +5,7 @@ import { getMarkets } from '@play-money/api-helpers/client'
 import { RecentLiquidity } from '@play-money/finance/components/RecentLiquidity'
 import { RecentTrades } from '@play-money/finance/components/RecentTrades'
 import { UserQuestCard } from '@play-money/quests/components/UserQuestCard'
+import { formatDistanceToNowShort } from '@play-money/ui'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Button } from '@play-money/ui/button'
 import { Card } from '@play-money/ui/card'
@@ -38,13 +38,13 @@ export default async function AppPage() {
               return (
                 <div className="flex flex-col transition-colors hover:bg-muted/50 sm:flex-row" key={market.id}>
                   <Link
-                    className="m-2 mb-0 ml-3 line-clamp-2 flex-1 sm:mb-2"
+                    className="m-2 mb-0 ml-3 line-clamp-2 flex-[3] sm:mb-2"
                     href={`/questions/${market.id}/${market.slug}`}
                   >
                     {market.question}
                   </Link>
 
-                  <div className="flex flex-1">
+                  <div className="flex flex-[2]">
                     <Link className="flex-1 p-2" href={`/questions/${market.id}/${market.slug}`}>
                       {isBinaryMarket ? (
                         <div className="flex flex-row items-center gap-2">
@@ -69,7 +69,7 @@ export default async function AppPage() {
                     </Link>
                     <div className="p-2 pr-3">
                       {market.closeDate ? (
-                        <div className="text-muted-foreground">{`in ${formatDistanceToNow(market.closeDate)}`}</div>
+                        <div className="text-muted-foreground">{formatDistanceToNowShort(market.closeDate)}</div>
                       ) : (
                         <MinusIcon className="h-4 w-4 text-muted-foreground/50" />
                       )}
@@ -101,13 +101,13 @@ export default async function AppPage() {
               return (
                 <div className="flex flex-col transition-colors hover:bg-muted/50 sm:flex-row" key={market.id}>
                   <Link
-                    className="m-2 mb-0 ml-3 line-clamp-2 flex-1 sm:mb-2"
+                    className="m-2 mb-0 ml-3 line-clamp-2 flex-[3] sm:mb-2"
                     href={`/questions/${market.id}/${market.slug}`}
                   >
                     {market.question}
                   </Link>
 
-                  <div className="flex flex-1">
+                  <div className="flex flex-[2]">
                     <Link className="flex-1 p-2" href={`/questions/${market.id}/${market.slug}`}>
                       {isBinaryMarket ? (
                         <div className="flex flex-row items-center gap-2">

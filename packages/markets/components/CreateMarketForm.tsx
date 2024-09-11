@@ -79,6 +79,7 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
         { name: 'Yes', color: SHUFFLED_COLORS[0] },
         { name: 'No', color: SHUFFLED_COLORS[1] },
       ],
+      tags: [],
     },
   })
 

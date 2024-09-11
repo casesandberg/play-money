@@ -45,11 +45,13 @@ export function MarketToolbar({
   canEdit,
   onInitiateEdit,
   onInitiateBoost,
+  onRevalidate,
 }: {
   market: ExtendedMarket
   canEdit?: boolean
   onInitiateEdit?: () => void
   onInitiateBoost?: () => void
+  onRevalidate?: () => void
 }) {
   const { user } = useUser()
   const [isResolving, setResolving] = useQueryString('resolve')
@@ -117,7 +119,12 @@ export function MarketToolbar({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <ResolveMarketDialog market={market} open={isResolving === 'true'} onClose={() => setResolving(undefined)} />
+      <ResolveMarketDialog
+        market={market}
+        open={isResolving === 'true'}
+        onClose={() => setResolving(undefined)}
+        onSuccess={onRevalidate}
+      />
     </div>
   )
 }
