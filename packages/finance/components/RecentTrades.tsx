@@ -1,11 +1,11 @@
 'use client'
 
-import { formatDistanceToNow } from 'date-fns'
 import _ from 'lodash'
 import Link from 'next/link'
 import { useRecentTrades } from '@play-money/api-helpers/client/hooks'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { calculateBalanceChanges, findBalanceChange } from '@play-money/finance/lib/helpers'
+import { formatDistanceToNowShort } from '@play-money/ui'
 import { UserLink } from '@play-money/users/components/UserLink'
 
 export function RecentTrades() {
@@ -52,9 +52,7 @@ export function RecentTrades() {
                 </span>
               </>
             ) : null}{' '}
-            <span className="text-muted-foreground">
-              {formatDistanceToNow(transaction.createdAt, { addSuffix: true })}
-            </span>
+            <span className="text-muted-foreground">{formatDistanceToNowShort(transaction.createdAt)}</span>
           </li>
         )
       })}

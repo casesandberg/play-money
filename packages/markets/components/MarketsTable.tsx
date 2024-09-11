@@ -1,12 +1,12 @@
 'use client'
 
 import { ColumnDef, RowData } from '@tanstack/react-table'
-import { formatDistanceToNow } from 'date-fns'
 import { MinusIcon } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 import { User } from '@play-money/database'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
+import { formatDistanceToNowShort } from '@play-money/ui'
 import { useSearchParam } from '@play-money/ui'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { DataTable } from '@play-money/ui/data-table'
@@ -117,7 +117,7 @@ export const columns: Array<ColumnDef<ExtendedMarket>> = [
     cell: ({ row }) => {
       const value = row.getValue<Date>('closeDate')
       if (value) {
-        return <div className="text-muted-foreground">{`in ${formatDistanceToNow(value)}`}</div>
+        return <div className="text-muted-foreground">{formatDistanceToNowShort(value)}</div>
       }
 
       return <MinusIcon className="h-4 w-4 text-muted-foreground/50" />

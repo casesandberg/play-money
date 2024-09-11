@@ -1,11 +1,11 @@
 'use client'
 
-import { formatDistanceToNow } from 'date-fns'
 import _ from 'lodash'
 import Link from 'next/link'
 import React from 'react'
 import { useLiquidity } from '@play-money/api-helpers/client/hooks'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
+import { formatDistanceToNowShort } from '@play-money/ui'
 import { UserLink } from '@play-money/users/components/UserLink'
 import { calculateBalanceChanges, findBalanceChange } from '../lib/helpers'
 
@@ -49,9 +49,7 @@ export function RecentLiquidity() {
                 <UserLink hideUsername user={transaction.initiator} />
               </div>
             ) : null}
-            <span className="text-muted-foreground">
-              {formatDistanceToNow(transaction.createdAt, { addSuffix: true })}
-            </span>
+            <span className="text-muted-foreground">{formatDistanceToNowShort(transaction.createdAt)}</span>
           </li>
         )
       })}
