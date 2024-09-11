@@ -32,7 +32,10 @@ export default async function AppPage() {
           <div className="divide-y font-mono text-sm">
             {closingMarkets.map((market) => {
               const isBinaryMarket = market.options.length === 2
-              const firstOption = market.options[0]
+              const createdOrderOptions = market.options.sort(
+                (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+              )
+              const firstOption = createdOrderOptions[0]
               const sortedOptions = market.options.sort((a, b) => (b.probability || 0) - (a.probability || 0))
 
               return (
@@ -95,7 +98,10 @@ export default async function AppPage() {
           <div className="divide-y font-mono text-sm">
             {newMarkets.map((market) => {
               const isBinaryMarket = market.options.length === 2
-              const firstOption = market.options[0]
+              const createdOrderOptions = market.options.sort(
+                (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+              )
+              const firstOption = createdOrderOptions[0]
               const sortedOptions = market.options.sort((a, b) => (b.probability || 0) - (a.probability || 0))
 
               return (

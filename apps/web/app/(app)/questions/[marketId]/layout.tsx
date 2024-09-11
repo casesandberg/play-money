@@ -12,7 +12,10 @@ export default async function AppQuestionsLayout({
   searchParams?: { option: string }
 }) {
   const market = await getExtendedMarket({ marketId: params.marketId })
-  const activeOptionId = searchParams?.option || market.options[0]?.id || ''
+  const createdOrderOptions = market.options.sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  )
+  const activeOptionId = searchParams?.option || createdOrderOptions[0]?.id || ''
 
   // eslint-disable-next-line @typescript-eslint/require-await -- Next requires this to be async since its SSR
   const handleRevalidate = async () => {

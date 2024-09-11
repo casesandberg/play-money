@@ -58,7 +58,10 @@ export function MarketOverviewPage({
   const [isEditing, setIsEditing] = useSearchParam('edit')
   const [isEditOption, setIsEditOption] = useSearchParam('editOption')
   const [isBoosting, setIsBoosting] = useSearchParam('boost')
-  const activeOptionId = option || market.options[0]?.id || ''
+  const createdOrderOptions = market.options.sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  )
+  const activeOptionId = option || createdOrderOptions[0]?.id || ''
   const isCreator = user?.id === market.createdBy
   const probabilities = marketOptionBalancesToProbabilities(balance?.amm)
 
