@@ -68,7 +68,7 @@ export async function createMarketLiquidityTransaction({
     entries,
     marketId,
     additionalLogic: async (txParams) => {
-      txParams.tx.market.update({
+      await txParams.tx.market.update({
         where: {
           id: marketId,
         },
