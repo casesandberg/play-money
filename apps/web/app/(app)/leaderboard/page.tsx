@@ -7,6 +7,7 @@ import { Badge } from '@play-money/ui/badge'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@play-money/ui/tooltip'
 import { cn } from '@play-money/ui/utils'
 import { UserLink } from '@play-money/users/components/UserLink'
+import { LeaderboardTitle } from './LeaderboardTitle'
 
 function LeaderboardUserTable({
   users,
@@ -101,63 +102,37 @@ export default async function AppQuestionsPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
         <div className="w-full rounded-lg border bg-card text-card-foreground shadow-sm">
-          <div className="flex justify-between rounded-t-lg border-b bg-muted px-4 py-2 pt-8">
-            <h4 className="text-lg font-semibold">Top traders</h4>
-            <Tooltip>
-              <TooltipTrigger>
-                <InfoIcon className="size-4 text-muted-foreground" />
-              </TooltipTrigger>
-              <TooltipContent className="max-w-sm">
-                Calculated as all realized gains from trading during the period plus the net present value of any
-                positions held during the period.
-              </TooltipContent>
-            </Tooltip>
-          </div>
+          <LeaderboardTitle
+            description="Calculated as all realized gains from trading during the period plus the net present value of any
+                positions held during the period."
+            title="Top traders"
+          />
+
           <LeaderboardUserTable activeUserRank={leaderboard.userRankings?.trader} users={leaderboard.topTraders} />
         </div>
 
         <div className="w-full rounded-lg border bg-card text-card-foreground shadow-sm">
-          <div className="flex justify-between rounded-t-lg border-b bg-muted px-4 py-2 pt-8">
-            <h4 className="text-lg font-semibold">Top creators</h4>
-            <Tooltip>
-              <TooltipTrigger>
-                <InfoIcon className="size-4 text-muted-foreground" />
-              </TooltipTrigger>
-              <TooltipContent className="max-w-sm">
-                Calculated as all unique trader fees obtained during the time period.
-              </TooltipContent>
-            </Tooltip>
-          </div>
+          <LeaderboardTitle
+            description="Calculated as all unique trader fees obtained during the time period."
+            title="Top creators"
+          />
           <LeaderboardUserTable activeUserRank={leaderboard.userRankings?.creator} users={leaderboard.topCreators} />
         </div>
 
         <div className="w-full rounded-lg border bg-card text-card-foreground shadow-sm">
-          <div className="flex justify-between rounded-t-lg border-b bg-muted px-4 py-2 pt-8">
-            <h4 className="text-lg font-semibold">Top promoters</h4>
-            <Tooltip>
-              <TooltipTrigger>
-                <InfoIcon className="size-4 text-muted-foreground" />
-              </TooltipTrigger>
-              <TooltipContent className="max-w-sm">
-                Calculated as all volume bonuses obtained from all liquidity boosted markets during the time period.
-              </TooltipContent>
-            </Tooltip>
-          </div>
+          <LeaderboardTitle
+            description="Calculated as all volume bonuses obtained from all liquidity boosted markets during the time period."
+            title="Top promoters"
+          />
           <LeaderboardUserTable activeUserRank={leaderboard.userRankings?.promoter} users={leaderboard.topPromoters} />
         </div>
 
         <div className="w-full rounded-lg border bg-card text-card-foreground shadow-sm">
-          <div className="flex justify-between rounded-t-lg border-b bg-muted px-4 py-2 pt-8">
-            <h4 className="text-lg font-semibold">Top questers</h4>
-            <Tooltip>
-              <TooltipTrigger>
-                <InfoIcon className="size-4 text-muted-foreground" />
-              </TooltipTrigger>
-              <TooltipContent className="max-w-sm">
-                Calculated as all quest-related bonuses collected in the time period.
-              </TooltipContent>
-            </Tooltip>
-          </div>
+          <LeaderboardTitle
+            description="Calculated as all quest-related bonuses collected in the time period."
+            title="Top questers"
+          />
+
           <LeaderboardUserTable activeUserRank={leaderboard.userRankings?.quester} users={leaderboard.topQuesters} />
         </div>
       </div>
