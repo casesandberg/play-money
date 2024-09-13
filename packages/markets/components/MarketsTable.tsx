@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from '@play-money/ui/select'
 import { ExtendedMarket } from '../types'
+import { MarketProbabilityDetail } from './MarketProbabilityDetail'
 
 export const columns: Array<ColumnDef<ExtendedMarket>> = [
   {
@@ -48,33 +49,16 @@ export const columns: Array<ColumnDef<ExtendedMarket>> = [
     cell: ({ row }) => {
       const options = row.original.options
       const marketResolution = row.original.marketResolution
-      const isBinaryMarket = options.length === 2
 
-      const sortedOptions = options ? options.sort((a, b) => (b.probability || 0) - (a.probability || 0)) : undefined
       return (
         <Link href={`/questions/${row.original.id}/${row.original.slug}`}>
           {marketResolution ? (
-            <div className="text-muted-foreground">Resolved {marketResolution.resolution.name}</div>
-          ) : isBinaryMarket ? (
-            <div className="flex flex-row items-center gap-2">
-              <div style={{ color: options[0].color }}>{options[0].probability}%</div>
-              <Progress
-                className="h-2 max-w-[150px] transition-transform"
-                data-color={options[0].color}
-                indicatorStyle={{ backgroundColor: options[0].color }}
-                value={options[0].probability}
-              />
+            <div className="text-muted-foreground">
+              <span className="font-semibold">Resolved</span> {marketResolution.resolution.name}
             </div>
-          ) : sortedOptions ? (
-            <div className="line-clamp-2 text-muted-foreground">
-              <span className="pr-4" style={{ color: sortedOptions[0].color }}>
-                {sortedOptions[0].probability}% {sortedOptions[0].name}
-              </span>
-              {/* <span style={{ color: sortedOptions[1].color }}>
-                {sortedOptions[1].probability}% {sortedOptions[1].name}
-              </span> */}
-            </div>
-          ) : null}
+          ) : (
+            <MarketProbabilityDetail options={options} />
+          )}
         </Link>
       )
     },
