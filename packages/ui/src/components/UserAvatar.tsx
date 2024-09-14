@@ -19,14 +19,17 @@ export function UserAvatar({
   user,
   size,
   className,
+  imgClassName,
 }: VariantProps<typeof userAvatarVariants> & {
   user: { username: string; avatarUrl?: string | null; id: string }
   className?: string
+  imgClassName?: string
 }) {
   return (
     <Avatar className={cn(userAvatarVariants({ size, className }))}>
       <AvatarImage
         alt={`@${user.username}`}
+        className={cn(imgClassName)}
         src={user.avatarUrl ?? `https://api.dicebear.com/8.x/initials/svg?seed=${user.username}&scale=75`}
       />
       <AvatarFallback />

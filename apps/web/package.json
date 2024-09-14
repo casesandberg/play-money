@@ -23,6 +23,9 @@
     "@play-money/search": "*",
     "@play-money/ui": "*",
     "@play-money/users": "*",
+    "@tiptap/extension-mention": "^2.6.6",
+    "@tiptap/react": "^2.6.6",
+    "@tiptap/suggestion": "^2.6.6",
     "@vercel/blob": "^0.23.4",
     "date-fns": "^3.6.0",
     "lodash": "^4.17.21",
@@ -34,6 +37,7 @@
     "react-hook-form": "^7.51.5",
     "recharts": "^2.13.0-alpha.4",
     "swr": "^2.2.5",
+    "tippy.js": "^6.3.7",
     "zod": "^3.23.8"
   },
   "devDependencies": {

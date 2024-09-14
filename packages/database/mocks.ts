@@ -173,7 +173,7 @@ export function mockMarketOption(overrides?: Partial<MarketOption>): MarketOptio
     marketId: faker.string.uuid(),
     createdAt: faker.date.past(),
     updatedAt: faker.date.past(),
-    probability: 0.5,
+    probability: 50,
     ...overrides,
   }
 }

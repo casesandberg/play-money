@@ -4,12 +4,12 @@ import React from 'react'
 import { getMarkets } from '@play-money/api-helpers/client'
 import { RecentLiquidity } from '@play-money/finance/components/RecentLiquidity'
 import { RecentTrades } from '@play-money/finance/components/RecentTrades'
+import { MarketProbabilityDetail } from '@play-money/markets/components/MarketProbabilityDetail'
 import { UserQuestCard } from '@play-money/quests/components/UserQuestCard'
 import { formatDistanceToNowShort } from '@play-money/ui'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Button } from '@play-money/ui/button'
 import { Card } from '@play-money/ui/card'
-import { Progress } from '@play-money/ui/progress'
 
 export default async function AppPage() {
   const { markets: closingMarkets } = await getMarkets({ sortField: 'closeDate', sortDirection: 'asc', pageSize: '5' })
@@ -31,17 +31,10 @@ export default async function AppPage() {
 
           <div className="divide-y font-mono text-sm">
             {closingMarkets.map((market) => {
-              const isBinaryMarket = market.options.length === 2
-              const createdOrderOptions = market.options.sort(
-                (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-              )
-              const firstOption = createdOrderOptions[0]
-              const sortedOptions = market.options.sort((a, b) => (b.probability || 0) - (a.probability || 0))
-
               return (
                 <div className="flex flex-col transition-colors hover:bg-muted/50 sm:flex-row" key={market.id}>
                   <Link
-                    className="m-2 mb-0 ml-3 line-clamp-2 flex-[3] sm:mb-2"
+                    className="m-2 mb-0 ml-3 line-clamp-2 flex-[3] visited:text-muted-foreground sm:mb-2"
                     href={`/questions/${market.id}/${market.slug}`}
                   >
                     {market.question}
@@ -49,25 +42,12 @@ export default async function AppPage() {
 
                   <div className="flex flex-[2]">
                     <Link className="flex-1 p-2" href={`/questions/${market.id}/${market.slug}`}>
-                      {isBinaryMarket ? (
-                        <div className="flex flex-row items-center gap-2">
-                          <div style={{ color: firstOption.color }}>{firstOption.probability}%</div>
-                          <Progress
-                            className="h-2 max-w-[150px] transition-transform"
-                            data-color={firstOption.color}
-                            indicatorStyle={{ backgroundColor: firstOption.color }}
-                            value={firstOption.probability}
-                          />
+                      {market.marketResolution ? (
+                        <div className="text-muted-foreground">
+                          <span className="font-semibold">Resolved</span> {market.marketResolution.resolution.name}
                         </div>
                       ) : (
-                        <div className="line-clamp-2 text-muted-foreground">
-                          <span className="pr-4" style={{ color: sortedOptions[0].color }}>
-                            {sortedOptions[0].probability}% {sortedOptions[0].name}
-                          </span>
-                          {/* <span style={{ color: sortedOptions[1].color }}>
-                {sortedOptions[1].probability}% {sortedOptions[1].name}
-              </span> */}
-                        </div>
+                        <MarketProbabilityDetail options={market.options} />
                       )}
                     </Link>
                     <div className="p-2 pr-3">
@@ -97,17 +77,10 @@ export default async function AppPage() {
 
           <div className="divide-y font-mono text-sm">
             {newMarkets.map((market) => {
-              const isBinaryMarket = market.options.length === 2
-              const createdOrderOptions = market.options.sort(
-                (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-              )
-              const firstOption = createdOrderOptions[0]
-              const sortedOptions = market.options.sort((a, b) => (b.probability || 0) - (a.probability || 0))
-
               return (
                 <div className="flex flex-col transition-colors hover:bg-muted/50 sm:flex-row" key={market.id}>
                   <Link
-                    className="m-2 mb-0 ml-3 line-clamp-2 flex-[3] sm:mb-2"
+                    className="m-2 mb-0 ml-3 line-clamp-2 flex-[3] visited:text-muted-foreground sm:mb-2"
                     href={`/questions/${market.id}/${market.slug}`}
                   >
                     {market.question}
@@ -115,25 +88,12 @@ export default async function AppPage() {
 
                   <div className="flex flex-[2]">
                     <Link className="flex-1 p-2" href={`/questions/${market.id}/${market.slug}`}>
-                      {isBinaryMarket ? (
-                        <div className="flex flex-row items-center gap-2">
-                          <div style={{ color: firstOption.color }}>{firstOption.probability}%</div>
-                          <Progress
-                            className="h-2 max-w-[150px] transition-transform"
-                            data-color={firstOption.color}
-                            indicatorStyle={{ backgroundColor: firstOption.color }}
-                            value={firstOption.probability}
-                          />
+                      {market.marketResolution ? (
+                        <div className="text-muted-foreground">
+                          <span className="font-semibold">Resolved</span> {market.marketResolution.resolution.name}
                         </div>
                       ) : (
-                        <div className="line-clamp-2 text-muted-foreground">
-                          <span className="pr-4" style={{ color: sortedOptions[0].color }}>
-                            {sortedOptions[0].probability}% {sortedOptions[0].name}
-                          </span>
-                          {/* <span style={{ color: sortedOptions[1].color }}>
-                {sortedOptions[1].probability}% {sortedOptions[1].name}
-              </span> */}
-                        </div>
+                        <MarketProbabilityDetail options={market.options} />
                       )}
                     </Link>
                     <div className="p-2 pr-3">

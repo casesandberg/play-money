@@ -317,6 +317,10 @@ export async function getUserStats({ userId }: { userId: string }) {
   }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/stats`)
 }
 
+export async function getUser({ userId }: { userId: string }): Promise<User> {
+  return apiHandler<User>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}`)
+}
+
 export async function getUserUsername({ username }: { username: string }): Promise<User> {
   return apiHandler<User>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/username/${username}`, {
     next: {

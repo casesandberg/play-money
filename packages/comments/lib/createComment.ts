@@ -6,6 +6,20 @@ import { createDailyCommentBonusTransaction } from '@play-money/quests/lib/creat
 import { hasCommentedToday } from '@play-money/quests/lib/helpers'
 import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
 
+function extractUniqueMentionIds(htmlString: string): string[] {
+  const mentionRegex = /<mention[^>]*data-id="([^"]*)"[^>]*>/g
+  const uniqueIds = new Set<string>()
+
+  let match
+  while ((match = mentionRegex.exec(htmlString)) !== null) {
+    if (match[1]) {
+      uniqueIds.add(match[1])
+    }
+  }
+
+  return Array.from(uniqueIds)
+}
+
 export async function createComment({
   content,
   authorId,
@@ -26,11 +40,32 @@ export async function createComment({
     },
   })
 
-  // TODO: Comment mentions.
-
   const market = await getMarket({ id: entityId })
+  const userIdsMentioned = extractUniqueMentionIds(content)
 
-  if (parentId && comment.parent && authorId !== comment.parent?.authorId) {
+  await Promise.all(
+    userIdsMentioned.map(async (mentionedUserId) => {
+      if (mentionedUserId === authorId) return
+
+      await createNotification({
+        type: 'COMMENT_MENTION',
+        actorId: authorId,
+        marketId: market.id,
+        commentId: comment.id,
+        parentCommentId: parentId ?? undefined,
+        groupKey: market.id,
+        userId: mentionedUserId,
+        actionUrl: `/questions/${market.id}/${market.slug}#${comment.id}`,
+      })
+    })
+  )
+
+  if (
+    parentId &&
+    comment.parent &&
+    authorId !== comment.parent?.authorId &&
+    !userIdsMentioned.includes(comment.parent?.authorId)
+  ) {
     await createNotification({
       type: 'COMMENT_REPLY',
       actorId: authorId,
@@ -57,7 +92,11 @@ export async function createComment({
   }
 
   // TODO switch this to watchers of the market.
-  const recipientIds = await getUniqueLiquidityProviderIds(market.id, [authorId, comment.parent?.authorId])
+  const recipientIds = await getUniqueLiquidityProviderIds(market.id, [
+    authorId,
+    comment.parent?.authorId,
+    ...userIdsMentioned,
+  ])
 
   await Promise.all(
     recipientIds.map((recipientId) =>

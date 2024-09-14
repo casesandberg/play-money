@@ -123,7 +123,7 @@ export interface CommentMentionNotificationContent extends NotificationContentBa
   actor: User
   market: Market
   comment: Comment
-  parentComment: Comment
+  parentComment?: Comment
 }
 
 export interface CreateCommentMentionNotification extends CreateNotificationBase {
@@ -131,7 +131,7 @@ export interface CreateCommentMentionNotification extends CreateNotificationBase
   actorId: string
   marketId: string
   commentId: string
-  parentCommentId: string
+  parentCommentId?: string
 }
 
 export type NotificationContent =

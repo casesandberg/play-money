@@ -2,6 +2,7 @@ import useSWR from 'swr'
 import { User } from '@play-money/database'
 import { MarketOptionPositionAsNumbers, NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
 import { TransactionWithEntries } from '@play-money/finance/types'
+import { ExtendedMarket } from '@play-money/markets/types'
 import { NotificationGroupWithLastNotification } from '@play-money/notifications/lib/getNotifications'
 import { Quest } from '@play-money/quests/components/QuestCard'
 
@@ -57,6 +58,12 @@ export function useMarketGraph({ marketId }: { marketId: string }) {
       }>
     }>
   }>(MARKET_GRAPH_PATH(marketId), { refreshInterval: FIVE_MINUTES })
+}
+
+export function useMarketRelated({ marketId }: { marketId: string }) {
+  return useSWR<{
+    markets: Array<ExtendedMarket>
+  }>(`/v1/markets/${marketId}/related`)
 }
 
 export const MY_NOTIFICATIONS_PATH = '/v1/users/me/notifications'

@@ -13,8 +13,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@play-money/ui/dropdown-menu'
-import { Progress } from '@play-money/ui/progress'
 import { cn } from '@play-money/ui/utils'
+import { MarketProbabilityDetail } from './MarketProbabilityDetail'
 
 export function MarketOptionRow({
   option,
@@ -42,17 +42,7 @@ export function MarketOptionRow({
         <Checkbox variant="outline" checked={active} />
         <div className="flex flex-1 flex-col gap-1">
           <div className="line-clamp-2 font-semibold leading-none">{option.name}</div>
-          <div className="flex flex-row items-center gap-2">
-            <div className="font-mono text-xs font-semibold leading-none" style={{ color: option.color }}>
-              {Math.round(probability)}%
-            </div>
-            <Progress
-              className="h-2 max-w-[200px] transition-transform"
-              data-color={option.color}
-              indicatorStyle={{ backgroundColor: option.color }}
-              value={probability}
-            />
-          </div>
+          <MarketProbabilityDetail options={[option]} size="sm" />
         </div>
       </div>
 
