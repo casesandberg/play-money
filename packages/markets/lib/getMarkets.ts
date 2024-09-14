@@ -5,6 +5,7 @@ interface MarketFilterOptions {
   status?: 'active' | 'halted' | 'closed' | 'resolved' | 'cancelled' | 'all'
   createdBy?: string
   tag?: string
+  tags?: string[]
 }
 
 interface SortOptions {
@@ -52,7 +53,7 @@ export async function getMarkets(
       where: {
         ...statusFilters,
         createdBy: filters.createdBy,
-        tags: filters.tag ? { has: filters.tag } : undefined,
+        tags: filters.tag ? { has: filters.tag } : filters.tags ? { hasSome: filters.tags } : undefined,
       },
       include: {
         user: true,

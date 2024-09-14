@@ -69,7 +69,6 @@ export function MarketOverviewPage({
     (prev.probability || 0) > (current.probability || 0) ? prev : current
   )
 
-  console.log(market.options)
   const orderedMarketOptions = _.orderBy(market.options, 'createdAt')
 
   const handleRevalidateBalance = async () => {
