@@ -107,10 +107,17 @@ export function NotificationItem({
       bottomLine = `${notification.actor.displayName}${othersCount} reacted: ${notification.commentReaction.emoji}`
       break
     }
-    default: {
-      topLine = notification.type
-      bottomLine = ''
+    case 'COMMENT_MENTION': {
+      topLine = notification.parentComment?.content
+        ? createSnippet(notification.parentComment.content)
+        : notification.market.question
+      bottomLine = `${notification.actor.displayName}${othersCount} mentioned you: ${createSnippet(notification.comment.content)}`
+      break
     }
+    // default: {
+    //   topLine = notification.type
+    //   bottomLine = ''
+    // }
   }
 
   return (
