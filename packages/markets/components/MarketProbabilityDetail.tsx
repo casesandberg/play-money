@@ -3,6 +3,21 @@ import { MarketOption } from '@play-money/database'
 import { Progress } from '@play-money/ui/progress'
 import { cn } from '@play-money/ui/utils'
 
+function formatProbability(probability: number | null) {
+  if (probability === null) {
+    return ''
+  }
+  const roundedProbability = Math.round(probability)
+
+  if (roundedProbability === 0) {
+    return '<1%'
+  }
+  if (roundedProbability === 100) {
+    return '>99%'
+  }
+  return `${roundedProbability}%`
+}
+
 export function MarketProbabilityDetail({
   options,
   size = 'md',
@@ -20,7 +35,7 @@ export function MarketProbabilityDetail({
           className={cn('font-mono font-semibold leading-none', size === 'sm' && 'text-xs')}
           style={{ color: option.color }}
         >
-          {Math.round(option.probability ?? 0)}%
+          {formatProbability(option.probability)}
         </div>
         <Progress
           className="h-2 max-w-[150px] transition-transform"
@@ -38,7 +53,7 @@ export function MarketProbabilityDetail({
     <div className="line-clamp-2 text-muted-foreground">
       <span className="pr-4" style={{ color: highestProbabilityOption.color }}>
         <span className={cn('font-mono font-semibold leading-none', size === 'sm' && 'text-xs')}>
-          {highestProbabilityOption.probability}%
+          {formatProbability(highestProbabilityOption.probability)}
         </span>{' '}
         {highestProbabilityOption.name}
       </span>
