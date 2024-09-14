@@ -34,7 +34,10 @@ export const columns: Array<ColumnDef<ExtendedMarket>> = [
     },
     cell: ({ row }) => {
       return (
-        <Link href={`/questions/${row.original.id}/${row.original.slug}`} className="ml-1 line-clamp-2">
+        <Link
+          href={`/questions/${row.original.id}/${row.original.slug}`}
+          className="ml-1 line-clamp-2 visited:text-muted-foreground"
+        >
           {row.getValue('question')}
         </Link>
       )

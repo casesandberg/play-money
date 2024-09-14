@@ -35,7 +35,7 @@ export default async function AppPage() {
               return (
                 <div className="flex flex-col transition-colors hover:bg-muted/50 sm:flex-row" key={market.id}>
                   <Link
-                    className="m-2 mb-0 ml-3 line-clamp-2 flex-[3] sm:mb-2"
+                    className="m-2 mb-0 ml-3 line-clamp-2 flex-[3] visited:text-muted-foreground sm:mb-2"
                     href={`/questions/${market.id}/${market.slug}`}
                   >
                     {market.question}
@@ -81,7 +81,7 @@ export default async function AppPage() {
               return (
                 <div className="flex flex-col transition-colors hover:bg-muted/50 sm:flex-row" key={market.id}>
                   <Link
-                    className="m-2 mb-0 ml-3 line-clamp-2 flex-[3] sm:mb-2"
+                    className="m-2 mb-0 ml-3 line-clamp-2 flex-[3] visited:text-muted-foreground sm:mb-2"
                     href={`/questions/${market.id}/${market.slug}`}
                   >
                     {market.question}
