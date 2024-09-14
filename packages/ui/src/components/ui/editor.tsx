@@ -7,6 +7,7 @@ import { EditorContent, Extension, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import React, { useEffect, useState, useRef } from 'react'
+import { useEditorExtensions } from '../../contexts/EditorExtensionsContext'
 import { cn } from '../../lib/utils'
 import { Button } from './button'
 
@@ -36,9 +37,12 @@ function Editor({
   onRendered,
 }: EditorProps) {
   const [isEditorRendered, setIsEditorRendered] = useState(false)
+  const contextExtensions = useEditorExtensions()
+
   const editor = useEditor({
     content: value,
     editable: !disabled,
+    immediatelyRender: false,
     editorProps: {
       attributes: {
         class: cn(
@@ -64,6 +68,7 @@ function Editor({
           class: 'text-primary',
         },
       }),
+      ...(contextExtensions?.extensions || []),
     ],
     onCreate() {
       setIsEditorRendered(true)

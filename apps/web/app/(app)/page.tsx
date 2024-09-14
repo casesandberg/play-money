@@ -10,7 +10,6 @@ import { formatDistanceToNowShort } from '@play-money/ui'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Button } from '@play-money/ui/button'
 import { Card } from '@play-money/ui/card'
-import { Progress } from '@play-money/ui/progress'
 
 export default async function AppPage() {
   const { markets: closingMarkets } = await getMarkets({ sortField: 'closeDate', sortDirection: 'asc', pageSize: '5' })
