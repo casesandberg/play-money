@@ -97,11 +97,11 @@ describe('updateMarketPositionValues', () => {
 
     expect(mockTx.marketOptionPosition.update).toHaveBeenCalledWith({
       where: { id: 'user-1-pos' },
-      data: { value: expect.closeToDecimal(41.88) },
+      data: expect.objectContaining({ value: expect.closeToDecimal(41.88) }),
     })
     expect(mockTx.marketOptionPosition.update).toHaveBeenCalledWith({
       where: { id: 'user-2-pos' },
-      data: { value: expect.closeToDecimal(9.01) },
+      data: expect.objectContaining({ value: expect.closeToDecimal(9.01) }),
     })
   })
 

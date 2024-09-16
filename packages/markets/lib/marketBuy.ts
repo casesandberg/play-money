@@ -62,6 +62,7 @@ export async function marketBuy({
         where: { id: marketId },
         data: {
           uniqueTradersCount: { increment: 1 },
+          updatedAt: new Date(),
         },
       }),
     ])

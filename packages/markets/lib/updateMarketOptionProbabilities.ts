@@ -24,6 +24,7 @@ export async function updateMarketOptionProbabilities({
         },
         data: {
           probability,
+          updatedAt: new Date(),
         },
       })
     })

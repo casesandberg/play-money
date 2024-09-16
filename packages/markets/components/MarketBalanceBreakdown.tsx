@@ -57,16 +57,16 @@ export function MarketBalanceBreakdown({
           {positions.map((position) => {
             const option = options.find((option) => option.id === position.optionId)!
             const value = new Decimal(position.value).toDecimalPlaces(4)
-            const cost = new Decimal(position.value).toDecimalPlaces(4)
-            const change = value.sub(cost).div(cost).times(100).toNumber()
+            const cost = new Decimal(position.cost).toDecimalPlaces(4)
+            const change = value.sub(cost).div(cost).times(100).round().toNumber()
             const changeLabel = `(${change > 0 ? '+' : ''}${change}%)`
 
             return value.toNumber() ? (
               <Tooltip key={position.optionId}>
-                <TooltipTrigger className="flex w-full justify-between text-xs text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <div className="size-2 rounded-md" style={{ backgroundColor: option.color }} />
-                    <span className="font-mono">{option.name}</span>
+                <TooltipTrigger className="flex w-full justify-between gap-2 text-xs text-muted-foreground">
+                  <div className="flex gap-1">
+                    <div className="mt-1 size-2 flex-shrink-0 rounded-md" style={{ backgroundColor: option.color }} />
+                    <span className="line-clamp-2 font-mono">{option.name}</span>
                   </div>
                   <div className="flex gap-2">
                     {change ? (
@@ -76,7 +76,7 @@ export function MarketBalanceBreakdown({
                   </div>
                 </TooltipTrigger>
                 <TooltipContent className="max-w-sm" align="start">
-                  <div className="line-clamp-2">{option.name}</div>
+                  <div>{option.name}</div>
                   <div className="text-xs text-muted-foreground">
                     Cost: {new Decimal(position.cost).toDecimalPlaces(4).toString()}
                   </div>

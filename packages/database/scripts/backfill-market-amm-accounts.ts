@@ -27,6 +27,7 @@ async function main() {
                 type: 'MARKET_CLEARING' as const,
               },
             },
+            updatedAt: new Date(),
           },
         })
         console.log(`Successfully created account for market with id: ${market.id}`)

@@ -22,6 +22,7 @@ async function main() {
                 type: 'USER',
               },
             },
+            updatedAt: new Date(),
           },
         })
         console.log(`Successfully created account for user with id: ${user.id}`)

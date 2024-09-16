@@ -114,6 +114,7 @@ export async function createMarket({
       },
       data: {
         marketId: createdMarket.id,
+        updatedAt: new Date(),
       },
     }),
     db.account.update({
@@ -122,6 +123,7 @@ export async function createMarket({
       },
       data: {
         marketId: createdMarket.id,
+        updatedAt: new Date(),
       },
     }),
   ])

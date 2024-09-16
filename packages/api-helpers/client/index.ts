@@ -1,7 +1,8 @@
 import _ from 'lodash'
 import { CommentWithReactions } from '@play-money/comments/lib/getComment'
-import { Market, User } from '@play-money/database'
-import { TransactionWithEntries, LeaderboardUser } from '@play-money/finance/types'
+import { Market, MarketOptionPosition, User } from '@play-money/database'
+import { NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
+import { TransactionWithEntries, LeaderboardUser, ExtendedMarketOptionPosition } from '@play-money/finance/types'
 import { ExtendedMarket } from '@play-money/markets/types'
 
 // TODO: @casesandberg Generate this from OpenAPI schema
@@ -337,6 +338,22 @@ export async function getUserTransactions({
   return apiHandler<{ transactions: Array<TransactionWithEntries> }>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/transactions`
   )
+}
+
+export async function getUserPositions({
+  userId,
+  pageSize,
+}: {
+  userId: string
+  pageSize?: number
+}): Promise<{ positions: Array<ExtendedMarketOptionPosition> }> {
+  return apiHandler<{ positions: Array<ExtendedMarketOptionPosition> }>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/positions${pageSize ? `?pageSize=${pageSize}` : ''}`
+  )
+}
+
+export async function getUserBalance({ userId }: { userId: string }): Promise<{ balance: NetBalanceAsNumbers }> {
+  return apiHandler<{ balance: NetBalanceAsNumbers }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/balance`)
 }
 
 export async function getUserMarkets({ userId }: { userId: string }): Promise<{ markets: Array<ExtendedMarket> }> {

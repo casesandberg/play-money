@@ -87,6 +87,7 @@ export async function createComment({
         commentCount: {
           increment: 1,
         },
+        updatedAt: new Date(),
       },
     })
   }

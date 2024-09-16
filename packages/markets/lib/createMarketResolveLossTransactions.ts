@@ -83,6 +83,7 @@ export async function createMarketResolveLossTransactions({
                       decrement: quantity.toNumber(),
                     },
                     value: 0,
+                    updatedAt: new Date(),
                   },
                 })
               }),

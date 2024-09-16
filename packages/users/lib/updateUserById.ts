@@ -44,7 +44,7 @@ export async function updateUserById({
 
   const updatedUser = await db.user.update({
     where: { id },
-    data: updatedData,
+    data: { ...updatedData, updatedAt: new Date() },
   })
 
   return updatedUser

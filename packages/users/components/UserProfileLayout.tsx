@@ -1,11 +1,12 @@
 import { format } from 'date-fns'
 import React from 'react'
-import { getUserStats, getUserUsername } from '@play-money/api-helpers/client'
+import { getUserBalance, getUserStats, getUserUsername } from '@play-money/api-helpers/client'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { formatNumber } from '@play-money/finance/lib/formatCurrency'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@play-money/ui/card'
 import { Separator } from '@play-money/ui/separator'
+import { UserPlaystyleChart } from './UserPlaystyleChart'
 
 const DiscordIcon = ({ className }: { className: string }) => (
   <svg viewBox="0 -28.5 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" className={className}>
@@ -33,6 +34,14 @@ c21.209-2.535,41.426-8.171,60.222-16.505C497.448,118.542,479.666,137.004,459.186
   </svg>
 )
 
+function getOrdersOfMagnitude(num: number): number {
+  if (num < 1) {
+    return 1
+  }
+
+  return Math.floor(Math.log10(num / 1)) + 1
+}
+
 export async function UserProfileLayout({
   params: { username },
   children,
@@ -42,60 +51,78 @@ export async function UserProfileLayout({
 }) {
   const profile = await getUserUsername({ username })
   const stats = await getUserStats({ userId: profile.id })
+  const { balance } = await getUserBalance({ userId: profile.id })
+
+  const quester =
+    balance.subtotals['DAILY_TRADE_BONUS'] +
+    balance.subtotals['DAILY_MARKET_BONUS'] +
+    balance.subtotals['DAILY_COMMENT_BONUS'] +
+    balance.subtotals['DAILY_LIQUIDITY_BONUS']
+  const creator = balance.subtotals['CREATOR_TRADER_BONUS']
+  const trader = Math.abs(balance.subtotals['TRADE_BUY'])
+  const promoter = Math.abs(balance.subtotals['LIQUIDITY_DEPOSIT'])
+
+  const playstyleData = [
+    { subject: 'Quester', value: getOrdersOfMagnitude(quester) / 4, color: '#a0d8e7' },
+    { subject: 'Creator', value: getOrdersOfMagnitude(creator) / 4, color: '#ffc638' },
+    { subject: 'Trader', value: getOrdersOfMagnitude(trader) / 4, color: '#00cdb1' },
+    { subject: 'Promoter', value: getOrdersOfMagnitude(promoter) / 4, color: '#8247ff' },
+  ]
 
   return (
     <main className="mx-auto flex flex-1 flex-col items-start gap-6 md:flex-row">
-      <Card className="w-full md:w-80">
-        <CardHeader className="flex flex-row items-start gap-4 bg-muted/50">
-          <UserAvatar user={profile} size="lg" />
-          <div>
-            <CardTitle className="text-lg">{profile.displayName}</CardTitle>
-            <CardDescription>@{profile.username}</CardDescription>
-          </div>
-          {/* <div className="ml-auto flex items-center gap-1">
+      <div className="w-full space-y-4 md:w-80">
+        <Card>
+          <CardHeader className="flex flex-row items-start gap-4 bg-muted/50">
+            <UserAvatar user={profile} size="lg" />
+            <div>
+              <CardTitle className="text-lg">{profile.displayName}</CardTitle>
+              <CardDescription>@{profile.username}</CardDescription>
+            </div>
+            {/* <div className="ml-auto flex items-center gap-1">
             <EditOrFollowUserButton userId={profile.id} />
           </div> */}
-        </CardHeader>
-        <CardContent className="pt-3 text-sm md:pt-6">
-          <div className="grid gap-3">
-            {profile.bio ? <div>{profile.bio}</div> : null}
-            {profile.twitterHandle || profile.discordHandle || profile.website ? (
-              <div className="flex min-w-0 flex-row gap-4">
-                {profile.twitterHandle ? (
-                  <a
-                    href={`https://twitter.com/${profile.twitterHandle}`}
-                    target="_blank"
-                    className="flex min-w-0 items-center gap-2 text-muted-foreground hover:text-foreground hover:underline"
-                  >
-                    <TwitterIcon className="h-4 w-4" />
-                    <span className="truncate">{profile.twitterHandle}</span>
-                  </a>
-                ) : null}
+          </CardHeader>
+          <CardContent className="pt-3 text-sm md:pt-6">
+            <div className="grid gap-3">
+              {profile.bio ? <div>{profile.bio}</div> : null}
+              {profile.twitterHandle || profile.discordHandle || profile.website ? (
+                <div className="flex min-w-0 flex-row gap-4">
+                  {profile.twitterHandle ? (
+                    <a
+                      href={`https://twitter.com/${profile.twitterHandle}`}
+                      target="_blank"
+                      className="flex min-w-0 items-center gap-2 text-muted-foreground hover:text-foreground hover:underline"
+                    >
+                      <TwitterIcon className="h-4 w-4" />
+                      <span className="truncate">{profile.twitterHandle}</span>
+                    </a>
+                  ) : null}
 
-                {profile.discordHandle ? (
-                  <a
-                    href={`https://discordapp.com/users/${profile.discordHandle}`}
-                    target="_blank"
-                    className="flex min-w-0 items-center gap-2 text-muted-foreground hover:text-foreground hover:underline"
-                  >
-                    <DiscordIcon className="h-4 w-4" />
-                    <span className="truncate">{profile.discordHandle}</span>
-                  </a>
-                ) : null}
+                  {profile.discordHandle ? (
+                    <a
+                      href={`https://discordapp.com/users/${profile.discordHandle}`}
+                      target="_blank"
+                      className="flex min-w-0 items-center gap-2 text-muted-foreground hover:text-foreground hover:underline"
+                    >
+                      <DiscordIcon className="h-4 w-4" />
+                      <span className="truncate">{profile.discordHandle}</span>
+                    </a>
+                  ) : null}
 
-                {profile.website ? (
-                  <a
-                    href={profile.website}
-                    target="_blank"
-                    className="flex min-w-0 items-center gap-2 text-muted-foreground hover:text-foreground hover:underline"
-                  >
-                    <DiscordIcon className="h-4 w-4" />
-                    <span className="truncate">{profile.website}</span>
-                  </a>
-                ) : null}
-              </div>
-            ) : null}
-            {/* <div className="flex flex-row gap-4">
+                  {profile.website ? (
+                    <a
+                      href={profile.website}
+                      target="_blank"
+                      className="flex min-w-0 items-center gap-2 text-muted-foreground hover:text-foreground hover:underline"
+                    >
+                      <DiscordIcon className="h-4 w-4" />
+                      <span className="truncate">{profile.website}</span>
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
+              {/* <div className="flex flex-row gap-4">
               <Link
                 href={`/${profile.username}/followers`}
                 className="flex items-center gap-1 text-muted-foreground hover:text-foreground hover:underline"
@@ -111,44 +138,58 @@ export async function UserProfileLayout({
                 <span>Followers</span>
               </Link>
             </div> */}
-          </div>
+            </div>
 
-          <Separator className="my-4" />
+            <Separator className="my-4" />
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center">
-              <div className="font-semibold">
-                <CurrencyDisplay value={stats.netWorth + stats.otherIncome} isShort />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <div className="font-semibold">
+                  <CurrencyDisplay value={stats.netWorth + stats.otherIncome} isShort />
+                </div>
+                <div className="text-muted-foreground">Net worth</div>
               </div>
-              <div className="text-muted-foreground">Net worth</div>
-            </div>
-            <div className="text-center">
-              <div className="font-mono font-semibold">{formatNumber(stats.tradingVolume)}</div>
-              <div className="text-muted-foreground">Trading volume</div>
-            </div>
-            <div className="text-center">
-              <div className="font-semibold">{stats.totalMarkets}</div>
-              <div className="text-muted-foreground">Total markets</div>
-            </div>
-            <div className="text-center">
-              <div className="font-semibold">
-                {stats.lastTradeAt ? (
-                  <time dateTime={stats.lastTradeAt.toString()}>{format(stats.lastTradeAt, 'MMM d, yyyy')}</time>
-                ) : (
-                  '-'
-                )}
+              <div className="text-center">
+                <div className="font-mono font-semibold">{formatNumber(stats.tradingVolume)}</div>
+                <div className="text-muted-foreground">Trading volume</div>
               </div>
-              <div className="text-muted-foreground">Last traded</div>
+              <div className="text-center">
+                <div className="font-semibold">{stats.totalMarkets}</div>
+                <div className="text-muted-foreground">Total markets</div>
+              </div>
+              <div className="text-center">
+                <div className="font-semibold">
+                  {stats.lastTradeAt ? (
+                    <time dateTime={stats.lastTradeAt.toString()}>{format(stats.lastTradeAt, 'MMM d, yyyy')}</time>
+                  ) : (
+                    '-'
+                  )}
+                </div>
+                <div className="text-muted-foreground">Last traded</div>
+              </div>
             </div>
+          </CardContent>
+          <CardFooter className="flex flex-row items-center border-t bg-muted/50 py-3 md:py-3">
+            <div className="text-xs text-muted-foreground">
+              Joined <time dateTime={profile.createdAt.toString()}>{format(profile.createdAt, 'MMM d, yyyy')}</time> —{' '}
+              {stats.activeDayCount} day{stats.activeDayCount > 1 ? 's' : ''} active
+            </div>
+          </CardFooter>
+        </Card>
+
+        <Card className="relative p-4">
+          <div className="absolute z-10 text-lg font-semibold text-muted-foreground">Playstyle</div>
+          <UserPlaystyleChart data={playstyleData} />
+          <div className="flex flex-wrap justify-center gap-x-2 border-t pt-1">
+            {playstyleData.map(({ subject, value, color }) => (
+              <div key={subject} className="flex items-center gap-1">
+                <div className="h-2 w-2 rounded-md" style={{ backgroundColor: color }} />
+                <div className="font-mono text-xs text-muted-foreground">{subject}</div>
+              </div>
+            ))}
           </div>
-        </CardContent>
-        <CardFooter className="flex flex-row items-center border-t bg-muted/50 py-3 md:py-3">
-          <div className="text-xs text-muted-foreground">
-            Joined <time dateTime={profile.createdAt.toString()}>{format(profile.createdAt, 'MMM d, yyyy')}</time> —{' '}
-            {stats.activeDayCount} day{stats.activeDayCount > 1 ? 's' : ''} active
-          </div>
-        </CardFooter>
-      </Card>
+        </Card>
+      </div>
 
       <div className="w-full flex-1">{children}</div>
     </main>

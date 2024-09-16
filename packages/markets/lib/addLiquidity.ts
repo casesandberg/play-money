@@ -58,6 +58,7 @@ export async function addLiquidity({
       where: { id: marketId },
       data: {
         uniquePromotersCount: { increment: amount.toNumber() },
+        updatedAt: new Date(),
       },
     })
   }

@@ -52,7 +52,7 @@ export async function resolveMarket({
 
     await tx.market.update({
       where: { id: marketId },
-      data: { resolvedAt: now, closeDate: now },
+      data: { resolvedAt: now, closeDate: now, updatedAt: now },
     })
   })
 
