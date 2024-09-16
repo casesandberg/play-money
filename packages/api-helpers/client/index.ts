@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { CommentWithReactions } from '@play-money/comments/lib/getComment'
 import { Market, User } from '@play-money/database'
+import { NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
 import { TransactionWithEntries, LeaderboardUser } from '@play-money/finance/types'
 import { ExtendedMarket } from '@play-money/markets/types'
 
@@ -337,6 +338,10 @@ export async function getUserTransactions({
   return apiHandler<{ transactions: Array<TransactionWithEntries> }>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/transactions`
   )
+}
+
+export async function getUserBalance({ userId }: { userId: string }): Promise<{ balance: NetBalanceAsNumbers }> {
+  return apiHandler<{ balance: NetBalanceAsNumbers }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/balance`)
 }
 
 export async function getUserMarkets({ userId }: { userId: string }): Promise<{ markets: Array<ExtendedMarket> }> {
