@@ -76,6 +76,7 @@ export async function createMarketLiquidityTransaction({
           liquidityCount: {
             increment: amount.toNumber(),
           },
+          updatedAt: new Date(),
         },
       })
       const balances = await updateMarketBalances({ ...txParams, marketId })

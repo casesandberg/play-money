@@ -222,7 +222,7 @@ model Transaction {
   initiatorId String?
   initiator   User?              @relation(fields: [initiatorId], references: [id])
   createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
   batchId     String?
   batch       TransactionBatch?  @relation(fields: [batchId], references: [id])
   marketId    String?
@@ -282,7 +282,7 @@ model Account {
   balances       Balance[]
   positions      MarketOptionPosition[]
   createdAt      DateTime               @default(now())
-  updatedAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
 }
 
 model Balance {
@@ -296,7 +296,7 @@ model Balance {
   marketId  String?
   market    Market?   @relation(fields: [marketId], references: [id])
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@index(fields: [accountId, assetType, assetId, marketId])
 }
@@ -313,7 +313,7 @@ model MarketOptionPosition {
   quantity  Decimal
   value     Decimal
   createdAt DateTime     @default(now())
-  updatedAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 
   @@unique(fields: [accountId, optionId])
   @@index(fields: [accountId, optionId])

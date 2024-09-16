@@ -49,6 +49,7 @@ export async function createMarketSellTransaction({
             liquidityCount: {
               decrement: amount.toNumber(),
             },
+            updatedAt: new Date(),
           },
         }),
       ])

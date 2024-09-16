@@ -13,7 +13,7 @@ export async function updateMarketOption({ id, name, color }: { id: string; name
 
   const updatedMarket = await db.marketOption.update({
     where: { id },
-    data: updatedData,
+    data: { ...updatedData, updatedAt: new Date() },
   })
 
   return updatedMarket

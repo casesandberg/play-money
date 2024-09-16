@@ -35,6 +35,7 @@ async function main() {
           where: { id: noOption.id },
           data: {
             createdAt: new Date(noOption.createdAt.getTime() + 1),
+            updatedAt: new Date(),
           },
         })
 

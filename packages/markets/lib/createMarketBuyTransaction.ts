@@ -49,6 +49,7 @@ export async function createMarketBuyTransaction({
             liquidityCount: {
               increment: amount.toNumber(),
             },
+            updatedAt: new Date(),
           },
         }),
       ])

@@ -54,6 +54,7 @@ export async function updateMarketPositionValues({
         where: { id: position.id },
         data: {
           value: new Decimal(newValue.shares).sub(tax),
+          updatedAt: new Date(),
         },
       })
     })

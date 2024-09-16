@@ -89,6 +89,7 @@ export async function createMarketResolveWinTransactions({
                   decrement: position.quantity.toNumber(),
                 },
                 value: 0,
+                updatedAt: new Date(),
               },
             }),
             updateMarketBalances({ ...txParams, marketId }),

@@ -60,6 +60,7 @@ async function main() {
           },
           data: {
             liquidityCount: data._sum.amount?.toNumber(),
+            updatedAt: new Date(),
           },
         })
         console.log(`Successfully added liquidity count to market with id: ${market.id}`)
@@ -94,6 +95,7 @@ async function main() {
           },
           data: {
             uniqueTradersCount: data.length,
+            updatedAt: new Date(),
           },
         })
         console.log(`Successfully added unique traders count to market with id: ${market.id}`)
@@ -130,6 +132,7 @@ async function main() {
           },
           data: {
             uniquePromotersCount: data.length,
+            updatedAt: new Date(),
           },
         })
         console.log(`Successfully added unique promoters count to market with id: ${market.id}`)
@@ -162,6 +165,7 @@ async function main() {
           },
           data: {
             commentCount: data._count,
+            updatedAt: new Date(),
           },
         })
         console.log(`Successfully added comments count to market with id: ${market.id}`)

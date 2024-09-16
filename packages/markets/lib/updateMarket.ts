@@ -35,7 +35,7 @@ export async function updateMarket({
 
   const updatedMarket = await db.market.update({
     where: { id },
-    data: updatedData,
+    data: { ...updatedData, updatedAt: new Date() },
   })
 
   return updatedMarket

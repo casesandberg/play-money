@@ -10,7 +10,7 @@ export async function updateComment({ id, content }: { id: string; content?: str
 
   const updatedComment = await db.comment.update({
     where: { id },
-    data: updatedData,
+    data: { ...updatedData, updatedAt: new Date() },
   })
 
   return updatedComment
