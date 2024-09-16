@@ -1,4 +1,4 @@
-import { Market, MarketOption, Transaction, TransactionEntry, User } from '@play-money/database'
+import { Market, MarketOption, MarketOptionPosition, Transaction, TransactionEntry, User } from '@play-money/database'
 
 export type TransactionEntryInput = Pick<
   TransactionEntry,
@@ -19,4 +19,9 @@ export type LeaderboardUser = {
   avatarUrl?: string | null
   total: number
   rank: number
+}
+
+export type ExtendedMarketOptionPosition = MarketOptionPosition & {
+  market: Market
+  option: MarketOption
 }

@@ -1,8 +1,8 @@
 import _ from 'lodash'
 import { CommentWithReactions } from '@play-money/comments/lib/getComment'
-import { Market, User } from '@play-money/database'
+import { Market, MarketOptionPosition, User } from '@play-money/database'
 import { NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
-import { TransactionWithEntries, LeaderboardUser } from '@play-money/finance/types'
+import { TransactionWithEntries, LeaderboardUser, ExtendedMarketOptionPosition } from '@play-money/finance/types'
 import { ExtendedMarket } from '@play-money/markets/types'
 
 // TODO: @casesandberg Generate this from OpenAPI schema
@@ -337,6 +337,18 @@ export async function getUserTransactions({
 }): Promise<{ transactions: Array<TransactionWithEntries> }> {
   return apiHandler<{ transactions: Array<TransactionWithEntries> }>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/transactions`
+  )
+}
+
+export async function getUserPositions({
+  userId,
+  pageSize,
+}: {
+  userId: string
+  pageSize?: number
+}): Promise<{ positions: Array<ExtendedMarketOptionPosition> }> {
+  return apiHandler<{ positions: Array<ExtendedMarketOptionPosition> }>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/positions${pageSize ? `?pageSize=${pageSize}` : ''}`
   )
 }
 
