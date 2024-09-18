@@ -6,7 +6,7 @@ import _ from 'lodash'
 import { ToggleLeftIcon, XIcon, CircleIcon, CircleDotIcon, PlusIcon } from 'lucide-react'
 import moment from 'moment'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { CirclePicker } from 'react-color'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { mutate } from 'swr'
@@ -27,6 +27,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@play-money/ui/popover'
 import { RadioGroup, RadioGroupItem } from '@play-money/ui/radio-group'
 import { toast } from '@play-money/ui/use-toast'
 import { cn } from '@play-money/ui/utils'
+import { clearPresistedData, getPersistedData, usePersistForm } from '../../ui/src/hooks/usePersistForm'
+
+const CREATE_MARKET_FORM_KEY = 'create-market-form'
 
 const COLORS = [
   '#f44336',
@@ -68,25 +71,39 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
   const router = useRouter()
   const tzName = /\((?<tz>[A-Za-z\s].*)\)/.exec(new Date().toString())?.groups?.tz ?? null
 
+  const getDefaultValues = useMemo(
+    () =>
+      getPersistedData<MarketCreateFormValues>({
+        defaultValue: {
+          question: '',
+          type: 'binary',
+          description: '',
+          closeDate: moment().add(1, 'month').endOf('day').toDate(),
+          options: [
+            { name: 'Yes', color: SHUFFLED_COLORS[0] },
+            { name: 'No', color: SHUFFLED_COLORS[1] },
+          ],
+          tags: [],
+        },
+        localStorageKey: CREATE_MARKET_FORM_KEY,
+      }),
+    []
+  )
+
   const form = useForm<MarketCreateFormValues>({
     resolver: zodResolver(marketCreateFormSchema),
-    defaultValues: {
-      question: '',
-      type: 'binary',
-      description: '',
-      closeDate: moment().add(1, 'month').endOf('day').toDate(),
-      options: [
-        { name: 'Yes', color: SHUFFLED_COLORS[0] },
-        { name: 'No', color: SHUFFLED_COLORS[1] },
-      ],
-      tags: [],
-    },
+    defaultValues: getDefaultValues,
   })
+
+  usePersistForm({ value: form.getValues(), localStorageKey: CREATE_MARKET_FORM_KEY })
 
   async function onSubmit(market: MarketCreateFormValues) {
     try {
       const newMarket = await createMarket(market)
 
+      clearPresistedData({ localStorageKey: CREATE_MARKET_FORM_KEY })
+      form.reset({})
+      form.reset({}) // Requires double reset to work: https://github.com/orgs/react-hook-form/discussions/7589#discussioncomment-8295031
       onSuccess?.()
       void mutate(MY_BALANCE_PATH)
       toast({
@@ -103,7 +120,7 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
 
   const handleSubmit = form.handleSubmit(onSubmit)
 
-  const { fields, replace, append, remove } = useFieldArray({
+  const { fields, replace, append, remove, update } = useFieldArray({
     control: form.control,
     name: 'options',
   })
@@ -113,16 +130,28 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
   useEffect(
     function replaceOptionsIfMulti() {
       if (type === 'binary') {
-        replace([
-          { name: 'Yes', color: SHUFFLED_COLORS[0] },
-          { name: 'No', color: SHUFFLED_COLORS[1] },
-        ])
-      } else if (type === 'multi') {
-        replace([
-          { name: '', color: SHUFFLED_COLORS[0] },
-          { name: '', color: SHUFFLED_COLORS[1] },
-          { name: '', color: SHUFFLED_COLORS[2] },
-        ])
+        const options = form.getValues('options') || []
+
+        if (options[0] && !options[0].name) {
+          update(0, { ...options[0], name: 'Yes' })
+        }
+
+        if (options[1] && !options[1].name) {
+          update(1, { ...options[1], name: 'No' })
+        }
+
+        if (options.length > 2 && !options[2].name) {
+          remove(2)
+        }
+      } else if (type === 'multi' && fields.length === 2) {
+        const options = form.getValues('options')
+        if (options[0].name === 'Yes') {
+          update(0, { ...options[0], name: '' })
+        }
+        if (options[1].name === 'No') {
+          update(1, { ...options[1], name: '' })
+        }
+        append({ name: '', color: SHUFFLED_COLORS[2] })
       }
     },
     [type]
@@ -227,7 +256,7 @@ export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void
             <Card className="divide-y">
               {fields.map((fieldItem, index) => (
                 <div className="relative flex gap-1 p-2" key={fieldItem.id}>
-                  {type === 'multi' && index > 2 ? (
+                  {(type === 'binary' && index > 1) || (type === 'multi' && index > 2) ? (
                     <Button
                       variant="outline"
                       size="icon"
