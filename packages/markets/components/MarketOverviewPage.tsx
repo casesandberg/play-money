@@ -90,7 +90,7 @@ export function MarketOverviewPage({
 
       <CardHeader className="pt-0 md:pt-0">
         <CardTitle className="leading-relaxed">{market.question}</CardTitle>
-        <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 font-mono text-sm text-muted-foreground md:flex-nowrap">
+        <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground md:flex-nowrap">
           {!market.marketResolution ? (
             <div style={{ color: mostLikelyOption.color }} className="flex-shrink-0 font-medium">
               {Math.round(mostLikelyOption.probability || 0)}% {_.truncate(mostLikelyOption.name, { length: 30 })}
