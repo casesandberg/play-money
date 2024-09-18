@@ -2,11 +2,34 @@
 
 import { format } from 'date-fns'
 import React from 'react'
-import { AreaChart, ResponsiveContainer, YAxis, Tooltip as ChartTooltip, Area } from 'recharts'
+import { AreaChart, ResponsiveContainer, YAxis, XAxis, Tooltip as ChartTooltip, Area } from 'recharts'
 import { useUserGraph } from '@play-money/api-helpers/client/hooks'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
+import { formatNumber } from '@play-money/finance/lib/formatCurrency'
 import { Card } from '@play-money/ui/card'
 import { cn } from '@play-money/ui/utils'
+
+function CustomizedXAxisTick({ x, y, payload }: { x: number; y: number; payload: { value: string } }) {
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={5} dx={-4} textAnchor="end" className="fill-muted-foreground/50">
+        {format(payload.value, 'MMM d')}
+      </text>
+    </g>
+  )
+}
+
+function CustomizedYAxisTick({ x, y, payload }: { x: number; y: number; payload: { value: number } }) {
+  return payload.value !== 0 ? (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={4} dx={2} textAnchor="start" className="fill-muted-foreground/50">
+        ¤{formatNumber(payload.value)}
+      </text>
+    </g>
+  ) : (
+    <g />
+  )
+}
 
 const BALANCE_COLOR = '#333'
 const LIQUIDITY_COLOR = '#7c3aed'
@@ -35,10 +58,10 @@ export function UserGraph({ userId }: { userId: string }) {
           </div>
         ) : null}
       </div>
-      <div className="h-32 p-4">
+      <div className="h-40">
         {graph?.data ? (
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart width={300} height={128} data={graph.data}>
+            <AreaChart width={300} height={128} data={graph.data} margin={{ top: 10, right: 0, bottom: 0, left: 0 }}>
               <ChartTooltip
                 content={({ payload }) => {
                   const data = payload?.[0]?.payload
@@ -61,7 +84,25 @@ export function UserGraph({ userId }: { userId: string }) {
                   return null
                 }}
               />
-              <YAxis type="number" domain={[0, 1]} hide />
+              <XAxis
+                height={20}
+                dataKey="endAt"
+                stroke="hsl(var(--border))"
+                // axisLine={false}
+                className="font-mono text-[10px] uppercase"
+                minTickGap={80}
+                tick={CustomizedXAxisTick}
+                tickFormatter={(value) => format(value, 'MMM d')}
+              />
+              <YAxis
+                type="number"
+                width={50}
+                stroke="hsl(var(--border))"
+                className="font-mono text-[10px] uppercase"
+                orientation="right"
+                tick={CustomizedYAxisTick}
+                tickFormatter={(value, i) => (value !== 0 && value !== 100 ? `${value}%` : '')}
+              />
 
               <defs>
                 <linearGradient id="fillLiquidity" x1="0" y1="0" x2="0" y2="1">
