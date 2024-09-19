@@ -114,11 +114,11 @@ export async function getUserTotalTimeSeries({
         bucket.balance = bucket.balance.add(entry.amount)
 
         if (entry.transaction.type === 'LIQUIDITY_WITHDRAWAL' || entry.transaction.type === 'LIQUIDITY_RETURNED') {
-          bucket.liquidity = bucket.liquidity.sub(entry.amount)
+          bucket.liquidity = Decimal.max(bucket.liquidity.sub(entry.amount), 0) // Stop negative numbers
         }
 
         if (entry.transaction.type === 'TRADE_SELL' || entry.transaction.type === 'TRADE_WIN') {
-          bucket.markets = bucket.markets.sub(entry.amount)
+          bucket.markets = Decimal.max(bucket.markets.sub(entry.amount), 0) // Stop negative numbers
         }
       }
     })
