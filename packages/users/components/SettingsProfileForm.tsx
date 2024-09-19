@@ -85,6 +85,7 @@ export function SettingsProfileForm({
                     <Avatar className="size-32">
                       <AvatarImage
                         alt={`@${user?.username}`}
+                        className="object-cover"
                         src={value || `https://api.dicebear.com/8.x/initials/svg?seed=${user?.username}&scale=75`}
                       />
                       <AvatarFallback />
