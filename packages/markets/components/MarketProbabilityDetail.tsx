@@ -3,7 +3,7 @@ import { MarketOption } from '@play-money/database'
 import { Progress } from '@play-money/ui/progress'
 import { cn } from '@play-money/ui/utils'
 
-function formatProbability(probability: number | null) {
+export function formatProbability(probability: number | null) {
   if (probability === null) {
     return ''
   }

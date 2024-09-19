@@ -5,6 +5,7 @@ import { LineChart, Line, ResponsiveContainer, YAxis, XAxis, CartesianGrid, Tool
 import { useMarketGraph } from '@play-money/api-helpers/client/hooks'
 import { Card } from '@play-money/ui/card'
 import { ExtendedMarket } from '../types'
+import { formatProbability } from './MarketProbabilityDetail'
 
 function CustomizedXAxisTick({ x, y, payload }: { x: number; y: number; payload: { value: string } }) {
   return (
@@ -30,7 +31,10 @@ function CustomizedYAxisTick({ x, y, payload }: { x: number; y: number; payload:
 
 export function MarketGraph({ market, activeOptionId }: { market: ExtendedMarket; activeOptionId: string }) {
   const { data: graph } = useMarketGraph({ marketId: market.id })
-  const activeOptionIndex = market.options.findIndex((o) => o.id === activeOptionId)
+  const createdOrderOptions = market.options.sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  )
+  const activeOptionIndex = createdOrderOptions.findIndex((o) => o.id === activeOptionId)
 
   return (
     <Card className="h-40">
@@ -44,11 +48,16 @@ export function MarketGraph({ market, activeOptionId }: { market: ExtendedMarket
                   return (
                     <Card className="p-1 font-mono text-xs">
                       <div>{format(data.startAt, 'MMM d, yyyy')}</div>
-                      {market.options.map((option, i) => (
-                        <div key={option.id} style={{ color: option.color }}>
-                          {option.name}: {data.options[i].probability}%
-                        </div>
-                      ))}
+                      {createdOrderOptions.map((option, i) => {
+                        const dataOption = data.options.find(
+                          (o: { id: string; proability: number }) => o.id === option.id
+                        )
+                        return (
+                          <div key={option.id} style={{ color: option.color }}>
+                            {option.name}: {formatProbability(dataOption.probability)}
+                          </div>
+                        )
+                      })}
                     </Card>
                   )
                 }
@@ -75,7 +84,7 @@ export function MarketGraph({ market, activeOptionId }: { market: ExtendedMarket
               tick={CustomizedYAxisTick}
               tickFormatter={(value, i) => (value !== 0 && value !== 100 ? `${value}%` : '')}
             />
-            {market.options.map((option, i) => (
+            {createdOrderOptions.map((option, i) => (
               <Line
                 key={option.id}
                 type="step"
@@ -92,8 +101,13 @@ export function MarketGraph({ market, activeOptionId }: { market: ExtendedMarket
               <Line
                 type="step"
                 dot={false}
-                dataKey={(data) => data.options[activeOptionIndex].probability}
-                stroke={market.options[activeOptionIndex].color}
+                dataKey={(data) => {
+                  const activeOption = data.options.find(
+                    (option: { id: string; proability: number }) => option.id === activeOptionId
+                  )
+                  return activeOption.probability
+                }}
+                stroke={createdOrderOptions[activeOptionIndex].color}
                 strokeWidth={2.5}
                 strokeLinejoin="round"
                 animationDuration={750}
