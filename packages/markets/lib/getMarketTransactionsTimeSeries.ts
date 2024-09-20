@@ -129,7 +129,7 @@ export async function getMarketTransactionsTimeSeries({
     endAt: bucket.endAt,
     options: bucket.options.map((option) => ({
       id: option.id,
-      probability: option.probability.toNumber(),
+      probability: Decimal.max(option.probability, 0).toNumber(),
     })),
   }))
 

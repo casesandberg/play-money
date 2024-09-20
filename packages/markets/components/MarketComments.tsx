@@ -8,7 +8,7 @@ export async function MarketComments({ marketId }: { marketId: string }) {
 
   const handleRevalidate = async () => {
     'use server'
-    revalidateTag('comments')
+    revalidateTag(`${marketId}:comments`)
   }
 
   return <CommentsList comments={comments} entity={{ type: 'MARKET', id: marketId }} onRevalidate={handleRevalidate} />

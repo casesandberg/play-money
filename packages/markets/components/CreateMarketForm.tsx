@@ -33,23 +33,14 @@ const CREATE_MARKET_FORM_KEY = 'create-market-form'
 
 const COLORS = [
   '#f44336',
-  '#e91e63',
   '#9c27b0',
-  '#673ab7',
   '#3f51b5',
   '#2196f3',
-  '#03a9f4',
-  '#00bcd4',
   '#009688',
-  '#4caf50',
   '#8bc34a',
-  '#cddc39',
-  '#ffeb3b',
   '#ffc107',
   '#ff9800',
-  '#ff5722',
   '#795548',
-  '#9e9e9e',
   '#607d8b',
 ]
 
@@ -66,8 +57,14 @@ const marketCreateFormSchema = MarketSchema.pick({
 )
 type MarketCreateFormValues = z.infer<typeof marketCreateFormSchema>
 
-export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void> }) {
-  const [SHUFFLED_COLORS] = useState(_.shuffle(COLORS))
+export function CreateMarketForm({
+  colors = COLORS,
+  onSuccess,
+}: {
+  colors?: Array<string>
+  onSuccess?: () => Promise<void>
+}) {
+  const [SHUFFLED_COLORS] = useState(_.shuffle(colors))
   const router = useRouter()
   const tzName = /\((?<tz>[A-Za-z\s].*)\)/.exec(new Date().toString())?.groups?.tz ?? null
 

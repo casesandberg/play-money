@@ -48,7 +48,7 @@ export function CreateCommentForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        <Card className="focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2">
+        <Card className="ring-offset-background focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2">
           <FormField
             control={form.control}
             name="content"

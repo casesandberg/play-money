@@ -1,5 +1,6 @@
 'use client'
 
+import { CircleOffIcon } from 'lucide-react'
 import React from 'react'
 import { mutate } from 'swr'
 import {
@@ -8,7 +9,6 @@ import {
   MY_BALANCE_PATH,
   useMarketBalance,
 } from '@play-money/api-helpers/client/hooks'
-import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { useSearchParam } from '@play-money/ui'
 import { Card, CardContent, CardHeader } from '@play-money/ui/card'
 import { Combobox } from '@play-money/ui/combobox'
@@ -23,11 +23,13 @@ import { useSidebar } from './SidebarContext'
 
 export function MarketTradePanel({
   market,
+  isTradable = true,
   isResolved = false,
   activeOptionId,
   onTradeComplete,
 }: {
   market: ExtendedMarket
+  isTradable?: boolean
   isResolved: boolean
   activeOptionId: string
   onTradeComplete?: () => void
@@ -53,7 +55,7 @@ export function MarketTradePanel({
 
   return (
     <div className="space-y-4">
-      {!isResolved ? (
+      {isTradable ? (
         <Card className={cn(effect && 'animate-slide-in-right')} onAnimationEnd={resetEffect}>
           <Tabs defaultValue="buy">
             <CardHeader className="flex items-start bg-muted md:p-3">
@@ -87,6 +89,11 @@ export function MarketTradePanel({
               </TabsContent>
             </CardContent>
           </Tabs>
+        </Card>
+      ) : !isResolved ? (
+        <Card className="flex flex-col items-center justify-center gap-4 p-4 sm:h-64">
+          <CircleOffIcon className="size-8 stroke-[1.5px] text-muted-foreground" />
+          <div className="text-balance text-center text-sm uppercase text-muted-foreground">Trading closed</div>
         </Card>
       ) : (
         <MarketLeaderboardPanel market={market} />

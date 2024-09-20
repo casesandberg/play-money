@@ -232,7 +232,7 @@ export async function getMarketComments({
   return apiHandler<{ comments: Array<CommentWithReactions> }>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/comments`,
     {
-      next: { tags: ['comments'] },
+      next: { tags: [`${marketId}:comments`] },
     }
   )
 }

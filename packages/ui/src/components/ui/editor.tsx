@@ -85,7 +85,7 @@ function Editor({
   useEffect(
     function handleResetEdgeCase() {
       // Fix for react-hook-form resetting the value to '<p></p>' when the form is reset
-      if (editor && value === '<p></p>' && value !== editor.getHTML()) {
+      if (editor && value && value !== editor.getHTML()) {
         editor.commands.setContent(value)
       }
     },

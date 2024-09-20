@@ -30,6 +30,7 @@ import { EmojiPicker, EmojiReactionList } from '@play-money/ui/emoji'
 import { toast } from '@play-money/ui/use-toast'
 import { cn } from '@play-money/ui/utils'
 import { UserLink } from '@play-money/users/components/UserLink'
+import { formatDistanceToNowShort } from '../../ui/src/helpers'
 import { CreateCommentForm } from './CreateCommentForm'
 
 export function CommentItem({
@@ -84,7 +85,7 @@ export function CommentItem({
     <div
       id={comment.id}
       className={cn(
-        isHighlighted && 'bg-primary/10 ring-2 ring-primary ring-offset-2 dark:ring-offset-black',
+        isHighlighted && 'bg-primary/10 ring-2 ring-primary ring-offset-2 ring-offset-background',
         'group flex flex-row gap-4 rounded-md px-6 py-2 hover:bg-muted/50',
         (isReplyOpen || isPortalOpen) && 'bg-muted/50'
       )}
@@ -92,11 +93,11 @@ export function CommentItem({
       <UserAvatar user={comment.author} className="mt-2" />
 
       <Collapsible open={isReplyOpen} onOpenChange={setIsReplyOpen} className="w-full">
-        <div className="flex flex-row items-center gap-4">
+        <div className="flex flex-row items-center gap-2">
           <UserLink user={comment.author} className="truncate" hideUsername />
 
           <div className="flex-shrink-0 text-sm text-muted-foreground">
-            {formatDistance(comment.createdAt, new Date(), { addSuffix: true })}
+            {formatDistanceToNowShort(comment.createdAt)}
           </div>
 
           {comment.edited && <div className="flex-shrink-0 text-sm text-muted-foreground">(edited)</div>}

@@ -80,7 +80,7 @@ export function CommentsList({
             onEdit={handleEdit(comment.id)}
             onDelete={handleDelete(comment.id)}
           />
-          <div className="ml-12">
+          <div className="ml-6 sm:ml-12">
             {comment.replies.map((reply) => (
               <CommentItem
                 key={reply.id}

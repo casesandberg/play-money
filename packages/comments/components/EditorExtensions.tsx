@@ -96,7 +96,7 @@ export function MentionChip(props: NodeViewProps) {
   return user ? (
     <NodeViewWrapper
       as={props.editor.isEditable ? 'span' : Link}
-      className="inline-flex items-center gap-1 rounded-md border border-primary bg-primary/10 px-1 font-normal text-primary-foreground"
+      className="inline-flex items-center gap-1 rounded-md border border-primary bg-primary/10 px-1 font-normal text-primary-foreground dark:text-secondary-foreground"
       href={`/${user.username}`}
       style={{ verticalAlign: 'text-bottom', lineHeight: 1.1, textDecoration: 'none' }}
     >

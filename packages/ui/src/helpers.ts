@@ -15,6 +15,7 @@ export function formatDistanceToNowShort(date: Date | number): string {
     .replace(/\sminutes?/, 'm')
     .replace(/\sseconds?/, 's')
     .replace(/^in\s?/, '')
+    .replace(/^about\s?/, '')
     .replace(/\sago/, '')
     .trim()
 }

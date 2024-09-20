@@ -8,6 +8,7 @@ const userAvatarVariants = cva('', {
       default: 'h-8 w-8',
       sm: 'h-4 w-4',
       lg: 'h-16 w-16',
+      xl: 'h-32 w-32',
     },
   },
   defaultVariants: {
@@ -29,7 +30,7 @@ export function UserAvatar({
     <Avatar className={cn(userAvatarVariants({ size, className }))}>
       <AvatarImage
         alt={`@${user.username}`}
-        className={cn(imgClassName)}
+        className={cn('object-cover', imgClassName)}
         src={user.avatarUrl ?? `https://api.dicebear.com/8.x/initials/svg?seed=${user.username}&scale=75`}
       />
       <AvatarFallback />
