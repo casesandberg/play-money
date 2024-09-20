@@ -7,7 +7,7 @@ export function canResolveMarket({ market, userId }: { market: Market; userId?: 
 
 export function isMarketTradable(market: Market): boolean {
   const now = new Date()
-  return !market.resolvedAt && (!market.closeDate || market.closeDate > now)
+  return !market.resolvedAt && (!market.closeDate || new Date(market.closeDate) > now)
 }
 
 export function isMarketResolved(market: ExtendedMarket): boolean {
