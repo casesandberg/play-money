@@ -15,7 +15,6 @@ export function MarketPageSidebar({
   activeOptionId: string
   onTradeComplete: () => void
 }) {
-  console.log(isMarketTradable(market))
   return (
     <div className="space-y-8">
       <MarketTradePanel

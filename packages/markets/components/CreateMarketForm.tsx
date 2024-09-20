@@ -31,7 +31,7 @@ import { clearPresistedData, getPersistedData, usePersistForm } from '../../ui/s
 
 const CREATE_MARKET_FORM_KEY = 'create-market-form'
 
-let COLORS = [
+const COLORS = [
   '#f44336',
   '#9c27b0',
   '#3f51b5',
@@ -43,23 +43,6 @@ let COLORS = [
   '#795548',
   '#607d8b',
 ]
-
-// This is a hack for Chromatic tests giving false positives.
-// TODO: Look into a seed based apprach or something that can be mocked.
-if (process.env.NODE_ENV === 'test') {
-  COLORS = [
-    '#f44336',
-    '#f44336',
-    '#f44336',
-    '#f44336',
-    '#f44336',
-    '#f44336',
-    '#f44336',
-    '#f44336',
-    '#f44336',
-    '#f44336',
-  ]
-}
 
 const marketCreateFormSchema = MarketSchema.pick({
   question: true,
@@ -74,8 +57,14 @@ const marketCreateFormSchema = MarketSchema.pick({
 )
 type MarketCreateFormValues = z.infer<typeof marketCreateFormSchema>
 
-export function CreateMarketForm({ onSuccess }: { onSuccess?: () => Promise<void> }) {
-  const [SHUFFLED_COLORS] = useState(_.shuffle(COLORS))
+export function CreateMarketForm({
+  colors = COLORS,
+  onSuccess,
+}: {
+  colors?: Array<string>
+  onSuccess?: () => Promise<void>
+}) {
+  const [SHUFFLED_COLORS] = useState(_.shuffle(colors))
   const router = useRouter()
   const tzName = /\((?<tz>[A-Za-z\s].*)\)/.exec(new Date().toString())?.groups?.tz ?? null
 

@@ -29,7 +29,7 @@ export function MarketTradePanel({
   onTradeComplete,
 }: {
   market: ExtendedMarket
-  isTradable: boolean
+  isTradable?: boolean
   isResolved: boolean
   activeOptionId: string
   onTradeComplete?: () => void
