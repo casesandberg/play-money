@@ -30,6 +30,7 @@ import { EmojiPicker, EmojiReactionList } from '@play-money/ui/emoji'
 import { toast } from '@play-money/ui/use-toast'
 import { cn } from '@play-money/ui/utils'
 import { UserLink } from '@play-money/users/components/UserLink'
+import { formatDistanceToNowShort } from '../../ui/src/helpers'
 import { CreateCommentForm } from './CreateCommentForm'
 
 export function CommentItem({
@@ -92,11 +93,11 @@ export function CommentItem({
       <UserAvatar user={comment.author} className="mt-2" />
 
       <Collapsible open={isReplyOpen} onOpenChange={setIsReplyOpen} className="w-full">
-        <div className="flex flex-row items-center gap-4">
+        <div className="flex flex-row items-center gap-2">
           <UserLink user={comment.author} className="truncate" hideUsername />
 
           <div className="flex-shrink-0 text-sm text-muted-foreground">
-            {formatDistance(comment.createdAt, new Date(), { addSuffix: true })}
+            {formatDistanceToNowShort(comment.createdAt)}
           </div>
 
           {comment.edited && <div className="flex-shrink-0 text-sm text-muted-foreground">(edited)</div>}
