@@ -2,6 +2,7 @@
 
 import { BellIcon } from 'lucide-react'
 import { useState } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
 import { createMyNotifications } from '@play-money/api-helpers/client'
 import { useNotifications } from '@play-money/api-helpers/client/hooks'
 import { Badge } from '@play-money/ui/badge'
@@ -46,38 +47,50 @@ export function NotificationDropdown() {
         }}
       >
         <Card className="border-0 shadow-lg">
-          <div className="flex justify-between border-b p-3 px-4 md:p-3 md:px-4">
-            <div>
-              Notifications
-              <Badge variant="outline" className="ml-2">
-                {data?.unreadCount}
-              </Badge>
+          <ErrorBoundary
+            fallback={
+              <div className="p-4 text-sm uppercase text-muted-foreground">
+                There was an error loading notifications
+              </div>
+            }
+          >
+            <div className="flex justify-between border-b p-3 px-4 md:p-3 md:px-4">
+              <div>
+                Notifications
+                <Badge variant="outline" className="ml-2">
+                  {data?.unreadCount}
+                </Badge>
+              </div>
+              <div>
+                <Button
+                  variant="link"
+                  size="sm"
+                  className="h-6 p-1"
+                  disabled={!data?.unreadCount}
+                  onClick={handleMarkAllRead}
+                >
+                  Mark all read
+                </Button>
+              </div>
             </div>
-            <div>
-              <Button
-                variant="link"
-                size="sm"
-                className="h-6 p-1"
-                disabled={!data?.unreadCount}
-                onClick={handleMarkAllRead}
-              >
-                Mark all read
-              </Button>
-            </div>
-          </div>
-          <CardContent className="max-h-[450px] overflow-y-auto p-0 md:p-0">
-            <div className="divide-y">
-              {data?.notifications?.length ? (
-                data?.notifications.map(({ id, count, lastNotification }, i) => (
-                  <div key={id} onClick={() => setIsOpen(false)}>
-                    <NotificationItem notification={lastNotification} count={count} unread={!lastNotification.readAt} />
-                  </div>
-                ))
-              ) : (
-                <div className="p-4 text-center text-sm text-muted-foreground">Zero notifications</div>
-              )}
-            </div>
-          </CardContent>
+            <CardContent className="max-h-[450px] overflow-y-auto p-0 md:p-0">
+              <div className="divide-y">
+                {data?.notifications?.length ? (
+                  data?.notifications.map(({ id, count, lastNotification }, i) => (
+                    <div key={id} onClick={() => setIsOpen(false)}>
+                      <NotificationItem
+                        notification={lastNotification}
+                        count={count}
+                        unread={!lastNotification.readAt}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-4 text-center text-sm text-muted-foreground">Zero notifications</div>
+                )}
+              </div>
+            </CardContent>
+          </ErrorBoundary>
         </Card>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -104,7 +104,7 @@ export function NotificationItem({
     }
     case 'COMMENT_REACTION': {
       topLine = createSnippet(notification.comment.content)
-      bottomLine = `${notification.actor.displayName}${othersCount} reacted: ${notification.commentReaction.emoji}`
+      bottomLine = `${notification.actor.displayName}${othersCount} reacted: ${notification.commentReaction?.emoji}`
       break
     }
     case 'COMMENT_MENTION': {
