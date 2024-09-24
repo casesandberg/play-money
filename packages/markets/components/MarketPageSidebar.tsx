@@ -8,11 +8,9 @@ import { RelatedMarkets } from './RelatedMarkets'
 
 export function MarketPageSidebar({
   market,
-  activeOptionId,
   onTradeComplete,
 }: {
   market: ExtendedMarket
-  activeOptionId: string
   onTradeComplete: () => void
 }) {
   return (
@@ -21,7 +19,6 @@ export function MarketPageSidebar({
         market={market}
         isTradable={isMarketTradable(market)}
         isResolved={isMarketResolved(market)}
-        activeOptionId={activeOptionId}
         onTradeComplete={onTradeComplete}
       />
 

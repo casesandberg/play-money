@@ -22,6 +22,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@play-money
 import { ReadMoreEditor } from '@play-money/ui/editor'
 import { UserLink } from '@play-money/users/components/UserLink'
 import { useUser } from '@play-money/users/context/UserContext'
+import { useSelectedItems } from '../../ui/src/contexts/SelectedItemContext'
 import { useSearchParam } from '../../ui/src/hooks/useSearchParam'
 import { ExtendedMarket } from '../types'
 import { EditMarketDialog } from './EditMarketDialog'
@@ -52,16 +53,12 @@ export function MarketOverviewPage({
   onRevalidate: () => Promise<void>
 }) {
   const { user } = useUser()
+  const { selected, setSelected } = useSelectedItems()
   const { triggerEffect } = useSidebar()
   const { data: balance } = useMarketBalance({ marketId: market.id })
-  const [option, setOption] = useSearchParam('option', 'replace')
   const [isEditing, setIsEditing] = useSearchParam('edit')
   const [isEditOption, setIsEditOption] = useSearchParam('editOption')
   const [isBoosting, setIsBoosting] = useSearchParam('boost')
-  const createdOrderOptions = market.options.sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-  )
-  const activeOptionId = option || createdOrderOptions[0]?.id || ''
   const isCreator = user?.id === market.createdBy
   const probabilities = marketOptionBalancesToProbabilities(balance?.amm)
 
@@ -112,7 +109,7 @@ export function MarketOverviewPage({
         </div>
       </CardHeader>
       <CardContent>
-        <MarketGraph market={market} activeOptionId={activeOptionId} />
+        <MarketGraph market={market} activeOptionId={selected[0]} />
       </CardContent>
 
       <CardContent>
@@ -161,13 +158,13 @@ export function MarketOverviewPage({
                       <MarketOptionRow
                         key={option.id}
                         option={option}
-                        active={option.id === activeOptionId}
+                        active={option.id === selected[0]}
                         probability={probabilities[option.id] || option.probability || 0}
                         className={i > 0 ? 'border-t' : ''}
                         canEdit={user?.id === market.createdBy}
                         onEdit={() => setIsEditOption(option.id)}
                         onSelect={() => {
-                          setOption(option.id)
+                          setSelected([option.id])
                           triggerEffect()
                         }}
                       />
@@ -183,13 +180,13 @@ export function MarketOverviewPage({
               <MarketOptionRow
                 key={option.id}
                 option={option}
-                active={option.id === activeOptionId}
+                active={option.id === selected[0]}
                 probability={probabilities[option.id] || option.probability || 0}
                 className={i > 0 ? 'border-t' : ''}
                 canEdit={user?.id === market.createdBy}
                 onEdit={() => setIsEditOption(option.id)}
                 onSelect={() => {
-                  setOption(option.id)
+                  setSelected([option.id])
                   triggerEffect()
                 }}
               />

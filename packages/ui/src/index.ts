@@ -1,4 +1,5 @@
 export * from './contexts/EditorExtensionsContext'
+export * from './contexts/SelectedItemContext'
 export * from './hooks/useLocalStorage'
 export * from './hooks/usePersistForm'
 export * from './hooks/useSearchParam'
