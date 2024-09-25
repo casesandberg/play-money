@@ -85,7 +85,7 @@ export async function createMarket({
               connect: {
                 id: parentListId,
               },
-            },
+            } as unknown as undefined,
           }
         : {}),
 

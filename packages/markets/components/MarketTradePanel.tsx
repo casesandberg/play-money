@@ -105,7 +105,7 @@ export function MarketTradePanel({
             </div>
 
             <MarketBalanceBreakdown
-              balances={[primaryBalance]}
+              balances={primaryBalance ? [primaryBalance] : []}
               positions={balance?.userPositions ?? []}
               options={market.options}
             />
