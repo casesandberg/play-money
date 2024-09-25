@@ -118,16 +118,19 @@ export async function createComment({
     )
   } else if (entityType === 'LIST') {
     const list = await getList({ id: entityId })
-    createNotification({
-      type: 'LIST_COMMENT',
-      actorId: authorId,
-      listId: entity.id,
-      commentId: comment.id,
-      parentCommentId: parentId ?? undefined,
-      groupKey: entity.id,
-      userId: list.ownerId,
-      actionUrl: `/questions/${entity.id}/${entity.slug}#${comment.id}`,
-    })
+
+    if (authorId !== list.ownerId) {
+      createNotification({
+        type: 'LIST_COMMENT',
+        actorId: authorId,
+        listId: entity.id,
+        commentId: comment.id,
+        parentCommentId: parentId ?? undefined,
+        groupKey: entity.id,
+        userId: list.ownerId,
+        actionUrl: `/lists/${entity.id}/${entity.slug}#${comment.id}`,
+      })
+    }
   }
 
   if (!(await hasCommentedToday({ userId: authorId }))) {
