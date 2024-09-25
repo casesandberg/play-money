@@ -79,11 +79,16 @@ export async function createMarket({
           })),
         },
       },
-      parentList: {
-        connect: {
-          id: parentListId,
-        },
-      },
+      ...(parentListId
+        ? {
+            parentList: {
+              connect: {
+                id: parentListId,
+              },
+            },
+          }
+        : {}),
+
       commentCount: 0,
       liquidityCount: 0,
       uniquePromotersCount: 0,
