@@ -1,7 +1,7 @@
 import { Maximize2Icon, MinusIcon } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
-import { getMarkets } from '@play-money/api-helpers/client'
+import { getLists, getMarkets } from '@play-money/api-helpers/client'
 import { RecentLiquidity } from '@play-money/finance/components/RecentLiquidity'
 import { RecentTrades } from '@play-money/finance/components/RecentTrades'
 import { MarketProbabilityDetail } from '@play-money/markets/components/MarketProbabilityDetail'
@@ -14,6 +14,7 @@ import { Card } from '@play-money/ui/card'
 export default async function AppPage() {
   const { markets: closingMarkets } = await getMarkets({ sortField: 'closeDate', sortDirection: 'asc', pageSize: '5' })
   const { markets: newMarkets } = await getMarkets({ pageSize: '10' })
+  const { lists: newLists } = await getLists({ pageSize: '5' })
 
   return (
     <div className="mx-auto flex max-w-screen-lg flex-1 flex-col gap-8 md:flex-row">
@@ -66,7 +67,44 @@ export default async function AppPage() {
 
         <Card>
           <div className="flex items-center justify-between rounded-t-lg border-b bg-muted pl-4 pr-2">
-            <h4 className="py-3 text-lg font-semibold">New questions</h4>
+            <h4 className="py-3 text-lg font-semibold">Recent lists</h4>
+          </div>
+
+          <div className="divide-y font-mono text-sm">
+            {newLists.map((list) => {
+              return (
+                <div className="flex flex-col transition-colors hover:bg-muted/50 sm:flex-row" key={list.id}>
+                  <Link
+                    className="m-2 mb-0 ml-3 line-clamp-2 flex-[3] visited:text-muted-foreground sm:mb-2"
+                    href={`/lists/${list.id}/${list.slug}`}
+                  >
+                    {list.title}
+                  </Link>
+
+                  <div className="flex flex-[2]">
+                    <Link className="flex-1 p-2" href={`/lists/${list.id}/${list.slug}`}>
+                      <span className="line-clamp-2">
+                        {list.markets
+                          .slice(0, 5)
+                          .map((m) => m.market.question)
+                          .join(', ')}
+                      </span>
+                    </Link>
+                    <div className="p-2 pr-3">
+                      <Link href={`/${list.owner.username}`}>
+                        <UserAvatar size="sm" user={list.owner} />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </Card>
+
+        <Card>
+          <div className="flex items-center justify-between rounded-t-lg border-b bg-muted pl-4 pr-2">
+            <h4 className="py-3 text-lg font-semibold">Recent questions</h4>
 
             <Link href="/questions">
               <Button size="icon" variant="ghost">

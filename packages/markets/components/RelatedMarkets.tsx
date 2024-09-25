@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useMarketRelated } from '@play-money/api-helpers/client/hooks'
 import { MarketProbabilityDetail } from './MarketProbabilityDetail'
 
-export function RelatedMarkets({ marketId }: { marketId: string }) {
+export function RelatedMarkets({ marketId, listId }: { marketId: string; listId?: string }) {
   const { data } = useMarketRelated({ marketId })
 
   return data?.markets.length ? (

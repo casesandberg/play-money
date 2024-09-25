@@ -48,6 +48,8 @@ model User {
   recipientNotifications Notification[]      @relation("NotificationRecipient")
   actorNotifications     Notification[]      @relation("NotificationActor")
   notificationGroups     NotificationGroup[] @relation()
+
+  createdLists List[] @relation("ListCreator")
 }
 
 model AuthAccount {
@@ -109,6 +111,11 @@ model Market {
 
   // Unnecessary reverse relations
   notifications Notification[] @relation()
+
+  lists MarketList[]
+
+  parentListId String?
+  parentList   List?   @relation("ParentListMarkets", fields: [parentListId], references: [id])
 }
 
 model MarketResolution {
@@ -157,6 +164,7 @@ model VerificationToken {
 
 enum CommentEntityType {
   MARKET
+  LIST
 }
 
 model Comment {
@@ -324,6 +332,8 @@ enum NotificationType {
   MARKET_TRADE
   MARKET_LIQUIDITY_ADDED
   MARKET_COMMENT
+  LIST_COMMENT
+  LIST_MARKET_ADDED
   COMMENT_REPLY
   COMMENT_MENTION
   COMMENT_REACTION
@@ -345,6 +355,8 @@ model Notification {
   marketResolution   MarketResolution? @relation(fields: [marketResolutionId], references: [id])
   transactionId      String?
   transaction        Transaction?      @relation(fields: [transactionId], references: [id])
+  listId             String?
+  list               List?             @relation(fields: [listId], references: [id])
   commentId          String?
   comment            Comment?          @relation("NotificationComment", fields: [commentId], references: [id])
   parentCommentId    String?
@@ -376,4 +388,47 @@ model NotificationGroup {
 
   @@unique(fields: [recipientId, type, groupWindowEnd, groupKey])
   @@index(fields: [recipientId, type, groupWindowEnd, groupKey])
+}
+
+enum QuestionContributionPolicy {
+  DISABLED
+  OWNERS_ONLY
+  FRIENDS_ONLY
+  PUBLIC
+}
+
+model List {
+  id                 String                     @id @default(cuid())
+  title              String /// @zod.string.min(1, { message: "Title is required" })
+  slug               String /// @zod.string.min(1, { message: "Slug is required" })
+  description        String?
+  ownerId            String
+  owner              User                       @relation("ListCreator", fields: [ownerId], references: [id])
+  contributionPolicy QuestionContributionPolicy @default(OWNERS_ONLY)
+  contributionReview Boolean?                   @default(false)
+  tags               String[]                   @default([]) /// @zod.string.array(.max(5))
+  markets            MarketList[]
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+
+  // New relation for parent markets
+  childrenMarkets Market[] @relation("ParentListMarkets")
+
+  // Unnecessary reverse relations
+  notifications Notification[] @relation()
+
+  @@index([ownerId])
+}
+
+model MarketList {
+  id        String   @id @default(cuid())
+  listId    String
+  list      List     @relation(fields: [listId], references: [id])
+  marketId  String
+  market    Market   @relation(fields: [marketId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([listId, marketId])
+  @@index([listId])
+  @@index([marketId])
 }

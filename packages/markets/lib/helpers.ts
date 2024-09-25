@@ -1,8 +1,8 @@
 import { Market } from '@play-money/database'
 import { ExtendedMarket } from '../types'
 
-export function canResolveMarket({ market, userId }: { market: Market; userId?: string }) {
-  return market.createdBy === userId
+export function canResolveMarket({ market, userId }: { market: ExtendedMarket; userId?: string }) {
+  return market.createdBy === userId && !isMarketResolved(market)
 }
 
 export function isMarketTradable(market: Market): boolean {

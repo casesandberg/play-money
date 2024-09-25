@@ -17,6 +17,7 @@
     "@play-money/comments": "*",
     "@play-money/database": "*",
     "@play-money/finance": "*",
+    "@play-money/lists": "*",
     "@play-money/markets": "*",
     "@play-money/notifications": "*",
     "@play-money/quests": "*",

@@ -26,6 +26,7 @@
     "./editor": "./src/components/ui/editor.tsx",
     "./emoji": "./src/components/ui/emoji.tsx",
     "./form": "./src/components/ui/form.tsx",
+    "./info-tooltip": "./src/components/ui/info-tooltip.tsx",
     "./input": "./src/components/ui/input.tsx",
     "./label": "./src/components/ui/label.tsx",
     "./multi-select": "./src/components/ui/multi-select.tsx",

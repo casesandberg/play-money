@@ -60,6 +60,42 @@ export async function getMarketBalances({
   return balances.filter((x) => x !== null)
 }
 
+export async function getListBalances({
+  accountId,
+  listId,
+}: {
+  accountId: string
+  listId: string
+}): Promise<Array<NetBalance>> {
+  const list = await db.list.findUnique({
+    where: { id: listId },
+    include: {
+      markets: {
+        include: {
+          market: {
+            include: {
+              options: true,
+            },
+          },
+        },
+      },
+    },
+  })
+
+  const balances = await Promise.all(
+    (list?.markets ?? []).map((market) => {
+      return Promise.all([
+        getBalance({ accountId, assetType: 'CURRENCY', assetId: 'PRIMARY', marketId: market.market.id }),
+        ...market.market.options.map((option) => {
+          return getBalance({ accountId, assetType: 'MARKET_OPTION', assetId: option.id, marketId: market.market.id })
+        }),
+      ])
+    })
+  )
+
+  return balances.flat().filter((x) => x !== null)
+}
+
 export function transformMarketBalancesToNumbers(balances: Array<NetBalance> = []): Array<NetBalanceAsNumbers> {
   return balances.map((balance) => ({
     ...balance,

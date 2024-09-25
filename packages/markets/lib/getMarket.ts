@@ -26,6 +26,7 @@ export async function getMarket({
             resolvedBy: true,
           },
         },
+        parentList: true,
       },
     })
   }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
+import { createList } from '@play-money/lists/lib/createList'
 import { createMarket } from '@play-money/markets/lib/createMarket'
 import { getMarkets } from '@play-money/markets/lib/getMarkets'
 import schema from './schema'
@@ -63,12 +64,25 @@ export async function POST(req: Request): Promise<SchemaResponse<typeof schema.p
 
     const body = (await req.json()) as unknown
     const basicMarket = schema.post.requestBody.parse(body)
-    const newMarket = await createMarket({
-      ...basicMarket,
-      createdBy: session.user.id,
-    })
 
-    return NextResponse.json(newMarket)
+    if (basicMarket.type === 'binary' || basicMarket.type === 'multi') {
+      const newMarket = await createMarket({
+        ...basicMarket,
+        createdBy: session.user.id,
+      })
+      return NextResponse.json({ market: newMarket })
+    } else if (basicMarket.type === 'list') {
+      const newList = await createList({
+        ...basicMarket,
+        ownerId: session.user.id,
+        title: basicMarket.question,
+        markets: basicMarket.options,
+        contributionPolicy: basicMarket.contributionPolicy || 'OWNERS_ONLY',
+      })
+      return NextResponse.json({ list: newList })
+    }
+
+    return NextResponse.json({})
   } catch (error: unknown) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
     if (error instanceof Error) {
