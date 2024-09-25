@@ -1,5 +1,5 @@
 import Decimal from 'decimal.js'
-import db from '@play-money/database'
+import db, { Market } from '@play-money/database'
 import { QuestionContributionPolicyType } from '@play-money/database/zod/inputTypeSchemas/QuestionContributionPolicySchema'
 import { getBalance } from '@play-money/finance/lib/getBalances'
 import { createMarket } from '@play-money/markets/lib/createMarket'
@@ -39,27 +39,27 @@ export async function createList({
     throw new Error('User does not have enough balance to create list')
   }
 
-  const createdMarkets = await Promise.all(
-    markets.map((market) =>
-      createMarket({
-        question: market.name,
-        description: description ?? '',
-        options: [
-          {
-            name: 'Yes',
-            color: market.color ?? '#3B82F6',
-          },
-          {
-            name: 'No',
-            color: '#EC4899',
-          },
-        ],
-        closeDate,
-        createdBy: ownerId,
-        subsidyAmount: costPerMarket,
-      })
-    )
-  )
+  const createdMarkets: Array<Market> = []
+  for (const market of markets) {
+    const createdMarket = await createMarket({
+      question: market.name,
+      description: description ?? '',
+      options: [
+        {
+          name: 'Yes',
+          color: market.color ?? '#3B82F6',
+        },
+        {
+          name: 'No',
+          color: '#EC4899',
+        },
+      ],
+      closeDate,
+      createdBy: ownerId,
+      subsidyAmount: costPerMarket,
+    })
+    createdMarkets.push(createdMarket)
+  }
 
   const createdList = await db.$transaction(
     async (tx) => {

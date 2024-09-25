@@ -1,6 +1,6 @@
 import db from '../prisma'
 
-const marketId = 'clyb4y767001087vumwtp1t0o'
+const marketIds = ['cm1hmxk3p004188ywvsgv9hff']
 
 // TODO: Cascade deletes, at least for transactions->transactionItems, and market->marketOptions
 
@@ -10,28 +10,36 @@ async function main() {
       db.transactionEntry.deleteMany({
         where: {
           transaction: {
-            marketId: marketId,
+            marketId: {
+              in: marketIds,
+            },
           },
         },
       }),
       db.transaction.deleteMany({
         where: {
-          marketId: marketId,
+          marketId: {
+            in: marketIds,
+          },
         },
       }),
       db.marketOption.deleteMany({
         where: {
-          marketId: marketId,
+          marketId: {
+            in: marketIds,
+          },
         },
       }),
       db.market.deleteMany({
         where: {
-          id: marketId,
+          id: {
+            in: marketIds,
+          },
         },
       }),
     ])
 
-    console.log(`Market ${marketId} deleted`)
+    console.log(`${marketIds.length} Markets deleted`)
   } catch (fetchError) {
     const error = fetchError as Error
     console.error(`An error occurred while fetching users: ${error.message}`)
