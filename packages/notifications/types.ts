@@ -6,6 +6,7 @@ import {
   TransactionEntry,
   User,
   Comment,
+  List,
 } from '@play-money/database'
 import { NotificationTypeType } from '@play-money/database/zod/inputTypeSchemas/NotificationTypeSchema'
 
@@ -86,10 +87,27 @@ export interface CreateMarketCommentNotification extends CreateNotificationBase 
   commentId: string
 }
 
+export interface ListCommentNotificationContent extends NotificationContentBase {
+  type: 'LIST_COMMENT'
+  actor: User
+  list: List
+  market?: Market
+  comment: Comment
+}
+
+export interface CreateListCommentNotification extends CreateNotificationBase {
+  type: 'LIST_COMMENT'
+  actorId: string
+  listId: string
+  marketId?: string
+  commentId: string
+}
+
 export interface CommentReplyNotificationContent extends NotificationContentBase {
   type: 'COMMENT_REPLY'
   actor: User
-  market: Market
+  market?: Market
+  list?: List
   comment: Comment
   parentComment: Comment
 }
@@ -97,7 +115,8 @@ export interface CommentReplyNotificationContent extends NotificationContentBase
 export interface CreateCommentReplyNotification extends CreateNotificationBase {
   type: 'COMMENT_REPLY'
   actorId: string
-  marketId: string
+  marketId?: string
+  listId?: string
   commentId: string
   parentCommentId: string
 }
@@ -105,7 +124,8 @@ export interface CreateCommentReplyNotification extends CreateNotificationBase {
 export interface CommentReactionNotificationContent extends NotificationContentBase {
   type: 'COMMENT_REACTION'
   actor: User
-  market: Market
+  market?: Market
+  list?: List
   comment: Comment
   commentReaction: CommentReaction
 }
@@ -113,7 +133,8 @@ export interface CommentReactionNotificationContent extends NotificationContentB
 export interface CreateCommentReactionNotification extends CreateNotificationBase {
   type: 'COMMENT_REACTION'
   actorId: string
-  marketId: string
+  marketId?: string
+  listId?: string
   commentId: string
   commentReactionId: string
 }
@@ -121,7 +142,8 @@ export interface CreateCommentReactionNotification extends CreateNotificationBas
 export interface CommentMentionNotificationContent extends NotificationContentBase {
   type: 'COMMENT_MENTION'
   actor: User
-  market: Market
+  market?: Market
+  list?: List
   comment: Comment
   parentComment?: Comment
 }
@@ -129,7 +151,8 @@ export interface CommentMentionNotificationContent extends NotificationContentBa
 export interface CreateCommentMentionNotification extends CreateNotificationBase {
   type: 'COMMENT_MENTION'
   actorId: string
-  marketId: string
+  marketId?: string
+  listId?: string
   commentId: string
   parentCommentId?: string
 }
@@ -139,6 +162,7 @@ export type NotificationContent =
   | MarketTradeNotificationContent
   | MarketLiquidityAddedNotificationContent
   | MarketCommentNotificationContent
+  | ListCommentNotificationContent
   | CommentReplyNotificationContent
   | CommentMentionNotificationContent
   | CommentReactionNotificationContent
@@ -148,6 +172,7 @@ export type CreateNotificationData =
   | CreateMarketTradeNotification
   | CreateMarketLiquidityAddedNotification
   | CreateMarketCommentNotification
+  | CreateListCommentNotification
   | CreateCommentReplyNotification
   | CreateCommentReactionNotification
   | CreateCommentMentionNotification

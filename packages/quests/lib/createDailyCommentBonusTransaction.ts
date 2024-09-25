@@ -10,7 +10,7 @@ export async function createDailyCommentBonusTransaction({
 }: {
   accountId: string
   initiatorId: string
-  marketId: string
+  marketId?: string
 }) {
   const houseAccount = await getHouseAccount()
   const payout = new Decimal(DAILY_COMMENT_BONUS_PRIMARY)

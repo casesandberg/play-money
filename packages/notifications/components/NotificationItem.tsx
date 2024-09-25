@@ -95,10 +95,19 @@ export function NotificationItem({
       bottomLine = `${notification.actor.displayName} commented: ${createSnippet(notification.comment.content)}`
       break
     }
+    case 'LIST_COMMENT': {
+      topLine = notification.list.title
+      bottomLine = `${notification.actor.displayName} commented: ${createSnippet(notification.comment.content)}`
+      break
+    }
     case 'COMMENT_REPLY': {
       topLine = notification.parentComment?.content
         ? createSnippet(notification.parentComment.content)
-        : notification.market.question
+        : notification.market
+          ? notification.market.question
+          : notification.list
+            ? notification.list.title
+            : ''
       bottomLine = `${notification.actor.displayName}${othersCount} replied: ${createSnippet(notification.comment.content)}`
       break
     }
@@ -110,7 +119,11 @@ export function NotificationItem({
     case 'COMMENT_MENTION': {
       topLine = notification.parentComment?.content
         ? createSnippet(notification.parentComment.content)
-        : notification.market.question
+        : notification.market
+          ? notification.market.question
+          : notification.list
+            ? notification.list.title
+            : ''
       bottomLine = `${notification.actor.displayName}${othersCount} mentioned you: ${createSnippet(notification.comment.content)}`
       break
     }

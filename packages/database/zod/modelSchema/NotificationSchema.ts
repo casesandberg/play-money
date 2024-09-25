@@ -16,6 +16,7 @@ export const NotificationSchema = z.object({
   marketOptionId: z.string().nullable(),
   marketResolutionId: z.string().nullable(),
   transactionId: z.string().nullable(),
+  listId: z.string().nullable(),
   commentId: z.string().nullable(),
   parentCommentId: z.string().nullable(),
   commentReactionId: z.string().nullable(),

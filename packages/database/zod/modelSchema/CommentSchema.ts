@@ -16,7 +16,6 @@ export const CommentSchema = z.object({
   parentId: z.string().nullable(),
   hidden: z.boolean(),
   entityId: z.string(),
-  listId: z.string().nullable(),
 })
 
 export type Comment = z.infer<typeof CommentSchema>

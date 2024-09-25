@@ -164,6 +164,7 @@ model VerificationToken {
 
 enum CommentEntityType {
   MARKET
+  LIST
 }
 
 model Comment {
@@ -185,9 +186,6 @@ model Comment {
   // Unnecessary reverse relations
   notifications       Notification[] @relation("NotificationComment")
   notificationParents Notification[] @relation("NotificationParentComment")
-
-  listId String?
-  list   List?   @relation(fields: [listId], references: [id])
 }
 
 model CommentReaction {
@@ -334,6 +332,8 @@ enum NotificationType {
   MARKET_TRADE
   MARKET_LIQUIDITY_ADDED
   MARKET_COMMENT
+  LIST_COMMENT
+  LIST_MARKET_ADDED
   COMMENT_REPLY
   COMMENT_MENTION
   COMMENT_REACTION
@@ -355,6 +355,8 @@ model Notification {
   marketResolution   MarketResolution? @relation(fields: [marketResolutionId], references: [id])
   transactionId      String?
   transaction        Transaction?      @relation(fields: [transactionId], references: [id])
+  listId             String?
+  list               List?             @relation(fields: [listId], references: [id])
   commentId          String?
   comment            Comment?          @relation("NotificationComment", fields: [commentId], references: [id])
   parentCommentId    String?
@@ -406,12 +408,14 @@ model List {
   contributionReview Boolean?                   @default(false)
   tags               String[]                   @default([]) /// @zod.string.array(.max(5))
   markets            MarketList[]
-  comments           Comment[]
   createdAt          DateTime                   @default(now())
   updatedAt          DateTime                   @updatedAt
 
   // New relation for parent markets
   childrenMarkets Market[] @relation("ParentListMarkets")
+
+  // Unnecessary reverse relations
+  notifications Notification[] @relation()
 
   @@index([ownerId])
 }

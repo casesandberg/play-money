@@ -4,7 +4,8 @@ import db from '@play-money/database'
 export async function getCommentsOnList({ listId }: { listId: string }): Promise<Array<CommentWithReactions>> {
   const comments = await db.comment.findMany({
     where: {
-      listId,
+      entityType: 'LIST',
+      entityId: listId,
     },
     include: {
       author: true,
