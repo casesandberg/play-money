@@ -42,6 +42,7 @@ export async function getNotifications(
             },
           },
           marketOption: true,
+          list: true,
         },
       },
     },
