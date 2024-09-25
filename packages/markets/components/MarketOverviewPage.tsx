@@ -2,7 +2,7 @@
 
 import { format, isPast } from 'date-fns'
 import _ from 'lodash'
-import { CircleCheckBig, ChevronDown } from 'lucide-react'
+import { CircleCheckBig, ChevronDown, Link2Icon } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 import { mutate } from 'swr'
@@ -86,6 +86,15 @@ export function MarketOverviewPage({
       />
 
       <CardHeader className="pt-0 md:pt-0">
+        {market.parentList ? (
+          <Link
+            href={`/lists/${market.parentList.id}/${market.parentList.slug}`}
+            className="flex items-center gap-2 text-muted-foreground"
+          >
+            <Link2Icon className="size-5" />
+            {market.parentList.title}
+          </Link>
+        ) : null}
         <CardTitle className="leading-relaxed">{market.question}</CardTitle>
         <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground md:flex-nowrap">
           {!market.marketResolution ? (

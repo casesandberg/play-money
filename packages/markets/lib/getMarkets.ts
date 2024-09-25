@@ -64,6 +64,7 @@ export async function getMarkets(
             resolvedBy: true,
           },
         },
+        parentList: true,
       },
       orderBy: {
         [sort.field]: sort.direction,
