@@ -37,6 +37,18 @@ export function useMarketBalance({ marketId }: { marketId: string }) {
   })
 }
 
+export function LIST_BALANCE_PATH(listId: string) {
+  return `/v1/lists/${listId}/balance`
+}
+export function useListBalance({ listId }: { listId: string }) {
+  return useSWR<{
+    user: Array<NetBalanceAsNumbers>
+    userPositions: Array<MarketOptionPositionAsNumbers>
+  }>(LIST_BALANCE_PATH(listId), {
+    refreshInterval: SIXTY_SECONDS,
+  })
+}
+
 export function useMarketPositions({ marketId }: { marketId: string }) {
   return useSWR<{
     balances: Array<NetBalanceAsNumbers & { account: { userPrimary: User } }>

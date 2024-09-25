@@ -19,6 +19,7 @@ export async function createMarket({
   options,
   tags,
   subsidyAmount = new Decimal(INITIAL_MARKET_LIQUIDITY_PRIMARY),
+  parentListId,
 }: {
   question: string
   description: string
@@ -27,6 +28,7 @@ export async function createMarket({
   options?: Array<PartialOptions>
   tags?: Array<string>
   subsidyAmount?: Decimal
+  parentListId?: string
 }) {
   let slug = slugifyTitle(question)
 
@@ -75,6 +77,11 @@ export async function createMarket({
             probability: new Decimal(1).div(parsedOptions.length).toNumber(),
             createdAt: new Date(now.getTime() + i), // Stagger createdAt so that they can be ordered by creation
           })),
+        },
+      },
+      parentList: {
+        connect: {
+          id: parentListId,
         },
       },
       commentCount: 0,

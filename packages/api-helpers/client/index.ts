@@ -1,8 +1,9 @@
 import _ from 'lodash'
 import { CommentWithReactions } from '@play-money/comments/lib/getComment'
-import { Market, MarketOptionPosition, User } from '@play-money/database'
+import { List, Market, MarketOptionPosition, User } from '@play-money/database'
 import { NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
 import { TransactionWithEntries, LeaderboardUser, ExtendedMarketOptionPosition } from '@play-money/finance/types'
+import { ExtendedList } from '@play-money/lists/types'
 import { ExtendedMarket } from '@play-money/markets/types'
 
 // TODO: @casesandberg Generate this from OpenAPI schema
@@ -126,8 +127,21 @@ export async function getExtendedMarket({ marketId }: { marketId: string }) {
   })
 }
 
+export async function getExtendedList({ listId }: { listId: string }) {
+  return apiHandler<ExtendedList>(`${process.env.NEXT_PUBLIC_API_URL}/v1/lists/${listId}?extended=true`, {
+    next: { tags: [`list:${listId}`] },
+  })
+}
+
 export async function createMarket(body: Record<string, unknown>) {
-  return apiHandler<Market>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets`, {
+  return apiHandler<{ market?: Market; list?: List }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets`, {
+    method: 'POST',
+    body,
+  })
+}
+
+export async function createListMarket({ listId }: { listId: string }, body: Record<string, unknown>) {
+  return apiHandler<{ market?: Market; list?: List }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/lists/${listId}/markets`, {
     method: 'POST',
     body,
   })
@@ -233,6 +247,19 @@ export async function getMarketComments({
     `${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/comments`,
     {
       next: { tags: [`${marketId}:comments`] },
+    }
+  )
+}
+
+export async function getListComments({
+  listId,
+}: {
+  listId: string
+}): Promise<{ comments: Array<CommentWithReactions> }> {
+  return apiHandler<{ comments: Array<CommentWithReactions> }>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/lists/${listId}/comments`,
+    {
+      next: { tags: [`list:${listId}:comments`] },
     }
   )
 }

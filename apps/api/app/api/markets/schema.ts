@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
-import { MarketOptionSchema, MarketSchema } from '@play-money/database'
+import { ListSchema, MarketOptionSchema, MarketSchema, QuestionContributionPolicySchema } from '@play-money/database'
 
 export default createSchema({
   get: {
@@ -39,9 +39,11 @@ export default createSchema({
           color: true,
         })
       ),
+      type: z.enum(['binary', 'multi', 'list']).optional(),
+      contributionPolicy: QuestionContributionPolicySchema.optional(),
     }),
     responses: {
-      200: MarketSchema,
+      200: z.object({ market: MarketSchema.optional(), list: ListSchema.optional() }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },
