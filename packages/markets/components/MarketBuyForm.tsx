@@ -10,10 +10,12 @@ import { MarketOption } from '@play-money/database'
 import { Button } from '@play-money/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
+import { RadioGroup, RadioGroupItem } from '@play-money/ui/radio-group'
 import { toast } from '@play-money/ui/use-toast'
 import { cn } from '@play-money/ui/utils'
 
 const FormSchema = z.object({
+  optionId: z.string(),
   amount: z.coerce.number().min(1, { message: 'Amount must be greater than zero' }),
 })
 
@@ -21,13 +23,11 @@ type FormData = z.infer<typeof FormSchema>
 
 export function MarketBuyForm({
   marketId,
-  option,
-  hasOutcome,
+  options,
   onComplete,
 }: {
   marketId: string
-  option: MarketOption
-  hasOutcome?: boolean
+  options: Array<MarketOption>
   onComplete?: () => void
 }) {
   const [quote, setQuote] = useState<{ newProbability: number; potentialReturn: number } | null>(null)
@@ -35,12 +35,15 @@ export function MarketBuyForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       amount: 100,
+      optionId: options[0].id,
     },
   })
 
+  const selectedOption = options.find((o) => o.id === form.getValues('optionId'))
+
   const onSubmit = async (data: FormData) => {
     try {
-      await createMarketBuy({ marketId, optionId: option.id, amount: data.amount })
+      await createMarketBuy({ marketId, optionId: data.optionId, amount: data.amount })
       toast({ title: 'Bet placed successfully' })
       form.reset({ amount: 0 })
       setQuote(null)
@@ -65,34 +68,46 @@ export function MarketBuyForm({
   }
 
   useEffect(() => {
+    form.setValue('optionId', options[0].id)
+  }, [options])
+
+  useEffect(() => {
     const amount = form?.getValues('amount')
-    if (amount && option.id) {
-      fetchQuote(amount, option.id)
+    const optionId = form?.getValues('optionId')
+
+    if (amount && optionId) {
+      fetchQuote(amount, optionId)
     }
 
-    const subscription = form.watch(({ amount }) => {
-      if (amount) {
-        fetchQuote(amount, option.id)
+    const subscription = form.watch(({ amount, optionId }) => {
+      if (amount && optionId) {
+        fetchQuote(amount, optionId)
       }
     })
     return () => subscription.unsubscribe()
-  }, [form, option.id])
+  }, [form, options])
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {hasOutcome ? (
+        {options.length > 1 ? (
           <FormField
             control={form.control}
-            name="amount"
+            name="optionId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Outcome</FormLabel>
+                <FormLabel>Option</FormLabel>
                 <FormControl>
-                  <Button className="flex-1">Yes</Button>
-                  <Button className="flex-1" variant="secondary">
-                    No
-                  </Button>
+                  <RadioGroup onValueChange={field.onChange} value={field.value} className="flex flex-col space-y-1">
+                    {options.map((option) => (
+                      <FormItem key={option.id} className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value={option.id} />
+                        </FormControl>
+                        <FormLabel className="font-normal">{option.name}</FormLabel>
+                      </FormItem>
+                    ))}
+                  </RadioGroup>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -154,7 +169,7 @@ export function MarketBuyForm({
         />
 
         <Button type="submit" className="w-full truncate" loading={form.formState.isSubmitting}>
-          Buy {_.truncate(option.name, { length: 20 })}
+          Buy {_.truncate(selectedOption?.name, { length: 20 })}
         </Button>
 
         <ul className="grid gap-1 text-sm">

@@ -3,53 +3,42 @@
 import { CircleOffIcon } from 'lucide-react'
 import React from 'react'
 import { mutate } from 'swr'
-import {
-  MARKET_BALANCE_PATH,
-  MARKET_GRAPH_PATH,
-  MY_BALANCE_PATH,
-  useMarketBalance,
-} from '@play-money/api-helpers/client/hooks'
+import { LIST_BALANCE_PATH, MY_BALANCE_PATH, useListBalance } from '@play-money/api-helpers/client/hooks'
+import { MarketBalanceBreakdown } from '@play-money/markets/components/MarketBalanceBreakdown'
+import { MarketBuyForm } from '@play-money/markets/components/MarketBuyForm'
+import { MarketLeaderboardPanel } from '@play-money/markets/components/MarketLeaderboardPanel'
+import { MarketSellForm } from '@play-money/markets/components/MarketSellForm'
+import { useSidebar } from '@play-money/markets/components/SidebarContext'
+import { isMarketResolved, isMarketTradable } from '@play-money/markets/lib/helpers'
 import { useSelectedItems } from '@play-money/ui'
 import { Card, CardContent, CardHeader } from '@play-money/ui/card'
 import { Combobox } from '@play-money/ui/combobox'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@play-money/ui/tabs'
 import { cn } from '@play-money/ui/utils'
-import { ExtendedMarket } from '../types'
-import { MarketBalanceBreakdown } from './MarketBalanceBreakdown'
-import { MarketBuyForm } from './MarketBuyForm'
-import { MarketLeaderboardPanel } from './MarketLeaderboardPanel'
-import { MarketSellForm } from './MarketSellForm'
-import { useSidebar } from './SidebarContext'
+import { ExtendedList } from '../types'
 
-export function MarketTradePanel({
-  market,
-  isTradable = true,
-  isResolved = false,
-  onTradeComplete,
-}: {
-  market: ExtendedMarket
-  isTradable?: boolean
-  isResolved: boolean
-  onTradeComplete?: () => void
-}) {
+export function ListTradePanel({ list, onTradeComplete }: { list: ExtendedList; onTradeComplete?: () => void }) {
   const { selected, setSelected } = useSelectedItems()
-  // We can SSR this now, since the P&L will be the one thats updated externally and this one will only ever be updated by a user!
-  const { data: balance, mutate: revalidate } = useMarketBalance({ marketId: market.id })
   const { effect, resetEffect } = useSidebar()
-  const activeOption = market.options.find((o) => o.id === selected[0])
-  const activePosition = balance?.userPositions.find((p) => p.optionId === activeOption?.id)
+  const { data: balance, mutate: revalidate } = useListBalance({ listId: list.id })
+  const selectedMarket = list.markets.find((m) => m.market.id === selected[0])
+
+  const isTradable = selectedMarket ? isMarketTradable(selectedMarket.market) : false
+  const isResolved = selectedMarket ? isMarketResolved(selectedMarket.market) : false
 
   const handleComplete = async () => {
     void mutate(MY_BALANCE_PATH)
-    void mutate(MARKET_BALANCE_PATH(market.id))
-    void mutate(MARKET_GRAPH_PATH(market.id))
-    void revalidate()
+    void mutate(LIST_BALANCE_PATH(list.id))
     void onTradeComplete?.()
+    revalidate()
   }
 
-  const primaryBalance = balance?.user.find((b) => b.assetId === 'PRIMARY')
+  const primaryBalances = balance?.user.filter((b) => b.assetId === 'PRIMARY')
+  const primaryBalanceSum = balance?.user
+    .filter((b) => b.assetId === 'PRIMARY')
+    .reduce((sum, position) => sum + position.total, 0)
   const positionsSum = (balance?.userPositions ?? []).reduce((sum, position) => sum + position.value, 0)
-  const total = (primaryBalance?.total || 0) + positionsSum
+  const total = (primaryBalanceSum || 0) + positionsSum
 
   return (
     <div className="space-y-4">
@@ -59,9 +48,9 @@ export function MarketTradePanel({
             <CardHeader className="flex items-start bg-muted md:p-3">
               <Combobox
                 buttonClassName="bg-muted w-full text-lg border-none"
-                value={activeOption?.id}
+                value={selectedMarket?.market.id}
                 onChange={(value) => setSelected([value])}
-                items={market.options.map((option) => ({ value: option.id, label: option.name }))}
+                items={list.markets.map((option) => ({ value: option.market.id, label: option.market.question }))}
               />
               <TabsList className="ml-3 p-0">
                 <TabsTrigger value="buy">Buy</TabsTrigger>
@@ -71,16 +60,20 @@ export function MarketTradePanel({
 
             <CardContent className="mt-4">
               <TabsContent className="space-y-4" value="buy">
-                {activeOption ? (
-                  <MarketBuyForm marketId={market.id} options={[activeOption]} onComplete={handleComplete} />
+                {selectedMarket ? (
+                  <MarketBuyForm
+                    marketId={selectedMarket.market.id}
+                    options={selectedMarket.market.options}
+                    onComplete={handleComplete}
+                  />
                 ) : null}
               </TabsContent>
               <TabsContent value="sell">
-                {activeOption ? (
+                {selectedMarket ? (
                   <MarketSellForm
-                    marketId={market.id}
-                    positions={activePosition ? [activePosition] : undefined}
-                    options={[activeOption]}
+                    positions={balance?.userPositions}
+                    options={selectedMarket.market.options}
+                    marketId={selectedMarket.market.id}
                     onComplete={handleComplete}
                   />
                 ) : null}
@@ -93,9 +86,9 @@ export function MarketTradePanel({
           <CircleOffIcon className="size-8 stroke-[1.5px] text-muted-foreground" />
           <div className="text-balance text-center text-sm uppercase text-muted-foreground">Trading closed</div>
         </Card>
-      ) : (
-        <MarketLeaderboardPanel market={market} />
-      )}
+      ) : selectedMarket ? (
+        <MarketLeaderboardPanel market={selectedMarket.market} />
+      ) : null}
 
       {total ? (
         <Card>
@@ -105,9 +98,10 @@ export function MarketTradePanel({
             </div>
 
             <MarketBalanceBreakdown
-              balances={[primaryBalance]}
+              markets={list.markets.map((m) => m.market)}
+              balances={primaryBalances}
               positions={balance?.userPositions ?? []}
-              options={market.options}
+              options={list.markets.map((m) => m.market.options).flat()}
             />
           </CardContent>
         </Card>

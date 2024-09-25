@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import Decimal from 'decimal.js'
 import _ from 'lodash'
 import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
@@ -11,11 +12,13 @@ import { MarketOptionPositionAsNumbers } from '@play-money/finance/lib/getBalanc
 import { Button } from '@play-money/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
+import { RadioGroup, RadioGroupItem } from '@play-money/ui/radio-group'
 import { Slider } from '@play-money/ui/slider'
 import { toast } from '@play-money/ui/use-toast'
 import { QuoteItem, calculateReturnPercentage, formatCurrency, formatPercentage } from './MarketBuyForm'
 
 const FormSchema = z.object({
+  optionId: z.string(),
   amount: z.coerce.number().min(1, { message: 'Amount must be greater than zero' }),
 })
 
@@ -23,36 +26,31 @@ type FormData = z.infer<typeof FormSchema>
 
 export function MarketSellForm({
   marketId,
-  option,
-  position,
+  options,
+  positions,
   onComplete,
 }: {
   marketId: string
-  option: MarketOption
-  position?: MarketOptionPositionAsNumbers
+  options: Array<MarketOption>
+  positions?: Array<MarketOptionPositionAsNumbers>
   onComplete?: () => void
 }) {
-  const [max, setMax] = useState(position?.quantity)
+  const [max, setMax] = useState(0)
   const [quote, setQuote] = useState<{ newProbability: number; potentialReturn: number } | null>(null)
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       amount: '' as unknown as number, // Fix uncontrolled component error
+      optionId: options[0].id,
     },
   })
 
-  useEffect(() => {
-    if (position?.quantity) {
-      setMax(position.quantity)
-      form.setValue('amount', Math.round(position.quantity / 2))
-    } else {
-      form.setValue('amount', 0)
-    }
-  }, [option.id, position])
+  const selectedOption = options.find((o) => o.id === form.getValues('optionId'))
+  const selectedPosition = positions?.find((p) => p.optionId === form.getValues('optionId'))
 
   const onSubmit = async (data: FormData) => {
     try {
-      await createMarketSell({ marketId: marketId, optionId: option.id, amount: data.amount })
+      await createMarketSell({ marketId: marketId, optionId: data.optionId, amount: data.amount })
       toast({ title: 'Shares sold successfully' })
       form.reset({ amount: 0 })
       setQuote(null)
@@ -77,24 +75,65 @@ export function MarketSellForm({
   }
 
   useEffect(() => {
+    form.setValue('optionId', options[0].id)
+  }, [options])
+
+  useEffect(() => {
+    if (selectedPosition?.quantity) {
+      setMax(selectedPosition.quantity)
+      form.setValue('amount', Math.round(selectedPosition.quantity / 2))
+    } else {
+      form.setValue('amount', 0)
+    }
+  }, [form.watch('optionId'), selectedPosition])
+
+  useEffect(() => {
     const amount = form?.getValues('amount')
-    if (amount && option.id) {
-      fetchQuote(amount, option.id)
+    const optionId = form?.getValues('optionId')
+    if (amount && optionId) {
+      fetchQuote(amount, optionId)
     }
 
-    const subscription = form.watch(({ amount }) => {
-      if (amount) {
-        fetchQuote(amount, option.id)
+    const subscription = form.watch(({ amount, optionId }) => {
+      if (amount && optionId) {
+        fetchQuote(amount, optionId)
       }
     })
     return () => subscription.unsubscribe()
-  }, [form, option.id])
+  }, [form, options])
 
-  const proportionateCost = (form.getValues('amount') * (position?.cost || 0)) / (position?.quantity || 0)
+  const proportionateCost =
+    (form.getValues('amount') * (selectedPosition?.cost || 0)) / (selectedPosition?.quantity || 0)
+  const disabled = !selectedPosition || new Decimal(selectedPosition.quantity).toDecimalPlaces(4).lt(0)
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {options.length > 1 ? (
+          <FormField
+            control={form.control}
+            name="optionId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Option</FormLabel>
+                <FormControl>
+                  <RadioGroup onValueChange={field.onChange} value={field.value} className="flex flex-col space-y-1">
+                    {options.map((option) => (
+                      <FormItem key={option.id} className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value={option.id} />
+                        </FormControl>
+                        <FormLabel className="font-normal">{option.name}</FormLabel>
+                      </FormItem>
+                    ))}
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        ) : null}
+
         <FormField
           control={form.control}
           name="amount"
@@ -109,6 +148,7 @@ export function MarketSellForm({
                     max={max}
                     value={[field.value]}
                     onValueChange={(value) => field.onChange(value[0])}
+                    disabled={disabled}
                   />
                   <div className="flex gap-2">
                     <Input
@@ -117,9 +157,16 @@ export function MarketSellForm({
                       {...field}
                       onChange={(e) => field.onChange(e.currentTarget.valueAsNumber)}
                       className="h-9 font-mono"
+                      disabled={disabled}
                     />
 
-                    <Button size="sm" type="button" variant="secondary" onClick={() => field.onChange(max)}>
+                    <Button
+                      size="sm"
+                      type="button"
+                      variant="secondary"
+                      onClick={() => field.onChange(max)}
+                      disabled={disabled}
+                    >
                       MAX
                     </Button>
                   </div>
@@ -130,8 +177,8 @@ export function MarketSellForm({
           )}
         />
 
-        <Button type="submit" className="w-full truncate" loading={form.formState.isSubmitting}>
-          Sell {_.truncate(option.name, { length: 20 })}
+        <Button type="submit" className="w-full truncate" loading={form.formState.isSubmitting} disabled={disabled}>
+          Sell {_.truncate(selectedOption?.name, { length: 20 })}
         </Button>
 
         <ul className="grid gap-1 text-sm">

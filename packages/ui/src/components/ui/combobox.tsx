@@ -76,8 +76,13 @@ export function Combobox({
                   }}
                   value={item.value}
                 >
-                  <Check className={cn('mr-2 h-4 w-4', innerValue === item.value ? 'opacity-100' : 'opacity-0')} />
-                  {item.label}
+                  <Check
+                    className={cn(
+                      'mr-2 h-4 w-4 flex-shrink-0',
+                      innerValue === item.value ? 'opacity-100' : 'opacity-0'
+                    )}
+                  />
+                  <span className="line-clamp-2">{item.label}</span>
                 </CommandItem>
               ))}
             </CommandGroup>
