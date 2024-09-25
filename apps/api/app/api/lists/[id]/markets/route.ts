@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
 import db from '@play-money/database'
+import { LOWEST_MARKET_LIQUIDITY_PRIMARY } from '@play-money/finance/economy'
 import { getList } from '@play-money/lists/lib/getList'
 import { canAddToList } from '@play-money/lists/rules'
 import { createMarket } from '@play-money/markets/lib/createMarket'
@@ -36,7 +37,7 @@ export async function POST(
       ...basicMarket,
       createdBy: session.user.id,
       parentListId: list.id,
-      subsidyAmount: new Decimal(100),
+      subsidyAmount: new Decimal(LOWEST_MARKET_LIQUIDITY_PRIMARY),
     })
 
     await db.list.update({

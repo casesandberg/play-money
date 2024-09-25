@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form'
 import z from 'zod'
 import { createListMarket } from '@play-money/api-helpers/client'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
+import { LOWEST_MARKET_LIQUIDITY_PRIMARY } from '@play-money/finance/economy'
 import { Alert, AlertDescription, AlertTitle } from '@play-money/ui/alert'
 import { Button } from '@play-money/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@play-money/ui/dialog'
@@ -150,7 +151,7 @@ export const AddMoreListDialog = ({
             </Alert>
 
             <Button disabled={!isDirty || !isValid} loading={isSubmitting} type="submit">
-              <CurrencyDisplay value={100} /> Create question
+              <CurrencyDisplay value={LOWEST_MARKET_LIQUIDITY_PRIMARY} /> Create question
             </Button>
           </form>
         </Form>

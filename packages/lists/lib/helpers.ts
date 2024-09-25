@@ -1,17 +1,12 @@
-export function calculateTotalCost(numItems: number): number {
-  const basePrice = 1000
-  const decayRate = 10
-  const minimumCost = 100
+import { INITIAL_MARKET_LIQUIDITY_PRIMARY, LOWEST_MARKET_LIQUIDITY_PRIMARY } from '@play-money/finance/economy'
 
+export function calculateTotalCost(numItems: number): number {
   let totalCost = 0
 
   for (let i = 1; i <= numItems; i++) {
-    // Calculate the cost per item based on logarithmic decay
-    const costPerItem = Math.max(basePrice / Math.log(i + decayRate), minimumCost)
+    const costPerItem = Math.max(INITIAL_MARKET_LIQUIDITY_PRIMARY - (i - 1) * 100, LOWEST_MARKET_LIQUIDITY_PRIMARY)
     totalCost += costPerItem
   }
-
-  totalCost = Math.round(totalCost / 100) * 100
 
   return totalCost
 }
