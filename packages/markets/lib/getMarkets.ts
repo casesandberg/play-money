@@ -54,6 +54,7 @@ export async function getMarkets(
         ...statusFilters,
         createdBy: filters.createdBy,
         tags: filters.tag ? { has: filters.tag } : filters.tags ? { hasSome: filters.tags } : undefined,
+        parentListId: null,
       },
       include: {
         user: true,
@@ -77,6 +78,7 @@ export async function getMarkets(
         ...statusFilters,
         createdBy: filters.createdBy,
         tags: filters.tag ? { has: filters.tag } : undefined,
+        parentListId: null,
       },
     }),
   ])

@@ -121,6 +121,36 @@ export async function getMarkets({
   })
 }
 
+export async function getLists({
+  tag,
+  page,
+  pageSize,
+  status,
+  sortField,
+  sortDirection,
+}: {
+  tag?: string
+  page?: string
+  pageSize?: string
+  status?: string
+  sortField?: string
+  sortDirection?: string
+} = {}) {
+  const currentParams = new URLSearchParams(
+    JSON.parse(JSON.stringify({ tag, page, pageSize, status, sortField, sortDirection }))
+  )
+  const search = currentParams.toString()
+
+  return apiHandler<{
+    lists: Array<ExtendedList>
+    page: number
+    pageSize: number
+    totalPages: number
+  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/lists${search ? `?${search}` : ''}`, {
+    next: { tags: ['lists'] },
+  })
+}
+
 export async function getExtendedMarket({ marketId }: { marketId: string }) {
   return apiHandler<ExtendedMarket>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}?extended=true`, {
     next: { tags: [`market:${marketId}`] },
