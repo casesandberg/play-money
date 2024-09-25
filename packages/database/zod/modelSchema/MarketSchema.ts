@@ -21,6 +21,7 @@ export const MarketSchema = z.object({
   uniqueTradersCount: z.number().int().nullable(),
   uniquePromotersCount: z.number().int().nullable(),
   liquidityCount: z.number().int().nullable(),
+  parentListId: z.string().nullable(),
 })
 
 export type Market = z.infer<typeof MarketSchema>
