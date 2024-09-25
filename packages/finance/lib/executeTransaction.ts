@@ -47,6 +47,7 @@ export async function executeTransaction({
       return transaction
     },
     {
+      maxWait: 5000,
       timeout: 10000,
     }
   )

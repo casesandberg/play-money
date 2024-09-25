@@ -29,32 +29,38 @@ export async function resolveMarket({
     throw new Error('User cannot resolve market')
   }
 
-  await db.$transaction(async (tx) => {
-    const now = new Date()
+  await db.$transaction(
+    async (tx) => {
+      const now = new Date()
 
-    await tx.marketResolution.upsert({
-      where: { marketId },
-      create: {
-        marketId,
-        resolutionId: optionId,
-        supportingLink,
-        resolvedById: resolverId,
-        createdAt: now,
-        updatedAt: now,
-      },
-      update: {
-        resolutionId: optionId,
-        supportingLink,
-        resolvedById: resolverId,
-        updatedAt: now,
-      },
-    })
+      await tx.marketResolution.upsert({
+        where: { marketId },
+        create: {
+          marketId,
+          resolutionId: optionId,
+          supportingLink,
+          resolvedById: resolverId,
+          createdAt: now,
+          updatedAt: now,
+        },
+        update: {
+          resolutionId: optionId,
+          supportingLink,
+          resolvedById: resolverId,
+          updatedAt: now,
+        },
+      })
 
-    await tx.market.update({
-      where: { id: marketId },
-      data: { resolvedAt: now, closeDate: now, updatedAt: now },
-    })
-  })
+      await tx.market.update({
+        where: { id: marketId },
+        data: { resolvedAt: now, closeDate: now, updatedAt: now },
+      })
+    },
+    {
+      maxWait: 5000,
+      timeout: 10000,
+    }
+  )
 
   await createMarketResolveLossTransactions({
     marketId,

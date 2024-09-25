@@ -61,43 +61,49 @@ export async function createList({
     )
   )
 
-  const createdList = await db.$transaction(async (tx) => {
-    const list = await tx.list.create({
-      data: {
-        title,
-        description,
-        ownerId,
-        slug,
-        tags: tags?.map((tag) => slugifyTitle(tag)),
-        markets: {
-          createMany: {
-            data: createdMarkets.map((market) => ({
-              marketId: market.id,
-            })),
+  const createdList = await db.$transaction(
+    async (tx) => {
+      const list = await tx.list.create({
+        data: {
+          title,
+          description,
+          ownerId,
+          slug,
+          tags: tags?.map((tag) => slugifyTitle(tag)),
+          markets: {
+            createMany: {
+              data: createdMarkets.map((market) => ({
+                marketId: market.id,
+              })),
+            },
           },
+          contributionPolicy,
         },
-        contributionPolicy,
-      },
-      include: {
-        markets: true,
-      },
-    })
-
-    await Promise.all(
-      createdMarkets.map((market) => {
-        return tx.market.update({
-          where: {
-            id: market.id,
-          },
-          data: {
-            parentListId: list.id,
-          },
-        })
+        include: {
+          markets: true,
+        },
       })
-    )
 
-    return list
-  })
+      await Promise.all(
+        createdMarkets.map((market) => {
+          return tx.market.update({
+            where: {
+              id: market.id,
+            },
+            data: {
+              parentListId: list.id,
+            },
+          })
+        })
+      )
+
+      return list
+    },
+    {
+      maxWait: 5000,
+      timeout: 10000,
+    }
+  )
 
   return createdList
 }
