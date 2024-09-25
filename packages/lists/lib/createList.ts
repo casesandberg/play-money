@@ -39,29 +39,29 @@ export async function createList({
     throw new Error('User does not have enough balance to create list')
   }
 
-  const createdList = await db.$transaction(async (tx) => {
-    const createdMarkets = await Promise.all(
-      markets.map((market) =>
-        createMarket({
-          question: market.name,
-          description: description ?? '',
-          options: [
-            {
-              name: 'Yes',
-              color: market.color ?? '#3B82F6',
-            },
-            {
-              name: 'No',
-              color: '#EC4899',
-            },
-          ],
-          closeDate,
-          createdBy: ownerId,
-          subsidyAmount: costPerMarket,
-        })
-      )
+  const createdMarkets = await Promise.all(
+    markets.map((market) =>
+      createMarket({
+        question: market.name,
+        description: description ?? '',
+        options: [
+          {
+            name: 'Yes',
+            color: market.color ?? '#3B82F6',
+          },
+          {
+            name: 'No',
+            color: '#EC4899',
+          },
+        ],
+        closeDate,
+        createdBy: ownerId,
+        subsidyAmount: costPerMarket,
+      })
     )
+  )
 
+  const createdList = await db.$transaction(async (tx) => {
     const list = await tx.list.create({
       data: {
         title,
