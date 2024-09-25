@@ -14,10 +14,12 @@ export async function createNotification({
   parentCommentId,
   transactionId,
   marketOptionId,
+  listId,
 }: {
   userId: string
   actionUrl: string
   groupKey: string
+  listId?: string
 } & CreateNotificationData) {
   const isGroupable = ['MARKET_TRADE', 'MARKET_LIQUIDITY_ADDED', 'COMMENT_REACTION'].includes(type)
 
@@ -34,6 +36,7 @@ export async function createNotification({
       parentCommentId,
       transactionId,
       marketOptionId,
+      listId,
     },
   })
 
