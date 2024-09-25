@@ -1,5 +1,6 @@
 import Decimal from 'decimal.js'
 import db from '@play-money/database'
+import { QuestionContributionPolicyType } from '@play-money/database/zod/inputTypeSchemas/QuestionContributionPolicySchema'
 import { getBalance } from '@play-money/finance/lib/getBalances'
 import { createMarket } from '@play-money/markets/lib/createMarket'
 import { slugifyTitle } from '@play-money/markets/lib/helpers'
@@ -13,6 +14,7 @@ export async function createList({
   ownerId,
   closeDate,
   markets,
+  contributionPolicy,
 }: {
   title: string
   description?: string
@@ -20,6 +22,7 @@ export async function createList({
   ownerId: string
   closeDate: Date | null
   markets: Array<{ name: string; color?: string }>
+  contributionPolicy: QuestionContributionPolicyType
 }) {
   const slug = slugifyTitle(title)
   const totalCost = calculateTotalCost(markets.length)
@@ -73,6 +76,7 @@ export async function createList({
             })),
           },
         },
+        contributionPolicy,
       },
       include: {
         markets: true,

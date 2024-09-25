@@ -77,6 +77,7 @@ export async function POST(req: Request): Promise<SchemaResponse<typeof schema.p
         ownerId: session.user.id,
         title: basicMarket.question,
         markets: basicMarket.options,
+        contributionPolicy: basicMarket.contributionPolicy || 'OWNERS_ONLY',
       })
       return NextResponse.json({ list: newList })
     }
