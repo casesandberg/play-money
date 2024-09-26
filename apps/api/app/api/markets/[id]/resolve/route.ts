@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
+import { getMarket } from '@play-money/markets/lib/getMarket'
 import { resolveMarket } from '@play-money/markets/lib/resolveMarket'
+import { canModifyMarket } from '@play-money/markets/rules'
+import { getUserById } from '@play-money/users/lib/getUserById'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'
@@ -21,6 +24,13 @@ export async function POST(
 
     const body = (await req.json()) as unknown
     const { optionId, supportingLink } = schema.post.requestBody.parse(body)
+
+    const market = await getMarket({ id, extended: true })
+    const resolvingUser = await getUserById({ id: session.user.id })
+
+    if (!canModifyMarket({ market, user: resolvingUser })) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
     await resolveMarket({
       resolverId: session.user.id,

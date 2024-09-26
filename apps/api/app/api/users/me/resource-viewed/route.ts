@@ -19,6 +19,8 @@ export async function POST(req: Request): Promise<SchemaResponse<typeof schema.p
 
     if (resourceType === 'MARKET') {
       await updateNotificationsRead({ userId: session.user.id, marketId: resourceId })
+    } else if (resourceType === 'LIST') {
+      await updateNotificationsRead({ userId: session.user.id, listId: resourceId })
     }
 
     return NextResponse.json({ success: true })

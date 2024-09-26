@@ -23,6 +23,7 @@ export { JsonNullValueInputSchema } from './JsonNullValueInputSchema';
 export { QueryModeSchema } from './QueryModeSchema';
 export { NullsOrderSchema } from './NullsOrderSchema';
 export { JsonNullValueFilterSchema } from './JsonNullValueFilterSchema';
+export { UserRoleSchema } from './UserRoleSchema';
 export { CommentEntityTypeSchema } from './CommentEntityTypeSchema';
 export { TransactionTypeSchema } from './TransactionTypeSchema';
 export { AssetTypeSchema } from './AssetTypeSchema';

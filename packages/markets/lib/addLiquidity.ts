@@ -7,9 +7,9 @@ import { createNotification } from '@play-money/notifications/lib/createNotifica
 import { createDailyLiquidityBonusTransaction } from '@play-money/quests/lib/createDailyLiquidityBonusTransaction'
 import { hasBoostedLiquidityToday } from '@play-money/quests/lib/helpers'
 import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
+import { isMarketResolved } from '../rules'
 import { createMarketLiquidityTransaction } from './createMarketLiquidityTransaction'
 import { getMarket } from './getMarket'
-import { isMarketResolved } from './helpers'
 
 export async function addLiquidity({
   userId,
@@ -31,7 +31,7 @@ export async function addLiquidity({
     throw new Error('User does not have enough balance')
   }
 
-  if (isMarketResolved(market)) {
+  if (isMarketResolved({ market })) {
     throw new Error('Market already resolved')
   }
 

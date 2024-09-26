@@ -20,6 +20,7 @@ async function main() {
               email: process.env.DEV_DB_SEED_EMAIL,
               username: 'dev',
               displayName: 'Dev User',
+              role: 'ADMIN' as const,
             }
           : {
               email: faker.internet.email(),

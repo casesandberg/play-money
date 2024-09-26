@@ -48,6 +48,7 @@ export function mockUser(overrides?: Partial<User>): User {
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
     primaryAccountId: faker.string.uuid(),
+    role: 'USER',
     timezone: faker.helpers.arrayElement(Intl.supportedValuesOf('timeZone')),
     ...overrides,
   }

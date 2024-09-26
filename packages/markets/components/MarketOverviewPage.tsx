@@ -24,6 +24,7 @@ import { UserLink } from '@play-money/users/components/UserLink'
 import { useUser } from '@play-money/users/context/UserContext'
 import { useSelectedItems } from '../../ui/src/contexts/SelectedItemContext'
 import { useSearchParam } from '../../ui/src/hooks/useSearchParam'
+import { canModifyMarket } from '../rules'
 import { ExtendedMarket } from '../types'
 import { EditMarketDialog } from './EditMarketDialog'
 import { EditMarketOptionDialog } from './EditMarketOptionDialog'
@@ -79,7 +80,7 @@ export function MarketOverviewPage({
     <Card className="flex-1">
       <MarketToolbar
         market={market}
-        canEdit={isCreator}
+        canEdit={user ? canModifyMarket({ market, user }) : false}
         onInitiateEdit={() => setIsEditing('true')}
         onInitiateBoost={() => setIsBoosting('true')}
         onRevalidate={handleRevalidateBalance}
@@ -170,7 +171,7 @@ export function MarketOverviewPage({
                         active={option.id === selected[0]}
                         probability={probabilities[option.id] || option.probability || 0}
                         className={i > 0 ? 'border-t' : ''}
-                        canEdit={user?.id === market.createdBy}
+                        canEdit={user ? canModifyMarket({ market, user }) : false}
                         onEdit={() => setIsEditOption(option.id)}
                         onSelect={() => {
                           setSelected([option.id])
@@ -192,7 +193,7 @@ export function MarketOverviewPage({
                 active={option.id === selected[0]}
                 probability={probabilities[option.id] || option.probability || 0}
                 className={i > 0 ? 'border-t' : ''}
-                canEdit={user?.id === market.createdBy}
+                canEdit={user ? canModifyMarket({ market, user }) : false}
                 onEdit={() => setIsEditOption(option.id)}
                 onSelect={() => {
                   setSelected([option.id])

@@ -2,11 +2,11 @@ import db from '@play-money/database'
 import { getUniqueTraderIds } from '@play-money/markets/lib/getUniqueTraderIds'
 import { createNotification } from '@play-money/notifications/lib/createNotification'
 import { getUserById } from '@play-money/users/lib/getUserById'
+import { canModifyMarket, isMarketResolved } from '../rules'
 import { createMarketExcessLiquidityTransactions } from './createMarketExcessLiquidityTransactions'
 import { createMarketResolveLossTransactions } from './createMarketResolveLossTransactions'
 import { createMarketResolveWinTransactions } from './createMarketResolveWinTransactions'
 import { getMarket } from './getMarket'
-import { canResolveMarket } from './helpers'
 
 export async function resolveMarket({
   resolverId,
@@ -20,13 +20,10 @@ export async function resolveMarket({
   supportingLink?: string
 }) {
   const market = await getMarket({ id: marketId, extended: true })
+  const resolvingUser = await getUserById({ id: resolverId })
 
-  if (market.resolvedAt) {
+  if (isMarketResolved({ market })) {
     throw new Error('Market already resolved')
-  }
-
-  if (!canResolveMarket({ market, userId: resolverId })) {
-    throw new Error('User cannot resolve market')
   }
 
   await db.$transaction(
@@ -76,8 +73,7 @@ export async function resolveMarket({
 
   await createMarketExcessLiquidityTransactions({ marketId, initiatorId: resolverId })
 
-  const user = await getUserById({ id: resolverId })
-  const recipientIds = await getUniqueTraderIds(marketId, [user.id])
+  const recipientIds = await getUniqueTraderIds(marketId, [resolvingUser.id])
 
   await Promise.all(
     recipientIds.map((recipientId) =>

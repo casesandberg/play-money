@@ -18,6 +18,11 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 model User {
   id               String             @id @default(cuid())
   username         String             @unique
@@ -38,6 +43,7 @@ model User {
   primaryAccount   Account            @relation("UserPrimaryAccount", fields: [primaryAccountId], references: [id])
   accounts         Account[]
   transactions     Transaction[]
+  role             UserRole           @default(USER)
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
 
