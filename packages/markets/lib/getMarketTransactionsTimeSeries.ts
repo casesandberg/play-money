@@ -2,6 +2,7 @@ import Decimal from 'decimal.js'
 import db from '@play-money/database'
 import { TransactionTypeType } from '@play-money/database/zod/inputTypeSchemas/TransactionTypeSchema'
 import { calculateProbability } from '@play-money/finance/amms/maniswap-v1.1'
+import { distributeRemainder } from '@play-money/finance/lib/helpers'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import { getMarketAmmAccount } from './getMarketAmmAccount'
 import { MarketTransaction } from './getMarketTransactions'
@@ -109,17 +110,16 @@ export async function getMarketTransactionsTimeSeries({
       })
     })
 
-    const totalShares = bucket.options.reduce((sum, option) => sum.plus(option.shares), new Decimal(0))
+    const shares = bucket.options.map((option) => option.shares)
+    const probabilities = bucket.options.map((_option, i) => {
+      return calculateProbability({ index: i, shares })
+    })
+    const distributed = distributeRemainder(probabilities)
 
     bucket.options = bucket.options.map((option, i) => {
       return {
         ...option,
-        probability: calculateProbability({
-          index: i,
-          shares: bucket.options.map((option) => option.shares),
-        })
-          .times(100)
-          .round(),
+        probability: distributed[i],
       }
     })
   })
@@ -129,7 +129,7 @@ export async function getMarketTransactionsTimeSeries({
     endAt: bucket.endAt,
     options: bucket.options.map((option) => ({
       id: option.id,
-      probability: Decimal.max(option.probability, 0).toNumber(),
+      probability: option.probability.toNumber(),
     })),
   }))
 
