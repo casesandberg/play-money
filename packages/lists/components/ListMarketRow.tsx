@@ -5,7 +5,7 @@ import { EllipsisVerticalIcon } from 'lucide-react'
 import React from 'react'
 import { MarketProbabilityDetail } from '@play-money/markets/components/MarketProbabilityDetail'
 import { ResolveMarketDialog } from '@play-money/markets/components/ResolveMarketDialog'
-import { canResolveMarket } from '@play-money/markets/lib/helpers'
+import { canModifyMarket } from '@play-money/markets/rules'
 import { ExtendedMarket } from '@play-money/markets/types'
 import { useSearchParam } from '@play-money/ui'
 import { Button } from '@play-money/ui/button'
@@ -43,7 +43,7 @@ export function ListMarketRow({
 }) {
   const { user } = useUser()
   const [isResolving, setResolving] = useSearchParam('resolve')
-  const canResolve = canResolveMarket({ market, userId: user?.id })
+  const canResolve = user ? canModifyMarket({ market, user: user }) : false
 
   return (
     <div className={cn('flex cursor-pointer items-center hover:bg-muted/50', active && 'bg-muted/50', className)}>

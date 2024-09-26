@@ -9,7 +9,7 @@ import { MarketBuyForm } from '@play-money/markets/components/MarketBuyForm'
 import { MarketLeaderboardPanel } from '@play-money/markets/components/MarketLeaderboardPanel'
 import { MarketSellForm } from '@play-money/markets/components/MarketSellForm'
 import { useSidebar } from '@play-money/markets/components/SidebarContext'
-import { isMarketResolved, isMarketTradable } from '@play-money/markets/lib/helpers'
+import { isMarketResolved, isMarketTradable } from '@play-money/markets/rules'
 import { useSelectedItems } from '@play-money/ui'
 import { Card, CardContent, CardHeader } from '@play-money/ui/card'
 import { Combobox } from '@play-money/ui/combobox'
@@ -23,8 +23,8 @@ export function ListTradePanel({ list, onTradeComplete }: { list: ExtendedList; 
   const { data: balance, mutate: revalidate } = useListBalance({ listId: list.id })
   const selectedMarket = list.markets.find((m) => m.market.id === selected[0])
 
-  const isTradable = selectedMarket ? isMarketTradable(selectedMarket.market) : false
-  const isResolved = selectedMarket ? isMarketResolved(selectedMarket.market) : false
+  const isTradable = selectedMarket ? isMarketTradable(selectedMarket) : false
+  const isResolved = selectedMarket ? isMarketResolved(selectedMarket) : false
 
   const handleComplete = async () => {
     void mutate(MY_BALANCE_PATH)

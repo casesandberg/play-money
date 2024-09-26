@@ -14,7 +14,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@play-money/ui/tooltip'
 import { toast } from '@play-money/ui/use-toast'
 import { useUser } from '@play-money/users/context/UserContext'
-import { canResolveMarket } from '../lib/helpers'
+import { canModifyMarket } from '../rules'
 import { ExtendedMarket } from '../types'
 import { ResolveMarketDialog } from './ResolveMarketDialog'
 
@@ -55,7 +55,7 @@ export function MarketToolbar({
 }) {
   const { user } = useUser()
   const [isResolving, setResolving] = useQueryString('resolve')
-  const canResolve = canResolveMarket({ market, userId: user?.id })
+  const canResolve = user ? canModifyMarket({ market, user: user }) : false
 
   const handleCopyLink = async () => {
     try {

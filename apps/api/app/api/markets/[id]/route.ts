@@ -4,6 +4,8 @@ import { auth } from '@play-money/auth'
 import { CommentNotFoundError } from '@play-money/comments/lib/exceptions'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import { updateMarket } from '@play-money/markets/lib/updateMarket'
+import { canModifyMarket } from '@play-money/markets/rules'
+import { getUserById } from '@play-money/users/lib/getUserById'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'
@@ -49,13 +51,15 @@ export async function PATCH(
     const { question, description, closeDate, tags } = schema.patch.requestBody.transform(stripUndefined).parse(body)
 
     const market = await getMarket({ id })
-    if (market.createdBy !== session.user.id) {
+    const user = await getUserById({ id: session.user.id })
+
+    if (!canModifyMarket({ market, user })) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const updatedComment = await updateMarket({ id, question, description, closeDate, tags })
+    const updatedMarket = await updateMarket({ id, question, description, closeDate, tags })
 
-    return NextResponse.json(updatedComment)
+    return NextResponse.json(updatedMarket)
   } catch (error) {
     if (error instanceof CommentNotFoundError) {
       return NextResponse.json({ error: error.message }, { status: 404 })
