@@ -171,7 +171,7 @@ export function MarketOverviewPage({
                         active={option.id === selected[0]}
                         probability={probabilities[option.id] || option.probability || 0}
                         className={i > 0 ? 'border-t' : ''}
-                        canEdit={user?.id === market.createdBy}
+                        canEdit={user ? canModifyMarket({ market, user }) : false}
                         onEdit={() => setIsEditOption(option.id)}
                         onSelect={() => {
                           setSelected([option.id])
@@ -193,7 +193,7 @@ export function MarketOverviewPage({
                 active={option.id === selected[0]}
                 probability={probabilities[option.id] || option.probability || 0}
                 className={i > 0 ? 'border-t' : ''}
-                canEdit={user?.id === market.createdBy}
+                canEdit={user ? canModifyMarket({ market, user }) : false}
                 onEdit={() => setIsEditOption(option.id)}
                 onSelect={() => {
                   setSelected([option.id])
