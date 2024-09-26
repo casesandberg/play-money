@@ -3,9 +3,11 @@ import db from '@play-money/database'
 export async function updateNotificationsRead({
   userId,
   marketId,
+  listId,
 }: {
   userId: string
   marketId?: string
+  listId?: string
 }): Promise<number> {
   const now = new Date()
 
@@ -14,6 +16,7 @@ export async function updateNotificationsRead({
       recipientId: userId,
       readAt: null,
       marketId: marketId,
+      listId: listId,
     },
     data: {
       readAt: now,
