@@ -28,9 +28,11 @@ export async function createComment({
   entityType,
   entityId,
 }: Pick<Comment, 'content' | 'authorId' | 'parentId' | 'entityType' | 'entityId'>) {
+  const trimmedContent = content.replace(/<p><\/p>/g, '')
+
   const comment = await db.comment.create({
     data: {
-      content,
+      content: trimmedContent,
       authorId,
       parentId,
       entityType,

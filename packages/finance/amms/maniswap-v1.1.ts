@@ -56,7 +56,7 @@ function calculateProbabilityCost({
   )
 }
 
-function findShareIndex(shares: Array<Decimal>, targetShare: Decimal): number {
+export function findShareIndex(shares: Array<Decimal>, targetShare: Decimal): number {
   return shares.findIndex((share) => share.eq(targetShare))
 }
 
@@ -149,7 +149,7 @@ export async function quote({
   probability: Decimal
   targetShare: Decimal
   shares: Array<Decimal>
-}): Promise<{ probability: Decimal; shares: Decimal; cost: Decimal }> {
+}): Promise<{ probability: Decimal; newProbabilities: Array<Decimal>; shares: Decimal; cost: Decimal }> {
   const targetIndex = findShareIndex(shares, targetShare)
   const currentProbability = calculateProbability({ index: targetIndex, shares })
   const isBuy = currentProbability.lt(probability)
@@ -168,6 +168,12 @@ export async function quote({
       index: targetIndex,
       shares: updatedShares,
     }),
+    newProbabilities: updatedShares.map((_prob, i) =>
+      calculateProbability({
+        index: i,
+        shares: updatedShares,
+      })
+    ),
     shares: returnedShares,
     cost,
   }

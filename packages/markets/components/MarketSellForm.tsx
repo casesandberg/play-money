@@ -105,11 +105,12 @@ export function MarketSellForm({
   const proportionateCost =
     (form.getValues('amount') * (selectedPosition?.cost || 0)) / (selectedPosition?.quantity || 0)
   const disabled = !selectedPosition || new Decimal(selectedPosition.quantity).toDecimalPlaces(4).lt(0)
+  const orderedOptions = _.orderBy(options, 'createdAt')
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {options.length > 1 ? (
+        {orderedOptions.length > 1 ? (
           <FormField
             control={form.control}
             name="optionId"
@@ -118,7 +119,7 @@ export function MarketSellForm({
                 <FormLabel>Option</FormLabel>
                 <FormControl>
                   <RadioGroup onValueChange={field.onChange} value={field.value} className="flex flex-col space-y-1">
-                    {options.map((option) => (
+                    {orderedOptions.map((option) => (
                       <FormItem key={option.id} className="flex items-center space-x-3 space-y-0">
                         <FormControl>
                           <RadioGroupItem value={option.id} />

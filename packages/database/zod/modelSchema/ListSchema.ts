@@ -8,12 +8,12 @@ import { QuestionContributionPolicySchema } from '../inputTypeSchemas/QuestionCo
 export const ListSchema = z.object({
   contributionPolicy: QuestionContributionPolicySchema,
   id: z.string().cuid(),
-  title: z.string().min(1, { message: "Title is required" }),
+  title: z.string().trim().min(1, { message: "Title is required" }),
   slug: z.string().min(1, { message: "Slug is required" }),
   description: z.string().nullable(),
   ownerId: z.string(),
   contributionReview: z.boolean().nullable(),
-  tags: z.string().array().max(5),
+  tags: z.string().trim().array().max(5),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

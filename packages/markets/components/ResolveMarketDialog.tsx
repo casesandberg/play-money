@@ -55,6 +55,10 @@ export const ResolveMarketDialog = ({
     }
   }
 
+  const {
+    formState: { isSubmitting, isDirty, isValid },
+  } = form
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
@@ -104,7 +108,7 @@ export const ResolveMarketDialog = ({
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
+            <Button type="submit" disabled={!isDirty || !isValid} loading={isSubmitting} className="w-full">
               Resolve
             </Button>
           </form>

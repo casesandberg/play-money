@@ -8,7 +8,7 @@ import { CommentEntityTypeSchema } from '../inputTypeSchemas/CommentEntityTypeSc
 export const CommentSchema = z.object({
   entityType: CommentEntityTypeSchema,
   id: z.string().cuid(),
-  content: z.string().min(1).max(5000),
+  content: z.string().trim().min(1).max(5000),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date().nullable(),
   edited: z.boolean(),

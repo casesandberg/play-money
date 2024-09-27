@@ -4,6 +4,7 @@ export function formatDistanceToNowShort(date: Date | number): string {
   const formatted = formatDistanceToNow(date, { addSuffix: true })
 
   return formatted
+    .replace(/less than a minute/, 'now')
     .replace(/\sabout\s/, '')
     .replace(/\sless than\s/, '<')
     .replace(/\sover\s/, '>')
