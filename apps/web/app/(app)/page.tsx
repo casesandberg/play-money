@@ -83,11 +83,18 @@ export default async function AppPage() {
 
                   <div className="flex flex-[2]">
                     <Link className="flex-1 p-2" href={`/lists/${list.id}/${list.slug}`}>
-                      <span className="line-clamp-2">
-                        {list.markets
-                          .slice(0, 5)
-                          .map((m) => m.market.question)
-                          .join(', ')}
+                      <span className="line-clamp-2 text-xs text-muted-foreground">
+                        {list.markets.slice(0, 5).map((m) => (
+                          <>
+                            <div className="inline pr-1" key={m.market.id}>
+                              <div
+                                className="mb-0.5 mr-1 inline-block size-1.5 flex-shrink-0 rounded-md"
+                                style={{ backgroundColor: m.market.options[0].color }}
+                              />
+                              {m.market.question}
+                            </div>{' '}
+                          </>
+                        ))}
                       </span>
                     </Link>
                     <div className="p-2 pr-3">
