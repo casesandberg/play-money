@@ -88,14 +88,14 @@ model Session {
 
 model Market {
   id                String                 @id @default(cuid())
-  question          String /// @zod.string.min(1, { message: "Question is required" })
+  question          String /// @zod.string.trim().min(1, { message: "Question is required" })
   description       String
   slug              String /// @zod.string.min(1, { message: "Slug is required" })
   closeDate         DateTime?
   resolvedAt        DateTime?
   transactions      Transaction[]
   createdBy         String
-  tags              String[]               @default([]) /// @zod.string.array(.max(5))
+  tags              String[]               @default([]) /// @zod.string.trim().array(.max(5))
   user              User                   @relation(fields: [createdBy], references: [id])
   ammAccountId      String                 @unique
   ammAccount        Account                @relation("MarketAMMAccount", fields: [ammAccountId], references: [id])
@@ -142,7 +142,7 @@ model MarketResolution {
 
 model MarketOption {
   id                   String                 @id @default(cuid())
-  name                 String /// @zod.string.min(1, { message: "Name is required" })
+  name                 String /// @zod.string.trim().min(1, { message: "Name is required" })
   marketId             String
   market               Market                 @relation(fields: [marketId], references: [id])
   color                String                 @default("#FF00FF") /// @zod.string.regex(/^#[0-9A-Fa-f]{6}$/)
@@ -175,7 +175,7 @@ enum CommentEntityType {
 
 model Comment {
   id         String            @id @default(cuid())
-  content    String /// @zod.string.min(1).max(5000)
+  content    String /// @zod.string.trim().min(1).max(5000)
   createdAt  DateTime          @default(now())
   updatedAt  DateTime?         @updatedAt
   edited     Boolean           @default(false)
@@ -405,14 +405,14 @@ enum QuestionContributionPolicy {
 
 model List {
   id                 String                     @id @default(cuid())
-  title              String /// @zod.string.min(1, { message: "Title is required" })
+  title              String /// @zod.string.trim().min(1, { message: "Title is required" })
   slug               String /// @zod.string.min(1, { message: "Slug is required" })
   description        String?
   ownerId            String
   owner              User                       @relation("ListCreator", fields: [ownerId], references: [id])
   contributionPolicy QuestionContributionPolicy @default(OWNERS_ONLY)
   contributionReview Boolean?                   @default(false)
-  tags               String[]                   @default([]) /// @zod.string.array(.max(5))
+  tags               String[]                   @default([]) /// @zod.string.trim().array(.max(5))
   markets            MarketList[]
   createdAt          DateTime                   @default(now())
   updatedAt          DateTime                   @updatedAt
