@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import React from 'react'
 import { useTrackResourceViewed } from '@play-money/notifications/hooks/useTrackResourceViewed'
+import { SidebarReferralAlert } from '@play-money/referrals/components/SidebarReferralAlert'
 import { Tabs, TabsList, TabsTrigger } from '@play-money/ui/tabs'
 import { SelectedItemsProvider } from '../../ui/src/contexts/SelectedItemContext'
 import { ExtendedMarket } from '../types'
@@ -52,7 +53,8 @@ export function MarketPageLayout({
             {children}
           </div>
 
-          <div className="w-full md:w-80">
+          <div className="w-full space-y-8 md:w-80">
+            <SidebarReferralAlert />
             <MarketPageSidebar market={market} onTradeComplete={onRevalidate} />
           </div>
         </main>

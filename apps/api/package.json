@@ -19,6 +19,7 @@
     "@play-money/lists": "*",
     "@play-money/markets": "*",
     "@play-money/notifications": "*",
+    "@play-money/referrals": "*",
     "@play-money/search": "*",
     "@play-money/users": "*",
     "bcryptjs": "^2.4.3",

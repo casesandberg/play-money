@@ -31,7 +31,7 @@ export function Spotlight({
   const { resolvedTheme } = useTheme()
 
   const alpha = resolvedTheme === 'dark' ? 0.15 : 0.05
-  const rgba = color === 'blue' ? `rgba(14, 165, 233, ${alpha})` : `rgba(142, 14, 233, ${alpha})`
+  const rgba = color === 'blue' ? `rgba(37, 9, 235, ${alpha})` : `rgba(142, 14, 233, ${alpha})`
   return (
     <motion.div
       className="pointer-events-none absolute -inset-px rounded-lg opacity-0 transition duration-300 group-hover:opacity-100"

@@ -4,6 +4,7 @@ import { SWRProvider } from '@play-money/api-helpers/components/SWRProvider'
 import { auth } from '@play-money/auth'
 import { SessionProvider } from '@play-money/auth/components/SessionProvider'
 import { EditorExtensions } from '@play-money/comments/components/EditorExtensions'
+import { ReferralProvider } from '@play-money/referrals/components/ReferralContext'
 import { ThemeProvider } from '@play-money/ui/ThemeProvider'
 import '@play-money/ui/emoji'
 import '@play-money/ui/styles.css'
@@ -39,7 +40,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <SessionProvider session={session}>
               <UserProvider user={user}>
                 <EditorExtensions>
-                  <TooltipProvider>{children}</TooltipProvider>
+                  <ReferralProvider>
+                    <TooltipProvider>{children}</TooltipProvider>
+                  </ReferralProvider>
                 </EditorExtensions>
               </UserProvider>
             </SessionProvider>

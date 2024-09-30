@@ -21,6 +21,7 @@
     "@play-money/markets": "*",
     "@play-money/notifications": "*",
     "@play-money/quests": "*",
+    "@play-money/referrals": "*",
     "@play-money/search": "*",
     "@play-money/ui": "*",
     "@play-money/users": "*",
