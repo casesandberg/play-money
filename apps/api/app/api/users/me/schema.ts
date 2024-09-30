@@ -16,6 +16,7 @@ export default createSchema({
       displayName: true,
       avatarUrl: true,
       timezone: true,
+      referredBy: true,
     }).partial(),
     responses: {
       200: UserSchema,

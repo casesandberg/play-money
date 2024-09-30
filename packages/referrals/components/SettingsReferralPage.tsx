@@ -51,14 +51,10 @@ export function SettingsReferralPage({ referrals }: { referrals: Array<User> }) 
           <div className="mt-4 space-y-4">
             {referrals.length ? (
               referrals.map((referral) => (
-                <div className="grid grid-cols-[40px_1fr_1fr] items-center gap-4">
-                  <UserAvatar user={referral} />
-                  <div>
-                    <UserLink user={referral} />
-                    <div className="font-medium">John Doe</div>
-                    {/* <div className="text-sm text-muted-foreground">john@example.com</div> */}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <UserAvatar user={referral} size="sm" />
+                  <UserLink user={referral} className="line-clamp-1" />
+                  <div className="ml-auto flex-shrink-0 text-sm text-muted-foreground">
                     Signed up on {format(referral.createdAt, 'MMM d, yyyy')}
                   </div>
                 </div>

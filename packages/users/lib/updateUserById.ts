@@ -9,6 +9,7 @@ export async function updateUserById({
   bio,
   avatarUrl,
   timezone,
+  referredBy,
 }: {
   id: string
   username?: string
@@ -16,6 +17,7 @@ export async function updateUserById({
   bio?: string
   avatarUrl?: string
   timezone?: string
+  referredBy?: string
 }) {
   const user = await getUserById({ id })
 
@@ -40,6 +42,9 @@ export async function updateUserById({
   }
   if (displayName) {
     updatedData.displayName = displayName
+  }
+  if (referredBy && !user.referredBy) {
+    updatedData.referredBy = referredBy
   }
 
   const updatedUser = await db.user.update({

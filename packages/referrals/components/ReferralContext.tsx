@@ -1,13 +1,15 @@
 'use client'
 
-import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react'
+import React, { createContext, useState, useEffect, useContext, ReactNode, useCallback } from 'react'
 import { getUserReferral } from '@play-money/api-helpers/client'
 import { User } from '@play-money/database'
+import { useUser } from '@play-money/users/context/UserContext'
 import { useSearchParam } from '../../ui/src/hooks/useSearchParam'
 
 interface ReferralContextType {
   referringUser: User | null
   isLoading: boolean
+  clear: () => void
 }
 
 const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000
@@ -15,6 +17,7 @@ const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000
 const ReferralContext = createContext<ReferralContextType | undefined>(undefined)
 
 export const ReferralProvider = ({ children }: { children: ReactNode }) => {
+  const { user } = useUser()
   const [refCode, setRefCode] = useSearchParam('ref')
   const [referringUser, setReferringUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -24,7 +27,7 @@ export const ReferralProvider = ({ children }: { children: ReactNode }) => {
       const code = localStorage.getItem('referralCode')
       const timestamp = parseInt(localStorage.getItem('referralTimestamp') || '0', 10)
 
-      if (code && Date.now() - timestamp < THIRTY_DAYS) {
+      if (!user && code && Date.now() - timestamp < THIRTY_DAYS) {
         setIsLoading(true)
         try {
           const user = await getUserReferral({ code })
@@ -49,7 +52,11 @@ export const ReferralProvider = ({ children }: { children: ReactNode }) => {
     fetchReferringUser()
   }, [])
 
-  return <ReferralContext.Provider value={{ referringUser, isLoading }}>{children}</ReferralContext.Provider>
+  const clear = useCallback(function clear() {
+    clearReferralCode()
+  }, [])
+
+  return <ReferralContext.Provider value={{ referringUser, isLoading, clear }}>{children}</ReferralContext.Provider>
 }
 
 export const useReferral = (): ReferralContextType => {
