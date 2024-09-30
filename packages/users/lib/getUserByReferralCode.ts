@@ -4,7 +4,7 @@ import { UserNotFoundError } from './exceptions'
 export async function getUserByReferralCode({ code }: { code: string }) {
   const user = await db.user.findUnique({
     where: {
-      id: code,
+      referralCode: code,
     },
   })
 

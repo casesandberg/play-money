@@ -17,7 +17,7 @@ export function SettingsSidebarNav({ className, items, ...props }: SidebarNavPro
   const pathname = usePathname()
 
   return (
-    <nav className={cn('flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1', className)} {...props}>
+    <nav className={cn('flex space-x-2 lg:w-[250px] lg:flex-col lg:space-x-0 lg:space-y-1', className)} {...props}>
       {items.map((item) => (
         <Link
           className={cn(

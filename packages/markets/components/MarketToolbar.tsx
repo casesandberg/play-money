@@ -66,6 +66,15 @@ export function MarketToolbar({
     }
   }
 
+  const handleCopyReferralLink = async () => {
+    try {
+      await navigator.clipboard.writeText(`${window.location.href}?ref=${user?.referralCode}`)
+      toast({ title: 'Referral link copied to clipboard!' })
+    } catch (error) {
+      console.error('Failed to copy:', error)
+    }
+  }
+
   return (
     <div className="flex items-center justify-end">
       {canEdit ? (
@@ -93,6 +102,7 @@ export function MarketToolbar({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={handleCopyLink}>Copy link</DropdownMenuItem>
+          {user ? <DropdownMenuItem onClick={handleCopyReferralLink}>Copy referral link</DropdownMenuItem> : null}
           {!market.resolvedAt ? <DropdownMenuItem onClick={onInitiateBoost}>Liquidity boost</DropdownMenuItem> : null}
 
           {canResolve ? (

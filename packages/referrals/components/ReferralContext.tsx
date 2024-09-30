@@ -32,7 +32,7 @@ export const ReferralProvider = ({ children }: { children: ReactNode }) => {
         } catch (error) {
           console.error('Error fetching referral info:', error)
           // TODO: Only remove if 404, not server error
-          clearReferralCode()
+          // clearReferralCode()
         } finally {
           setIsLoading(false)
         }

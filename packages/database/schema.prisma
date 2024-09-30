@@ -44,6 +44,10 @@ model User {
   accounts         Account[]
   transactions     Transaction[]
   role             UserRole           @default(USER)
+  referralCode     String?            @unique
+  referredBy       String?
+  referredUsers    User[]             @relation("Referrals")
+  referrer         User?              @relation("Referrals", fields: [referredBy], references: [id])
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
 
