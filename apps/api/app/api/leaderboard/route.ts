@@ -16,7 +16,7 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.GE
 
     const { month, year } = schema.GET.parameters.parse(params) ?? {}
 
-    const now = new Date(month && year ? `${month}/01/${year}` : undefined)
+    const now = month && year ? new Date(`${month}/01/${year}`) : new Date()
     const startDate = new Date(now.getFullYear(), now.getMonth(), 1)
     const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
 
