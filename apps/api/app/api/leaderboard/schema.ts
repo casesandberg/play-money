@@ -14,8 +14,8 @@ export default createSchema({
   GET: {
     parameters: z
       .object({
-        year: z.coerce.number(),
-        month: z.coerce.number(),
+        year: z.coerce.number().optional(),
+        month: z.coerce.number().optional(),
       })
       .optional(),
     responses: {
