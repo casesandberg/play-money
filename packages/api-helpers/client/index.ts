@@ -442,11 +442,13 @@ export async function getLeaderboard() {
     topCreators: Array<LeaderboardUser>
     topPromoters: Array<LeaderboardUser>
     topQuesters: Array<LeaderboardUser>
+    topReferrers: Array<LeaderboardUser>
     userRankings?: {
       trader: LeaderboardUser
       creator: LeaderboardUser
       promoter: LeaderboardUser
       quester: LeaderboardUser
+      referrer: LeaderboardUser
     }
   }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/leaderboard`, {
     next: {
