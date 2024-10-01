@@ -21,7 +21,7 @@ export async function createNotification({
   groupKey: string
   listId?: string
 } & CreateNotificationData) {
-  const isGroupable = ['MARKET_TRADE', 'MARKET_LIQUIDITY_ADDED', 'COMMENT_REACTION'].includes(type)
+  const isGroupable = ['MARKET_TRADE', 'MARKET_LIQUIDITY_ADDED', 'COMMENT_REACTION', 'REFERRER_BONUS'].includes(type)
 
   const notification = await db.notification.create({
     data: {

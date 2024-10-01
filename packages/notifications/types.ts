@@ -157,6 +157,22 @@ export interface CreateCommentMentionNotification extends CreateNotificationBase
   parentCommentId?: string
 }
 
+export interface ReferrerBonusNotificationContent extends NotificationContentBase {
+  type: 'REFERRER_BONUS'
+  actor: User
+  market?: Market
+  transaction: Transaction & {
+    entries: Array<TransactionEntry>
+  }
+}
+
+export interface CreateReferrerBonusNotification extends CreateNotificationBase {
+  type: 'REFERRER_BONUS'
+  actorId: string
+  marketId?: string
+  transactionId?: string
+}
+
 export type NotificationContent =
   | MarketResolvedNotificationContent
   | MarketTradeNotificationContent
@@ -166,6 +182,7 @@ export type NotificationContent =
   | CommentReplyNotificationContent
   | CommentMentionNotificationContent
   | CommentReactionNotificationContent
+  | ReferrerBonusNotificationContent
 
 export type CreateNotificationData =
   | CreateMarketResolvedNotification
@@ -176,3 +193,4 @@ export type CreateNotificationData =
   | CreateCommentReplyNotification
   | CreateCommentReactionNotification
   | CreateCommentMentionNotification
+  | CreateReferrerBonusNotification

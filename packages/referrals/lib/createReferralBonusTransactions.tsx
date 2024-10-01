@@ -2,6 +2,7 @@ import Decimal from 'decimal.js'
 import db, { User } from '@play-money/database'
 import { executeTransaction } from '@play-money/finance/lib/executeTransaction'
 import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
+import { createNotification } from '@play-money/notifications/lib/createNotification'
 import { getUserById } from '@play-money/users/lib/getUserById'
 
 export async function createReferralBonusTransactions({
@@ -19,7 +20,7 @@ export async function createReferralBonusTransactions({
   const houseAccount = await getHouseAccount()
 
   if (referringUser) {
-    await executeTransaction({
+    const transaction = await executeTransaction({
       type: 'REFERRER_BONUS',
       initiatorId,
       entries: [
@@ -47,6 +48,16 @@ export async function createReferralBonusTransactions({
         },
       ],
       marketId,
+    })
+
+    await createNotification({
+      type: 'REFERRER_BONUS',
+      actorId: initiatorId,
+      marketId,
+      transactionId: transaction.id,
+      groupKey: 'REFERRER_BONUS',
+      userId: referringUser.id,
+      actionUrl: `/settings/referrals`,
     })
   }
 }
