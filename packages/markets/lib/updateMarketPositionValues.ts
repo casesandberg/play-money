@@ -53,7 +53,7 @@ export async function updateMarketPositionValues({
       return tx.marketOptionPosition.update({
         where: { id: position.id },
         data: {
-          value: new Decimal(newValue.shares).sub(tax),
+          value: Decimal.max(new Decimal(newValue.shares).sub(tax), 0),
           updatedAt: new Date(),
         },
       })

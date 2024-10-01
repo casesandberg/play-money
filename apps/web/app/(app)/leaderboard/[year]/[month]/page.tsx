@@ -6,7 +6,7 @@ import type { LeaderboardUser } from '@play-money/finance/types'
 import { Badge } from '@play-money/ui/badge'
 import { cn } from '@play-money/ui/utils'
 import { UserLink } from '@play-money/users/components/UserLink'
-import { LeaderboardTitle } from './LeaderboardTitle'
+import { LeaderboardTitle } from '../../LeaderboardTitle'
 
 function LeaderboardUserTable({
   users,
@@ -73,8 +73,8 @@ function LeaderboardUserTable({
   )
 }
 
-export default async function AppQuestionsPage() {
-  const leaderboard = await getLeaderboard({})
+export default async function AppLeaderboardSearchPage({ params }: { params: { month: string; year: string } }) {
+  const leaderboard = await getLeaderboard({ year: params.year, month: params.month })
 
   const monthNames = [
     'January',
@@ -91,13 +91,15 @@ export default async function AppQuestionsPage() {
     'December',
   ]
 
-  const date = new Date()
+  const date = new Date(`${params.month}/01/${params.year}`)
   const monthIndex = date.getMonth()
   const monthName = monthNames[monthIndex]
 
   return (
     <div className="mx-auto max-w-screen-lg flex-1 gap-8 md:flex-row">
-      <h3 className="mb-8 text-center text-2xl font-semibold">{monthName} Leaderboard</h3>
+      <h3 className="mb-8 text-center text-2xl font-semibold">
+        {monthName} {params.year} Leaderboard
+      </h3>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
         <div className="w-full rounded-lg border bg-card text-card-foreground shadow-sm">

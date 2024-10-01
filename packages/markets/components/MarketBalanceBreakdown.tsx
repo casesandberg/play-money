@@ -78,12 +78,13 @@ export function MarketBalanceBreakdown({
         {positions.map((position) => {
           const option = options.find((option) => option.id === position.optionId)!
           const marketOfOption = markets?.find((m) => m.id === option.marketId)
+          const quantity = new Decimal(position.quantity).toDecimalPlaces(4)
           const value = new Decimal(position.value).toDecimalPlaces(4)
           const cost = new Decimal(position.cost).toDecimalPlaces(4)
           const change = value.sub(cost).div(cost).times(100).round().toNumber()
           const changeLabel = `(${change > 0 ? '+' : ''}${change}%)`
 
-          return value.toNumber() ? (
+          return value.toNumber() || quantity.toNumber() ? (
             <Tooltip key={position.optionId}>
               <TooltipTrigger className="flex w-full justify-between gap-2 text-xs text-muted-foreground">
                 <div className="flex gap-1">

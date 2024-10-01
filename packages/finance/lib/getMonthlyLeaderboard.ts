@@ -238,7 +238,7 @@ export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, user
     topCreators: topCreators.slice(0, 10).map(transformUserOutput),
     topPromoters: topPromoters.slice(0, 10).map(transformUserOutput),
     topQuesters: topQuesters.slice(0, 10).map(transformUserOutput),
-    topReferrers: topReferrers.slice(0, 10).map(transformUserOutput),
+    topReferrers: topReferrers.slice(0, 10).map(transformUserOutput) || [],
     userRankings,
   }
 }
