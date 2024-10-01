@@ -12,6 +12,12 @@ const LeaderboardUserSchema = z.object({
 
 export default createSchema({
   GET: {
+    parameters: z
+      .object({
+        year: z.coerce.number(),
+        month: z.coerce.number(),
+      })
+      .optional(),
     responses: {
       200: z.object({
         topTraders: z.array(LeaderboardUserSchema),

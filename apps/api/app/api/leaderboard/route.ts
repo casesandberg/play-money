@@ -2,15 +2,21 @@ import { NextResponse } from 'next/server'
 import { type SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
 import { getMonthlyLeaderboard } from '@play-money/finance/lib/getMonthlyLeaderboard'
-import type schema from './schema'
+import schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(_req: Request): Promise<SchemaResponse<typeof schema.GET.responses>> {
+export async function GET(req: Request): Promise<SchemaResponse<typeof schema.GET.responses>> {
   try {
     const session = await auth()
 
-    const now = new Date()
+    const url = new URL(req.url)
+    const searchParams = new URLSearchParams(url.search)
+    const params = Object.fromEntries(searchParams)
+
+    const { month, year } = schema.GET.parameters.parse(params) ?? {}
+
+    const now = new Date(month && year ? `${month}/01/${year}` : undefined)
     const startDate = new Date(now.getFullYear(), now.getMonth(), 1)
     const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
 

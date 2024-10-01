@@ -436,7 +436,7 @@ export async function createMarketGenerateTags({ question }: { question: string 
   })
 }
 
-export async function getLeaderboard() {
+export async function getLeaderboard({ month, year }: { month?: string; year?: string }) {
   return apiHandler<{
     topTraders: Array<LeaderboardUser>
     topCreators: Array<LeaderboardUser>
@@ -450,7 +450,7 @@ export async function getLeaderboard() {
       quester: LeaderboardUser
       referrer: LeaderboardUser
     }
-  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/leaderboard`, {
+  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/leaderboard${month && year ? `?year=${year}&month=${month}` : ''}`, {
     next: {
       revalidate: 600, // Ten mins
     },
