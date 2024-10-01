@@ -231,6 +231,9 @@ enum TransactionType {
 
   HOUSE_GIFT
   HOUSE_SIGNUP_BONUS
+
+  REFERRER_BONUS
+  REFERREE_BONUS
 }
 
 model Transaction {
@@ -347,6 +350,7 @@ enum NotificationType {
   COMMENT_REPLY
   COMMENT_MENTION
   COMMENT_REACTION
+  REFERRER_BONUS
 }
 
 model Notification {
