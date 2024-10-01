@@ -61,12 +61,14 @@ export async function UserProfileLayout({
   const creator = balance.subtotals['CREATOR_TRADER_BONUS']
   const trader = Math.abs(balance.subtotals['TRADE_BUY'])
   const promoter = Math.abs(balance.subtotals['LIQUIDITY_DEPOSIT'])
+  const referrer = balance.subtotals['REFERRER_BONUS']
 
   const playstyleData = [
     { subject: 'Quester', value: getOrdersOfMagnitude(quester) / 4, color: '#a0d8e7' },
     { subject: 'Creator', value: getOrdersOfMagnitude(creator) / 4, color: '#ffc638' },
     { subject: 'Trader', value: getOrdersOfMagnitude(trader) / 4, color: '#00cdb1' },
     { subject: 'Promoter', value: getOrdersOfMagnitude(promoter) / 4, color: '#8247ff' },
+    { subject: 'Referrer', value: getOrdersOfMagnitude(referrer) / 4, color: '#2563eb' },
   ]
 
   return (
@@ -180,7 +182,7 @@ export async function UserProfileLayout({
         <Card className="relative p-4">
           <div className="absolute z-10 text-lg font-semibold text-muted-foreground">Playstyle</div>
           <UserPlaystyleChart data={playstyleData} />
-          <div className="flex flex-wrap justify-center gap-x-2 border-t pt-1">
+          <div className="flex flex-wrap justify-center gap-x-3 border-t pt-1">
             {playstyleData.map(({ subject, value, color }) => (
               <div key={subject} className="flex items-center gap-1">
                 <div className="h-2 w-2 rounded-md" style={{ backgroundColor: color }} />

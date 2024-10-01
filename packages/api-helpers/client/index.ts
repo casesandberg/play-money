@@ -91,6 +91,10 @@ export async function getMyBalance() {
   return apiHandler<{ balance: number }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/balance`)
 }
 
+export async function getMyReferrals() {
+  return apiHandler<{ referrals: Array<User> }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/referrals`)
+}
+
 export async function getMarkets({
   tag,
   page,
@@ -379,6 +383,10 @@ export async function getUser({ userId }: { userId: string }): Promise<User> {
   return apiHandler<User>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}`)
 }
 
+export async function getUserReferral({ code }: { code: string }): Promise<User> {
+  return apiHandler<User>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/referral/${code}`)
+}
+
 export async function getUserUsername({ username }: { username: string }): Promise<User> {
   return apiHandler<User>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/username/${username}`, {
     next: {
@@ -434,11 +442,13 @@ export async function getLeaderboard() {
     topCreators: Array<LeaderboardUser>
     topPromoters: Array<LeaderboardUser>
     topQuesters: Array<LeaderboardUser>
+    topReferrers: Array<LeaderboardUser>
     userRankings?: {
       trader: LeaderboardUser
       creator: LeaderboardUser
       promoter: LeaderboardUser
       quester: LeaderboardUser
+      referrer: LeaderboardUser
     }
   }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/leaderboard`, {
     next: {

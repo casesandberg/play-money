@@ -18,12 +18,14 @@ export default createSchema({
         topCreators: z.array(LeaderboardUserSchema),
         topPromoters: z.array(LeaderboardUserSchema),
         topQuesters: z.array(LeaderboardUserSchema),
+        topReferrers: z.array(LeaderboardUserSchema),
         userRankings: z
           .object({
             trader: LeaderboardUserSchema.optional(),
             creator: LeaderboardUserSchema.optional(),
             promoter: LeaderboardUserSchema.optional(),
             quester: LeaderboardUserSchema.optional(),
+            referrer: LeaderboardUserSchema.optional(),
           })
           .or(z.null())
           .optional(),

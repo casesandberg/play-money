@@ -1,7 +1,10 @@
 import Decimal from 'decimal.js'
+import db from '@play-money/database'
 import { DAILY_COMMENT_BONUS_PRIMARY } from '@play-money/finance/economy'
 import { executeTransaction } from '@play-money/finance/lib/executeTransaction'
 import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
+import { createReferralBonusTransactions } from '@play-money/referrals/lib/createReferralBonusTransactions'
+import { isNewlyReferredUser } from '@play-money/referrals/lib/helpers'
 
 export async function createDailyCommentBonusTransaction({
   accountId,
@@ -12,7 +15,14 @@ export async function createDailyCommentBonusTransaction({
   initiatorId: string
   marketId?: string
 }) {
-  const houseAccount = await getHouseAccount()
+  const [houseAccount, user] = await Promise.all([
+    getHouseAccount(),
+    db.user.findFirstOrThrow({
+      where: {
+        primaryAccountId: accountId,
+      },
+    }),
+  ])
   const payout = new Decimal(DAILY_COMMENT_BONUS_PRIMARY)
 
   const entries = [
@@ -31,6 +41,15 @@ export async function createDailyCommentBonusTransaction({
     entries,
     marketId,
   })
+
+  if (isNewlyReferredUser(user)) {
+    await createReferralBonusTransactions({
+      user,
+      initiatorId,
+      marketId,
+      payout,
+    })
+  }
 
   return transaction
 }

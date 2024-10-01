@@ -134,6 +134,15 @@ export default async function AppQuestionsPage() {
 
           <LeaderboardUserTable activeUserRank={leaderboard.userRankings?.quester} users={leaderboard.topQuesters} />
         </div>
+
+        <div className="w-full rounded-lg border bg-card text-card-foreground shadow-sm">
+          <LeaderboardTitle
+            description="Calculated as all referrer-related bonuses collected in the time period."
+            title="Top referrers"
+          />
+
+          <LeaderboardUserTable activeUserRank={leaderboard.userRankings?.referrer} users={leaderboard.topReferrers} />
+        </div>
       </div>
     </div>
   )

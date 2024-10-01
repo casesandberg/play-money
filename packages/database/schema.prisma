@@ -44,6 +44,10 @@ model User {
   accounts         Account[]
   transactions     Transaction[]
   role             UserRole           @default(USER)
+  referralCode     String?            @unique
+  referredBy       String?
+  referredUsers    User[]             @relation("Referrals")
+  referrer         User?              @relation("Referrals", fields: [referredBy], references: [id])
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
 
@@ -227,6 +231,9 @@ enum TransactionType {
 
   HOUSE_GIFT
   HOUSE_SIGNUP_BONUS
+
+  REFERRER_BONUS
+  REFERREE_BONUS
 }
 
 model Transaction {
@@ -343,6 +350,7 @@ enum NotificationType {
   COMMENT_REPLY
   COMMENT_MENTION
   COMMENT_REACTION
+  REFERRER_BONUS
 }
 
 model Notification {
