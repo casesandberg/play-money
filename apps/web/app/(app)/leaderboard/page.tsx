@@ -141,10 +141,7 @@ export default async function AppQuestionsPage() {
             title="Top referrers"
           />
 
-          <LeaderboardUserTable
-            activeUserRank={leaderboard.userRankings?.referrer}
-            users={leaderboard.topReferrers ?? []}
-          />
+          <LeaderboardUserTable activeUserRank={leaderboard.userRankings?.referrer} users={leaderboard.topReferrers} />
         </div>
       </div>
     </div>
