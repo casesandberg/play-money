@@ -229,6 +229,7 @@ export function MarketOverviewPage({
       {renderComments}
 
       <EditMarketDialog
+        key={market.updatedAt.toString()} // reset form when market updates
         market={market}
         open={isEditing === 'true'}
         onClose={() => setIsEditing(undefined)}
