@@ -21,6 +21,7 @@
     "@play-money/notifications": "*",
     "@play-money/referrals": "*",
     "@play-money/search": "*",
+    "@play-money/transparency": "*",
     "@play-money/users": "*",
     "bcryptjs": "^2.4.3",
     "decimal.js": "^10.4.3",

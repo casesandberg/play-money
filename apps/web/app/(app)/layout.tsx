@@ -96,6 +96,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         >
           Open source
         </a>
+        {/* —
+        <Link className="hover:underline" href="/transparency">
+          Transparency
+        </Link> */}
       </div>
     </div>
   )
