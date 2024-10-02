@@ -427,6 +427,10 @@ export async function getUserMarkets({ userId }: { userId: string }): Promise<{ 
   )
 }
 
+export async function getUserLists({ userId }: { userId: string }): Promise<{ lists: Array<ExtendedList> }> {
+  return apiHandler<{ lists: Array<ExtendedList> }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/lists?ownerId=${userId}`)
+}
+
 export async function createMarketGenerateTags({ question }: { question: string }) {
   return apiHandler<{ tags: Array<string> }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/generate-tags`, {
     method: 'POST',

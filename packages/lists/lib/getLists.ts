@@ -1,7 +1,9 @@
 import db, { List } from '@play-money/database'
 import { ExtendedList } from '../types'
 
-interface ListFilterOptions {}
+interface ListFilterOptions {
+  ownerId?: string
+}
 
 interface SortOptions {
   field: string
@@ -20,6 +22,9 @@ export async function getLists(
 ): Promise<{ lists: Array<List | ExtendedList>; total: number }> {
   const [lists, total] = await Promise.all([
     db.list.findMany({
+      where: {
+        ownerId: filters.ownerId,
+      },
       include: {
         owner: true,
         markets: {

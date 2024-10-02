@@ -11,9 +11,9 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.ge
     const searchParams = new URLSearchParams(url.search)
     const params = Object.fromEntries(searchParams)
 
-    const { pageSize = 50 } = schema.get.parameters.parse(params) ?? {}
+    const { pageSize = 50, ownerId } = schema.get.parameters.parse(params) ?? {}
 
-    const { lists, total } = await getLists({}, undefined, {
+    const { lists, total } = await getLists({ ownerId }, undefined, {
       skip: (1 - 1) * pageSize,
       take: pageSize,
     })
