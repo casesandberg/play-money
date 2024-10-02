@@ -45,7 +45,7 @@ export function MarketBuyForm({
     try {
       await createMarketBuy({ marketId, optionId: data.optionId, amount: data.amount })
       toast({ title: 'Bet placed successfully' })
-      form.reset({ amount: 0 })
+      form.reset({ amount: 100 })
       setQuote(null)
       onComplete?.()
     } catch (error: any) {
@@ -139,18 +139,18 @@ export function MarketBuyForm({
                     type="button"
                     variant="secondary"
                     className="h-6 px-2 font-mono"
-                    onClick={() => field.onChange((field.value || 0) + 500)}
+                    onClick={() => field.onChange((field.value || 0) + 250)}
                   >
-                    +500
+                    +250
                   </Button>
                   <Button
                     size="sm"
                     type="button"
                     variant="secondary"
                     className="h-6 px-2 font-mono"
-                    onClick={() => field.onChange((field.value || 0) + 5000)}
+                    onClick={() => field.onChange((field.value || 0) + 1000)}
                   >
-                    +5k
+                    +1k
                   </Button>
                 </div>
               </FormLabel>

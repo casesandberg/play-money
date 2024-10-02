@@ -55,6 +55,9 @@ export const LiquidityBoostDialog = ({
 }) => {
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
+    defaultValues: {
+      amount: 250,
+    },
   })
 
   const {
@@ -65,7 +68,7 @@ export const LiquidityBoostDialog = ({
     try {
       await createLiquidity({ marketId: market.id, amount: data.amount })
       toast({ title: `$${data.amount} liquidity added!` })
-      form.reset()
+      form.reset({ amount: 250 })
       onSuccess?.()
       onClose()
     } catch (error: any) {
@@ -131,9 +134,18 @@ export const LiquidityBoostDialog = ({
                         type="button"
                         variant="secondary"
                         className="h-6 px-2 font-mono"
+                        onClick={() => field.onChange((field.value || 0) + 250)}
+                      >
+                        +250
+                      </Button>
+                      <Button
+                        size="sm"
+                        type="button"
+                        variant="secondary"
+                        className="h-6 px-2 font-mono"
                         onClick={() => field.onChange((field.value || 0) + 1000)}
                       >
-                        +1000
+                        +1k
                       </Button>
                       <Button
                         size="sm"
@@ -143,15 +155,6 @@ export const LiquidityBoostDialog = ({
                         onClick={() => field.onChange((field.value || 0) + 5000)}
                       >
                         +5k
-                      </Button>
-                      <Button
-                        size="sm"
-                        type="button"
-                        variant="secondary"
-                        className="h-6 px-2 font-mono"
-                        onClick={() => field.onChange((field.value || 0) + 25000)}
-                      >
-                        +25k
                       </Button>
                     </div>
                   </FormLabel>
@@ -171,7 +174,7 @@ export const LiquidityBoostDialog = ({
               )}
             />
 
-            <Button disabled={!isDirty || !isValid} loading={isSubmitting} type="submit">
+            <Button disabled={!isValid} loading={isSubmitting} type="submit">
               Add liquidity
             </Button>
           </form>
