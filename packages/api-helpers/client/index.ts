@@ -340,7 +340,7 @@ export async function createMyResourceViewed({
 }
 
 export async function getSearch({ query }: { query: string }) {
-  return apiHandler<{ users: Array<User>; markets: Array<Market> }>(
+  return apiHandler<{ users: Array<User>; markets: Array<Market>; lists: Array<List> }>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/search?query=${query}`
   )
 }
