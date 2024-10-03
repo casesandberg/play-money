@@ -88,7 +88,7 @@ export async function marketBuy({
   )
 
   // TODO: Look into returning multiple messages to let the user know toast of the bonus.
-  if (!(await hasPlacedMarketTradeToday({ userId })) && amount.gte(DAILY_TRADE_BONUS_PRIMARY)) {
+  if (!(await hasPlacedMarketTradeToday({ userId }))) {
     await createDailyTradeBonusTransaction({ accountId: userAccount.id, marketId, initiatorId: userId })
   }
 }

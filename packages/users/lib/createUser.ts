@@ -1,4 +1,4 @@
-import Decimal from 'decimal.js'
+import { Resend } from 'resend'
 import { generateFromEmail } from 'unique-username-generator'
 import db from '@play-money/database'
 import { User } from '@play-money/database'
@@ -48,6 +48,21 @@ export async function createUser({ email }: { email: string }): Promise<User & O
   await createHouseSingupBonusTransaction({
     userId: user.id,
   })
+
+  // Subscribe user to audience if it exists
+  if (process.env.RESEND_AUDIENCE_ID) {
+    try {
+      const resend = new Resend(process.env.AUTH_RESEND_KEY)
+
+      resend.contacts.create({
+        email,
+        unsubscribed: false,
+        audienceId: process.env.RESEND_AUDIENCE_ID,
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   return user as User & OmittedUserFields
 }

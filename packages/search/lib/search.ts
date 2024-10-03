@@ -1,13 +1,15 @@
-import db, { Market, User } from '@play-money/database'
+import db, { List, Market, User } from '@play-money/database'
 
 interface SearchResults {
   users: Array<User>
   markets: Array<Market>
+  lists: Array<List>
 }
 
 export async function search({ query = '' }: { query?: string }): Promise<SearchResults> {
   let users: Array<User> = []
   let markets: Array<Market> = []
+  let lists: Array<List> = []
 
   if (query && query.length > 3) {
     users = await db.$queryRaw<Array<User>>`
@@ -27,6 +29,14 @@ export async function search({ query = '' }: { query?: string }): Promise<Search
       ORDER BY rank DESC
       LIMIT 5;
       `
+    lists = await db.$queryRaw<Array<List>>`
+      SELECT *, 
+        ts_rank_cd(to_tsvector('english', title || ' ' || description), plainto_tsquery('english', ${query})) AS rank
+      FROM "List"
+      WHERE to_tsvector('english', title || ' ' || description) @@ plainto_tsquery('english', ${query})
+      ORDER BY rank DESC
+      LIMIT 5;
+      `
   } else {
     users = await db.$queryRaw<Array<User>>`
       SELECT *
@@ -41,10 +51,18 @@ export async function search({ query = '' }: { query?: string }): Promise<Search
       ORDER BY "createdAt" DESC
       LIMIT 5;
       `
+
+    lists = await db.$queryRaw<Array<List>>`
+      SELECT *
+      FROM "List"
+      ORDER BY "createdAt" DESC
+      LIMIT 5;
+      `
   }
 
   return {
     users,
     markets,
+    lists,
   }
 }

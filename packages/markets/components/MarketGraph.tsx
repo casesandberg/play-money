@@ -89,7 +89,10 @@ export function MarketGraph({ market, activeOptionId }: { market: ExtendedMarket
                 key={option.id}
                 type="step"
                 dot={false}
-                dataKey={(data) => data.options[i].probability}
+                dataKey={(data) => {
+                  const dataOption = data.options.find((o: { id: string; proability: number }) => o.id === option.id)
+                  return dataOption.probability
+                }}
                 stroke={option.color}
                 opacity={0.4}
                 strokeWidth={2.5}

@@ -23,6 +23,7 @@
     "@play-money/quests": "*",
     "@play-money/referrals": "*",
     "@play-money/search": "*",
+    "@play-money/transparency": "*",
     "@play-money/ui": "*",
     "@play-money/users": "*",
     "@tiptap/extension-mention": "^2.6.6",

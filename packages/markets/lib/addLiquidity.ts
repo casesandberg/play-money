@@ -79,7 +79,7 @@ export async function addLiquidity({
     )
   )
 
-  if (!(await hasBoostedLiquidityToday({ userId: userId })) && amount.gte(DAILY_LIQUIDITY_BONUS_PRIMARY)) {
+  if (!(await hasBoostedLiquidityToday({ userId: userId }))) {
     await createDailyLiquidityBonusTransaction({ accountId: userAccount.id, marketId: market.id, initiatorId: userId })
   }
 

@@ -7,6 +7,7 @@ export default createSchema({
     parameters: z
       .object({
         pageSize: z.coerce.number().optional(),
+        ownerId: z.string().optional(),
       })
       .optional(),
     responses: {

@@ -340,7 +340,7 @@ export async function createMyResourceViewed({
 }
 
 export async function getSearch({ query }: { query: string }) {
-  return apiHandler<{ users: Array<User>; markets: Array<Market> }>(
+  return apiHandler<{ users: Array<User>; markets: Array<Market>; lists: Array<List> }>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/search?query=${query}`
   )
 }
@@ -425,6 +425,10 @@ export async function getUserMarkets({ userId }: { userId: string }): Promise<{ 
   return apiHandler<{ markets: Array<ExtendedMarket> }>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/markets?createdBy=${userId}`
   )
+}
+
+export async function getUserLists({ userId }: { userId: string }): Promise<{ lists: Array<ExtendedList> }> {
+  return apiHandler<{ lists: Array<ExtendedList> }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/lists?ownerId=${userId}`)
 }
 
 export async function createMarketGenerateTags({ question }: { question: string }) {

@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form'
 import z from 'zod'
 import { createMarketBuy, getMarketQuote } from '@play-money/api-helpers/client'
 import { MarketOption } from '@play-money/database'
+import { DAILY_TRADE_BONUS_PRIMARY } from '@play-money/finance/economy'
 import { Button } from '@play-money/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
@@ -34,7 +35,7 @@ export function MarketBuyForm({
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      amount: 100,
+      amount: DAILY_TRADE_BONUS_PRIMARY,
       optionId: options[0].id,
     },
   })
@@ -45,7 +46,7 @@ export function MarketBuyForm({
     try {
       await createMarketBuy({ marketId, optionId: data.optionId, amount: data.amount })
       toast({ title: 'Bet placed successfully' })
-      form.reset({ amount: 0 })
+      form.reset({ amount: DAILY_TRADE_BONUS_PRIMARY })
       setQuote(null)
       onComplete?.()
     } catch (error: any) {
@@ -130,27 +131,27 @@ export function MarketBuyForm({
                     type="button"
                     variant="secondary"
                     className="h-6 px-2 font-mono"
-                    onClick={() => field.onChange((field.value || 0) + 100)}
+                    onClick={() => field.onChange((field.value || 0) + DAILY_TRADE_BONUS_PRIMARY)}
                   >
-                    +100
+                    +{DAILY_TRADE_BONUS_PRIMARY}
                   </Button>
                   <Button
                     size="sm"
                     type="button"
                     variant="secondary"
                     className="h-6 px-2 font-mono"
-                    onClick={() => field.onChange((field.value || 0) + 500)}
+                    onClick={() => field.onChange((field.value || 0) + 250)}
                   >
-                    +500
+                    +250
                   </Button>
                   <Button
                     size="sm"
                     type="button"
                     variant="secondary"
                     className="h-6 px-2 font-mono"
-                    onClick={() => field.onChange((field.value || 0) + 5000)}
+                    onClick={() => field.onChange((field.value || 0) + 1000)}
                   >
-                    +5k
+                    +1k
                   </Button>
                 </div>
               </FormLabel>
@@ -158,7 +159,7 @@ export function MarketBuyForm({
                 <div className="space-y-2">
                   <Input
                     type="number"
-                    placeholder="100"
+                    placeholder={String(DAILY_TRADE_BONUS_PRIMARY)}
                     {...field}
                     onChange={(e) => field.onChange(e.currentTarget.valueAsNumber)}
                     className="h-9 font-mono"

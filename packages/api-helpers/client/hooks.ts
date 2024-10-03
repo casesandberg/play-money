@@ -10,6 +10,7 @@ import { Quest } from '@play-money/quests/components/QuestCard'
 
 const SIXTY_SECONDS = 1000 * 60
 const FIVE_MINUTES = SIXTY_SECONDS * 5
+const ONE_HOUR = SIXTY_SECONDS * 60
 
 export function useLiquidity() {
   return useSWR<{ transactions: Array<TransactionWithEntries> }>(`/v1/liquidity`, {
@@ -105,4 +106,16 @@ export function useUserGraph({ userId }: { userId: string }) {
       endAt: Date
     }>
   }>(`/v1/users/${userId}/graph`, { refreshInterval: FIVE_MINUTES })
+}
+
+export function useTransparencyStatsUsers() {
+  return useSWR<{
+    data: Array<{
+      dau: number
+      signups: number
+      referrals: number
+      startAt: Date
+      endAt: Date
+    }>
+  }>(`/v1/transparency/stats/users`, { refreshInterval: ONE_HOUR })
 }

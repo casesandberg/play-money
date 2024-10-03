@@ -7,6 +7,7 @@ import z from 'zod'
 import { createLiquidity } from '@play-money/api-helpers/client'
 import { Market } from '@play-money/database'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
+import { DAILY_LIQUIDITY_BONUS_PRIMARY } from '@play-money/finance/economy'
 import { formatNumber } from '@play-money/finance/lib/formatCurrency'
 import { Button } from '@play-money/ui/button'
 import { Card } from '@play-money/ui/card'
@@ -55,6 +56,9 @@ export const LiquidityBoostDialog = ({
 }) => {
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
+    defaultValues: {
+      amount: 250,
+    },
   })
 
   const {
@@ -65,7 +69,7 @@ export const LiquidityBoostDialog = ({
     try {
       await createLiquidity({ marketId: market.id, amount: data.amount })
       toast({ title: `$${data.amount} liquidity added!` })
-      form.reset()
+      form.reset({ amount: 250 })
       onSuccess?.()
       onClose()
     } catch (error: any) {
@@ -131,27 +135,27 @@ export const LiquidityBoostDialog = ({
                         type="button"
                         variant="secondary"
                         className="h-6 px-2 font-mono"
-                        onClick={() => field.onChange((field.value || 0) + 1000)}
+                        onClick={() => field.onChange((field.value || 0) + DAILY_LIQUIDITY_BONUS_PRIMARY)}
                       >
-                        +1000
+                        +{DAILY_LIQUIDITY_BONUS_PRIMARY}
                       </Button>
                       <Button
                         size="sm"
                         type="button"
                         variant="secondary"
                         className="h-6 px-2 font-mono"
-                        onClick={() => field.onChange((field.value || 0) + 5000)}
+                        onClick={() => field.onChange((field.value || 0) + DAILY_LIQUIDITY_BONUS_PRIMARY * 4)}
                       >
-                        +5k
+                        +{formatNumber(DAILY_LIQUIDITY_BONUS_PRIMARY * 4)}
                       </Button>
                       <Button
                         size="sm"
                         type="button"
                         variant="secondary"
                         className="h-6 px-2 font-mono"
-                        onClick={() => field.onChange((field.value || 0) + 25000)}
+                        onClick={() => field.onChange((field.value || 0) + DAILY_LIQUIDITY_BONUS_PRIMARY * 12)}
                       >
-                        +25k
+                        +{formatNumber(DAILY_LIQUIDITY_BONUS_PRIMARY * 12)}
                       </Button>
                     </div>
                   </FormLabel>
@@ -171,7 +175,7 @@ export const LiquidityBoostDialog = ({
               )}
             />
 
-            <Button disabled={!isDirty || !isValid} loading={isSubmitting} type="submit">
+            <Button disabled={!isValid} loading={isSubmitting} type="submit">
               Add liquidity
             </Button>
           </form>
