@@ -159,7 +159,7 @@ export function MarketBuyForm({
                 <div className="space-y-2">
                   <Input
                     type="number"
-                    placeholder={DAILY_TRADE_BONUS_PRIMARY}
+                    placeholder={String(DAILY_TRADE_BONUS_PRIMARY)}
                     {...field}
                     onChange={(e) => field.onChange(e.currentTarget.valueAsNumber)}
                     className="h-9 font-mono"
