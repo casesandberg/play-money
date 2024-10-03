@@ -63,7 +63,7 @@ export function UserStatsGraph() {
                         <div>{format(data.startAt, 'MMM d, yyyy')}</div>
                         <div style={{ color: DAU_COLOR }}>DAU: {data.dau}</div>
                         <div style={{ color: SIGNUPS_COLOR }}>Signups: {data.signups}</div>
-                        <div style={{ color: REFERRALS_COLOR }}>Referrals: {data.signups}</div>
+                        <div style={{ color: REFERRALS_COLOR }}>Referrals: {data.referrals}</div>
                       </Card>
                     )
                   }

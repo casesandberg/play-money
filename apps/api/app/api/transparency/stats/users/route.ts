@@ -7,8 +7,11 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(_req: Request): Promise<SchemaResponse<typeof schema.GET.responses>> {
   try {
+    const now = new Date()
+    const startAt = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
     const data = await getStatsUsersTimeSeries({
       endAt: new Date(),
+      startAt,
     })
 
     return NextResponse.json({

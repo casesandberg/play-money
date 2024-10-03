@@ -19,12 +19,10 @@ export async function getStatsUsersTimeSeries({
   tickInterval?: number
 }) {
   if (!startAt) {
-    // const firstUser = await db.user.findFirst({
-    //   orderBy: { createdAt: 'asc' },
-    // })
-    // startAt = firstUser?.createdAt || new Date()
-    const now = new Date()
-    startAt = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
+    const firstUser = await db.user.findFirst({
+      orderBy: { createdAt: 'asc' },
+    })
+    startAt = firstUser?.createdAt || new Date()
   }
 
   const tickIntervalMs = tickInterval * 60 * 60 * 1000
