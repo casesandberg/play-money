@@ -7,6 +7,7 @@ import z from 'zod'
 import { createLiquidity } from '@play-money/api-helpers/client'
 import { Market } from '@play-money/database'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
+import { DAILY_LIQUIDITY_BONUS_PRIMARY } from '@play-money/finance/economy'
 import { formatNumber } from '@play-money/finance/lib/formatCurrency'
 import { Button } from '@play-money/ui/button'
 import { Card } from '@play-money/ui/card'
@@ -134,27 +135,27 @@ export const LiquidityBoostDialog = ({
                         type="button"
                         variant="secondary"
                         className="h-6 px-2 font-mono"
-                        onClick={() => field.onChange((field.value || 0) + 250)}
+                        onClick={() => field.onChange((field.value || 0) + DAILY_LIQUIDITY_BONUS_PRIMARY)}
                       >
-                        +250
+                        +{DAILY_LIQUIDITY_BONUS_PRIMARY}
                       </Button>
                       <Button
                         size="sm"
                         type="button"
                         variant="secondary"
                         className="h-6 px-2 font-mono"
-                        onClick={() => field.onChange((field.value || 0) + 1000)}
+                        onClick={() => field.onChange((field.value || 0) + DAILY_LIQUIDITY_BONUS_PRIMARY * 4)}
                       >
-                        +1k
+                        +{formatNumber(DAILY_LIQUIDITY_BONUS_PRIMARY * 4)}
                       </Button>
                       <Button
                         size="sm"
                         type="button"
                         variant="secondary"
                         className="h-6 px-2 font-mono"
-                        onClick={() => field.onChange((field.value || 0) + 5000)}
+                        onClick={() => field.onChange((field.value || 0) + DAILY_LIQUIDITY_BONUS_PRIMARY * 12)}
                       >
-                        +5k
+                        +{formatNumber(DAILY_LIQUIDITY_BONUS_PRIMARY * 12)}
                       </Button>
                     </div>
                   </FormLabel>
