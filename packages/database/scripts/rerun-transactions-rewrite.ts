@@ -1,4 +1,5 @@
 import Decimal from 'decimal.js'
+import { INITIAL_MARKET_LIQUIDITY_PRIMARY } from '@play-money/finance/economy'
 import { createHouseSingupBonusTransaction } from '@play-money/finance/lib/createHouseSingupBonusTransaction'
 import { createMarketLiquidityTransaction } from '@play-money/markets/lib/createMarketLiquidityTransaction'
 import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
@@ -56,7 +57,7 @@ async function main() {
           type: 'LIQUIDITY_INITIALIZE',
           initiatorId: market.createdBy,
           accountId: userAccount.id,
-          amount: new Decimal(1000),
+          amount: new Decimal(INITIAL_MARKET_LIQUIDITY_PRIMARY),
           marketId: market.id,
         })
 
