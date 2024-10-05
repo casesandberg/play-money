@@ -147,7 +147,7 @@ export async function UserListsTable({ userId }: { userId: string }) {
         {lists.length
           ? lists.map((list) => {
               return (
-                <Link href={`/questions/${list.id}/${list.slug}`} legacyBehavior key={list.id}>
+                <Link href={`/lists/${list.id}/${list.slug}`} legacyBehavior key={list.id}>
                   <TableRow className="cursor-pointer">
                     <TableCell>
                       <div className="line-clamp-2">{list.title}</div>
