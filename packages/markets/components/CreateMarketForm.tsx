@@ -452,7 +452,7 @@ export function CreateMarketForm({
                       inputClassName="border text-sm p-3 min-h-[80px]"
                       placeholder={
                         type === 'binary'
-                          ? 'Resolves to the price listed on coindesk at mightnight on Dec 31st.'
+                          ? 'Resolves to the price listed on coindesk at midnight on Dec 31st.'
                           : type === 'multi'
                             ? 'Resolves to credible reporting on news sites such as CNN.'
                             : type === 'list'
