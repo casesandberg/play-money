@@ -4,6 +4,7 @@ import _ from 'lodash'
 import Link from 'next/link'
 import React from 'react'
 import {
+  getMarketPositions,
   getUserLists,
   getUserMarkets,
   getUserPositions,
@@ -17,7 +18,10 @@ import { Card, CardContent } from '@play-money/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@play-money/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@play-money/ui/tabs'
 import { cn } from '@play-money/ui/utils'
+import { useSearchParam } from '../../ui/src/hooks/useSearchParam'
 import { UserGraph } from './UserGraph'
+import { UserPositionsTable } from './UserPositionsTable'
+import { UserProfileTabs } from './UserProfileTabs'
 
 export async function UserTradesTable({ userId }: { userId: string }) {
   const { transactions } = await getUserTransactions({ userId })
@@ -182,7 +186,41 @@ export async function UserListsTable({ userId }: { userId: string }) {
   )
 }
 
-export async function UserProfilePage({ username }: { username: string }) {
+async function UserPositionsTab({
+  userId,
+  filters,
+}: {
+  userId: string
+  filters?: {
+    pageSize?: string
+    page?: string
+    status?: 'active' | 'closed' | 'all'
+    sortField?: string
+    sortDirection?: string
+  }
+}) {
+  const { marketPositions, totalPages } = await getMarketPositions({ ownerId: userId, ...filters })
+
+  return (
+    <div className="mt-3 md:mt-6">
+      <UserPositionsTable data={marketPositions} totalPages={totalPages} />
+    </div>
+  )
+}
+
+export async function UserProfilePage({
+  username,
+  filters,
+}: {
+  username: string
+  filters?: {
+    pageSize?: string
+    page?: string
+    status?: 'active' | 'closed' | 'all'
+    sortField?: string
+    sortDirection?: string
+  }
+}) {
   const user = await getUserUsername({ username })
   const { positions } = await getUserPositions({ userId: user.id, pageSize: 5 })
   const { markets } = await getUserMarkets({ userId: user.id })
@@ -191,13 +229,14 @@ export async function UserProfilePage({ username }: { username: string }) {
     <div className="flex flex-col gap-4">
       <UserGraph userId={user.id} />
 
-      <Tabs defaultValue="overview">
+      <UserProfileTabs>
         <div className="flex items-center">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="trades">Trades</TabsTrigger>
             <TabsTrigger value="markets">Questions</TabsTrigger>
             <TabsTrigger value="lists">Lists</TabsTrigger>
+            <TabsTrigger value="positions">Positions</TabsTrigger>
           </TabsList>
         </div>
         <TabsContent value="overview">
@@ -294,7 +333,15 @@ export async function UserProfilePage({ username }: { username: string }) {
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
+
+        <TabsContent value="positions">
+          <Card>
+            <CardContent>
+              <UserPositionsTab userId={user.id} filters={filters} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </UserProfileTabs>
     </div>
   )
 }
