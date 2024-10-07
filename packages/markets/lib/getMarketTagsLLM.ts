@@ -7,13 +7,18 @@ export async function getMarketTagsLLM({ question }: { question: string }) {
     if (!process.env['OPENAI_API_KEY']) {
       throw new Error('No key')
     }
+
+    if (question.trim().length < 5 || question.trim().length > 500) {
+      return []
+    }
+
     const client = new OpenAI()
 
     const chatCompletion = await client.chat.completions.create({
       messages: [
         {
           role: 'user',
-          content: `Given a title of a question, please generate 4 tags that can be used to associate this question in a tag system. The first tag should be very broad and each subsequent one should increase in specificity. Use common vocabulary to increase overlap in tag names. Return as an array of strings as json. Question: ${question}`,
+          content: `Given a title of a question, please generate 5 tags that can be used to associate this question in a generic tag system. The first tag should be very broad. Use common vocabulary to increase overlap in tag names. Include relevant proper nouns. Return as an array of strings as json. Question: ${question}`,
         },
       ],
       model: 'gpt-4o-mini',
