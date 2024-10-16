@@ -28,6 +28,7 @@ export const Default: Story = {
   args: {
     market: mockExtendedMarket(),
     isResolved: false,
+    isCanceled: false,
   },
   decorators: [
     (Story) => (
@@ -42,6 +43,7 @@ export const NoOptionSelected: Story = {
   args: {
     market: mockExtendedMarket(),
     isResolved: false,
+    isCanceled: false,
   },
   decorators: [
     (Story) => (
@@ -50,4 +52,20 @@ export const NoOptionSelected: Story = {
       </SelectedItemsProvider>
     ),
   ],
+}
+
+export const Canceled: Story = {
+  args: {
+    market: mockExtendedMarket(),
+    isResolved: false,
+    isCanceled: true,
+  },
+}
+
+export const Resolved: Story = {
+  args: {
+    market: mockExtendedMarket(),
+    isResolved: true,
+    isCanceled: false,
+  },
 }
