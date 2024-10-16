@@ -1,4 +1,4 @@
-import { Market, MarketOption, MarketResolution, User } from '@play-money/database'
+import { List, Market, MarketOption, MarketOptionPosition, MarketResolution, User } from '@play-money/database'
 
 export type ExtendedMarket = Market & {
   user: User
@@ -7,4 +7,10 @@ export type ExtendedMarket = Market & {
     resolution: MarketOption
     resolvedBy: User
   }
+  parentList?: List
+}
+
+export type ExtendedMarketPosition = MarketOptionPosition & {
+  option: MarketOption
+  market: Market
 }

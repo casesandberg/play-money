@@ -14,8 +14,9 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@play-money/ui/tooltip'
 import { toast } from '@play-money/ui/use-toast'
 import { useUser } from '@play-money/users/context/UserContext'
-import { canResolveMarket } from '../lib/helpers'
+import { canModifyMarket } from '../rules'
 import { ExtendedMarket } from '../types'
+import { CancelMarketDialog } from './CancelMarketDialog'
 import { ResolveMarketDialog } from './ResolveMarketDialog'
 
 function useQueryString(key: string) {
@@ -55,12 +56,23 @@ export function MarketToolbar({
 }) {
   const { user } = useUser()
   const [isResolving, setResolving] = useQueryString('resolve')
-  const canResolve = canResolveMarket({ market, userId: user?.id })
+  const [isCanceling, setCanceling] = useQueryString('cancel')
+  const canResolve = user ? canModifyMarket({ market, user: user }) : false
+  const canCancel = user ? canModifyMarket({ market, user: user }) : false
 
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href)
       toast({ title: 'Link copied to clipboard!' })
+    } catch (error) {
+      console.error('Failed to copy:', error)
+    }
+  }
+
+  const handleCopyReferralLink = async () => {
+    try {
+      await navigator.clipboard.writeText(`${window.location.href}?ref=${user?.referralCode}`)
+      toast({ title: 'Referral link copied to clipboard!' })
     } catch (error) {
       console.error('Failed to copy:', error)
     }
@@ -93,7 +105,10 @@ export function MarketToolbar({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={handleCopyLink}>Copy link</DropdownMenuItem>
-          {!market.resolvedAt ? <DropdownMenuItem onClick={onInitiateBoost}>Liquidity boost</DropdownMenuItem> : null}
+          {user ? <DropdownMenuItem onClick={handleCopyReferralLink}>Copy referral link</DropdownMenuItem> : null}
+          {!market.resolvedAt && !market.canceledAt ? (
+            <DropdownMenuItem onClick={onInitiateBoost}>Liquidity boost</DropdownMenuItem>
+          ) : null}
 
           {canResolve ? (
             <>
@@ -116,6 +131,20 @@ export function MarketToolbar({
               </DropdownMenuItem>
             </>
           ) : null}
+
+          {canCancel ? (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  setCanceling('true')
+                }}
+                className="text-destructive"
+              >
+                Cancel market
+              </DropdownMenuItem>
+            </>
+          ) : null}
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -123,6 +152,13 @@ export function MarketToolbar({
         market={market}
         open={isResolving === 'true'}
         onClose={() => setResolving(undefined)}
+        onSuccess={onRevalidate}
+      />
+
+      <CancelMarketDialog
+        market={market}
+        open={isCanceling === 'true'}
+        onClose={() => setCanceling(undefined)}
         onSuccess={onRevalidate}
       />
     </div>

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
+import { ReferralQuestBonusRow } from '@play-money/referrals/components/ReferralQuestBonusRow'
 import { Badge } from '@play-money/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
 import { cn } from '@play-money/ui/utils'
@@ -24,7 +25,7 @@ export function QuestCard({ quests }: { quests: Quest[] }) {
         </CardTitle>
       </CardHeader>
       {!allComplete ? (
-        <CardContent className="mt-4 grid gap-4">
+        <CardContent className="mt-4 grid gap-4 md:pb-4">
           <div className="grid gap-2">
             {quests.map((quest) => (
               <Link href={quest.href} key={quest.title}>
@@ -47,6 +48,8 @@ export function QuestCard({ quests }: { quests: Quest[] }) {
                 </div>
               </Link>
             ))}
+
+            <ReferralQuestBonusRow />
           </div>
         </CardContent>
       ) : null}

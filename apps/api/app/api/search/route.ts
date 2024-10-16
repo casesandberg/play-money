@@ -13,9 +13,9 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.GE
 
     const { query } = schema.GET.parameters.parse(params)
 
-    const { users, markets } = await search({ query })
+    const { users, markets, lists } = await search({ query })
 
-    return NextResponse.json({ users, markets })
+    return NextResponse.json({ users, markets, lists })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 })

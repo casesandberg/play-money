@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import React, { useState, useEffect } from 'react'
 import { getSearch } from '@play-money/api-helpers/client'
-import { Market, User } from '@play-money/database'
+import { List, Market, User } from '@play-money/database'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import {
   CommandDialog,
@@ -18,7 +18,9 @@ import { DialogDescription, DialogTitle } from '@play-money/ui/dialog'
 export function GlobalSearchMenu({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const router = useRouter()
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState<{ users: Array<User>; markets: Array<Market> } | null>(null)
+  const [results, setResults] = useState<{ users: Array<User>; markets: Array<Market>; lists: Array<List> } | null>(
+    null
+  )
 
   useEffect(() => {
     async function search() {
@@ -57,6 +59,23 @@ export function GlobalSearchMenu({ open, onOpenChange }: { open: boolean; onOpen
                 }}
               >
                 <div className="line-clamp-2 font-semibold">{market.question}</div>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        ) : null}
+        {results?.lists.length ? (
+          <CommandGroup heading="Lists">
+            {results.lists.map((list) => (
+              <CommandItem
+                key={list.id}
+                value={list.id}
+                className="flex flex-row gap-2"
+                onSelect={() => {
+                  router.push(`/lists/${list.id}/${list.slug}`)
+                  onOpenChange(false)
+                }}
+              >
+                <div className="line-clamp-2 font-semibold">{list.title}</div>
               </CommandItem>
             ))}
           </CommandGroup>

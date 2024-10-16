@@ -7,12 +7,12 @@ import { createNotification } from '@play-money/notifications/lib/createNotifica
 import { createDailyTradeBonusTransaction } from '@play-money/quests/lib/createDailyTradeBonusTransaction'
 import { hasPlacedMarketTradeToday } from '@play-money/quests/lib/helpers'
 import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
+import { isMarketTradable } from '../rules'
 import { createLiquidityVolumeBonusTransaction } from './createLiquidityVolumeBonusTransaction'
 import { createMarketBuyTransaction } from './createMarketBuyTransaction'
 import { createMarketLiquidityTransaction } from './createMarketLiquidityTransaction'
 import { createMarketTraderBonusTransactions } from './createMarketTraderBonusTransactions'
 import { getMarket } from './getMarket'
-import { isMarketTradable } from './helpers'
 
 export async function marketBuy({
   marketId,
@@ -27,7 +27,7 @@ export async function marketBuy({
 }) {
   const [market, userAccount] = await Promise.all([getMarket({ id: marketId }), getUserPrimaryAccount({ userId })])
 
-  if (!isMarketTradable(market)) {
+  if (!isMarketTradable({ market })) {
     throw new Error('Market is closed')
   }
 
@@ -88,7 +88,7 @@ export async function marketBuy({
   )
 
   // TODO: Look into returning multiple messages to let the user know toast of the bonus.
-  if (!(await hasPlacedMarketTradeToday({ userId })) && amount.gte(DAILY_TRADE_BONUS_PRIMARY)) {
+  if (!(await hasPlacedMarketTradeToday({ userId }))) {
     await createDailyTradeBonusTransaction({ accountId: userAccount.id, marketId, initiatorId: userId })
   }
 }

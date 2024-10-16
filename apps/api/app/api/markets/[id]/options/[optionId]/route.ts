@@ -4,6 +4,8 @@ import { auth } from '@play-money/auth'
 import { CommentNotFoundError } from '@play-money/comments/lib/exceptions'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import { updateMarketOption } from '@play-money/markets/lib/updateMarketOption'
+import { canModifyMarket } from '@play-money/markets/rules'
+import { getUserById } from '@play-money/users/lib/getUserById'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'
@@ -24,7 +26,9 @@ export async function PATCH(
     const { name, color } = schema.patch.requestBody.transform(stripUndefined).parse(body)
 
     const market = await getMarket({ id })
-    if (market.createdBy !== session.user.id) {
+    const user = await getUserById({ id: session.user.id })
+
+    if (!canModifyMarket({ market, user })) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

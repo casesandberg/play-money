@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
-import { quote } from '@play-money/finance/amms/maniswap-v1.1'
+import { findShareIndex, quote } from '@play-money/finance/amms/maniswap-v1.1'
 import { getMarketBalances } from '@play-money/finance/lib/getBalances'
-import { calculateRealizedGainsTax } from '@play-money/finance/lib/helpers'
+import { calculateRealizedGainsTax, distributeRemainder } from '@play-money/finance/lib/helpers'
 import { getMarketAmmAccount } from './getMarketAmmAccount'
 
 export async function getMarketQuote({
@@ -23,17 +23,19 @@ export async function getMarketQuote({
   const optionsShares = optionBalances.map(({ total }) => total)
 
   // TODO: Change to multi-step quote to account for limit orders
-  let { probability, shares } = await quote({
+  let { newProbabilities, shares } = await quote({
     amount,
     probability: isBuy ? new Decimal(0.99) : new Decimal(0.01),
     targetShare: targetBalance!.total,
     shares: optionsShares,
   })
 
+  const shareIndex = findShareIndex(optionsShares, targetBalance!.total)
+  const distributed = distributeRemainder(newProbabilities)
   const tax = calculateRealizedGainsTax({ cost: amount, salePrice: shares })
 
   return {
-    probability,
+    probability: distributed[shareIndex],
     shares: shares.sub(tax),
   }
 }

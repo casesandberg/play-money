@@ -18,6 +18,11 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 model User {
   id               String             @id @default(cuid())
   username         String             @unique
@@ -34,10 +39,16 @@ model User {
   commentReactions CommentReaction[]
   resolvedMarkets  MarketResolution[]
   markets          Market[]
+  cancelledMarkets Market[]           @relation("MarketCanceledBy")
   primaryAccountId String             @unique
   primaryAccount   Account            @relation("UserPrimaryAccount", fields: [primaryAccountId], references: [id])
   accounts         Account[]
   transactions     Transaction[]
+  role             UserRole           @default(USER)
+  referralCode     String?            @unique
+  referredBy       String?
+  referredUsers    User[]             @relation("Referrals")
+  referrer         User?              @relation("Referrals", fields: [referredBy], references: [id])
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
 
@@ -48,6 +59,8 @@ model User {
   recipientNotifications Notification[]      @relation("NotificationRecipient")
   actorNotifications     Notification[]      @relation("NotificationActor")
   notificationGroups     NotificationGroup[] @relation()
+
+  createdLists List[] @relation("ListCreator")
 }
 
 model AuthAccount {
@@ -80,14 +93,17 @@ model Session {
 
 model Market {
   id                String                 @id @default(cuid())
-  question          String /// @zod.string.min(1, { message: "Question is required" })
+  question          String /// @zod.string.trim().min(1, { message: "Question is required" })
   description       String
   slug              String /// @zod.string.min(1, { message: "Slug is required" })
   closeDate         DateTime?
   resolvedAt        DateTime?
+  canceledAt        DateTime?
+  canceledById      String?
+  canceledBy        User?                  @relation("MarketCanceledBy", fields: [canceledById], references: [id])
   transactions      Transaction[]
   createdBy         String
-  tags              String[]               @default([]) /// @zod.string.array(.max(5))
+  tags              String[]               @default([]) /// @zod.string.trim().array(.max(5))
   user              User                   @relation(fields: [createdBy], references: [id])
   ammAccountId      String                 @unique
   ammAccount        Account                @relation("MarketAMMAccount", fields: [ammAccountId], references: [id])
@@ -109,6 +125,11 @@ model Market {
 
   // Unnecessary reverse relations
   notifications Notification[] @relation()
+
+  lists MarketList[]
+
+  parentListId String?
+  parentList   List?   @relation("ParentListMarkets", fields: [parentListId], references: [id])
 }
 
 model MarketResolution {
@@ -129,7 +150,7 @@ model MarketResolution {
 
 model MarketOption {
   id                   String                 @id @default(cuid())
-  name                 String /// @zod.string.min(1, { message: "Name is required" })
+  name                 String /// @zod.string.trim().min(1, { message: "Name is required" })
   marketId             String
   market               Market                 @relation(fields: [marketId], references: [id])
   color                String                 @default("#FF00FF") /// @zod.string.regex(/^#[0-9A-Fa-f]{6}$/)
@@ -157,11 +178,12 @@ model VerificationToken {
 
 enum CommentEntityType {
   MARKET
+  LIST
 }
 
 model Comment {
   id         String            @id @default(cuid())
-  content    String /// @zod.string.min(1).max(5000)
+  content    String /// @zod.string.trim().min(1).max(5000)
   createdAt  DateTime          @default(now())
   updatedAt  DateTime?         @updatedAt
   edited     Boolean           @default(false)
@@ -213,6 +235,9 @@ enum TransactionType {
 
   HOUSE_GIFT
   HOUSE_SIGNUP_BONUS
+
+  REFERRER_BONUS
+  REFERREE_BONUS
 }
 
 model Transaction {
@@ -221,6 +246,8 @@ model Transaction {
   entries     TransactionEntry[]
   initiatorId String?
   initiator   User?              @relation(fields: [initiatorId], references: [id])
+  isReverse   Boolean?
+  reverseOfId String?
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
   batchId     String?
@@ -321,12 +348,16 @@ model MarketOptionPosition {
 
 enum NotificationType {
   MARKET_RESOLVED
+  MARKET_CANCELED
   MARKET_TRADE
   MARKET_LIQUIDITY_ADDED
   MARKET_COMMENT
+  LIST_COMMENT
+  LIST_MARKET_ADDED
   COMMENT_REPLY
   COMMENT_MENTION
   COMMENT_REACTION
+  REFERRER_BONUS
 }
 
 model Notification {
@@ -345,6 +376,8 @@ model Notification {
   marketResolution   MarketResolution? @relation(fields: [marketResolutionId], references: [id])
   transactionId      String?
   transaction        Transaction?      @relation(fields: [transactionId], references: [id])
+  listId             String?
+  list               List?             @relation(fields: [listId], references: [id])
   commentId          String?
   comment            Comment?          @relation("NotificationComment", fields: [commentId], references: [id])
   parentCommentId    String?
@@ -376,4 +409,47 @@ model NotificationGroup {
 
   @@unique(fields: [recipientId, type, groupWindowEnd, groupKey])
   @@index(fields: [recipientId, type, groupWindowEnd, groupKey])
+}
+
+enum QuestionContributionPolicy {
+  DISABLED
+  OWNERS_ONLY
+  FRIENDS_ONLY
+  PUBLIC
+}
+
+model List {
+  id                 String                     @id @default(cuid())
+  title              String /// @zod.string.trim().min(1, { message: "Title is required" })
+  slug               String /// @zod.string.min(1, { message: "Slug is required" })
+  description        String?
+  ownerId            String
+  owner              User                       @relation("ListCreator", fields: [ownerId], references: [id])
+  contributionPolicy QuestionContributionPolicy @default(OWNERS_ONLY)
+  contributionReview Boolean?                   @default(false)
+  tags               String[]                   @default([]) /// @zod.string.trim().array(.max(5))
+  markets            MarketList[]
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+
+  // New relation for parent markets
+  childrenMarkets Market[] @relation("ParentListMarkets")
+
+  // Unnecessary reverse relations
+  notifications Notification[] @relation()
+
+  @@index([ownerId])
+}
+
+model MarketList {
+  id        String   @id @default(cuid())
+  listId    String
+  list      List     @relation(fields: [listId], references: [id])
+  marketId  String
+  market    Market   @relation(fields: [marketId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([listId, marketId])
+  @@index([listId])
+  @@index([marketId])
 }

@@ -20,20 +20,23 @@ async function main() {
               email: process.env.DEV_DB_SEED_EMAIL,
               username: 'dev',
               displayName: 'Dev User',
+              role: 'ADMIN' as const,
             }
           : {
               email: faker.internet.email(),
             }
 
-      let { primaryAccountId, ...data } = mockUser(devOverride) as User & OmittedUserFields
+      let { primaryAccountId, referredBy, ...data } = mockUser(devOverride) as User & OmittedUserFields
       const user = await db.user.create({
         data: {
           ...data,
+          referredBy: referredBy ? referredBy : undefined,
+          primaryAccountId: undefined as unknown as string,
           primaryAccount: {
             create: {
               type: 'USER',
             },
-          },
+          } as unknown as undefined,
         },
       })
 

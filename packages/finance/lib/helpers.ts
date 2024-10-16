@@ -98,25 +98,45 @@ export async function calculateBalanceSubtotals({
 export function marketOptionBalancesToProbabilities(balances: Array<NetBalance | NetBalanceAsNumbers> = []) {
   const assetBalances = balances.filter((balance) => balance?.assetType === 'MARKET_OPTION')
 
+  const shares = assetBalances.map((balance) => balance.total)
+  const probabilities = assetBalances.map((_assetBalance, i) => {
+    return calculateProbability({ index: i, shares })
+  })
+
+  const distributed = distributeRemainder(probabilities)
+
   return assetBalances.reduce(
     (result, assetBalance, i) => {
-      const probability = calculateProbability({
-        index: i,
-        shares: assetBalances.map((balance) => balance.total),
-      })
-        .times(100)
-        .toDecimalPlaces(2)
-
-      if (probability.isNaN()) {
-        result[assetBalance.assetId] = 0
-      } else {
-        result[assetBalance.assetId] = probability.toNumber()
-      }
+      result[assetBalance.assetId] = distributed[i].toNumber()
 
       return result
     },
     {} as Record<string, number>
   )
+}
+
+export function distributeRemainder(arr: Array<Decimal>) {
+  if (!arr.length) {
+    return []
+  }
+  const total = arr.reduce<Decimal>((a, b) => a.plus(b), new Decimal(0))
+  const exactPercentages = arr.map((num) => num.div(total).times(100))
+
+  const floored = exactPercentages.map((v) => Decimal.floor(v))
+  const remainders = exactPercentages.map((num, i) => num.sub(floored[i]))
+
+  const flooredSum = floored.reduce((a, b) => a.plus(b), new Decimal(0))
+
+  let remainderToDistribute = new Decimal(100).sub(flooredSum)
+
+  while (remainderToDistribute.gt(0)) {
+    const maxIndex = remainders.findIndex((rem) => rem.eq(Decimal.max(...remainders)))
+    floored[maxIndex] = floored[maxIndex].plus(1)
+    remainders[maxIndex] = new Decimal(0)
+    remainderToDistribute = remainderToDistribute.sub(1)
+  }
+
+  return floored
 }
 
 export function calculateRealizedGainsTax({ cost, salePrice }: { cost: Decimal; salePrice: Decimal }) {

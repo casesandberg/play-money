@@ -2,7 +2,7 @@
 
 import { format, isPast } from 'date-fns'
 import _ from 'lodash'
-import { CircleCheckBig, ChevronDown } from 'lucide-react'
+import { CircleCheckBig, ChevronDown, Link2Icon } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 import { mutate } from 'swr'
@@ -12,6 +12,7 @@ import {
   MY_BALANCE_PATH,
   useMarketBalance,
 } from '@play-money/api-helpers/client/hooks'
+import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { marketOptionBalancesToProbabilities } from '@play-money/finance/lib/helpers'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Alert, AlertDescription, AlertTitle } from '@play-money/ui/alert'
@@ -22,7 +23,9 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@play-money
 import { ReadMoreEditor } from '@play-money/ui/editor'
 import { UserLink } from '@play-money/users/components/UserLink'
 import { useUser } from '@play-money/users/context/UserContext'
+import { useSelectedItems } from '../../ui/src/contexts/SelectedItemContext'
 import { useSearchParam } from '../../ui/src/hooks/useSearchParam'
+import { canModifyMarket } from '../rules'
 import { ExtendedMarket } from '../types'
 import { EditMarketDialog } from './EditMarketDialog'
 import { EditMarketOptionDialog } from './EditMarketOptionDialog'
@@ -52,16 +55,12 @@ export function MarketOverviewPage({
   onRevalidate: () => Promise<void>
 }) {
   const { user } = useUser()
+  const { selected, setSelected } = useSelectedItems()
   const { triggerEffect } = useSidebar()
   const { data: balance } = useMarketBalance({ marketId: market.id })
-  const [option, setOption] = useSearchParam('option', 'replace')
   const [isEditing, setIsEditing] = useSearchParam('edit')
   const [isEditOption, setIsEditOption] = useSearchParam('editOption')
   const [isBoosting, setIsBoosting] = useSearchParam('boost')
-  const createdOrderOptions = market.options.sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-  )
-  const activeOptionId = option || createdOrderOptions[0]?.id || ''
   const isCreator = user?.id === market.createdBy
   const probabilities = marketOptionBalancesToProbabilities(balance?.amm)
 
@@ -82,20 +81,40 @@ export function MarketOverviewPage({
     <Card className="flex-1">
       <MarketToolbar
         market={market}
-        canEdit={isCreator}
+        canEdit={user ? canModifyMarket({ market, user }) : false}
         onInitiateEdit={() => setIsEditing('true')}
         onInitiateBoost={() => setIsBoosting('true')}
         onRevalidate={handleRevalidateBalance}
       />
 
       <CardHeader className="pt-0 md:pt-0">
+        {market.parentList ? (
+          <Link
+            href={`/lists/${market.parentList.id}/${market.parentList.slug}`}
+            className="flex items-center gap-2 text-muted-foreground"
+          >
+            <Link2Icon className="size-5" />
+            {market.parentList.title}
+          </Link>
+        ) : null}
         <CardTitle className="leading-relaxed">{market.question}</CardTitle>
         <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground md:flex-nowrap">
-          {!market.marketResolution ? (
+          {market.canceledAt ? (
+            <div className="text-muted-foreground">
+              <span className="font-semibold">Canceled</span>
+            </div>
+          ) : null}
+          {!market.marketResolution && !market.canceledAt ? (
             <div style={{ color: mostLikelyOption.color }} className="flex-shrink-0 font-medium">
               {Math.round(mostLikelyOption.probability || 0)}% {_.truncate(mostLikelyOption.name, { length: 30 })}
             </div>
           ) : null}
+          {market.liquidityCount ? (
+            <div className="flex-shrink-0">
+              <CurrencyDisplay value={market.liquidityCount} isShort /> Vol.
+            </div>
+          ) : null}
+
           {market.closeDate ? (
             <div className="flex-shrink-0">
               {isPast(market.closeDate) ? 'Ended' : 'Ending'} {format(market.closeDate, 'MMM d, yyyy')}
@@ -112,7 +131,7 @@ export function MarketOverviewPage({
         </div>
       </CardHeader>
       <CardContent>
-        <MarketGraph market={market} activeOptionId={activeOptionId} />
+        <MarketGraph market={market} activeOptionId={selected[0]} />
       </CardContent>
 
       <CardContent>
@@ -161,13 +180,13 @@ export function MarketOverviewPage({
                       <MarketOptionRow
                         key={option.id}
                         option={option}
-                        active={option.id === activeOptionId}
+                        active={option.id === selected[0]}
                         probability={probabilities[option.id] || option.probability || 0}
                         className={i > 0 ? 'border-t' : ''}
-                        canEdit={user?.id === market.createdBy}
+                        canEdit={user ? canModifyMarket({ market, user }) : false}
                         onEdit={() => setIsEditOption(option.id)}
                         onSelect={() => {
-                          setOption(option.id)
+                          setSelected([option.id])
                           triggerEffect()
                         }}
                       />
@@ -183,13 +202,13 @@ export function MarketOverviewPage({
               <MarketOptionRow
                 key={option.id}
                 option={option}
-                active={option.id === activeOptionId}
+                active={option.id === selected[0]}
                 probability={probabilities[option.id] || option.probability || 0}
                 className={i > 0 ? 'border-t' : ''}
-                canEdit={user?.id === market.createdBy}
+                canEdit={user ? canModifyMarket({ market, user }) : false}
                 onEdit={() => setIsEditOption(option.id)}
                 onSelect={() => {
-                  setOption(option.id)
+                  setSelected([option.id])
                   triggerEffect()
                 }}
               />
@@ -198,11 +217,11 @@ export function MarketOverviewPage({
         ) : null}
       </CardContent>
 
-      <CardContent>
-        <ReadMoreEditor value={market.description} maxLines={6} />
+      <CardContent className="space-y-2">
+        {market.description ? <ReadMoreEditor value={market.description} maxLines={6} /> : null}
 
         {market.tags.length ? (
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2">
             {market.tags.map((tag) => (
               <Link href={`/questions/tagged/${tag}`} key={tag}>
                 <Badge variant="secondary">{tag}</Badge>
@@ -212,7 +231,7 @@ export function MarketOverviewPage({
         ) : null}
       </CardContent>
 
-      {!market.resolvedAt ? (
+      {!market.resolvedAt && !market.canceledAt ? (
         <CardContent>
           <LiquidityBoostAlert onClick={() => setIsBoosting('true')} />
         </CardContent>
@@ -222,6 +241,7 @@ export function MarketOverviewPage({
       {renderComments}
 
       <EditMarketDialog
+        key={market.updatedAt.toString()} // reset form when market updates
         market={market}
         open={isEditing === 'true'}
         onClose={() => setIsEditing(undefined)}

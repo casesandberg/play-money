@@ -12,18 +12,26 @@ const LeaderboardUserSchema = z.object({
 
 export default createSchema({
   GET: {
+    parameters: z
+      .object({
+        year: z.coerce.number().optional(),
+        month: z.coerce.number().optional(),
+      })
+      .optional(),
     responses: {
       200: z.object({
         topTraders: z.array(LeaderboardUserSchema),
         topCreators: z.array(LeaderboardUserSchema),
         topPromoters: z.array(LeaderboardUserSchema),
         topQuesters: z.array(LeaderboardUserSchema),
+        topReferrers: z.array(LeaderboardUserSchema),
         userRankings: z
           .object({
             trader: LeaderboardUserSchema.optional(),
             creator: LeaderboardUserSchema.optional(),
             promoter: LeaderboardUserSchema.optional(),
             quester: LeaderboardUserSchema.optional(),
+            referrer: LeaderboardUserSchema.optional(),
           })
           .or(z.null())
           .optional(),

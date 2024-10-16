@@ -19,6 +19,7 @@ export async function createMarket({
   options,
   tags,
   subsidyAmount = new Decimal(INITIAL_MARKET_LIQUIDITY_PRIMARY),
+  parentListId,
 }: {
   question: string
   description: string
@@ -27,6 +28,7 @@ export async function createMarket({
   options?: Array<PartialOptions>
   tags?: Array<string>
   subsidyAmount?: Decimal
+  parentListId?: string
 }) {
   let slug = slugifyTitle(question)
 
@@ -77,6 +79,16 @@ export async function createMarket({
           })),
         },
       },
+      ...(parentListId
+        ? {
+            parentList: {
+              connect: {
+                id: parentListId,
+              },
+            } as unknown as undefined,
+          }
+        : {}),
+
       commentCount: 0,
       liquidityCount: 0,
       uniquePromotersCount: 0,

@@ -31,7 +31,7 @@ export async function executeTransaction({
         data: {
           type,
           initiatorId,
-          marketId,
+          marketId: marketId ?? null,
           entries: { create: entries },
           options: {
             connect: optionIds?.map((id) => ({ id })),
@@ -47,6 +47,7 @@ export async function executeTransaction({
       return transaction
     },
     {
+      maxWait: 5000,
       timeout: 10000,
     }
   )

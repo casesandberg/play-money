@@ -2,6 +2,7 @@ import { MenuIcon } from 'lucide-react'
 import Link from 'next/link'
 import { getMyBalance } from '@play-money/api-helpers/client'
 import { NotificationDropdown } from '@play-money/notifications/components/NotificationDropdown'
+import { UserQuestCard } from '@play-money/quests/components/UserQuestCard'
 import { GlobalSearchTriggerLink } from '@play-money/search/components/GlobalSearchTriggerLink'
 import { Button } from '@play-money/ui/button'
 import { Sheet, SheetTrigger, SheetContent, SheetClose } from '@play-money/ui/sheet'
@@ -57,14 +58,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                 <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left">
-              <div className="flex flex-col gap-4">
+            <SheetContent className="flex flex-col" side="left">
+              <div className="flex flex-1 flex-col gap-4">
                 <span className="text-lg font-bold tracking-tight text-muted-foreground">PlayMoney</span>
                 <MainNav
                   className="flex flex-col items-start space-y-4 text-lg"
                   renderItemWrap={(child) => <SheetClose asChild>{child}</SheetClose>}
                 />
               </div>
+              <UserQuestCard />
             </SheetContent>
           </Sheet>
           <Link className="flex items-center gap-2" href="/">
@@ -94,6 +96,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         >
           Open source
         </a>
+        {/* —
+        <Link className="hover:underline" href="/transparency">
+          Transparency
+        </Link> */}
       </div>
     </div>
   )

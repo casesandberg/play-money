@@ -3,7 +3,14 @@ import Decimal from 'decimal.js'
 import _ from 'lodash'
 import Link from 'next/link'
 import React from 'react'
-import { getUserMarkets, getUserPositions, getUserTransactions, getUserUsername } from '@play-money/api-helpers/client'
+import {
+  getMarketPositions,
+  getUserLists,
+  getUserMarkets,
+  getUserPositions,
+  getUserTransactions,
+  getUserUsername,
+} from '@play-money/api-helpers/client'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { calculateBalanceChanges, findBalanceChange } from '@play-money/finance/lib/helpers'
 import { MarketProbabilityDetail } from '@play-money/markets/components/MarketProbabilityDetail'
@@ -11,7 +18,10 @@ import { Card, CardContent } from '@play-money/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@play-money/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@play-money/ui/tabs'
 import { cn } from '@play-money/ui/utils'
+import { useSearchParam } from '../../ui/src/hooks/useSearchParam'
 import { UserGraph } from './UserGraph'
+import { UserPositionsTable } from './UserPositionsTable'
+import { UserProfileTabs } from './UserProfileTabs'
 
 export async function UserTradesTable({ userId }: { userId: string }) {
   const { transactions } = await getUserTransactions({ userId })
@@ -95,7 +105,7 @@ export async function UserMarketsTable({ userId }: { userId: string }) {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Market</TableHead>
+          <TableHead>Question</TableHead>
           <TableHead className="hidden w-[150px] sm:table-cell">Resolves</TableHead>
           {/* <TableHead className="hidden sm:table-cell">Bonus</TableHead> */}
         </TableRow>
@@ -125,7 +135,92 @@ export async function UserMarketsTable({ userId }: { userId: string }) {
   )
 }
 
-export async function UserProfilePage({ username }: { username: string }) {
+export async function UserListsTable({ userId }: { userId: string }) {
+  const { lists } = await getUserLists({ userId })
+
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>List</TableHead>
+          <TableHead className="hidden w-[250px] sm:table-cell">Options</TableHead>
+          {/* <TableHead className="hidden sm:table-cell">Bonus</TableHead> */}
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {lists.length
+          ? lists.map((list) => {
+              return (
+                <Link href={`/lists/${list.id}/${list.slug}`} legacyBehavior key={list.id}>
+                  <TableRow className="cursor-pointer">
+                    <TableCell>
+                      <div className="line-clamp-2">{list.title}</div>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      <Link className="block flex-1 p-2" href={`/lists/${list.id}/${list.slug}`}>
+                        <span className="line-clamp-2 text-xs text-muted-foreground">
+                          {list.markets.slice(0, 5).map((m) => (
+                            <>
+                              <div className="inline pr-1" key={m.market.id}>
+                                <div
+                                  className="mb-0.5 mr-1 inline-block size-1.5 flex-shrink-0 rounded-md"
+                                  style={{ backgroundColor: m.market.options[0].color }}
+                                />
+                                {m.market.question}
+                              </div>{' '}
+                            </>
+                          ))}
+                        </span>
+                      </Link>
+                    </TableCell>
+                    {/* <TableCell className="hidden md:table-cell">
+                                <MarketUserTraderBonusAmount marketId={market.id} />
+                              </TableCell> */}
+                  </TableRow>
+                </Link>
+              )
+            })
+          : null}
+      </TableBody>
+    </Table>
+  )
+}
+
+async function UserPositionsTab({
+  userId,
+  filters,
+}: {
+  userId: string
+  filters?: {
+    pageSize?: string
+    page?: string
+    status?: 'active' | 'closed' | 'all'
+    sortField?: string
+    sortDirection?: string
+  }
+}) {
+  const { marketPositions, totalPages } = await getMarketPositions({ ownerId: userId, ...filters })
+
+  return (
+    <div className="mt-3 md:mt-6">
+      <UserPositionsTable data={marketPositions} totalPages={totalPages} />
+    </div>
+  )
+}
+
+export async function UserProfilePage({
+  username,
+  filters,
+}: {
+  username: string
+  filters?: {
+    pageSize?: string
+    page?: string
+    status?: 'active' | 'closed' | 'all'
+    sortField?: string
+    sortDirection?: string
+  }
+}) {
   const user = await getUserUsername({ username })
   const { positions } = await getUserPositions({ userId: user.id, pageSize: 5 })
   const { markets } = await getUserMarkets({ userId: user.id })
@@ -134,12 +229,14 @@ export async function UserProfilePage({ username }: { username: string }) {
     <div className="flex flex-col gap-4">
       <UserGraph userId={user.id} />
 
-      <Tabs defaultValue="overview">
+      <UserProfileTabs>
         <div className="flex items-center">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="trades">Trades</TabsTrigger>
             <TabsTrigger value="markets">Questions</TabsTrigger>
+            <TabsTrigger value="lists">Lists</TabsTrigger>
+            <TabsTrigger value="positions">Positions</TabsTrigger>
           </TabsList>
         </div>
         <TabsContent value="overview">
@@ -228,7 +325,23 @@ export async function UserProfilePage({ username }: { username: string }) {
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
+
+        <TabsContent value="lists">
+          <Card>
+            <CardContent>
+              <UserListsTable userId={user.id} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="positions">
+          <Card>
+            <CardContent>
+              <UserPositionsTab userId={user.id} filters={filters} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </UserProfileTabs>
     </div>
   )
 }

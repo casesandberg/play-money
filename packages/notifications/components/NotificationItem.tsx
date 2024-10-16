@@ -5,6 +5,7 @@ import { formatNumber } from '@play-money/finance/lib/formatCurrency'
 import { calculateBalanceChanges, findBalanceChange } from '@play-money/finance/lib/helpers'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { cn } from '@play-money/ui/utils'
+import { formatDistanceToNowShort } from '../../ui/src/helpers'
 import { NotificationGroupWithLastNotification } from '../lib/getNotifications'
 
 function createSnippet(htmlString: string, maxLength = 150) {
@@ -52,6 +53,11 @@ export function NotificationItem({
       bottomLine = `Resolved ${notification.marketOption.name} by ${notification.actor.displayName}`
       break
     }
+    case 'MARKET_CANCELED': {
+      topLine = notification.market.question
+      bottomLine = `Canceled by ${notification.actor.displayName}`
+      break
+    }
     case 'MARKET_TRADE': {
       // Transactions Rewrite blew away old transactions.
       if (!notification.transaction) {
@@ -68,7 +74,7 @@ export function NotificationItem({
       })
 
       topLine = notification.market.question
-      bottomLine = `${notification.actor.displayName} bet: ${formatNumber(Math.abs(primaryChange?.change ?? 0))} ${notification.marketOption.name}${othersCount}`
+      bottomLine = `${notification.actor.displayName} bet: ¤${formatNumber(Math.abs(primaryChange?.change ?? 0))} ${notification.marketOption.name}${othersCount}`
       break
     }
     case 'MARKET_LIQUIDITY_ADDED': {
@@ -87,7 +93,7 @@ export function NotificationItem({
       })
 
       topLine = notification.market.question
-      bottomLine = `${formatNumber(Math.abs(primaryChange?.change ?? 0))} liquidity added by ${notification.actor.displayName}${othersCount}`
+      bottomLine = `¤${formatNumber(Math.abs(primaryChange?.change ?? 0))} liquidity added by ${notification.actor.displayName}${othersCount}`
       break
     }
     case 'MARKET_COMMENT': {
@@ -95,10 +101,19 @@ export function NotificationItem({
       bottomLine = `${notification.actor.displayName} commented: ${createSnippet(notification.comment.content)}`
       break
     }
+    case 'LIST_COMMENT': {
+      topLine = notification.list.title
+      bottomLine = `${notification.actor.displayName} commented: ${createSnippet(notification.comment.content)}`
+      break
+    }
     case 'COMMENT_REPLY': {
       topLine = notification.parentComment?.content
         ? createSnippet(notification.parentComment.content)
-        : notification.market.question
+        : notification.market
+          ? notification.market.question
+          : notification.list
+            ? notification.list.title
+            : ''
       bottomLine = `${notification.actor.displayName}${othersCount} replied: ${createSnippet(notification.comment.content)}`
       break
     }
@@ -110,8 +125,20 @@ export function NotificationItem({
     case 'COMMENT_MENTION': {
       topLine = notification.parentComment?.content
         ? createSnippet(notification.parentComment.content)
-        : notification.market.question
+        : notification.market
+          ? notification.market.question
+          : notification.list
+            ? notification.list.title
+            : ''
       bottomLine = `${notification.actor.displayName}${othersCount} mentioned you: ${createSnippet(notification.comment.content)}`
+      break
+    }
+    case 'REFERRER_BONUS': {
+      const balanceChanges = calculateBalanceChanges(notification.transaction)
+      const amount = Math.abs(balanceChanges[0].change)
+
+      topLine = 'You recieved a referral bonus'
+      bottomLine = `¤${formatNumber(amount)} from ${notification.actor.displayName}${othersCount}`
       break
     }
     // default: {
@@ -136,17 +163,7 @@ export function NotificationItem({
           </div>
           <div className="flex items-end gap-2 text-xs text-muted-foreground">
             <div className="line-clamp-3 min-w-0 flex-1">{bottomLine}</div>
-            <div>
-              {formatDistanceToNow(notification.createdAt)
-                .replace('about ', '')
-                .replace(/ years?/, 'y')
-                .replace(/ months?/, 'm')
-                .replace(/ weeks?/, 'w')
-                .replace(/ days?/, 'd')
-                .replace(/ hours?/, 'h')
-                .replace(/ minutes?/, 'm')
-                .replace(/ seconds?/, 's')}
-            </div>
+            <div>{formatDistanceToNowShort(notification.createdAt)}</div>
           </div>
         </div>
       </div>

@@ -13,7 +13,7 @@ function transformUserOutput(input: LeaderboardUser): LeaderboardUser {
 
 export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, userId?: string) {
   const usernamesToIgnore = ['house', 'community']
-  const [topTraders, topCreators, topPromoters, topQuesters] = await Promise.all([
+  const [topTraders, topCreators, topPromoters, topQuesters, topReferrers] = await Promise.all([
     db.$queryRaw<Array<LeaderboardUser>>`
     WITH trader_transactions AS (
         SELECT 
@@ -183,6 +183,37 @@ export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, user
     --   WHERE COALESCE(qb.total, 0) > 0
       ORDER BY total DESC
     `,
+    db.$queryRaw<Array<LeaderboardUser>>`
+      WITH referrer_bonuses AS (
+        SELECT 
+          a.id AS "accountId",
+          SUM(CASE 
+            WHEN te."fromAccountId" = a.id THEN -te.amount
+            WHEN te."toAccountId" = a.id THEN te.amount
+            ELSE 0
+          END) as total
+        FROM "Transaction" t
+        JOIN "TransactionEntry" te ON t.id = te."transactionId"
+        JOIN "Account" a ON a.id IN (te."fromAccountId", te."toAccountId")
+        WHERE t."createdAt" BETWEEN ${startDate} AND ${endDate}
+          AND t.type IN ('REFERRER_BONUS')
+          AND te."assetType" = 'CURRENCY'
+          AND a.type = 'USER'
+        GROUP BY a.id
+      )
+      SELECT 
+        u.id as "userId",
+        u."displayName",
+        u."username",
+        u."avatarUrl",
+        COALESCE(qb.total, 0) as total,
+        RANK() OVER (ORDER BY COALESCE(qb.total, 0) DESC) as rank
+      FROM "User" u
+      LEFT JOIN referrer_bonuses qb ON u."primaryAccountId" = qb."accountId"
+      WHERE u."username" NOT IN (${Prisma.join(usernamesToIgnore)})
+    --   WHERE COALESCE(qb.total, 0) > 0
+      ORDER BY total DESC
+    `,
   ])
 
   let userRankings = null
@@ -191,12 +222,14 @@ export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, user
     const creatorRanking = topCreators.find((c) => c.userId === userId)
     const promoterRanking = topPromoters.find((p) => p.userId === userId)
     const quester = topQuesters.find((q) => q.userId === userId)
+    const referrers = topReferrers.find((q) => q.userId === userId)
 
     userRankings = {
       trader: traderRanking ? transformUserOutput(traderRanking) : undefined,
       creator: creatorRanking ? transformUserOutput(creatorRanking) : undefined,
       promoter: promoterRanking ? transformUserOutput(promoterRanking) : undefined,
       quester: quester ? transformUserOutput(quester) : undefined,
+      referrers: referrers ? transformUserOutput(referrers) : undefined,
     }
   }
 
@@ -205,6 +238,7 @@ export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, user
     topCreators: topCreators.slice(0, 10).map(transformUserOutput),
     topPromoters: topPromoters.slice(0, 10).map(transformUserOutput),
     topQuesters: topQuesters.slice(0, 10).map(transformUserOutput),
+    topReferrers: topReferrers.slice(0, 10).map(transformUserOutput) || [],
     userRankings,
   }
 }

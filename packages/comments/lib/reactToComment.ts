@@ -1,4 +1,5 @@
 import db, { CommentReaction } from '@play-money/database'
+import { getList } from '@play-money/lists/lib/getList'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import { createNotification } from '@play-money/notifications/lib/createNotification'
 
@@ -37,17 +38,20 @@ export async function reactToComment({
   })
 
   if (userId !== reaction.comment.authorId) {
-    const market = await getMarket({ id: reaction.comment.entityId })
+    const entity =
+      reaction.comment.entityType === 'MARKET'
+        ? await getMarket({ id: reaction.comment.entityId })
+        : await getList({ id: reaction.comment.entityId })
 
     await createNotification({
       type: 'COMMENT_REACTION',
       actorId: userId,
-      marketId: market.id,
+      ...(reaction.comment.entityType === 'MARKET' ? { marketId: entity.id } : { list: entity.id }),
       commentId: reaction.comment.id,
       commentReactionId: reaction.id,
-      groupKey: market.id,
+      groupKey: entity.id,
       userId: reaction.comment.authorId,
-      actionUrl: `/questions/${market.id}/${market.slug}#${reaction.comment.id}`,
+      actionUrl: `/${reaction.comment.entityType === 'MARKET' ? 'questions' : 'lists'}/${entity.id}/${entity.slug}#${reaction.comment.id}`,
     })
   }
 

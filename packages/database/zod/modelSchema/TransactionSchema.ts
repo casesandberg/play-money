@@ -9,6 +9,8 @@ export const TransactionSchema = z.object({
   type: TransactionTypeSchema,
   id: z.string().cuid(),
   initiatorId: z.string().nullable(),
+  isReverse: z.boolean().nullable(),
+  reverseOfId: z.string().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   batchId: z.string().nullable(),

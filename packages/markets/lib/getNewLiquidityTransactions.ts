@@ -12,6 +12,7 @@ export async function getNewLiquidityTransactions(): Promise<Array<TransactionWi
           fromAccountId: houseAccount.id,
         },
       },
+      isReverse: null,
     },
     orderBy: {
       createdAt: 'desc',

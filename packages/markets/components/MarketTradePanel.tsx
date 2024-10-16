@@ -9,7 +9,7 @@ import {
   MY_BALANCE_PATH,
   useMarketBalance,
 } from '@play-money/api-helpers/client/hooks'
-import { useSearchParam } from '@play-money/ui'
+import { useSelectedItems } from '@play-money/ui'
 import { Card, CardContent, CardHeader } from '@play-money/ui/card'
 import { Combobox } from '@play-money/ui/combobox'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@play-money/ui/tabs'
@@ -25,20 +25,20 @@ export function MarketTradePanel({
   market,
   isTradable = true,
   isResolved = false,
-  activeOptionId,
+  isCanceled = false,
   onTradeComplete,
 }: {
   market: ExtendedMarket
   isTradable?: boolean
   isResolved: boolean
-  activeOptionId: string
+  isCanceled: boolean
   onTradeComplete?: () => void
 }) {
+  const { selected, setSelected } = useSelectedItems()
   // We can SSR this now, since the P&L will be the one thats updated externally and this one will only ever be updated by a user!
   const { data: balance, mutate: revalidate } = useMarketBalance({ marketId: market.id })
-  const [option, setOption] = useSearchParam('option')
   const { effect, resetEffect } = useSidebar()
-  const activeOption = market.options.find((o) => o.id === (option || activeOptionId))
+  const activeOption = market.options.find((o) => o.id === selected[0])
   const activePosition = balance?.userPositions.find((p) => p.optionId === activeOption?.id)
 
   const handleComplete = async () => {
@@ -55,14 +55,19 @@ export function MarketTradePanel({
 
   return (
     <div className="space-y-4">
-      {isTradable ? (
+      {isCanceled ? (
+        <Card className="flex flex-col items-center justify-center gap-4 p-4 sm:h-64">
+          <CircleOffIcon className="size-8 stroke-[1.5px] text-muted-foreground" />
+          <div className="text-balance text-center text-sm uppercase text-muted-foreground">Question canceled</div>
+        </Card>
+      ) : isTradable ? (
         <Card className={cn(effect && 'animate-slide-in-right')} onAnimationEnd={resetEffect}>
           <Tabs defaultValue="buy">
             <CardHeader className="flex items-start bg-muted md:p-3">
               <Combobox
                 buttonClassName="bg-muted w-full text-lg border-none"
-                value={option || activeOptionId}
-                onChange={(value) => setOption(value)}
+                value={activeOption?.id}
+                onChange={(value) => setSelected([value])}
                 items={market.options.map((option) => ({ value: option.id, label: option.name }))}
               />
               <TabsList className="ml-3 p-0">
@@ -74,15 +79,15 @@ export function MarketTradePanel({
             <CardContent className="mt-4">
               <TabsContent className="space-y-4" value="buy">
                 {activeOption ? (
-                  <MarketBuyForm marketId={market.id} option={activeOption} onComplete={handleComplete} />
+                  <MarketBuyForm marketId={market.id} options={[activeOption]} onComplete={handleComplete} />
                 ) : null}
               </TabsContent>
               <TabsContent value="sell">
                 {activeOption ? (
                   <MarketSellForm
                     marketId={market.id}
-                    position={activePosition}
-                    option={activeOption}
+                    positions={activePosition ? [activePosition] : undefined}
+                    options={[activeOption]}
                     onComplete={handleComplete}
                   />
                 ) : null}
@@ -107,7 +112,7 @@ export function MarketTradePanel({
             </div>
 
             <MarketBalanceBreakdown
-              balance={primaryBalance}
+              balances={primaryBalance ? [primaryBalance] : []}
               positions={balance?.userPositions ?? []}
               options={market.options}
             />

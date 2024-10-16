@@ -6,6 +6,7 @@ import {
   TransactionEntry,
   User,
   Comment,
+  List,
 } from '@play-money/database'
 import { NotificationTypeType } from '@play-money/database/zod/inputTypeSchemas/NotificationTypeSchema'
 
@@ -36,6 +37,18 @@ export interface MarketResolvedNotificationContent extends NotificationContentBa
   actor: User
   market: Market
   marketOption: MarketOption
+}
+
+export interface CreateMarketCanceledNotification extends CreateNotificationBase {
+  type: 'MARKET_CANCELED'
+  actorId: string
+  marketId: string
+}
+
+export interface MarketCanceledNotificationContent extends NotificationContentBase {
+  type: 'MARKET_CANCELED'
+  actor: User
+  market: Market
 }
 
 export interface MarketTradeNotificationContent extends NotificationContentBase {
@@ -86,10 +99,27 @@ export interface CreateMarketCommentNotification extends CreateNotificationBase 
   commentId: string
 }
 
+export interface ListCommentNotificationContent extends NotificationContentBase {
+  type: 'LIST_COMMENT'
+  actor: User
+  list: List
+  market?: Market
+  comment: Comment
+}
+
+export interface CreateListCommentNotification extends CreateNotificationBase {
+  type: 'LIST_COMMENT'
+  actorId: string
+  listId: string
+  marketId?: string
+  commentId: string
+}
+
 export interface CommentReplyNotificationContent extends NotificationContentBase {
   type: 'COMMENT_REPLY'
   actor: User
-  market: Market
+  market?: Market
+  list?: List
   comment: Comment
   parentComment: Comment
 }
@@ -97,7 +127,8 @@ export interface CommentReplyNotificationContent extends NotificationContentBase
 export interface CreateCommentReplyNotification extends CreateNotificationBase {
   type: 'COMMENT_REPLY'
   actorId: string
-  marketId: string
+  marketId?: string
+  listId?: string
   commentId: string
   parentCommentId: string
 }
@@ -105,7 +136,8 @@ export interface CreateCommentReplyNotification extends CreateNotificationBase {
 export interface CommentReactionNotificationContent extends NotificationContentBase {
   type: 'COMMENT_REACTION'
   actor: User
-  market: Market
+  market?: Market
+  list?: List
   comment: Comment
   commentReaction: CommentReaction
 }
@@ -113,7 +145,8 @@ export interface CommentReactionNotificationContent extends NotificationContentB
 export interface CreateCommentReactionNotification extends CreateNotificationBase {
   type: 'COMMENT_REACTION'
   actorId: string
-  marketId: string
+  marketId?: string
+  listId?: string
   commentId: string
   commentReactionId: string
 }
@@ -121,7 +154,8 @@ export interface CreateCommentReactionNotification extends CreateNotificationBas
 export interface CommentMentionNotificationContent extends NotificationContentBase {
   type: 'COMMENT_MENTION'
   actor: User
-  market: Market
+  market?: Market
+  list?: List
   comment: Comment
   parentComment?: Comment
 }
@@ -129,25 +163,48 @@ export interface CommentMentionNotificationContent extends NotificationContentBa
 export interface CreateCommentMentionNotification extends CreateNotificationBase {
   type: 'COMMENT_MENTION'
   actorId: string
-  marketId: string
+  marketId?: string
+  listId?: string
   commentId: string
   parentCommentId?: string
 }
 
+export interface ReferrerBonusNotificationContent extends NotificationContentBase {
+  type: 'REFERRER_BONUS'
+  actor: User
+  market?: Market
+  transaction: Transaction & {
+    entries: Array<TransactionEntry>
+  }
+}
+
+export interface CreateReferrerBonusNotification extends CreateNotificationBase {
+  type: 'REFERRER_BONUS'
+  actorId: string
+  marketId?: string
+  transactionId?: string
+}
+
 export type NotificationContent =
   | MarketResolvedNotificationContent
+  | MarketCanceledNotificationContent
   | MarketTradeNotificationContent
   | MarketLiquidityAddedNotificationContent
   | MarketCommentNotificationContent
+  | ListCommentNotificationContent
   | CommentReplyNotificationContent
   | CommentMentionNotificationContent
   | CommentReactionNotificationContent
+  | ReferrerBonusNotificationContent
 
 export type CreateNotificationData =
   | CreateMarketResolvedNotification
+  | CreateMarketCanceledNotification
   | CreateMarketTradeNotification
   | CreateMarketLiquidityAddedNotification
   | CreateMarketCommentNotification
+  | CreateListCommentNotification
   | CreateCommentReplyNotification
   | CreateCommentReactionNotification
   | CreateCommentMentionNotification
+  | CreateReferrerBonusNotification

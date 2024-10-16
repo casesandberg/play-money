@@ -7,9 +7,9 @@ import { createNotification } from '@play-money/notifications/lib/createNotifica
 import { createDailyLiquidityBonusTransaction } from '@play-money/quests/lib/createDailyLiquidityBonusTransaction'
 import { hasBoostedLiquidityToday } from '@play-money/quests/lib/helpers'
 import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
+import { isMarketCanceled, isMarketResolved } from '../rules'
 import { createMarketLiquidityTransaction } from './createMarketLiquidityTransaction'
 import { getMarket } from './getMarket'
-import { isMarketResolved } from './helpers'
 
 export async function addLiquidity({
   userId,
@@ -31,8 +31,12 @@ export async function addLiquidity({
     throw new Error('User does not have enough balance')
   }
 
-  if (isMarketResolved(market)) {
+  if (isMarketResolved({ market })) {
     throw new Error('Market already resolved')
+  }
+
+  if (isMarketCanceled({ market })) {
+    throw new Error('Market is canceled')
   }
 
   const transaction = await createMarketLiquidityTransaction({
@@ -49,6 +53,7 @@ export async function addLiquidity({
       type: {
         in: ['LIQUIDITY_DEPOSIT', 'LIQUIDITY_INITIALIZE'],
       },
+      isReverse: null,
       initiatorId: userId,
     },
   })
@@ -79,7 +84,7 @@ export async function addLiquidity({
     )
   )
 
-  if (!(await hasBoostedLiquidityToday({ userId: userId })) && amount.gte(DAILY_LIQUIDITY_BONUS_PRIMARY)) {
+  if (!(await hasBoostedLiquidityToday({ userId: userId }))) {
     await createDailyLiquidityBonusTransaction({ accountId: userAccount.id, marketId: market.id, initiatorId: userId })
   }
 

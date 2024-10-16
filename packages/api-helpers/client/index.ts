@@ -1,9 +1,10 @@
 import _ from 'lodash'
 import { CommentWithReactions } from '@play-money/comments/lib/getComment'
-import { Market, MarketOptionPosition, User } from '@play-money/database'
+import { List, Market, MarketOption, MarketOptionPosition, User } from '@play-money/database'
 import { NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
 import { TransactionWithEntries, LeaderboardUser, ExtendedMarketOptionPosition } from '@play-money/finance/types'
-import { ExtendedMarket } from '@play-money/markets/types'
+import { ExtendedList } from '@play-money/lists/types'
+import { ExtendedMarket, ExtendedMarketPosition } from '@play-money/markets/types'
 
 // TODO: @casesandberg Generate this from OpenAPI schema
 
@@ -90,6 +91,10 @@ export async function getMyBalance() {
   return apiHandler<{ balance: number }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/balance`)
 }
 
+export async function getMyReferrals() {
+  return apiHandler<{ referrals: Array<User> }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/referrals`)
+}
+
 export async function getMarkets({
   tag,
   page,
@@ -120,14 +125,87 @@ export async function getMarkets({
   })
 }
 
+export async function getMarketPositions({
+  ownerId,
+  page,
+  pageSize,
+  status,
+  sortField,
+  sortDirection,
+}: {
+  ownerId?: string
+  page?: string
+  pageSize?: string
+  status?: 'active' | 'closed' | 'all'
+  sortField?: string
+  sortDirection?: string
+} = {}) {
+  const currentParams = new URLSearchParams(
+    JSON.parse(JSON.stringify({ ownerId, page, pageSize, status, sortField, sortDirection }))
+  )
+  const search = currentParams.toString()
+
+  return apiHandler<{
+    marketPositions: Array<ExtendedMarketPosition>
+    page: number
+    pageSize: number
+    totalPages: number
+  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/market-positions${search ? `?${search}` : ''}`, {
+    next: { tags: ['markets'] },
+  })
+}
+
+export async function getLists({
+  tag,
+  page,
+  pageSize,
+  status,
+  sortField,
+  sortDirection,
+}: {
+  tag?: string
+  page?: string
+  pageSize?: string
+  status?: string
+  sortField?: string
+  sortDirection?: string
+} = {}) {
+  const currentParams = new URLSearchParams(
+    JSON.parse(JSON.stringify({ tag, page, pageSize, status, sortField, sortDirection }))
+  )
+  const search = currentParams.toString()
+
+  return apiHandler<{
+    lists: Array<ExtendedList>
+    page: number
+    pageSize: number
+    totalPages: number
+  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/lists${search ? `?${search}` : ''}`, {
+    next: { tags: ['lists'] },
+  })
+}
+
 export async function getExtendedMarket({ marketId }: { marketId: string }) {
   return apiHandler<ExtendedMarket>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}?extended=true`, {
     next: { tags: [`market:${marketId}`] },
   })
 }
 
+export async function getExtendedList({ listId }: { listId: string }) {
+  return apiHandler<ExtendedList>(`${process.env.NEXT_PUBLIC_API_URL}/v1/lists/${listId}?extended=true`, {
+    next: { tags: [`list:${listId}`] },
+  })
+}
+
 export async function createMarket(body: Record<string, unknown>) {
-  return apiHandler<Market>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets`, {
+  return apiHandler<{ market?: Market; list?: List }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets`, {
+    method: 'POST',
+    body,
+  })
+}
+
+export async function createListMarket({ listId }: { listId: string }, body: Record<string, unknown>) {
+  return apiHandler<{ market?: Market; list?: List }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/lists/${listId}/markets`, {
     method: 'POST',
     body,
   })
@@ -237,6 +315,19 @@ export async function getMarketComments({
   )
 }
 
+export async function getListComments({
+  listId,
+}: {
+  listId: string
+}): Promise<{ comments: Array<CommentWithReactions> }> {
+  return apiHandler<{ comments: Array<CommentWithReactions> }>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/lists/${listId}/comments`,
+    {
+      next: { tags: [`list:${listId}:comments`] },
+    }
+  )
+}
+
 export async function createMarketResolve({
   marketId,
   optionId,
@@ -251,6 +342,15 @@ export async function createMarketResolve({
     body: {
       optionId,
       supportingLink,
+    },
+  })
+}
+
+export async function createMarketCancel({ marketId, reason }: { marketId: string; reason: string }) {
+  return apiHandler<unknown>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/cancel`, {
+    method: 'POST',
+    body: {
+      reason,
     },
   })
 }
@@ -279,7 +379,7 @@ export async function createMyResourceViewed({
 }
 
 export async function getSearch({ query }: { query: string }) {
-  return apiHandler<{ users: Array<User>; markets: Array<Market> }>(
+  return apiHandler<{ users: Array<User>; markets: Array<Market>; lists: Array<List> }>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/search?query=${query}`
   )
 }
@@ -322,6 +422,10 @@ export async function getUser({ userId }: { userId: string }): Promise<User> {
   return apiHandler<User>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}`)
 }
 
+export async function getUserReferral({ code }: { code: string }): Promise<User> {
+  return apiHandler<User>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/referral/${code}`)
+}
+
 export async function getUserUsername({ username }: { username: string }): Promise<User> {
   return apiHandler<User>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/username/${username}`, {
     next: {
@@ -362,6 +466,10 @@ export async function getUserMarkets({ userId }: { userId: string }): Promise<{ 
   )
 }
 
+export async function getUserLists({ userId }: { userId: string }): Promise<{ lists: Array<ExtendedList> }> {
+  return apiHandler<{ lists: Array<ExtendedList> }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/lists?ownerId=${userId}`)
+}
+
 export async function createMarketGenerateTags({ question }: { question: string }) {
   return apiHandler<{ tags: Array<string> }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/generate-tags`, {
     method: 'POST',
@@ -371,19 +479,21 @@ export async function createMarketGenerateTags({ question }: { question: string 
   })
 }
 
-export async function getLeaderboard() {
+export async function getLeaderboard({ month, year }: { month?: string; year?: string }) {
   return apiHandler<{
     topTraders: Array<LeaderboardUser>
     topCreators: Array<LeaderboardUser>
     topPromoters: Array<LeaderboardUser>
     topQuesters: Array<LeaderboardUser>
+    topReferrers: Array<LeaderboardUser>
     userRankings?: {
       trader: LeaderboardUser
       creator: LeaderboardUser
       promoter: LeaderboardUser
       quester: LeaderboardUser
+      referrer: LeaderboardUser
     }
-  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/leaderboard`, {
+  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/leaderboard${month && year ? `?year=${year}&month=${month}` : ''}`, {
     next: {
       revalidate: 600, // Ten mins
     },

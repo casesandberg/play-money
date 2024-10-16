@@ -102,23 +102,27 @@ export async function getUserTotalTimeSeries({
     bucket.transactionEntries.forEach((entry) => {
       if (entry.fromAccountId === accountId) {
         bucket.balance = bucket.balance.sub(entry.amount)
-
-        if (entry.transaction.type === 'LIQUIDITY_DEPOSIT' || entry.transaction.type === 'LIQUIDITY_INITIALIZE') {
-          bucket.liquidity = bucket.liquidity.add(entry.amount)
-        }
-
-        if (entry.transaction.type === 'TRADE_BUY') {
-          bucket.markets = bucket.markets.add(entry.amount)
-        }
       } else if (entry.toAccountId === accountId) {
         bucket.balance = bucket.balance.add(entry.amount)
+      }
 
-        if (entry.transaction.type === 'LIQUIDITY_WITHDRAWAL' || entry.transaction.type === 'LIQUIDITY_RETURNED') {
-          bucket.liquidity = Decimal.max(bucket.liquidity.sub(entry.amount), 0) // Stop negative numbers
-        }
-
-        if (entry.transaction.type === 'TRADE_SELL' || entry.transaction.type === 'TRADE_WIN') {
+      if (['TRADE_SELL', 'TRADE_WIN', 'TRADE_LOSS', 'TRADE_BUY'].includes(entry.transaction.type)) {
+        if (entry.fromAccountId === accountId) {
+          bucket.markets = bucket.markets.add(entry.amount)
+        } else if (entry.toAccountId === accountId) {
           bucket.markets = Decimal.max(bucket.markets.sub(entry.amount), 0) // Stop negative numbers
+        }
+      }
+
+      if (
+        ['LIQUIDITY_WITHDRAWAL', 'LIQUIDITY_RETURNED', 'LIQUIDITY_DEPOSIT', 'LIQUIDITY_INITIALIZE'].includes(
+          entry.transaction.type
+        )
+      ) {
+        if (entry.fromAccountId === accountId) {
+          bucket.liquidity = bucket.liquidity.add(entry.amount)
+        } else if (entry.toAccountId === accountId) {
+          bucket.liquidity = Decimal.max(bucket.liquidity.sub(entry.amount), 0) // Stop negative numbers
         }
       }
     })

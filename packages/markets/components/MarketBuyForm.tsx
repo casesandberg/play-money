@@ -7,13 +7,16 @@ import { useForm } from 'react-hook-form'
 import z from 'zod'
 import { createMarketBuy, getMarketQuote } from '@play-money/api-helpers/client'
 import { MarketOption } from '@play-money/database'
+import { DAILY_TRADE_BONUS_PRIMARY } from '@play-money/finance/economy'
 import { Button } from '@play-money/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@play-money/ui/form'
 import { Input } from '@play-money/ui/input'
+import { RadioGroup, RadioGroupItem } from '@play-money/ui/radio-group'
 import { toast } from '@play-money/ui/use-toast'
 import { cn } from '@play-money/ui/utils'
 
 const FormSchema = z.object({
+  optionId: z.string(),
   amount: z.coerce.number().min(1, { message: 'Amount must be greater than zero' }),
 })
 
@@ -21,28 +24,29 @@ type FormData = z.infer<typeof FormSchema>
 
 export function MarketBuyForm({
   marketId,
-  option,
-  hasOutcome,
+  options,
   onComplete,
 }: {
   marketId: string
-  option: MarketOption
-  hasOutcome?: boolean
+  options: Array<MarketOption>
   onComplete?: () => void
 }) {
   const [quote, setQuote] = useState<{ newProbability: number; potentialReturn: number } | null>(null)
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      amount: 100,
+      amount: DAILY_TRADE_BONUS_PRIMARY,
+      optionId: options[0].id,
     },
   })
 
+  const selectedOption = options.find((o) => o.id === form.getValues('optionId'))
+
   const onSubmit = async (data: FormData) => {
     try {
-      await createMarketBuy({ marketId, optionId: option.id, amount: data.amount })
+      await createMarketBuy({ marketId, optionId: data.optionId, amount: data.amount })
       toast({ title: 'Bet placed successfully' })
-      form.reset({ amount: 0 })
+      form.reset({ amount: DAILY_TRADE_BONUS_PRIMARY })
       setQuote(null)
       onComplete?.()
     } catch (error: any) {
@@ -65,34 +69,48 @@ export function MarketBuyForm({
   }
 
   useEffect(() => {
+    form.setValue('optionId', options[0].id)
+  }, [options])
+
+  useEffect(() => {
     const amount = form?.getValues('amount')
-    if (amount && option.id) {
-      fetchQuote(amount, option.id)
+    const optionId = form?.getValues('optionId')
+
+    if (amount && optionId) {
+      fetchQuote(amount, optionId)
     }
 
-    const subscription = form.watch(({ amount }) => {
-      if (amount) {
-        fetchQuote(amount, option.id)
+    const subscription = form.watch(({ amount, optionId }) => {
+      if (amount && optionId) {
+        fetchQuote(amount, optionId)
       }
     })
     return () => subscription.unsubscribe()
-  }, [form, option.id])
+  }, [form, options])
+
+  const orderedOptions = _.orderBy(options, 'createdAt')
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {hasOutcome ? (
+        {orderedOptions.length > 1 ? (
           <FormField
             control={form.control}
-            name="amount"
+            name="optionId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Outcome</FormLabel>
+                <FormLabel>Option</FormLabel>
                 <FormControl>
-                  <Button className="flex-1">Yes</Button>
-                  <Button className="flex-1" variant="secondary">
-                    No
-                  </Button>
+                  <RadioGroup onValueChange={field.onChange} value={field.value} className="flex flex-col space-y-1">
+                    {orderedOptions.map((option) => (
+                      <FormItem key={option.id} className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value={option.id} />
+                        </FormControl>
+                        <FormLabel className="font-normal">{option.name}</FormLabel>
+                      </FormItem>
+                    ))}
+                  </RadioGroup>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -113,27 +131,27 @@ export function MarketBuyForm({
                     type="button"
                     variant="secondary"
                     className="h-6 px-2 font-mono"
-                    onClick={() => field.onChange((field.value || 0) + 100)}
+                    onClick={() => field.onChange((field.value || 0) + DAILY_TRADE_BONUS_PRIMARY)}
                   >
-                    +100
+                    +{DAILY_TRADE_BONUS_PRIMARY}
                   </Button>
                   <Button
                     size="sm"
                     type="button"
                     variant="secondary"
                     className="h-6 px-2 font-mono"
-                    onClick={() => field.onChange((field.value || 0) + 500)}
+                    onClick={() => field.onChange((field.value || 0) + 250)}
                   >
-                    +500
+                    +250
                   </Button>
                   <Button
                     size="sm"
                     type="button"
                     variant="secondary"
                     className="h-6 px-2 font-mono"
-                    onClick={() => field.onChange((field.value || 0) + 5000)}
+                    onClick={() => field.onChange((field.value || 0) + 1000)}
                   >
-                    +5k
+                    +1k
                   </Button>
                 </div>
               </FormLabel>
@@ -141,7 +159,7 @@ export function MarketBuyForm({
                 <div className="space-y-2">
                   <Input
                     type="number"
-                    placeholder="100"
+                    placeholder={String(DAILY_TRADE_BONUS_PRIMARY)}
                     {...field}
                     onChange={(e) => field.onChange(e.currentTarget.valueAsNumber)}
                     className="h-9 font-mono"
@@ -154,7 +172,7 @@ export function MarketBuyForm({
         />
 
         <Button type="submit" className="w-full truncate" loading={form.formState.isSubmitting}>
-          Buy {_.truncate(option.name, { length: 20 })}
+          Buy {_.truncate(selectedOption?.name, { length: 20 })}
         </Button>
 
         <ul className="grid gap-1 text-sm">
@@ -174,7 +192,7 @@ export function MarketBuyForm({
 // TODO: Create format components and using existing currency component
 export const formatCurrency = (value: number) => `¤${Math.round(value)}`
 
-export const formatPercentage = (value: number) => `${Math.round(value * 100)}%`
+export const formatPercentage = (value: number) => `${value}%`
 
 export const calculateReturnPercentage = (potentialReturn = 0, amount = 0) => {
   return ((potentialReturn - amount) / amount) * 100

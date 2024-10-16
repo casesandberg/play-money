@@ -6,10 +6,10 @@ const sidebarNavItems = [
     title: 'Profile',
     href: '/settings',
   },
-  // {
-  //   title: 'Notifications',
-  //   href: '/settings/notifications',
-  // },
+  {
+    title: 'Referrals',
+    href: '/settings/referrals',
+  },
 ]
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {

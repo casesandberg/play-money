@@ -56,7 +56,7 @@ function calculateProbabilityCost({
   )
 }
 
-function findShareIndex(shares: Array<Decimal>, targetShare: Decimal): number {
+export function findShareIndex(shares: Array<Decimal>, targetShare: Decimal): number {
   return shares.findIndex((share) => share.eq(targetShare))
 }
 
@@ -73,7 +73,10 @@ export function calculateProbability({ index, shares }: { index: number; shares:
   const sum = sumShares(shares)
 
   // The probability for the given index is one minus the share count at the index times the number of dimensions divided by the sum of all shares
-  return new Decimal(1).sub(new Decimal(indexShares).mul(shares.length - 1).div(sum))
+  const prob = new Decimal(1).sub(new Decimal(indexShares).mul(shares.length - 1).div(sum))
+
+  // TODO: write tests around this going below 0
+  return Decimal.max(prob, 0)
 }
 
 function binarySearch(
@@ -149,7 +152,7 @@ export async function quote({
   probability: Decimal
   targetShare: Decimal
   shares: Array<Decimal>
-}): Promise<{ probability: Decimal; shares: Decimal; cost: Decimal }> {
+}): Promise<{ probability: Decimal; newProbabilities: Array<Decimal>; shares: Decimal; cost: Decimal }> {
   const targetIndex = findShareIndex(shares, targetShare)
   const currentProbability = calculateProbability({ index: targetIndex, shares })
   const isBuy = currentProbability.lt(probability)
@@ -168,6 +171,12 @@ export async function quote({
       index: targetIndex,
       shares: updatedShares,
     }),
+    newProbabilities: updatedShares.map((_prob, i) =>
+      calculateProbability({
+        index: i,
+        shares: updatedShares,
+      })
+    ),
     shares: returnedShares,
     cost,
   }
