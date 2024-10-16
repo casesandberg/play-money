@@ -52,7 +52,7 @@ export function ListMarketRow({
         <div className="flex flex-1 flex-col gap-1">
           <div className="line-clamp-2 font-semibold leading-none">{market.question}</div>
           {market.canceledAt ? (
-            <div className="text-muted-foreground">
+            <div className="text-sm text-muted-foreground">
               <span className="font-semibold">Canceled</span>
             </div>
           ) : market.marketResolution ? (

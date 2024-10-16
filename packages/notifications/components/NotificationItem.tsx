@@ -53,6 +53,11 @@ export function NotificationItem({
       bottomLine = `Resolved ${notification.marketOption.name} by ${notification.actor.displayName}`
       break
     }
+    case 'MARKET_CANCELED': {
+      topLine = notification.market.question
+      bottomLine = `Canceled by ${notification.actor.displayName}`
+      break
+    }
     case 'MARKET_TRADE': {
       // Transactions Rewrite blew away old transactions.
       if (!notification.transaction) {

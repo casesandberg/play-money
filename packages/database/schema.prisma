@@ -348,6 +348,7 @@ model MarketOptionPosition {
 
 enum NotificationType {
   MARKET_RESOLVED
+  MARKET_CANCELED
   MARKET_TRADE
   MARKET_LIQUIDITY_ADDED
   MARKET_COMMENT

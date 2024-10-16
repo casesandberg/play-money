@@ -2,8 +2,10 @@ import { createComment } from '@play-money/comments/lib/createComment'
 import db from '@play-money/database'
 import { calculateBalanceChanges } from '@play-money/finance/lib/helpers'
 import { updateGlobalBalances } from '@play-money/finance/lib/updateGlobalBalances'
+import { createNotification } from '@play-money/notifications/lib/createNotification'
 import { isMarketResolved, isMarketCanceled } from '../rules'
 import { getMarket } from './getMarket'
+import { getUniqueTraderIds } from './getUniqueTraderIds'
 import { updateMarketBalances } from './updateMarketBalances'
 
 export async function cancelMarket({
@@ -112,6 +114,21 @@ export async function cancelMarket({
     where: { id: marketId },
     data: { canceledAt: new Date(), canceledById },
   })
+
+  const recipientIds = await getUniqueTraderIds(marketId, [canceledById])
+
+  await Promise.all(
+    recipientIds.map((recipientId) =>
+      createNotification({
+        type: 'MARKET_CANCELED',
+        actorId: canceledById,
+        marketId: market.id,
+        groupKey: market.id,
+        userId: recipientId,
+        actionUrl: `/questions/${market.id}/${market.slug}`,
+      })
+    )
+  )
 
   await createComment({
     content: `<p><strong>CANCELATION REASON:</strong><br />${reason}</p>`,
