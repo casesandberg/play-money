@@ -6,6 +6,7 @@ interface TransactionFilterOptions {
   marketId?: string
   userId?: string
   transactionType?: Array<TransactionTypeType>
+  isReverse?: boolean | null
 }
 
 interface SortOptions {
@@ -28,6 +29,7 @@ export async function getTransactions(
       marketId: filters.marketId,
       initiatorId: filters.userId,
       type: filters.transactionType ? { in: filters.transactionType } : undefined,
+      isReverse: filters.isReverse,
     },
     include: {
       entries: true,

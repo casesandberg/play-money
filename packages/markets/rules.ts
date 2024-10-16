@@ -5,6 +5,9 @@ export function canModifyMarket({ market, user }: { market: Market; user: User }
   if (isMarketResolved({ market })) {
     return false
   }
+  if (isMarketCanceled({ market })) {
+    return false
+  }
   return market.createdBy === user.id || isAdmin({ user })
 }
 
@@ -18,4 +21,8 @@ export function isMarketTradable({ market }: { market: Market }): boolean {
 
 export function isMarketResolved({ market }: { market: Market }): boolean {
   return Boolean(market.resolvedAt)
+}
+
+export function isMarketCanceled({ market }: { market: Market }): boolean {
+  return Boolean(market.canceledAt)
 }

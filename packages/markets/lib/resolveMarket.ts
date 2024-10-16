@@ -2,7 +2,7 @@ import db from '@play-money/database'
 import { getUniqueTraderIds } from '@play-money/markets/lib/getUniqueTraderIds'
 import { createNotification } from '@play-money/notifications/lib/createNotification'
 import { getUserById } from '@play-money/users/lib/getUserById'
-import { canModifyMarket, isMarketResolved } from '../rules'
+import { canModifyMarket, isMarketCanceled, isMarketResolved } from '../rules'
 import { createMarketExcessLiquidityTransactions } from './createMarketExcessLiquidityTransactions'
 import { createMarketResolveLossTransactions } from './createMarketResolveLossTransactions'
 import { createMarketResolveWinTransactions } from './createMarketResolveWinTransactions'
@@ -24,6 +24,10 @@ export async function resolveMarket({
 
   if (isMarketResolved({ market })) {
     throw new Error('Market already resolved')
+  }
+
+  if (isMarketCanceled({ market })) {
+    throw new Error('Market is canceled')
   }
 
   await db.$transaction(

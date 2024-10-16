@@ -52,10 +52,15 @@ export const columns: Array<ColumnDef<ExtendedMarket>> = [
     cell: ({ row }) => {
       const options = row.original.options
       const marketResolution = row.original.marketResolution
+      const canceledAt = row.original.canceledAt
 
       return (
         <Link href={`/questions/${row.original.id}/${row.original.slug}`}>
-          {marketResolution ? (
+          {canceledAt ? (
+            <div className="text-muted-foreground">
+              <span className="font-semibold">Canceled</span>
+            </div>
+          ) : marketResolution ? (
             <div className="text-muted-foreground">
               <span className="font-semibold">Resolved</span> {marketResolution.resolution.name}
             </div>
@@ -146,6 +151,7 @@ function MarketTableStatusSelect({ defaultValue = 'active' }: { defaultValue?: s
           <SelectItem value="active">Active</SelectItem>
           <SelectItem value="closed">Closed</SelectItem>
           <SelectItem value="resolved">Resolved</SelectItem>
+          <SelectItem value="canceled">Canceled</SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>

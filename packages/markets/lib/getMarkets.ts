@@ -2,7 +2,7 @@ import db, { Market } from '@play-money/database'
 import { ExtendedMarket } from '../types'
 
 interface MarketFilterOptions {
-  status?: 'active' | 'halted' | 'closed' | 'resolved' | 'cancelled' | 'all'
+  status?: 'active' | 'halted' | 'closed' | 'resolved' | 'canceled' | 'all'
   createdBy?: string
   tag?: string
   tags?: string[]
@@ -30,6 +30,7 @@ export async function getMarkets(
             gt: new Date(),
           },
           resolvedAt: null,
+          canceledAt: null,
         }
       : filters.status === 'closed'
         ? {
@@ -44,9 +45,15 @@ export async function getMarkets(
                 not: null,
               },
             }
-          : filters.status === 'all'
-            ? {}
-            : {}
+          : filters.status === 'canceled'
+            ? {
+                canceledAt: {
+                  not: null,
+                },
+              }
+            : filters.status === 'all'
+              ? {}
+              : {}
 
   const [markets, total] = await Promise.all([
     db.market.findMany({

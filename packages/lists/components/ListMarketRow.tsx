@@ -51,7 +51,11 @@ export function ListMarketRow({
         <Checkbox variant="outline" checked={active} />
         <div className="flex flex-1 flex-col gap-1">
           <div className="line-clamp-2 font-semibold leading-none">{market.question}</div>
-          {market.marketResolution ? (
+          {market.canceledAt ? (
+            <div className="text-sm text-muted-foreground">
+              <span className="font-semibold">Canceled</span>
+            </div>
+          ) : market.marketResolution ? (
             <div className="text-sm text-muted-foreground">
               <span className="font-semibold">Resolved</span> {market.marketResolution.resolution.name}
             </div>

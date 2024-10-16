@@ -122,6 +122,7 @@ async function main() {
             type: {
               in: ['LIQUIDITY_DEPOSIT', 'LIQUIDITY_INITIALIZE'],
             },
+            isReverse: false,
           },
           _count: true,
         })

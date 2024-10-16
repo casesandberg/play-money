@@ -6,7 +6,7 @@ export default createSchema({
   get: {
     parameters: z
       .object({
-        status: z.enum(['active', 'halted', 'closed', 'resolved', 'cancelled', 'all']).optional(),
+        status: z.enum(['active', 'halted', 'closed', 'resolved', 'canceled', 'all']).optional(),
         createdBy: z.string().optional(),
         pageSize: z.coerce.number().optional(),
         page: z.coerce.number().optional(),

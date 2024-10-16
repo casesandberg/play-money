@@ -66,6 +66,7 @@ export async function getMarketTransactionsTimeSeries({
       type: {
         notIn: excludeTransactionTypes,
       },
+      isReverse: null,
     },
     include: {
       entries: true,

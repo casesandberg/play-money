@@ -98,7 +98,12 @@ export function MarketOverviewPage({
         ) : null}
         <CardTitle className="leading-relaxed">{market.question}</CardTitle>
         <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground md:flex-nowrap">
-          {!market.marketResolution ? (
+          {market.canceledAt ? (
+            <div className="text-muted-foreground">
+              <span className="font-semibold">Canceled</span>
+            </div>
+          ) : null}
+          {!market.marketResolution && !market.canceledAt ? (
             <div style={{ color: mostLikelyOption.color }} className="flex-shrink-0 font-medium">
               {Math.round(mostLikelyOption.probability || 0)}% {_.truncate(mostLikelyOption.name, { length: 30 })}
             </div>
@@ -219,7 +224,7 @@ export function MarketOverviewPage({
         ) : null}
       </CardContent>
 
-      {!market.resolvedAt ? (
+      {!market.resolvedAt && !market.canceledAt ? (
         <CardContent>
           <LiquidityBoostAlert onClick={() => setIsBoosting('true')} />
         </CardContent>

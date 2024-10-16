@@ -16,6 +16,7 @@ export async function getMarketLiquidity(
         type: {
           in: ['LIQUIDITY_INITIALIZE', 'LIQUIDITY_DEPOSIT', 'LIQUIDITY_WITHDRAWAL'],
         },
+        isReverse: null,
       },
       select: {
         type: true,

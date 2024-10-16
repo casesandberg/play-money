@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { isMarketResolved, isMarketTradable } from '../rules'
+import { isMarketCanceled, isMarketResolved, isMarketTradable } from '../rules'
 import { ExtendedMarket } from '../types'
 import { MarketTradePanel } from './MarketTradePanel'
 import { RelatedMarkets } from './RelatedMarkets'
@@ -19,6 +19,7 @@ export function MarketPageSidebar({
         market={market}
         isTradable={isMarketTradable({ market })}
         isResolved={isMarketResolved({ market })}
+        isCanceled={isMarketCanceled({ market })}
         onTradeComplete={onTradeComplete}
       />
 

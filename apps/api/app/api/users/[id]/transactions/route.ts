@@ -19,6 +19,7 @@ export async function GET(
     const transactions = await getTransactions({
       userId: id,
       transactionType: ['TRADE_BUY', 'TRADE_SELL'],
+      isReverse: null,
     })
 
     return NextResponse.json({

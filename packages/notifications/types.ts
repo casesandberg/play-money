@@ -39,6 +39,18 @@ export interface MarketResolvedNotificationContent extends NotificationContentBa
   marketOption: MarketOption
 }
 
+export interface CreateMarketCanceledNotification extends CreateNotificationBase {
+  type: 'MARKET_CANCELED'
+  actorId: string
+  marketId: string
+}
+
+export interface MarketCanceledNotificationContent extends NotificationContentBase {
+  type: 'MARKET_CANCELED'
+  actor: User
+  market: Market
+}
+
 export interface MarketTradeNotificationContent extends NotificationContentBase {
   type: 'MARKET_TRADE'
   actor: User
@@ -175,6 +187,7 @@ export interface CreateReferrerBonusNotification extends CreateNotificationBase 
 
 export type NotificationContent =
   | MarketResolvedNotificationContent
+  | MarketCanceledNotificationContent
   | MarketTradeNotificationContent
   | MarketLiquidityAddedNotificationContent
   | MarketCommentNotificationContent
@@ -186,6 +199,7 @@ export type NotificationContent =
 
 export type CreateNotificationData =
   | CreateMarketResolvedNotification
+  | CreateMarketCanceledNotification
   | CreateMarketTradeNotification
   | CreateMarketLiquidityAddedNotification
   | CreateMarketCommentNotification
