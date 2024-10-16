@@ -70,6 +70,7 @@ export function mockMarket(overrides?: Partial<Market>): Market {
     ammAccountId: faker.string.uuid(),
     clearingAccountId: faker.string.uuid(),
     resolvedAt: faker.helpers.maybe(faker.date.past, { probability: 0.2 }) ?? null,
+    canceledAt: null,
     createdBy: faker.string.uuid(),
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
@@ -164,6 +165,7 @@ export function mockTransactionWithEntries(overrides?: Partial<TransactionWithEn
     batchId: null,
     market,
     initiator: user,
+    isReverse: false,
     ...overrides,
   }
 }

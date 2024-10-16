@@ -44,7 +44,11 @@ export default async function AppPage() {
 
                   <div className="flex flex-[2]">
                     <Link className="flex-1 p-2" href={`/questions/${market.id}/${market.slug}`}>
-                      {market.marketResolution ? (
+                      {market.canceledAt ? (
+                        <div className="text-muted-foreground">
+                          <span className="font-semibold">Canceled</span>
+                        </div>
+                      ) : market.marketResolution ? (
                         <div className="text-muted-foreground">
                           <span className="font-semibold">Resolved</span> {market.marketResolution.resolution.name}
                         </div>
@@ -134,7 +138,11 @@ export default async function AppPage() {
 
                   <div className="flex flex-[2]">
                     <Link className="flex-1 p-2" href={`/questions/${market.id}/${market.slug}`}>
-                      {market.marketResolution ? (
+                      {market.canceledAt ? (
+                        <div className="text-muted-foreground">
+                          <span className="font-semibold">Canceled</span>
+                        </div>
+                      ) : market.marketResolution ? (
                         <div className="text-muted-foreground">
                           <span className="font-semibold">Resolved</span> {market.marketResolution.resolution.name}
                         </div>

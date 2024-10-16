@@ -73,6 +73,7 @@ export async function getUserTotalTimeSeries({
         type: {
           notIn: excludeTransactionTypes,
         },
+        isReverse: null,
       },
     },
     include: {

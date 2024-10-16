@@ -8,6 +8,7 @@ export async function getUniqueLiquidityProviderIds(
     where: {
       type: 'LIQUIDITY_DEPOSIT',
       marketId,
+      isReverse: null,
     },
     select: {
       initiatorId: true,

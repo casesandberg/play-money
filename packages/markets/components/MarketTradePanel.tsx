@@ -25,11 +25,13 @@ export function MarketTradePanel({
   market,
   isTradable = true,
   isResolved = false,
+  isCanceled = false,
   onTradeComplete,
 }: {
   market: ExtendedMarket
   isTradable?: boolean
   isResolved: boolean
+  isCanceled: boolean
   onTradeComplete?: () => void
 }) {
   const { selected, setSelected } = useSelectedItems()
@@ -53,7 +55,12 @@ export function MarketTradePanel({
 
   return (
     <div className="space-y-4">
-      {isTradable ? (
+      {isCanceled ? (
+        <Card className="flex flex-col items-center justify-center gap-4 p-4 sm:h-64">
+          <CircleOffIcon className="size-8 stroke-[1.5px] text-muted-foreground" />
+          <div className="text-balance text-center text-sm uppercase text-muted-foreground">Question canceled</div>
+        </Card>
+      ) : isTradable ? (
         <Card className={cn(effect && 'animate-slide-in-right')} onAnimationEnd={resetEffect}>
           <Tabs defaultValue="buy">
             <CardHeader className="flex items-start bg-muted md:p-3">

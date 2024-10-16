@@ -11,6 +11,8 @@ export const MarketSchema = z.object({
   slug: z.string().min(1, { message: "Slug is required" }),
   closeDate: z.coerce.date().nullable(),
   resolvedAt: z.coerce.date().nullable(),
+  canceledAt: z.coerce.date().nullable(),
+  canceledById: z.string().nullable(),
   createdBy: z.string(),
   tags: z.string().trim().array().max(5),
   ammAccountId: z.string(),

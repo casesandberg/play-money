@@ -9,7 +9,7 @@ import { MarketBuyForm } from '@play-money/markets/components/MarketBuyForm'
 import { MarketLeaderboardPanel } from '@play-money/markets/components/MarketLeaderboardPanel'
 import { MarketSellForm } from '@play-money/markets/components/MarketSellForm'
 import { useSidebar } from '@play-money/markets/components/SidebarContext'
-import { isMarketResolved, isMarketTradable } from '@play-money/markets/rules'
+import { isMarketCanceled, isMarketResolved, isMarketTradable } from '@play-money/markets/rules'
 import { useSelectedItems } from '@play-money/ui'
 import { Card, CardContent, CardHeader } from '@play-money/ui/card'
 import { Combobox } from '@play-money/ui/combobox'
@@ -25,6 +25,7 @@ export function ListTradePanel({ list, onTradeComplete }: { list: ExtendedList; 
 
   const isTradable = selectedMarket ? isMarketTradable(selectedMarket) : false
   const isResolved = selectedMarket ? isMarketResolved(selectedMarket) : false
+  const isCanceled = selectedMarket ? isMarketCanceled(selectedMarket) : false
 
   const handleComplete = async () => {
     void mutate(MY_BALANCE_PATH)
@@ -42,7 +43,12 @@ export function ListTradePanel({ list, onTradeComplete }: { list: ExtendedList; 
 
   return (
     <div className="space-y-4">
-      {isTradable ? (
+      {isCanceled ? (
+        <Card className="flex flex-col items-center justify-center gap-4 p-4 sm:h-64">
+          <CircleOffIcon className="size-8 stroke-[1.5px] text-muted-foreground" />
+          <div className="text-balance text-center text-sm uppercase text-muted-foreground">Question canceled</div>
+        </Card>
+      ) : isTradable ? (
         <Card className={cn(effect && 'animate-slide-in-right')} onAnimationEnd={resetEffect}>
           <Tabs defaultValue="buy">
             <CardHeader className="flex items-start bg-muted md:p-3">

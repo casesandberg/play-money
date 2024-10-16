@@ -29,6 +29,7 @@ async function getTradingVolumeByUser(userId: string) {
       transaction: {
         type: 'TRADE_BUY',
         initiatorId: userId,
+        isReverse: null,
       },
     },
   })
@@ -43,6 +44,7 @@ async function getTradingVolumeByUser(userId: string) {
       transaction: {
         type: 'TRADE_SELL',
         initiatorId: userId,
+        isReverse: null,
       },
     },
   })
@@ -101,6 +103,7 @@ async function getLastTradeByUser(userId: string) {
       type: {
         in: ['TRADE_BUY', 'TRADE_SELL'],
       },
+      isReverse: null,
     },
     orderBy: {
       createdAt: 'desc',

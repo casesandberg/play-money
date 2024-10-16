@@ -346,6 +346,15 @@ export async function createMarketResolve({
   })
 }
 
+export async function createMarketCancel({ marketId, reason }: { marketId: string; reason: string }) {
+  return apiHandler<unknown>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/cancel`, {
+    method: 'POST',
+    body: {
+      reason,
+    },
+  })
+}
+
 export async function createMyNotifications() {
   return apiHandler<unknown>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/notifications`, {
     method: 'POST',
