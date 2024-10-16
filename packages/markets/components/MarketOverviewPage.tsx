@@ -217,11 +217,11 @@ export function MarketOverviewPage({
         ) : null}
       </CardContent>
 
-      <CardContent>
-        <ReadMoreEditor value={market.description} maxLines={6} />
+      <CardContent className="space-y-2">
+        {market.description ? <ReadMoreEditor value={market.description} maxLines={6} /> : null}
 
         {market.tags.length ? (
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2">
             {market.tags.map((tag) => (
               <Link href={`/questions/tagged/${tag}`} key={tag}>
                 <Badge variant="secondary">{tag}</Badge>
