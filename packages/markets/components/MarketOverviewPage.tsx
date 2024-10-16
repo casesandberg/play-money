@@ -12,6 +12,7 @@ import {
   MY_BALANCE_PATH,
   useMarketBalance,
 } from '@play-money/api-helpers/client/hooks'
+import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { marketOptionBalancesToProbabilities } from '@play-money/finance/lib/helpers'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Alert, AlertDescription, AlertTitle } from '@play-money/ui/alert'
@@ -108,6 +109,12 @@ export function MarketOverviewPage({
               {Math.round(mostLikelyOption.probability || 0)}% {_.truncate(mostLikelyOption.name, { length: 30 })}
             </div>
           ) : null}
+          {market.liquidityCount ? (
+            <div className="flex-shrink-0">
+              <CurrencyDisplay value={market.liquidityCount} isShort /> Vol.
+            </div>
+          ) : null}
+
           {market.closeDate ? (
             <div className="flex-shrink-0">
               {isPast(market.closeDate) ? 'Ended' : 'Ending'} {format(market.closeDate, 'MMM d, yyyy')}
@@ -210,11 +217,11 @@ export function MarketOverviewPage({
         ) : null}
       </CardContent>
 
-      <CardContent>
-        <ReadMoreEditor value={market.description} maxLines={6} />
+      <CardContent className="space-y-2">
+        {market.description ? <ReadMoreEditor value={market.description} maxLines={6} /> : null}
 
         {market.tags.length ? (
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2">
             {market.tags.map((tag) => (
               <Link href={`/questions/tagged/${tag}`} key={tag}>
                 <Badge variant="secondary">{tag}</Badge>
