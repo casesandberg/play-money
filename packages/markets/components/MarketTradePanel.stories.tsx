@@ -53,19 +53,3 @@ export const NoOptionSelected: Story = {
     ),
   ],
 }
-
-export const Canceled: Story = {
-  args: {
-    market: mockExtendedMarket(),
-    isResolved: false,
-    isCanceled: true,
-  },
-}
-
-export const Resolved: Story = {
-  args: {
-    market: mockExtendedMarket(),
-    isResolved: true,
-    isCanceled: false,
-  },
-}
