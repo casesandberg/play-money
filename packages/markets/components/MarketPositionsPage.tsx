@@ -37,7 +37,11 @@ export function MarketPositionsPage({
               {Math.round(mostLikelyOption.probability || 0)}% {_.truncate(mostLikelyOption.name, { length: 30 })}
             </div>
           ) : null}
-
+          {market.liquidityCount ? (
+            <div className="flex-shrink-0">
+              <CurrencyDisplay value={market.liquidityCount} isShort /> Vol.
+            </div>
+          ) : null}
           {market.closeDate ? (
             <div className="flex-shrink-0">
               {isPast(market.closeDate) ? 'Ended' : 'Ending'} {format(market.closeDate, 'MMM d, yyyy')}
