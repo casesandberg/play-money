@@ -4,7 +4,10 @@ import { MarketOptionPositionSchema, UserSchema } from '@play-money/database'
 
 export default createSchema({
   GET: {
-    parameters: UserSchema.pick({ id: true }).extend({ pageSize: z.coerce.number().optional() }),
+    parameters: UserSchema.pick({ id: true }).extend({
+      pageSize: z.coerce.number().optional(),
+      status: z.enum(['active', 'closed', 'all']).optional(),
+    }),
     responses: {
       200: z.object({
         positions: z.array(MarketOptionPositionSchema),

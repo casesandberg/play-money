@@ -15,13 +15,14 @@ export async function GET(
     const searchParams = new URLSearchParams(url.search)
     const urlParams = Object.fromEntries(searchParams)
 
-    const { id, pageSize } = schema.GET.parameters.parse({ ...(params || {}), ...urlParams })
+    const { id, pageSize, status } = schema.GET.parameters.parse({ ...(params || {}), ...urlParams })
 
     const user = await getUserById({ id })
 
     const { positions } = await getPositions(
       {
         accountId: user.primaryAccountId,
+        status,
       },
       { field: 'updatedAt', direction: 'desc' },
       { take: pageSize ?? 25, skip: 0 }

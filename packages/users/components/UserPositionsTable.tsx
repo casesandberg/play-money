@@ -30,10 +30,17 @@ export const columns: Array<ColumnDef<ExtendedMarketPosition>> = [
     },
     cell: ({ row }) => {
       const option = row.original.option
+      const quantity = new Decimal(row.original.quantity).toDecimalPlaces(4)
 
       return (
         <Link href={`/questions/${row.original.market.id}/${row.original.market.slug}`} className="line-clamp-2">
-          <CurrencyDisplay value={Number(row.original.value)} /> {_.truncate(option.name, { length: 40 })}
+          {quantity.gt(0) ? (
+            <>
+              <CurrencyDisplay value={Number(row.original.value)} /> {_.truncate(option.name, { length: 40 })}
+            </>
+          ) : (
+            <>Closed</>
+          )}
         </Link>
       )
     },
@@ -49,8 +56,11 @@ export const columns: Array<ColumnDef<ExtendedMarketPosition>> = [
       const cost = new Decimal(row.original.cost).toDecimalPlaces(4)
       const change = value.sub(cost).div(cost).times(100).round().toNumber()
       const changeLabel = `(${change > 0 ? '+' : ''}${change}%)`
+      const quantity = new Decimal(row.original.quantity).toDecimalPlaces(4)
 
-      return change ? <span className={change > 0 ? 'text-lime-500' : 'text-red-400'}>{changeLabel}</span> : null
+      return change && quantity.gt(0) ? (
+        <span className={change > 0 ? 'text-lime-500' : 'text-red-400'}>{changeLabel}</span>
+      ) : null
     },
   },
   {
