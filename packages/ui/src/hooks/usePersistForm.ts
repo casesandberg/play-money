@@ -20,6 +20,10 @@ export const getPersistedData = <T>({
   defaultValue: T
   localStorageKey: string
 }): T => {
+  if (typeof window === 'undefined') {
+    return defaultValue
+  }
+
   const data = localStorage.getItem(localStorageKey)
 
   if (data) {
@@ -37,5 +41,9 @@ export const getPersistedData = <T>({
 }
 
 export function clearPresistedData({ localStorageKey }: { localStorageKey: string }) {
+  if (typeof window === 'undefined') {
+    return
+  }
+
   localStorage.removeItem(localStorageKey)
 }

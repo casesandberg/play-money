@@ -38,6 +38,7 @@ export async function getMarkets(
               lt: new Date(),
             },
             resolvedAt: null,
+            canceledAt: null,
           }
         : filters.status === 'resolved'
           ? {

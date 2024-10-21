@@ -3,6 +3,7 @@ import { ExtendedMarketOptionPosition } from '../types'
 
 interface PositionsFilterOptions {
   accountId?: string
+  status?: 'active' | 'closed' | 'all'
 }
 
 interface SortOptions {
@@ -20,11 +21,24 @@ export async function getPositions(
   sort: SortOptions = { field: 'createdAt', direction: 'desc' },
   pagination: PaginationOptions = { skip: 0, take: 10 }
 ): Promise<{ positions: Array<ExtendedMarketOptionPosition>; total: number }> {
+  const statusFilters =
+    filters.status === 'active'
+      ? {
+          quantity: { gt: 0.0001 },
+        }
+      : filters.status === 'closed'
+        ? {
+            quantity: { lte: 0.0001 },
+          }
+        : filters.status === 'all'
+          ? {}
+          : {}
+
   const [positions, total] = await Promise.all([
     db.marketOptionPosition.findMany({
       where: {
         accountId: filters.accountId,
-        value: { gt: 0 },
+        ...statusFilters,
       },
       include: {
         market: true,
@@ -39,7 +53,7 @@ export async function getPositions(
     db.marketOptionPosition.count({
       where: {
         accountId: filters.accountId,
-        value: { gt: 0 },
+        ...statusFilters,
       },
     }),
   ])

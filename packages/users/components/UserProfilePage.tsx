@@ -199,7 +199,11 @@ async function UserPositionsTab({
     sortDirection?: string
   }
 }) {
-  const { marketPositions, totalPages } = await getMarketPositions({ ownerId: userId, ...filters })
+  const { marketPositions, totalPages } = await getMarketPositions({
+    ownerId: userId,
+    ...filters,
+    status: filters?.status ?? 'active',
+  })
 
   return (
     <div className="mt-3 md:mt-6">
