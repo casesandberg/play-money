@@ -121,9 +121,7 @@ export async function createComment({
   } else if (entityType === 'LIST') {
     const list = await getList({ id: entityId })
 
-    if ([authorId, comment.parent?.authorId, ...userIdsMentioned].includes(list.ownerId)) return
-
-    if (authorId !== list.ownerId) {
+    if (![authorId, comment.parent?.authorId, ...userIdsMentioned].includes(list.ownerId)) {
       createNotification({
         type: 'LIST_COMMENT',
         actorId: authorId,
