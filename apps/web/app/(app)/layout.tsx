@@ -60,7 +60,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </SheetTrigger>
             <SheetContent className="flex flex-col" side="left">
               <div className="flex flex-1 flex-col gap-4">
-                <span className="text-lg font-bold tracking-tight text-muted-foreground">PlayMoney</span>
+                <span className="text-lg font-bold tracking-tight text-muted-foreground">👻 PlayMoney</span>
                 <MainNav
                   className="flex flex-col items-start space-y-4 text-lg"
                   renderItemWrap={(child) => <SheetClose asChild>{child}</SheetClose>}
@@ -70,7 +70,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </SheetContent>
           </Sheet>
           <Link className="flex items-center gap-2" href="/">
-            <span className="text-lg font-bold tracking-tight text-muted-foreground">PlayMoney</span>
+            <span className="text-lg font-bold tracking-tight text-muted-foreground">👻 PlayMoney</span>
           </Link>
           <MainNav className="hidden gap-6 md:flex" />
 

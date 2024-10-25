@@ -23,7 +23,7 @@ function CustomizedYAxisTick({ x, y, payload }: { x: number; y: number; payload:
   return payload.value !== 0 ? (
     <g transform={`translate(${x},${y})`}>
       <text x={0} y={0} dy={4} dx={2} textAnchor="start" className="fill-muted-foreground/50">
-        ¤{formatNumber(payload.value)}
+        🎃{formatNumber(payload.value)}
       </text>
     </g>
   ) : (

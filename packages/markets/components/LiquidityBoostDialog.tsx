@@ -68,7 +68,7 @@ export const LiquidityBoostDialog = ({
   const onSubmit = async (data: FormData) => {
     try {
       await createLiquidity({ marketId: market.id, amount: data.amount })
-      toast({ title: `¤${data.amount} liquidity added!` })
+      toast({ title: `🎃${data.amount} liquidity added!` })
       form.reset({ amount: 250 })
       onSuccess?.()
       onClose()
