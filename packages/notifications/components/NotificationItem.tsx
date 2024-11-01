@@ -74,7 +74,7 @@ export function NotificationItem({
       })
 
       topLine = notification.market.question
-      bottomLine = `${notification.actor.displayName} bet: 🎃${formatNumber(Math.abs(primaryChange?.change ?? 0))} ${notification.marketOption.name}${othersCount}`
+      bottomLine = `${notification.actor.displayName} bet: ¤${formatNumber(Math.abs(primaryChange?.change ?? 0))} ${notification.marketOption.name}${othersCount}`
       break
     }
     case 'MARKET_LIQUIDITY_ADDED': {
@@ -93,7 +93,7 @@ export function NotificationItem({
       })
 
       topLine = notification.market.question
-      bottomLine = `🎃${formatNumber(Math.abs(primaryChange?.change ?? 0))} liquidity added by ${notification.actor.displayName}${othersCount}`
+      bottomLine = `¤${formatNumber(Math.abs(primaryChange?.change ?? 0))} liquidity added by ${notification.actor.displayName}${othersCount}`
       break
     }
     case 'MARKET_COMMENT': {
@@ -138,7 +138,7 @@ export function NotificationItem({
       const amount = Math.abs(balanceChanges[0].change)
 
       topLine = 'You recieved a referral bonus'
-      bottomLine = `🎃${formatNumber(amount)} from ${notification.actor.displayName}${othersCount}`
+      bottomLine = `¤${formatNumber(amount)} from ${notification.actor.displayName}${othersCount}`
       break
     }
     // default: {
