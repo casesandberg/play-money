@@ -121,6 +121,7 @@ export function CreateMarketForm({
         router.push(`/lists/${created.list.id}/${created.list.slug}`)
       }
     } catch (error) {
+      console.error(error)
       toast({
         title: 'There was an error creating your market',
         description: (error as Error).message,

@@ -4,6 +4,8 @@
 import { useEffect, useState, useCallback } from 'react'
 
 function getItemFromLocalStorage<T>(key: string) {
+  'use client'
+
   // FIXME: !!!!!!!!!
   if (typeof window === 'undefined') return null
 

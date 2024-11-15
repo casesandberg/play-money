@@ -68,11 +68,15 @@ export const useReferral = (): ReferralContextType => {
 }
 
 function setReferralCode(code: string) {
+  'use client'
+
   localStorage.setItem('referralCode', code)
   localStorage.setItem('referralTimestamp', Date.now().toString())
 }
 
 function clearReferralCode() {
+  'use client'
+
   localStorage.removeItem('referralCode')
   localStorage.removeItem('referralTimestamp')
 }
