@@ -2,9 +2,9 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PopoverClose } from '@radix-ui/react-popover'
+import { format, endOfDay, endOfWeek, endOfMonth, endOfYear, addMonths } from 'date-fns'
 import _ from 'lodash'
 import { ToggleLeftIcon, XIcon, CircleIcon, CircleDotIcon, PlusIcon, AlignLeftIcon } from 'lucide-react'
-import moment from 'moment'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { CirclePicker } from 'react-color'
@@ -80,7 +80,7 @@ export function CreateMarketForm({
           question: '',
           type: 'binary',
           description: '',
-          closeDate: moment().add(1, 'month').endOf('day').toDate(),
+          closeDate: endOfMonth(addMonths(new Date(), 1)),
           options: [
             { name: 'Yes', color: SHUFFLED_COLORS[0] },
             { name: 'No', color: SHUFFLED_COLORS[1] },
@@ -503,15 +503,60 @@ export function CreateMarketForm({
               <FormItem>
                 <FormLabel>Close Date</FormLabel>
                 <FormControl>
-                  <Input
-                    type="datetime-local"
-                    {...field}
-                    className="w-auto"
-                    onChange={(e) => {
-                      field.onChange(new Date(e.target.value))
-                    }}
-                    value={field.value ? moment(field.value).format('YYYY-MM-DDTHH:mm') : ''}
-                  />
+                  <div>
+                    <Input
+                      type="datetime-local"
+                      {...field}
+                      className="w-auto"
+                      onChange={(e) => {
+                        field.onChange(new Date(e.target.value))
+                      }}
+                      value={field.value ? format(field.value, "yyyy-MM-dd'T'HH:mm") : ''}
+                    />
+
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        variant={
+                          format(field.value!, 'Pp') === format(endOfDay(new Date()), 'Pp') ? 'heavy' : 'secondary'
+                        }
+                        onClick={() => field.onChange(endOfDay(new Date()).toISOString())}
+                        type="button"
+                      >
+                        Today
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={
+                          format(field.value!, 'Pp') === format(endOfWeek(new Date()), 'Pp') ? 'heavy' : 'secondary'
+                        }
+                        onClick={() => field.onChange(endOfWeek(new Date()).toISOString())}
+                        type="button"
+                      >
+                        This Week
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={
+                          format(field.value!, 'Pp') === format(endOfMonth(new Date()), 'Pp') ? 'heavy' : 'secondary'
+                        }
+                        onClick={() => field.onChange(endOfMonth(new Date()).toISOString())}
+                        type="button"
+                      >
+                        End of {format(new Date(), 'MMMM')}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={
+                          format(field.value!, 'Pp') === format(endOfYear(new Date()), 'Pp') ? 'heavy' : 'secondary'
+                        }
+                        onClick={() => field.onChange(endOfYear(new Date()).toISOString())}
+                        type="button"
+                      >
+                        End of {format(new Date(), 'yyyy')}
+                      </Button>
+                    </div>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
