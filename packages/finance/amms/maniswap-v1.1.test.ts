@@ -229,6 +229,21 @@ describe('maniswap-v1.1', () => {
       expect(result.probability).toBeCloseToDecimal(0.34)
       expect(result.shares).toBeCloseToDecimal(48.2)
     })
+
+    it('should not return negative cost in multiple choice', async () => {
+      const result = await quote({
+        amount: new Decimal(100),
+        probability: new Decimal(0.99),
+        targetShare: new Decimal(426.78451201237680227),
+        shares: [
+          new Decimal(31716.63784106040384),
+          new Decimal(34757.830029168841174),
+          new Decimal(426.78451201237680227),
+        ],
+      })
+
+      expect(result.shares).toBeCloseToDecimal(102.56)
+    })
   })
 
   describe('addLiquidity', () => {

@@ -12,6 +12,7 @@
     "@play-money/finance": "*",
     "@play-money/notifications": "*",
     "@play-money/quests": "*",
+    "chrono-node": "^2.7.7",
     "decimal.js": "^10.4.3",
     "next": "^14.1.1",
     "openai": "^4.56.1",

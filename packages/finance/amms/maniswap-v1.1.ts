@@ -158,7 +158,7 @@ export async function quote({
   const isBuy = currentProbability.lt(probability)
 
   let costToHitProbability = calculateProbabilityCost({ probability, targetShare, shares, isBuy })
-  const cost = Decimal.min(costToHitProbability, amount)
+  const cost = Decimal.min(costToHitProbability.abs(), amount)
 
   const returnedShares = trade({ amount: cost, targetShare, shares, isBuy })
 

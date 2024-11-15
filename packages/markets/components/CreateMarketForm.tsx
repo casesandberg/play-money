@@ -2,9 +2,9 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PopoverClose } from '@radix-ui/react-popover'
+import { format, endOfDay, endOfWeek, endOfMonth, endOfYear, addMonths } from 'date-fns'
 import _ from 'lodash'
 import { ToggleLeftIcon, XIcon, CircleIcon, CircleDotIcon, PlusIcon, AlignLeftIcon } from 'lucide-react'
-import moment from 'moment'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { CirclePicker } from 'react-color'
@@ -31,6 +31,7 @@ import { RadioGroup, RadioGroupItem } from '@play-money/ui/radio-group'
 import { toast } from '@play-money/ui/use-toast'
 import { cn } from '@play-money/ui/utils'
 import { clearPresistedData, getPersistedData, usePersistForm } from '../../ui/src/hooks/usePersistForm'
+import { parseQuestionForDate } from '../lib/helpers'
 
 const CREATE_MARKET_FORM_KEY = 'create-market-form'
 
@@ -79,7 +80,7 @@ export function CreateMarketForm({
           question: '',
           type: 'binary',
           description: '',
-          closeDate: moment().add(1, 'month').endOf('day').toDate(),
+          closeDate: endOfMonth(addMonths(new Date(), 1)),
           options: [
             { name: 'Yes', color: SHUFFLED_COLORS[0] },
             { name: 'No', color: SHUFFLED_COLORS[1] },
@@ -121,6 +122,7 @@ export function CreateMarketForm({
         router.push(`/lists/${created.list.id}/${created.list.slug}`)
       }
     } catch (error) {
+      console.error(error)
       toast({
         title: 'There was an error creating your market',
         description: (error as Error).message,
@@ -194,9 +196,17 @@ export function CreateMarketForm({
   )
 
   async function handleQuestionBlur() {
+    const question = form.getValues('question')
     if (!form.getValues('tags')?.length) {
-      const { tags } = await createMarketGenerateTags({ question: form.getValues('question') })
+      const { tags } = await createMarketGenerateTags({ question })
       form.setValue('tags', tags)
+    }
+
+    if (!form.formState.dirtyFields.closeDate) {
+      const closeDate = parseQuestionForDate(question)
+      if (closeDate) {
+        form.setValue('closeDate', closeDate)
+      }
     }
   }
 
@@ -408,7 +418,6 @@ export function CreateMarketForm({
                 variant="ghost"
                 type="button"
                 size="sm"
-                disabled={type === 'multi' ? fields.length >= 9 : type === 'list' ? fields.length >= 20 : false}
                 onClick={() => {
                   append({ name: '', color: SHUFFLED_COLORS[fields.length % SHUFFLED_COLORS.length] })
                 }}
@@ -494,15 +503,60 @@ export function CreateMarketForm({
               <FormItem>
                 <FormLabel>Close Date</FormLabel>
                 <FormControl>
-                  <Input
-                    type="datetime-local"
-                    {...field}
-                    className="w-auto"
-                    onChange={(e) => {
-                      field.onChange(new Date(e.target.value))
-                    }}
-                    value={field.value ? moment(field.value).format('YYYY-MM-DDTHH:mm') : ''}
-                  />
+                  <div>
+                    <Input
+                      type="datetime-local"
+                      {...field}
+                      className="w-auto"
+                      onChange={(e) => {
+                        field.onChange(new Date(e.target.value))
+                      }}
+                      value={field.value ? format(field.value, "yyyy-MM-dd'T'HH:mm") : ''}
+                    />
+
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        variant={
+                          format(field.value!, 'Pp') === format(endOfDay(new Date()), 'Pp') ? 'heavy' : 'secondary'
+                        }
+                        onClick={() => field.onChange(endOfDay(new Date()).toISOString())}
+                        type="button"
+                      >
+                        Today
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={
+                          format(field.value!, 'Pp') === format(endOfWeek(new Date()), 'Pp') ? 'heavy' : 'secondary'
+                        }
+                        onClick={() => field.onChange(endOfWeek(new Date()).toISOString())}
+                        type="button"
+                      >
+                        This Week
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={
+                          format(field.value!, 'Pp') === format(endOfMonth(new Date()), 'Pp') ? 'heavy' : 'secondary'
+                        }
+                        onClick={() => field.onChange(endOfMonth(new Date()).toISOString())}
+                        type="button"
+                      >
+                        End of {format(new Date(), 'MMMM')}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={
+                          format(field.value!, 'Pp') === format(endOfYear(new Date()), 'Pp') ? 'heavy' : 'secondary'
+                        }
+                        onClick={() => field.onChange(endOfYear(new Date()).toISOString())}
+                        type="button"
+                      >
+                        End of {format(new Date(), 'yyyy')}
+                      </Button>
+                    </div>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>

@@ -4,6 +4,8 @@ import _ from 'lodash'
 import { useEffect } from 'react'
 
 export const usePersistForm = ({ value, localStorageKey }: { value: unknown; localStorageKey: string }) => {
+  'use client'
+
   useEffect(() => {
     if (_.isEmpty(value)) {
       localStorage.removeItem(localStorageKey)
@@ -20,6 +22,8 @@ export const getPersistedData = <T>({
   defaultValue: T
   localStorageKey: string
 }): T => {
+  'use client'
+
   if (typeof window === 'undefined') {
     return defaultValue
   }
@@ -41,6 +45,8 @@ export const getPersistedData = <T>({
 }
 
 export function clearPresistedData({ localStorageKey }: { localStorageKey: string }) {
+  'use client'
+
   if (typeof window === 'undefined') {
     return
   }
