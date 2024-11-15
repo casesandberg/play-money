@@ -409,7 +409,6 @@ export function CreateMarketForm({
                 variant="ghost"
                 type="button"
                 size="sm"
-                disabled={type === 'multi' ? fields.length >= 9 : type === 'list' ? fields.length >= 20 : false}
                 onClick={() => {
                   append({ name: '', color: SHUFFLED_COLORS[fields.length % SHUFFLED_COLORS.length] })
                 }}
