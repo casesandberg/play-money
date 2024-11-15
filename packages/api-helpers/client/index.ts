@@ -493,9 +493,5 @@ export async function getLeaderboard({ month, year }: { month?: string; year?: s
       quester: LeaderboardUser
       referrer: LeaderboardUser
     }
-  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/leaderboard${month && year ? `?year=${year}&month=${month}` : ''}`, {
-    next: {
-      revalidate: 600, // Ten mins
-    },
-  })
+  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/leaderboard${month && year ? `?year=${year}&month=${month}` : ''}`)
 }
