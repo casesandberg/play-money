@@ -72,10 +72,9 @@ export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, user
         u."displayName",
         u."username",
         u."avatarUrl",
-        COALESCE(tt.net_amount, 0) + COALESCE(SUM(oh.holding_value), 0) as total
+        COALESCE(tt.net_amount, 0) as total
         FROM "User" u
         LEFT JOIN trader_transactions tt ON u."primaryAccountId" = tt."accountId"
-        LEFT JOIN option_holdings oh ON u."primaryAccountId" = oh."accountId"
         WHERE u."username" NOT IN (${Prisma.join(usernamesToIgnore)})
         GROUP BY u.id, u."displayName", tt.net_amount
     )
