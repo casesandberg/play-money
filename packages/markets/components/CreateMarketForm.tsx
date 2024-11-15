@@ -31,6 +31,7 @@ import { RadioGroup, RadioGroupItem } from '@play-money/ui/radio-group'
 import { toast } from '@play-money/ui/use-toast'
 import { cn } from '@play-money/ui/utils'
 import { clearPresistedData, getPersistedData, usePersistForm } from '../../ui/src/hooks/usePersistForm'
+import { parseQuestionForDate } from '../lib/helpers'
 
 const CREATE_MARKET_FORM_KEY = 'create-market-form'
 
@@ -195,9 +196,17 @@ export function CreateMarketForm({
   )
 
   async function handleQuestionBlur() {
+    const question = form.getValues('question')
     if (!form.getValues('tags')?.length) {
-      const { tags } = await createMarketGenerateTags({ question: form.getValues('question') })
+      const { tags } = await createMarketGenerateTags({ question })
       form.setValue('tags', tags)
+    }
+
+    if (!form.formState.dirtyFields.closeDate) {
+      const closeDate = parseQuestionForDate(question)
+      if (closeDate) {
+        form.setValue('closeDate', closeDate)
+      }
     }
   }
 
