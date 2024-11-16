@@ -4,6 +4,7 @@ import db, { MarketOptionPosition } from '@play-money/database'
 interface MarketPositionFilterOptions {
   status?: 'active' | 'closed' | 'all'
   ownerId?: string
+  marketId?: string
 }
 
 interface SortOptions {
@@ -42,6 +43,7 @@ export async function getMarketPositions(
     db.marketOptionPosition.findMany({
       where: {
         ...statusFilters,
+        marketId: filters.marketId,
         account: {
           userPrimary: {
             id: filters.ownerId,
@@ -66,6 +68,7 @@ export async function getMarketPositions(
     db.marketOptionPosition.count({
       where: {
         ...statusFilters,
+        marketId: filters.marketId,
         account: {
           userPrimary: {
             id: filters.ownerId,

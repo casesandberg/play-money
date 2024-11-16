@@ -142,6 +142,7 @@ export async function getMarkets({
 
 export async function getMarketPositions({
   ownerId,
+  marketId,
   page,
   pageSize,
   status,
@@ -149,6 +150,7 @@ export async function getMarketPositions({
   sortDirection,
 }: {
   ownerId?: string
+  marketId?: string
   page?: string
   pageSize?: string
   status?: 'active' | 'closed' | 'all'
@@ -156,7 +158,7 @@ export async function getMarketPositions({
   sortDirection?: string
 } = {}) {
   const currentParams = new URLSearchParams(
-    JSON.parse(JSON.stringify({ ownerId, page, pageSize, status, sortField, sortDirection }))
+    JSON.parse(JSON.stringify({ ownerId, page, pageSize, status, sortField, sortDirection, marketId }))
   )
   const search = currentParams.toString()
 

@@ -27,7 +27,11 @@ export function MarketPageLayout({
     (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   )
 
-  const initialTab = pathname.includes('/trades') ? 'trades' : 'overview'
+  const initialTab = pathname.includes('/trades')
+    ? 'trades'
+    : pathname.includes('/positions')
+      ? 'positions'
+      : 'overview'
 
   useTrackResourceViewed({ resourceId: market.id, resourceType: 'MARKET' })
 
@@ -36,6 +40,8 @@ export function MarketPageLayout({
       router.push(`/questions/${market.id}/${market.slug}`)
     } else if (value === 'trades') {
       router.push(`/questions/${market.id}/${market.slug}/trades`)
+    } else if (value === 'positions') {
+      router.push(`/questions/${market.id}/${market.slug}/positions`)
     }
   }
 
@@ -47,6 +53,7 @@ export function MarketPageLayout({
             <Tabs defaultValue={initialTab} className="w-[400px]" onValueChange={handleTabChange}>
               <TabsList>
                 <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="positions">Positions</TabsTrigger>
                 <TabsTrigger value="trades">Trades</TabsTrigger>
               </TabsList>
             </Tabs>

@@ -43,6 +43,11 @@ export async function getPositions(
       include: {
         market: true,
         option: true,
+        account: {
+          include: {
+            user: true,
+          },
+        },
       },
       orderBy: {
         [sort.field]: sort.direction,

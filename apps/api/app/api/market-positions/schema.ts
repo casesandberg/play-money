@@ -8,6 +8,7 @@ export default createSchema({
       .object({
         status: z.enum(['active', 'closed', 'all']).optional(),
         ownerId: z.string().optional(),
+        marketId: z.string().optional(),
         pageSize: z.coerce.number().optional(),
         page: z.coerce.number().optional(),
         sortField: z.string().optional(),
