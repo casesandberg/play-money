@@ -31,7 +31,9 @@ export function MarketPageLayout({
     ? 'trades'
     : pathname.includes('/positions')
       ? 'positions'
-      : 'overview'
+      : pathname.includes('/comments')
+        ? 'comments'
+        : 'overview'
 
   useTrackResourceViewed({ resourceId: market.id, resourceType: 'MARKET' })
 
@@ -42,6 +44,8 @@ export function MarketPageLayout({
       router.push(`/questions/${market.id}/${market.slug}/trades`)
     } else if (value === 'positions') {
       router.push(`/questions/${market.id}/${market.slug}/positions`)
+    } else if (value === 'comments') {
+      router.push(`/questions/${market.id}/${market.slug}/comments`)
     }
   }
 
@@ -53,6 +57,7 @@ export function MarketPageLayout({
             <Tabs defaultValue={initialTab} className="w-[400px]" onValueChange={handleTabChange}>
               <TabsList>
                 <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="comments">Comments</TabsTrigger>
                 <TabsTrigger value="positions">Positions</TabsTrigger>
                 <TabsTrigger value="trades">Trades</TabsTrigger>
               </TabsList>
