@@ -36,9 +36,24 @@ async function apiHandler<T>(
   return res.json() as Promise<T>
 }
 
-export async function getMarketTransactions({ marketId }: { marketId: string }) {
-  return apiHandler<{ transactions: Array<TransactionWithEntries> }>(
-    `${process.env.NEXT_PUBLIC_API_URL}/v1/transactions?marketId=${marketId}&transactionType=TRADE_BUY,TRADE_SELL`
+export async function getMarketTransactions({
+  marketId,
+  page,
+  pageSize,
+}: {
+  marketId: string
+  page?: string
+  pageSize?: string
+}) {
+  return apiHandler<{
+    transactions: Array<TransactionWithEntries>
+    page: number
+    pageSize: number
+    totalPages: number
+  }>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/transactions?marketId=${marketId}&transactionType=TRADE_BUY,TRADE_SELL${
+      page ? `&page=${page}` : ''
+    }${pageSize ? `&pageSize=${pageSize}` : ''}`
   )
 }
 
