@@ -57,6 +57,27 @@ export async function getMarketTransactions({
   )
 }
 
+export async function getMarketLiquidityTransactions({
+  marketId,
+  page,
+  pageSize,
+}: {
+  marketId: string
+  page?: string
+  pageSize?: string
+}) {
+  return apiHandler<{
+    transactions: Array<TransactionWithEntries>
+    page: number
+    pageSize: number
+    totalPages: number
+  }>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/transactions?marketId=${marketId}&transactionType=LIQUIDITY_INITIALIZE,LIQUIDITY_DEPOSIT,LIQUIDITY_WITHDRAWAL${
+      page ? `&page=${page}` : ''
+    }${pageSize ? `&pageSize=${pageSize}` : ''}`
+  )
+}
+
 export async function createCommentReaction({ commentId, emoji }: { commentId: string; emoji: string }) {
   return apiHandler<unknown>(`${process.env.NEXT_PUBLIC_API_URL}/v1/comments/${commentId}/reaction`, {
     method: 'POST',

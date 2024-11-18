@@ -2,6 +2,7 @@
 
 import { ColumnDef } from '@tanstack/react-table'
 import _ from 'lodash'
+import React from 'react'
 import { User } from '@play-money/database'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { formatDistanceToNowShort } from '@play-money/ui'
@@ -20,7 +21,6 @@ export const columns: Array<ColumnDef<TransactionWithEntries>> = [
     },
     cell: ({ row }) => {
       const initiator = row.getValue('initiator') as User
-      const type = row.original.type
 
       const balanceChanges = calculateBalanceChanges(row.original)
       const primaryChange = findBalanceChange({
@@ -29,7 +29,6 @@ export const columns: Array<ColumnDef<TransactionWithEntries>> = [
         assetType: 'CURRENCY',
         assetId: 'PRIMARY',
       })
-      const optionName = row.original.options[0]?.name
 
       return (
         <div className="flex flex-wrap items-center gap-x-2">
@@ -38,11 +37,10 @@ export const columns: Array<ColumnDef<TransactionWithEntries>> = [
               <UserAvatar user={initiator} size="sm" />
               <UserLink hideUsername user={initiator} />
             </>
-          ) : null}
-          {type === 'TRADE_BUY' ? 'bought' : type === 'TRADE_SELL' ? 'sold' : ''}
+          ) : null}{' '}
+          added{' '}
           <span className="font-semibold">
-            <CurrencyDisplay value={Math.abs(primaryChange?.change ?? 0)} isShort />{' '}
-            {_.truncate(optionName, { length: 30 })}
+            <CurrencyDisplay value={Math.abs(primaryChange?.change ?? 0)} isShort /> liquidity
           </span>
         </div>
       )
@@ -64,6 +62,6 @@ export const columns: Array<ColumnDef<TransactionWithEntries>> = [
   },
 ]
 
-export function TradesTable({ data, totalPages }: { data: Array<TransactionWithEntries>; totalPages: number }) {
+export function LiquidityTable({ data, totalPages }: { data: Array<TransactionWithEntries>; totalPages: number }) {
   return <DataTable data={data} columns={columns} totalPages={totalPages} showViewOptions={false} />
 }
