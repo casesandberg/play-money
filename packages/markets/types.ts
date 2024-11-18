@@ -40,7 +40,7 @@ export type MarketActivity = {
   timestampAt: Date
   comment?: CommentWithReactions
   transactions?: Array<TransactionWithEntries>
-  marketResolution?: MarketResolution & { resolvedBy: User; resolution: MarketOption }
+  marketResolution?: MarketResolution & { resolvedBy: User; resolution: MarketOption; market: Market }
   market?: Market & { user: User }
   option?: MarketOption
 }

@@ -2,8 +2,7 @@ import { Maximize2Icon, MinusIcon } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 import { getLists, getMarkets } from '@play-money/api-helpers/client'
-import { RecentLiquidity } from '@play-money/finance/components/RecentLiquidity'
-import { RecentTrades } from '@play-money/finance/components/RecentTrades'
+import { SiteActivity } from '@play-money/finance/components/SiteActivity'
 import { MarketProbabilityDetail } from '@play-money/markets/components/MarketProbabilityDetail'
 import { UserQuestCard } from '@play-money/quests/components/UserQuestCard'
 import { SidebarReferralAlert } from '@play-money/referrals/components/SidebarReferralAlert'
@@ -167,14 +166,10 @@ export default async function AppPage() {
       <div className="space-y-8 md:w-80">
         <SidebarReferralAlert />
         <UserQuestCard />
-        <div>
-          <div className="pb-2 text-xs font-semibold uppercase text-muted-foreground">Recent trades</div>
-          <RecentTrades />
-        </div>
 
         <div>
-          <div className="pb-2 text-xs font-semibold uppercase text-muted-foreground">New liquidity</div>
-          <RecentLiquidity />
+          <div className="pb-2 text-xs font-semibold uppercase text-muted-foreground">Activity</div>
+          <SiteActivity />
         </div>
 
         <SignedInReferralAlert />
