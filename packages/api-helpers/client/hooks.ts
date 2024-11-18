@@ -2,7 +2,7 @@ import useSWR from 'swr'
 import { User } from '@play-money/database'
 import { MarketOptionPositionAsNumbers, NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
 import { TransactionWithEntries } from '@play-money/finance/types'
-import { ExtendedMarket } from '@play-money/markets/types'
+import { ExtendedMarket, MarketActivity } from '@play-money/markets/types'
 import { NotificationGroupWithLastNotification } from '@play-money/notifications/lib/getNotifications'
 import { Quest } from '@play-money/quests/components/QuestCard'
 
@@ -23,6 +23,10 @@ export function useRecentTrades() {
     `/v1/transactions?transactionType=TRADE_BUY,TRADE_SELL`,
     { refreshInterval: FIVE_MINUTES }
   )
+}
+
+export function useSiteActivity() {
+  return useSWR<{ activities: Array<MarketActivity> }>(`/v1/activity`, { refreshInterval: FIVE_MINUTES })
 }
 
 export function MARKET_BALANCE_PATH(marketId: string) {

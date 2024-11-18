@@ -1,43 +1,22 @@
 import { addDays, isWithinInterval } from 'date-fns'
 import db, { CommentEntityType, Transaction } from '@play-money/database'
-import { TransactionWithEntries } from '@play-money/finance/types'
-import { MarketActivity } from '../types'
+import { MarketActivity } from '@play-money/markets/types'
+import { TransactionWithEntries } from '../types'
 
 type ActivityInput = {
-  marketId: string
   cursor?: Date
   limit?: number
   granularityDays?: number
 }
 
-export async function getActivityOnMarket({
-  marketId,
+export async function getSiteActivity({
   cursor = new Date(),
   limit = 15,
   granularityDays = 1,
 }: ActivityInput): Promise<Array<MarketActivity>> {
-  const [comments, transactions, market] = await Promise.all([
-    db.comment.findMany({
-      where: {
-        entityType: CommentEntityType.MARKET,
-        entityId: marketId,
-        createdAt: { lt: cursor },
-      },
-      include: {
-        author: true,
-        reactions: {
-          include: {
-            user: true,
-          },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-      take: limit,
-    }),
-
+  const [transactions, newMarkets, resolvedMarkets] = await Promise.all([
     db.transaction.findMany({
       where: {
-        marketId,
         createdAt: { lt: cursor },
         type: {
           in: ['TRADE_BUY', 'TRADE_SELL', 'LIQUIDITY_DEPOSIT', 'LIQUIDITY_WITHDRAWAL'],
@@ -55,45 +34,45 @@ export async function getActivityOnMarket({
       orderBy: { createdAt: 'desc' },
       take: 100,
     }),
-
-    db.market.findUnique({
-      where: { id: marketId },
+    db.market.findMany({
+      where: {
+        createdAt: { lt: cursor },
+      },
       include: {
         user: true,
-        marketResolution: {
-          include: {
-            resolution: true,
-            resolvedBy: true,
-            market: true,
-          },
-        },
       },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+    }),
+    db.marketResolution.findMany({
+      where: {
+        createdAt: { lt: cursor },
+      },
+      include: {
+        resolution: true,
+        resolvedBy: true,
+        market: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
     }),
   ])
 
   const nonGroupedActivities: Array<MarketActivity> = []
 
-  if (market) {
-    nonGroupedActivities.push({
-      type: 'MARKET_CREATED',
+  nonGroupedActivities.push(
+    ...newMarkets.map((market) => ({
+      type: 'MARKET_CREATED' as const,
       timestampAt: market.createdAt,
       market: market,
-    })
-  }
-
-  if (market?.marketResolution) {
-    nonGroupedActivities.push({
-      type: 'MARKET_RESOLVED',
-      timestampAt: market.marketResolution.createdAt,
-      marketResolution: market.marketResolution,
-    })
-  }
+    }))
+  )
 
   nonGroupedActivities.push(
-    ...comments.map((comment) => ({
-      type: 'COMMENT' as const,
-      timestampAt: comment.createdAt,
-      comment: comment,
+    ...resolvedMarkets.map((marketResolution) => ({
+      type: 'MARKET_RESOLVED' as const,
+      timestampAt: marketResolution.createdAt,
+      marketResolution,
     }))
   )
 
@@ -132,8 +111,9 @@ function groupTransactionsByType(
 
       const isSameType = transactionToActivityType(existingTransactions[0]) === transactionType
       const isSameOption = (existingTransactions[0].options?.[0]?.id || 'none') === (option?.id || 'none')
+      const isSameMarket = (existingTransactions[0].market?.id || 'none') === (transaction.market?.id || 'none')
 
-      if (isWithinGranularity && isSameType && isSameOption) {
+      if (isWithinGranularity && isSameType && isSameOption && isSameMarket) {
         buckets[existingKey].push(transaction)
         foundBucket = true
         break
@@ -142,7 +122,7 @@ function groupTransactionsByType(
 
     if (!foundBucket) {
       // Create new bucket if no matching bucket found
-      const newKey = `${transaction.createdAt.getTime()}_${transactionType}_${option?.id || 'none'}`
+      const newKey = `${transaction.createdAt.getTime()}_${transactionType}_${option?.id || 'none'}_${transaction.market?.id || 'none'}`
       buckets[newKey] = [transaction]
     }
   }
