@@ -2,16 +2,18 @@
 
 import { format, isPast } from 'date-fns'
 import _ from 'lodash'
-import { CircleCheckBig, ChevronDown, Link2Icon } from 'lucide-react'
+import { CircleCheckBig, ChevronDown, Link2Icon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 import { mutate } from 'swr'
+import { createComment } from '@play-money/api-helpers/client'
 import {
   MARKET_BALANCE_PATH,
   MARKET_GRAPH_PATH,
   MY_BALANCE_PATH,
   useMarketBalance,
 } from '@play-money/api-helpers/client/hooks'
+import { CreateCommentForm } from '@play-money/comments/components/CreateCommentForm'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { marketOptionBalancesToProbabilities } from '@play-money/finance/lib/helpers'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
@@ -21,6 +23,7 @@ import { Button } from '@play-money/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@play-money/ui/collapsible'
 import { ReadMoreEditor } from '@play-money/ui/editor'
+import { toast } from '@play-money/ui/use-toast'
 import { UserLink } from '@play-money/users/components/UserLink'
 import { useUser } from '@play-money/users/context/UserContext'
 import { useSelectedItems } from '../../ui/src/contexts/SelectedItemContext'
@@ -47,11 +50,11 @@ function getTextContrast(hex: string): string {
 
 export function MarketOverviewPage({
   market,
-  renderComments,
+  renderActivitiy,
   onRevalidate,
 }: {
   market: ExtendedMarket
-  renderComments: React.ReactNode
+  renderActivitiy: React.ReactNode
   onRevalidate: () => Promise<void>
 }) {
   const { user } = useUser()
@@ -75,6 +78,18 @@ export function MarketOverviewPage({
     void mutate(MY_BALANCE_PATH)
     void mutate(MARKET_BALANCE_PATH(market.id))
     void mutate(MARKET_GRAPH_PATH(market.id))
+  }
+
+  const handleCreateComment = async (content: string) => {
+    try {
+      await createComment({ content, entity: { type: 'MARKET', id: market.id } })
+      onRevalidate()
+    } catch (error) {
+      toast({
+        title: 'There was an error creating your comment',
+        description: (error as Error).message,
+      })
+    }
   }
 
   return (
@@ -237,8 +252,21 @@ export function MarketOverviewPage({
         </CardContent>
       ) : null}
 
-      <div className="px-6 text-lg font-semibold">Comments</div>
-      {renderComments}
+      <Collapsible>
+        <div className="flex flex-row items-center justify-between px-6 ">
+          <div className="text-lg font-semibold">Activity</div>
+          <CollapsibleTrigger asChild>
+            <Button size="sm" type="button" variant="secondary">
+              <PlusIcon className="h-4 w-4" /> Comment
+            </Button>
+          </CollapsibleTrigger>
+        </div>
+
+        <CollapsibleContent className="mt-2 px-6">
+          <CreateCommentForm onSubmit={handleCreateComment} />
+        </CollapsibleContent>
+      </Collapsible>
+      {renderActivitiy}
 
       <EditMarketDialog
         key={market.updatedAt.toString()} // reset form when market updates

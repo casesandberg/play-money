@@ -13,6 +13,7 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.ge
 
     const {
       ownerId,
+      marketId,
       status,
       pageSize = 50,
       page = 1,
@@ -21,7 +22,7 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.ge
     } = schema.get.parameters.parse(params) ?? {}
 
     const { marketPositions, total } = await getMarketPositions(
-      { ownerId, status },
+      { ownerId, status, marketId },
       sortField
         ? {
             field: sortField,

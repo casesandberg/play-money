@@ -4,7 +4,7 @@ import { List, Market, MarketOption, MarketOptionPosition, User } from '@play-mo
 import { NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
 import { TransactionWithEntries, LeaderboardUser, ExtendedMarketOptionPosition } from '@play-money/finance/types'
 import { ExtendedList } from '@play-money/lists/types'
-import { ExtendedMarket, ExtendedMarketPosition } from '@play-money/markets/types'
+import { ExtendedMarket, ExtendedMarketPosition, MarketActivity } from '@play-money/markets/types'
 
 // TODO: @casesandberg Generate this from OpenAPI schema
 
@@ -36,9 +36,45 @@ async function apiHandler<T>(
   return res.json() as Promise<T>
 }
 
-export async function getMarketTransactions({ marketId }: { marketId: string }) {
-  return apiHandler<{ transactions: Array<TransactionWithEntries> }>(
-    `${process.env.NEXT_PUBLIC_API_URL}/v1/transactions?marketId=${marketId}&transactionType=TRADE_BUY,TRADE_SELL`
+export async function getMarketTransactions({
+  marketId,
+  page,
+  pageSize,
+}: {
+  marketId: string
+  page?: string
+  pageSize?: string
+}) {
+  return apiHandler<{
+    transactions: Array<TransactionWithEntries>
+    page: number
+    pageSize: number
+    totalPages: number
+  }>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/transactions?marketId=${marketId}&transactionType=TRADE_BUY,TRADE_SELL${
+      page ? `&page=${page}` : ''
+    }${pageSize ? `&pageSize=${pageSize}` : ''}`
+  )
+}
+
+export async function getMarketLiquidityTransactions({
+  marketId,
+  page,
+  pageSize,
+}: {
+  marketId: string
+  page?: string
+  pageSize?: string
+}) {
+  return apiHandler<{
+    transactions: Array<TransactionWithEntries>
+    page: number
+    pageSize: number
+    totalPages: number
+  }>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/transactions?marketId=${marketId}&transactionType=LIQUIDITY_INITIALIZE,LIQUIDITY_DEPOSIT,LIQUIDITY_WITHDRAWAL${
+      page ? `&page=${page}` : ''
+    }${pageSize ? `&pageSize=${pageSize}` : ''}`
   )
 }
 
@@ -127,6 +163,7 @@ export async function getMarkets({
 
 export async function getMarketPositions({
   ownerId,
+  marketId,
   page,
   pageSize,
   status,
@@ -134,6 +171,7 @@ export async function getMarketPositions({
   sortDirection,
 }: {
   ownerId?: string
+  marketId?: string
   page?: string
   pageSize?: string
   status?: 'active' | 'closed' | 'all'
@@ -141,7 +179,7 @@ export async function getMarketPositions({
   sortDirection?: string
 } = {}) {
   const currentParams = new URLSearchParams(
-    JSON.parse(JSON.stringify({ ownerId, page, pageSize, status, sortField, sortDirection }))
+    JSON.parse(JSON.stringify({ ownerId, page, pageSize, status, sortField, sortDirection, marketId }))
   )
   const search = currentParams.toString()
 
@@ -311,6 +349,19 @@ export async function getMarketComments({
     `${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/comments`,
     {
       next: { tags: [`${marketId}:comments`] },
+    }
+  )
+}
+
+export async function getMarketActivity({
+  marketId,
+}: {
+  marketId: string
+}): Promise<{ activities: Array<MarketActivity> }> {
+  return apiHandler<{ activities: Array<MarketActivity> }>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/activity`,
+    {
+      next: { tags: [`${marketId}:activity`] },
     }
   )
 }

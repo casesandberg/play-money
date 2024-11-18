@@ -31,6 +31,7 @@ interface DataTableProps<TData, TValue> {
   data: Array<TData>
   totalPages: number
   controls?: React.ReactNode
+  showViewOptions?: boolean
 }
 
 function useURLSorting(): SortingOptions<unknown> & { sorting: SortingState } {
@@ -85,7 +86,8 @@ export function DataTable<TData, TValue>({
   data,
   columns,
   totalPages,
-  controls = Fragment({}),
+  controls = <></>,
+  showViewOptions = true,
 }: DataTableProps<TData, TValue>) {
   const { sorting, ...sortingOptions } = useURLSorting()
   const { pagination, ...paginationOptions } = useURLPagination({ pageCount: totalPages })
@@ -102,12 +104,14 @@ export function DataTable<TData, TValue>({
   })
 
   return (
-    <div className="w-full">
-      <div className="flex justify-between">
-        {controls}
-        <DataTableViewOptions table={table} />
-      </div>
-      <div className="my-4 rounded-md border font-mono text-sm">
+    <div className="flex w-full flex-col gap-4">
+      {showViewOptions ? (
+        <div className="flex justify-between">
+          {controls}
+          <DataTableViewOptions table={table} />
+        </div>
+      ) : null}
+      <div className="rounded-md border font-mono text-sm">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

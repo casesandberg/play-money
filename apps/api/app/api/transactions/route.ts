@@ -17,12 +17,18 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.GE
       params.transactionType = params.transactionType.split(',') as unknown as string
     }
 
-    const { marketId, userId, transactionType } = schema.GET.parameters.parse(params) ?? {}
+    const { marketId, userId, transactionType, page = 1, pageSize = 50 } = schema.GET.parameters.parse(params) ?? {}
 
-    const transactions = await getTransactions({ marketId, userId, transactionType })
+    const { transactions, total } = await getTransactions({ marketId, userId, transactionType }, undefined, {
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    })
 
     return NextResponse.json({
       transactions,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
     })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging

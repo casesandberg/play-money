@@ -27,7 +27,15 @@ export function MarketPageLayout({
     (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   )
 
-  const initialTab = pathname.includes('/trades') ? 'trades' : 'overview'
+  const initialTab = pathname.includes('/trades')
+    ? 'trades'
+    : pathname.includes('/positions')
+      ? 'positions'
+      : pathname.includes('/comments')
+        ? 'comments'
+        : pathname.includes('/liquidity')
+          ? 'liquidity'
+          : 'overview'
 
   useTrackResourceViewed({ resourceId: market.id, resourceType: 'MARKET' })
 
@@ -36,6 +44,12 @@ export function MarketPageLayout({
       router.push(`/questions/${market.id}/${market.slug}`)
     } else if (value === 'trades') {
       router.push(`/questions/${market.id}/${market.slug}/trades`)
+    } else if (value === 'positions') {
+      router.push(`/questions/${market.id}/${market.slug}/positions`)
+    } else if (value === 'comments') {
+      router.push(`/questions/${market.id}/${market.slug}/comments`)
+    } else if (value === 'liquidity') {
+      router.push(`/questions/${market.id}/${market.slug}/liquidity`)
     }
   }
 
@@ -47,7 +61,10 @@ export function MarketPageLayout({
             <Tabs defaultValue={initialTab} className="w-[400px]" onValueChange={handleTabChange}>
               <TabsList>
                 <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="comments">Comments</TabsTrigger>
+                <TabsTrigger value="positions">Positions</TabsTrigger>
                 <TabsTrigger value="trades">Trades</TabsTrigger>
+                <TabsTrigger value="liquidity">Liquidity</TabsTrigger>
               </TabsList>
             </Tabs>
             {children}

@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { mockExtendedMarket, mockTransactionWithEntries } from '@play-money/database/mocks'
-import { MarketPositionsPage } from './MarketPositionsPage'
+import { MarketTradesPage } from './MarketTradesPage'
 
 const meta = {
-  component: MarketPositionsPage,
+  component: MarketTradesPage,
   tags: ['autodocs'],
-} satisfies Meta<typeof MarketPositionsPage>
+} satisfies Meta<typeof MarketTradesPage>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -14,6 +14,7 @@ export const Default: Story = {
   args: {
     market: mockExtendedMarket(),
     transactions: [mockTransactionWithEntries(), mockTransactionWithEntries(), mockTransactionWithEntries()],
+    totalPages: 1,
   },
 }
 
@@ -21,5 +22,6 @@ export const Empty: Story = {
   args: {
     market: mockExtendedMarket(),
     transactions: [],
+    totalPages: 1,
   },
 }

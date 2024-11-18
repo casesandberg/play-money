@@ -15,6 +15,8 @@ export default createSchema({
         marketId: z.string().optional(),
         userId: z.string().optional(),
         transactionType: z.array(TransactionTypeSchema).optional(),
+        pageSize: z.coerce.number().optional(),
+        page: z.coerce.number().optional(),
       })
       .optional(),
     responses: {

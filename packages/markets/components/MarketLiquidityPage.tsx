@@ -2,26 +2,26 @@ import { format, isPast } from 'date-fns'
 import _ from 'lodash'
 import React from 'react'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
+import { LiquidityTable } from '@play-money/finance/components/LiquidityTable'
+import { TransactionWithEntries } from '@play-money/finance/types'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
 import { UserLink } from '@play-money/users/components/UserLink'
-import { ExtendedMarket, ExtendedMarketPosition } from '../types'
+import { ExtendedMarket } from '../types'
 import { MarketToolbar } from './MarketToolbar'
 
-export function MarketPositionsPage({
+export function MarketLiquidityPage({
   market,
-  positions,
+  liquidityTransactions,
 }: {
   market: ExtendedMarket
-  positions: Array<ExtendedMarketPosition>
+  liquidityTransactions: Array<TransactionWithEntries>
 }) {
   const simplyIfTwoOptions = market.options.length === 2
 
   const mostLikelyOption = market.options.reduce((prev, current) =>
     (prev.probability || 0) > (current.probability || 0) ? prev : current
   )
-
-  const orderedOptions = _.orderBy(market.options, 'createdAt')
 
   return (
     <Card className="flex-1">
@@ -54,37 +54,10 @@ export function MarketPositionsPage({
         </div>
       </CardHeader>
       <CardContent className="space-y-6 border-t pt-3 md:pt-6">
-        {positions.length ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {orderedOptions.map((option) => {
-              const optionPositions = _.filter(positions, { optionId: option.id })
-
-              return (
-                <Card key={option.id} className="divide-y">
-                  <div className="px-4 py-2 text-sm font-medium uppercase text-muted-foreground">{option.name}</div>
-                  {_.orderBy(optionPositions, (position) => Number(position.value) - Number(position.cost), 'desc').map(
-                    (position) => (
-                      <div key={position.id} className="flex flex-row flex-wrap justify-between gap-x-4 px-4 py-1">
-                        {position.account.user ? (
-                          <div className="flex flex-row items-center gap-2">
-                            <UserAvatar user={position.account.user} size="sm" />
-                            <UserLink user={position.account.user} />
-                          </div>
-                        ) : (
-                          position.account.id
-                        )}
-                        <div className="ml-auto">
-                          <CurrencyDisplay value={Number(position.value) - Number(position.cost)} />
-                        </div>
-                      </div>
-                    )
-                  )}
-                </Card>
-              )
-            })}
-          </div>
+        {liquidityTransactions.length ? (
+          <LiquidityTable data={liquidityTransactions} totalPages={1} />
         ) : (
-          <div className="text-sm text-muted-foreground">No positions yet.</div>
+          <div className="text-sm text-muted-foreground">No liquidity has been added yet.</div>
         )}
       </CardContent>
     </Card>

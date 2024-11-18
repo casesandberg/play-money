@@ -16,7 +16,7 @@ export async function GET(
 
     await getUserById({ id })
 
-    const transactions = await getTransactions({
+    const { transactions } = await getTransactions({
       userId: id,
       transactionType: ['TRADE_BUY', 'TRADE_SELL'],
       isReverse: null,

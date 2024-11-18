@@ -37,6 +37,7 @@ export function CommentItem({
   activeUserId,
   comment,
   isHighlighted,
+  condensed = false,
   onEmojiSelect,
   onCreateReply,
   onEdit,
@@ -45,6 +46,7 @@ export function CommentItem({
   activeUserId: string
   comment: CommentWithReactions
   isHighlighted?: boolean
+  condensed?: boolean
   onEmojiSelect: (emoji: string) => void
   onCreateReply: (content: string) => Promise<void>
   onEdit: (content: string) => Promise<void>
@@ -87,7 +89,8 @@ export function CommentItem({
       className={cn(
         isHighlighted && 'bg-primary/10 ring-2 ring-primary ring-offset-2 ring-offset-background',
         'group flex flex-row gap-4 rounded-md px-6 py-2 hover:bg-muted/50',
-        (isReplyOpen || isPortalOpen) && 'bg-muted/50'
+        (isReplyOpen || isPortalOpen) && 'bg-muted/50',
+        condensed && 'gap-2 px-3'
       )}
     >
       <UserAvatar user={comment.author} className="mt-2" />
