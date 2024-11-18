@@ -1,4 +1,21 @@
-import { Account, List, Market, MarketOption, MarketOptionPosition, MarketResolution, User } from '@play-money/database'
+import { z } from 'zod'
+import { CommentWithReactions } from '@play-money/comments/lib/getComment'
+import {
+  Account,
+  Comment,
+  CommentSchema,
+  List,
+  Market,
+  MarketOption,
+  MarketOptionPosition,
+  MarketOptionSchema,
+  MarketResolution,
+  MarketResolutionSchema,
+  MarketSchema,
+  TransactionSchema,
+  User,
+} from '@play-money/database'
+import { TransactionWithEntries } from '@play-money/finance/types'
 
 export type ExtendedMarket = Market & {
   user: User
@@ -17,3 +34,23 @@ export type ExtendedMarketPosition = MarketOptionPosition & {
     user: User
   }
 }
+
+export type MarketActivity = {
+  type: 'COMMENT' | 'TRADE_TRANSACTION' | 'LIQUIDITY_TRANSACTION' | 'MARKET_CREATED' | 'MARKET_RESOLVED'
+  timestampAt: Date
+  comment?: CommentWithReactions
+  transactions?: Array<TransactionWithEntries>
+  marketResolution?: MarketResolution & { resolvedBy: User; resolution: MarketOption }
+  market?: Market & { user: User }
+  option?: MarketOption
+}
+
+export const MarketActivitySchema = z.object({
+  type: z.enum(['COMMENT', 'TRADE_TRANSACTION', 'LIQUIDITY_TRANSACTION', 'MARKET_CREATED', 'MARKET_RESOLVED']),
+  timestampAt: z.date(),
+  comment: CommentSchema.optional(),
+  transactions: z.array(TransactionSchema).optional(),
+  marketResolution: MarketResolutionSchema.optional(),
+  market: MarketSchema.optional(),
+  option: MarketOptionSchema.optional(),
+})

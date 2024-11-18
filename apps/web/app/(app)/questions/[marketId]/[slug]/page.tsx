@@ -1,6 +1,6 @@
 import { revalidateTag } from 'next/cache'
 import { getExtendedMarket } from '@play-money/api-helpers/client'
-import { MarketComments } from '@play-money/markets/components/MarketComments'
+import { MarketActivity } from '@play-money/markets/components/MarketActivity'
 import { MarketOverviewPage } from '@play-money/markets/components/MarketOverviewPage'
 
 export default async function AppPostsSlugPage({ params }: { params: { marketId: string } }) {
@@ -16,7 +16,7 @@ export default async function AppPostsSlugPage({ params }: { params: { marketId:
     <MarketOverviewPage
       market={market}
       onRevalidate={handleRevalidate}
-      renderComments={<MarketComments marketId={market.id} />}
+      renderActivitiy={<MarketActivity marketId={market.id} />}
     />
   )
 }

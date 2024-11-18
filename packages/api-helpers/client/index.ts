@@ -4,7 +4,7 @@ import { List, Market, MarketOption, MarketOptionPosition, User } from '@play-mo
 import { NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
 import { TransactionWithEntries, LeaderboardUser, ExtendedMarketOptionPosition } from '@play-money/finance/types'
 import { ExtendedList } from '@play-money/lists/types'
-import { ExtendedMarket, ExtendedMarketPosition } from '@play-money/markets/types'
+import { ExtendedMarket, ExtendedMarketPosition, MarketActivity } from '@play-money/markets/types'
 
 // TODO: @casesandberg Generate this from OpenAPI schema
 
@@ -328,6 +328,19 @@ export async function getMarketComments({
     `${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/comments`,
     {
       next: { tags: [`${marketId}:comments`] },
+    }
+  )
+}
+
+export async function getMarketActivity({
+  marketId,
+}: {
+  marketId: string
+}): Promise<{ activities: Array<MarketActivity> }> {
+  return apiHandler<{ activities: Array<MarketActivity> }>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/activity`,
+    {
+      next: { tags: [`${marketId}:activity`] },
     }
   )
 }
