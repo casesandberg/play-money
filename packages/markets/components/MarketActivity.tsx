@@ -10,6 +10,10 @@ import { UserLink } from '@play-money/users/components/UserLink'
 import { UsersCondensedList } from '@play-money/users/components/UsersCondensedList'
 import { MarketActivityItem } from './MarketActivityItem'
 
+function isNotNull<T>(value: T | null): value is T {
+  return value !== null && value !== undefined
+}
+
 function summarizeTransactions(transactions: Array<TransactionWithEntries>) {
   const highestTotal =
     _(transactions)
@@ -45,7 +49,7 @@ export async function MarketActivity({ marketId }: { marketId: string }) {
           const uniqueInitiators = _(activity.transactions)
             .map((t) => t.initiator)
             .uniqBy('id')
-            .filter((initiator) => initiator !== null && initiator !== undefined)
+            .filter(isNotNull)
             .value()
 
           const transactionDescriptor: Array<string> = []
@@ -73,7 +77,7 @@ export async function MarketActivity({ marketId }: { marketId: string }) {
           const uniqueInitiators = _(activity.transactions)
             .map((t) => t.initiator)
             .uniqBy('id')
-            .filter((initiator) => initiator !== null && initiator !== undefined)
+            .filter(isNotNull)
             .value()
 
           return (
