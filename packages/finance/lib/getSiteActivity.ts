@@ -38,6 +38,10 @@ export async function getSiteActivity({
       where: {
         createdAt: { lt: cursor },
         parentListId: null,
+        resolvedAt: null,
+        closeDate: {
+          gte: new Date(),
+        },
       },
       include: {
         user: true,
@@ -48,6 +52,16 @@ export async function getSiteActivity({
     db.list.findMany({
       where: {
         createdAt: { lt: cursor },
+        markets: {
+          every: {
+            market: {
+              resolvedAt: null,
+              closeDate: {
+                gte: new Date(),
+              },
+            },
+          },
+        },
       },
       include: {
         owner: true,
