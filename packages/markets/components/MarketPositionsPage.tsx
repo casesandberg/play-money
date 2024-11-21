@@ -2,6 +2,7 @@ import { format, isPast } from 'date-fns'
 import _ from 'lodash'
 import React from 'react'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
+import { formatNumber } from '@play-money/finance/lib/formatCurrency'
 import { UserAvatar } from '@play-money/ui/UserAvatar'
 import { Card, CardContent, CardHeader, CardTitle } from '@play-money/ui/card'
 import { UserLink } from '@play-money/users/components/UserLink'
@@ -62,23 +63,19 @@ export function MarketPositionsPage({
               return (
                 <Card key={option.id} className="divide-y">
                   <div className="px-4 py-2 text-sm font-medium uppercase text-muted-foreground">{option.name}</div>
-                  {_.orderBy(optionPositions, (position) => Number(position.value) - Number(position.cost), 'desc').map(
-                    (position) => (
-                      <div key={position.id} className="flex flex-row flex-wrap justify-between gap-x-4 px-4 py-1">
-                        {position.account.user ? (
-                          <div className="flex flex-row items-center gap-2">
-                            <UserAvatar user={position.account.user} size="sm" />
-                            <UserLink user={position.account.user} />
-                          </div>
-                        ) : (
-                          position.account.id
-                        )}
-                        <div className="ml-auto">
-                          <CurrencyDisplay value={Number(position.value) - Number(position.cost)} />
+                  {_.orderBy(optionPositions, (position) => Number(position.quantity), 'desc').map((position) => (
+                    <div key={position.id} className="flex flex-row flex-wrap justify-between gap-x-4 px-4 py-1">
+                      {position.account.user ? (
+                        <div className="flex flex-row items-center gap-2">
+                          <UserAvatar user={position.account.user} size="sm" />
+                          <UserLink user={position.account.user} />
                         </div>
-                      </div>
-                    )
-                  )}
+                      ) : (
+                        position.account.id
+                      )}
+                      <div className="ml-auto">{formatNumber(Number(position.quantity))}</div>
+                    </div>
+                  ))}
                 </Card>
               )
             })}

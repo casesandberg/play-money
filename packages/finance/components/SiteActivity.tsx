@@ -121,7 +121,6 @@ export function SiteActivity() {
               <UserLink user={activity.market.user} hideUsername className="text-foreground" /> created{' '}
               {activity.market ? (
                 <>
-                  in{' '}
                   <span className="underline">
                     <Link
                       href={`/questions/${activity.market.id}/${activity.market.slug}`}
@@ -157,6 +156,23 @@ export function SiteActivity() {
                 </span>
               ) : null}{' '}
               to <span className="text-foreground">{activity.marketResolution.resolution.name}</span>
+            </SiteActivityItem>
+          )
+        } else if (activity.type === 'LIST_CREATED' && activity.list) {
+          return (
+            <SiteActivityItem
+              key={activity.timestampAt.toString()}
+              timestampAt={activity.timestampAt}
+              icon={<UserAvatar user={activity.list.owner} size="sm" />}
+              isFirst={i === 0}
+              isLast={i === activities.length - 1}
+            >
+              <UserLink user={activity.list.owner} hideUsername className="text-foreground" /> created{' '}
+              <span className="underline">
+                <Link href={`/lists/${activity.list.id}/${activity.list.slug}`} legacyBehavior key={activity.list.id}>
+                  {_.truncate(activity.list.title, { length: 50 })}
+                </Link>
+              </span>
             </SiteActivityItem>
           )
         }

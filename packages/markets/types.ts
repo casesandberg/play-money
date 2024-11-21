@@ -5,6 +5,7 @@ import {
   Comment,
   CommentSchema,
   List,
+  ListSchema,
   Market,
   MarketOption,
   MarketOptionPosition,
@@ -36,21 +37,36 @@ export type ExtendedMarketPosition = MarketOptionPosition & {
 }
 
 export type MarketActivity = {
-  type: 'COMMENT' | 'TRADE_TRANSACTION' | 'LIQUIDITY_TRANSACTION' | 'MARKET_CREATED' | 'MARKET_RESOLVED'
+  type:
+    | 'COMMENT'
+    | 'TRADE_TRANSACTION'
+    | 'LIQUIDITY_TRANSACTION'
+    | 'MARKET_CREATED'
+    | 'MARKET_RESOLVED'
+    | 'LIST_CREATED'
   timestampAt: Date
   comment?: CommentWithReactions
   transactions?: Array<TransactionWithEntries>
   marketResolution?: MarketResolution & { resolvedBy: User; resolution: MarketOption; market: Market }
   market?: Market & { user: User }
+  list?: List & { owner: User }
   option?: MarketOption
 }
 
 export const MarketActivitySchema = z.object({
-  type: z.enum(['COMMENT', 'TRADE_TRANSACTION', 'LIQUIDITY_TRANSACTION', 'MARKET_CREATED', 'MARKET_RESOLVED']),
+  type: z.enum([
+    'COMMENT',
+    'TRADE_TRANSACTION',
+    'LIQUIDITY_TRANSACTION',
+    'MARKET_CREATED',
+    'MARKET_RESOLVED',
+    'LIST_CREATED',
+  ]),
   timestampAt: z.date(),
   comment: CommentSchema.optional(),
   transactions: z.array(TransactionSchema).optional(),
   marketResolution: MarketResolutionSchema.optional(),
   market: MarketSchema.optional(),
+  list: ListSchema.optional(),
   option: MarketOptionSchema.optional(),
 })

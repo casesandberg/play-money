@@ -2,7 +2,7 @@
 
 import { format, isPast } from 'date-fns'
 import _ from 'lodash'
-import { CircleCheckBig, ChevronDown, Link2Icon, PlusIcon } from 'lucide-react'
+import { CircleCheckBig, ChevronDown, Link2Icon } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 import { mutate } from 'swr'
@@ -252,20 +252,13 @@ export function MarketOverviewPage({
         </CardContent>
       ) : null}
 
-      <Collapsible>
-        <div className="flex flex-row items-center justify-between px-6 ">
-          <div className="text-lg font-semibold">Activity</div>
-          <CollapsibleTrigger asChild>
-            <Button size="sm" type="button" variant="secondary">
-              <PlusIcon className="h-4 w-4" /> Comment
-            </Button>
-          </CollapsibleTrigger>
-        </div>
+      <div className="flex flex-row items-center justify-between px-6 ">
+        <div className="text-lg font-semibold">Activity</div>
+      </div>
 
-        <CollapsibleContent className="mt-2 px-6">
-          <CreateCommentForm onSubmit={handleCreateComment} />
-        </CollapsibleContent>
-      </Collapsible>
+      <div className="mt-2 px-6">
+        <CreateCommentForm onSubmit={handleCreateComment} startCollapsed />
+      </div>
       {renderActivitiy}
 
       <EditMarketDialog

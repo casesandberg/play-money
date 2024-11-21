@@ -65,7 +65,7 @@ function Editor({
       }),
       Link.configure({
         HTMLAttributes: {
-          class: 'text-primary',
+          class: 'text-primary break-all',
         },
       }),
       ...(contextExtensions?.extensions || []),

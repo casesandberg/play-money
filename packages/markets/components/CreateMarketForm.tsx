@@ -509,7 +509,11 @@ export function CreateMarketForm({
                       {...field}
                       className="w-auto"
                       onChange={(e) => {
-                        field.onChange(new Date(e.target.value))
+                        const timestamp = Date.parse(e.target.value)
+
+                        if (!isNaN(timestamp)) {
+                          field.onChange(new Date(e.target.value))
+                        }
                       }}
                       value={field.value ? format(field.value, "yyyy-MM-dd'T'HH:mm") : ''}
                     />
