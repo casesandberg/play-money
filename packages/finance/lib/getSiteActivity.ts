@@ -14,7 +14,7 @@ export async function getSiteActivity({
   limit = 15,
   granularityDays = 1,
 }: ActivityInput): Promise<Array<MarketActivity>> {
-  const [transactions, newMarkets, resolvedMarkets] = await Promise.all([
+  const [transactions, newMarkets, newLists, resolvedMarkets] = await Promise.all([
     db.transaction.findMany({
       where: {
         createdAt: { lt: cursor },
@@ -37,9 +37,20 @@ export async function getSiteActivity({
     db.market.findMany({
       where: {
         createdAt: { lt: cursor },
+        parentListId: null,
       },
       include: {
         user: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+    }),
+    db.list.findMany({
+      where: {
+        createdAt: { lt: cursor },
+      },
+      include: {
+        owner: true,
       },
       orderBy: { createdAt: 'desc' },
       take: 10,
@@ -65,6 +76,14 @@ export async function getSiteActivity({
       type: 'MARKET_CREATED' as const,
       timestampAt: market.createdAt,
       market: market,
+    }))
+  )
+
+  nonGroupedActivities.push(
+    ...newLists.map((list) => ({
+      type: 'LIST_CREATED' as const,
+      timestampAt: list.createdAt,
+      list: list,
     }))
   )
 
