@@ -45,6 +45,15 @@ export async function createUser({ email }: { email: string }): Promise<User & O
     },
   })
 
+  await db.account.update({
+    where: {
+      id: user.primaryAccountId,
+    },
+    data: {
+      userId: user.id,
+    },
+  })
+
   await createHouseSingupBonusTransaction({
     userId: user.id,
   })
