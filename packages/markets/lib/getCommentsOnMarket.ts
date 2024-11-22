@@ -1,10 +1,10 @@
 import { CommentWithReactions } from '@play-money/comments/lib/getComment'
-import db, { CommentEntityType } from '@play-money/database'
+import db from '@play-money/database'
 
 export async function getCommentsOnMarket({ marketId }: { marketId: string }): Promise<Array<CommentWithReactions>> {
   const comments = await db.comment.findMany({
     where: {
-      entityType: CommentEntityType.MARKET,
+      entityType: 'MARKET',
       entityId: marketId,
     },
     include: {

@@ -1,5 +1,5 @@
 import { addDays, isWithinInterval } from 'date-fns'
-import db, { CommentEntityType, Transaction } from '@play-money/database'
+import db, { Transaction } from '@play-money/database'
 import { TransactionWithEntries } from '@play-money/finance/types'
 import { MarketActivity } from '../types'
 
@@ -19,7 +19,7 @@ export async function getActivityOnMarket({
   const [comments, transactions, market] = await Promise.all([
     db.comment.findMany({
       where: {
-        entityType: CommentEntityType.MARKET,
+        entityType: 'MARKET',
         entityId: marketId,
         createdAt: { lt: cursor },
       },

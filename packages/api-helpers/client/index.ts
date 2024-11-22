@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { CommentWithReactions } from '@play-money/comments/lib/getComment'
-import { List, Market, MarketOption, MarketOptionPosition, User } from '@play-money/database'
+import { CommentEntityType, List, Market, MarketOption, MarketOptionPosition, User } from '@play-money/database'
 import { NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
 import { TransactionWithEntries, LeaderboardUser, ExtendedMarketOptionPosition } from '@play-money/finance/types'
 import { ExtendedList } from '@play-money/lists/types'
@@ -95,7 +95,7 @@ export async function createComment({
 }: {
   content: string
   parentId?: string
-  entity: { type: string; id: string }
+  entity: { type: CommentEntityType; id: string }
 }) {
   return apiHandler<unknown>(`${process.env.NEXT_PUBLIC_API_URL}/v1/comments`, {
     method: 'POST',
