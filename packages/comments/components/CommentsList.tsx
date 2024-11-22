@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { createComment, createCommentReaction, deleteComment, updateComment } from '@play-money/api-helpers/client'
 import { CommentWithReactions } from '@play-money/comments/lib/getComment'
+import { CommentEntityType } from '@play-money/database'
 import { toast } from '@play-money/ui/use-toast'
 import { useUser } from '@play-money/users/context/UserContext'
 import { flattenReplies } from '../lib/flattenReplies'
@@ -15,7 +16,7 @@ export function CommentsList({
   onRevalidate,
 }: {
   comments: Array<CommentWithReactions>
-  entity: { type: string; id: string }
+  entity: { type: CommentEntityType; id: string }
   onRevalidate: () => void
 }) {
   const { user } = useUser()

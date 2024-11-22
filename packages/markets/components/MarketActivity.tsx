@@ -41,7 +41,7 @@ export async function MarketActivity({ marketId }: { marketId: string }) {
             <CommentItemCard
               key={activity.timestampAt.toString()}
               comment={activity.comment}
-              entity={{ type: 'market', id: marketId }}
+              entity={{ type: 'MARKET', id: marketId }}
               onRevalidate={handleRevalidate}
             />
           )

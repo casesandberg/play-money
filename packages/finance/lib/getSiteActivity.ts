@@ -1,5 +1,5 @@
 import { addDays, isWithinInterval } from 'date-fns'
-import db, { CommentEntityType, Transaction } from '@play-money/database'
+import db, { Transaction } from '@play-money/database'
 import { MarketActivity } from '@play-money/markets/types'
 import { TransactionWithEntries } from '../types'
 
