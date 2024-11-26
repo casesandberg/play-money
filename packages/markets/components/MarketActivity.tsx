@@ -117,6 +117,18 @@ export async function MarketActivity({ marketId }: { marketId: string }) {
               question to <span className="text-foreground">{activity.marketResolution.resolution.name}</span>
             </MarketActivityItem>
           )
+        } else if (activity.type === 'MARKET_CANCELED' && activity.market) {
+          return (
+            <MarketActivityItem
+              key={activity.timestampAt.toString()}
+              timestampAt={activity.timestampAt}
+              icon={<UserAvatar user={activity.market.user} size="sm" />}
+              isFirst={i === 0}
+              isLast={i === activities.length - 1}
+            >
+              <UserLink user={activity.market.user} hideUsername className="text-foreground" /> canceled the question
+            </MarketActivityItem>
+          )
         }
 
         return activity.type

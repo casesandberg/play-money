@@ -98,12 +98,16 @@ export function NotificationItem({
     }
     case 'MARKET_COMMENT': {
       topLine = notification.market.question
-      bottomLine = `${notification.actor.displayName} commented: ${createSnippet(notification.comment.content)}`
+      bottomLine = !notification.comment
+        ? `${notification.actor.displayName} commented and deleted comment`
+        : `${notification.actor.displayName} commented: ${createSnippet(notification.comment.content)}`
       break
     }
     case 'LIST_COMMENT': {
       topLine = notification.list.title
-      bottomLine = `${notification.actor.displayName} commented: ${createSnippet(notification.comment.content)}`
+      bottomLine = !notification.comment
+        ? `${notification.actor.displayName} commented and deleted comment`
+        : `${notification.actor.displayName} commented: ${createSnippet(notification.comment.content)}`
       break
     }
     case 'COMMENT_REPLY': {
@@ -114,11 +118,13 @@ export function NotificationItem({
           : notification.list
             ? notification.list.title
             : ''
-      bottomLine = `${notification.actor.displayName}${othersCount} replied: ${createSnippet(notification.comment.content)}`
+      bottomLine = !notification.comment
+        ? `${notification.actor.displayName} commented and deleted comment`
+        : `${notification.actor.displayName}${othersCount} replied: ${createSnippet(notification.comment.content)}`
       break
     }
     case 'COMMENT_REACTION': {
-      topLine = createSnippet(notification.comment.content)
+      topLine = !notification.comment ? `Deleted comment` : createSnippet(notification.comment.content)
       bottomLine = `${notification.actor.displayName}${othersCount} reacted: ${notification.commentReaction?.emoji}`
       break
     }
@@ -130,7 +136,9 @@ export function NotificationItem({
           : notification.list
             ? notification.list.title
             : ''
-      bottomLine = `${notification.actor.displayName}${othersCount} mentioned you: ${createSnippet(notification.comment.content)}`
+      bottomLine = !notification.comment
+        ? `${notification.actor.displayName} mentioned you in a deleted comment`
+        : `${notification.actor.displayName}${othersCount} mentioned you: ${createSnippet(notification.comment.content)}`
       break
     }
     case 'REFERRER_BONUS': {

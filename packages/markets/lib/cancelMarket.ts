@@ -48,6 +48,7 @@ export async function cancelMarket({
     },
     include: {
       entries: true,
+      options: true,
     },
     orderBy: {
       createdAt: 'desc',
@@ -65,7 +66,7 @@ export async function cancelMarket({
       continue
     }
 
-    const { id: _, createdAt: __, updatedAt: ___, ...deconstructedTransaction } = transaction
+    const { id: _, createdAt: __, updatedAt: ___, options, ...deconstructedTransaction } = transaction
 
     await db.$transaction(async (tx) => {
       const reverseTransaction = await tx.transaction.create({
@@ -83,6 +84,9 @@ export async function cancelMarket({
                 })
               ),
             },
+          },
+          options: {
+            connect: options?.map(({ id }) => ({ id })),
           },
         },
         include: {
