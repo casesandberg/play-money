@@ -6,7 +6,9 @@ export async function getUniqueLiquidityProviderIds(
 ): Promise<string[]> {
   const result = await db.transaction.findMany({
     where: {
-      type: 'LIQUIDITY_DEPOSIT',
+      type: {
+        in: ['LIQUIDITY_DEPOSIT', 'LIQUIDITY_INITIALIZE'],
+      },
       marketId,
       isReverse: null,
     },
