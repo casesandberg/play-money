@@ -43,6 +43,7 @@ export type MarketActivity = {
     | 'LIQUIDITY_TRANSACTION'
     | 'MARKET_CREATED'
     | 'MARKET_RESOLVED'
+    | 'MARKET_CANCELED'
     | 'LIST_CREATED'
   timestampAt: Date
   comment?: CommentWithReactions
@@ -60,6 +61,7 @@ export const MarketActivitySchema = z.object({
     'LIQUIDITY_TRANSACTION',
     'MARKET_CREATED',
     'MARKET_RESOLVED',
+    'MARKET_CANCELED',
     'LIST_CREATED',
   ]),
   timestampAt: z.date(),

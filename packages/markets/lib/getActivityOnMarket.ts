@@ -45,6 +45,7 @@ export async function getActivityOnMarket({
         initiatorId: {
           not: null,
         },
+        isReverse: null,
       },
       include: {
         entries: true,
@@ -86,6 +87,14 @@ export async function getActivityOnMarket({
       type: 'MARKET_RESOLVED',
       timestampAt: market.marketResolution.createdAt,
       marketResolution: market.marketResolution,
+    })
+  }
+
+  if (market?.canceledAt) {
+    nonGroupedActivities.push({
+      type: 'MARKET_CANCELED',
+      timestampAt: market.canceledAt,
+      market: market,
     })
   }
 

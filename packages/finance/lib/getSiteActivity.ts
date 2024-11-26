@@ -24,6 +24,7 @@ export async function getSiteActivity({
         initiatorId: {
           not: null,
         },
+        isReverse: null,
       },
       include: {
         entries: true,
