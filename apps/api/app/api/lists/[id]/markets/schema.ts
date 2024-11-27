@@ -1,8 +1,8 @@
 import { z } from 'zod'
-import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
+import { ApiEndpoints, ServerErrorSchema } from '@play-money/api-helpers'
 import { MarketOptionSchema, MarketSchema } from '@play-money/database'
 
-export default createSchema({
+export default {
   post: {
     parameters: z.object({ id: z.string() }),
     requestBody: MarketSchema.pick({
@@ -24,4 +24,4 @@ export default createSchema({
       500: ServerErrorSchema,
     },
   },
-})
+} as const satisfies ApiEndpoints

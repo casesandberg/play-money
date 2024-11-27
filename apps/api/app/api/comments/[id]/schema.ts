@@ -1,8 +1,8 @@
 import { z } from 'zod'
-import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
+import { ApiEndpoints, ServerErrorSchema } from '@play-money/api-helpers'
 import { CommentSchema } from '@play-money/database'
 
-export default createSchema({
+export default {
   get: {
     parameters: CommentSchema.pick({ id: true }),
     responses: {
@@ -28,4 +28,4 @@ export default createSchema({
       500: ServerErrorSchema,
     },
   },
-})
+} as const satisfies ApiEndpoints

@@ -1,7 +1,7 @@
-import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
+import { ApiEndpoints, ServerErrorSchema } from '@play-money/api-helpers'
 import { CommentSchema } from '@play-money/database'
 
-export default createSchema({
+export default {
   post: {
     requestBody: CommentSchema.pick({
       content: true,
@@ -15,4 +15,4 @@ export default createSchema({
       500: ServerErrorSchema,
     },
   },
-})
+} as const satisfies ApiEndpoints

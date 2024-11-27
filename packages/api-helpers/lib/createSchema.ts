@@ -21,7 +21,3 @@ export type SchemaResponse<T extends { [key: number]: z.ZodObject<any> | z.ZodOb
 >
 
 export type ApiEndpoints = Partial<Record<HttpMethod, EndpointDefinition>>
-
-export function createSchema<T extends ApiEndpoints>(endpoints: T): T {
-  return endpoints
-}
