@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic'
 export async function GET(
   _req: Request,
   { params }: { params: unknown }
-): Promise<SchemaResponse<typeof schema.get.flatResponses>> {
+): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
     const { id } = schema.get.parameters.parse(params)
 
@@ -32,7 +32,7 @@ export async function GET(
 export async function PATCH(
   req: Request,
   { params }: { params: unknown }
-): Promise<SchemaResponse<typeof schema.patch.flatResponses>> {
+): Promise<SchemaResponse<typeof schema.patch.responses>> {
   try {
     const session = await auth()
 
@@ -65,7 +65,7 @@ export async function PATCH(
 export async function DELETE(
   _req: Request,
   { params }: { params: unknown }
-): Promise<SchemaResponse<typeof schema.delete.flatResponses>> {
+): Promise<SchemaResponse<typeof schema.delete.responses>> {
   try {
     const session = await auth()
 

@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic'
 export async function GET(
   _req: Request,
   { params }: { params: unknown }
-): Promise<SchemaResponse<typeof schema.get.flatResponses>> {
+): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
     const { id } = schema.get.parameters.parse(params)
     const session = await auth()

@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic'
 export async function POST(
   req: Request,
   { params }: { params: unknown }
-): Promise<SchemaResponse<typeof schema.post.flatResponses>> {
+): Promise<SchemaResponse<typeof schema.post.responses>> {
   try {
     const { id } = schema.post.parameters.parse(params)
 

@@ -6,7 +6,7 @@ import schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(req: Request): Promise<SchemaResponse<typeof schema.get.flatResponses>> {
+export async function GET(req: Request): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
     const session = await auth()
 
