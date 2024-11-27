@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic'
 export async function POST(
   req: Request,
   { params }: { params: unknown }
-): Promise<SchemaResponse<typeof schema.post.responses>> {
+): Promise<SchemaResponse<typeof schema.post.flatResponses>> {
   try {
     const session = await auth()
 

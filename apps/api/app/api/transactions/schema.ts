@@ -9,7 +9,7 @@ import {
 } from '@play-money/database'
 
 export default createSchema({
-  GET: {
+  get: {
     parameters: z
       .object({
         marketId: z.string().optional(),

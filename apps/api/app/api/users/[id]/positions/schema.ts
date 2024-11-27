@@ -3,7 +3,7 @@ import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
 import { MarketOptionPositionSchema, UserSchema } from '@play-money/database'
 
 export default createSchema({
-  GET: {
+  get: {
     parameters: UserSchema.pick({ id: true }).extend({
       pageSize: z.coerce.number().optional(),
       status: z.enum(['active', 'closed', 'all']).optional(),

@@ -6,7 +6,7 @@ import schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
-export async function POST(req: Request): Promise<SchemaResponse<typeof schema.post.responses>> {
+export async function POST(req: Request): Promise<SchemaResponse<typeof schema.post.flatResponses>> {
   try {
     const body = (await req.json()) as unknown
     const { question } = schema.post.requestBody.parse(body)

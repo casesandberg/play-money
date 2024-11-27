@@ -3,7 +3,7 @@ import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
 import { MarketSchema } from '@play-money/database'
 
 export default createSchema({
-  GET: {
+  get: {
     parameters: zod.object({ id: zod.string() }),
     responses: {
       200: zod.object({ markets: zod.array(MarketSchema) }),

@@ -5,13 +5,13 @@ import schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(req: Request): Promise<SchemaResponse<typeof schema.GET.responses>> {
+export async function GET(req: Request): Promise<SchemaResponse<typeof schema.get.flatResponses>> {
   try {
     const url = new URL(req.url)
     const searchParams = new URLSearchParams(url.search)
     const params = Object.fromEntries(searchParams)
 
-    const { username } = schema.GET.parameters.parse(params)
+    const { username } = schema.get.parameters.parse(params)
 
     const { available, message } = await checkUsername({ username })
 

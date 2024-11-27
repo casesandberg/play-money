@@ -8,7 +8,7 @@ import schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(req: Request): Promise<SchemaResponse<typeof schema.get.responses>> {
+export async function GET(req: Request): Promise<SchemaResponse<typeof schema.get.flatResponses>> {
   try {
     const url = new URL(req.url)
     const searchParams = new URLSearchParams(url.search)
@@ -54,7 +54,7 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.ge
   }
 }
 
-export async function POST(req: Request): Promise<SchemaResponse<typeof schema.post.responses>> {
+export async function POST(req: Request): Promise<SchemaResponse<typeof schema.post.flatResponses>> {
   try {
     const session = await auth()
 

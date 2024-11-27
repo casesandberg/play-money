@@ -1,46 +1,53 @@
 import { NextResponse } from 'next/server'
 import z from 'zod'
 
-export type SchemaResponse<Res extends z.ZodObject<any>> = NextResponse<z.infer<Res>>
+type HttpMethod = 'get' | 'post' | 'put' | 'patch' | 'delete'
 
-type SwaggerPathSpec = {
-  [key: string]: {
-    parameters?: z.ZodObject<any> | z.ZodOptional<z.ZodObject<any>>
-    requestBody?: z.ZodObject<any>
-    responses: {
-      [key: number]: z.ZodObject<any> | Array<z.ZodObject<any>>
+interface EndpointDefinition {
+  parameters?: z.ZodObject<any> | z.ZodOptional<z.ZodObject<any>>
+  requestBody?: z.ZodObject<any>
+  responses: {
+    [statusCode: number]: z.ZodObject<any> | z.ZodObject<any>[]
+  }
+}
+
+export type SchemaResponse<T> =
+  T extends z.ZodObject<any>
+    ? NextResponse<z.infer<T>>
+    : T extends z.ZodObject<any>[]
+      ? NextResponse<z.infer<T[number]>>
+      : never
+
+type ApiEndpoints = Partial<Record<HttpMethod, EndpointDefinition>>
+
+type UnwrapArray<T> = T extends Array<infer U> ? U : T
+
+type EndpointWithFlatResponses<T extends EndpointDefinition> = T & {
+  flatResponses: UnwrapArray<
+    T['responses'][keyof T['responses']] extends Array<infer V> ? V : [T['responses'][keyof T['responses']]]
+  >
+}
+
+type ProcessedApiEndpoints<T extends ApiEndpoints> = {
+  [Method in keyof T]: T[Method] extends EndpointDefinition ? EndpointWithFlatResponses<T[Method]> : never
+}
+
+function flattenResponses(responses: EndpointDefinition['responses']): z.ZodObject<any>[] {
+  return Object.values(responses).flatMap((response) => (Array.isArray(response) ? response : [response]))
+}
+
+export function createSchema<T extends ApiEndpoints>(endpoints: T): ProcessedApiEndpoints<T> {
+  const processedEndpoints = {} as ProcessedApiEndpoints<T>
+
+  for (const method in endpoints) {
+    if (endpoints.hasOwnProperty(method)) {
+      const endpointSpec = endpoints[method] as EndpointDefinition
+      processedEndpoints[method as keyof T] = {
+        ...endpointSpec,
+        flatResponses: flattenResponses(endpointSpec.responses),
+      } as ProcessedApiEndpoints<T>[typeof method]
     }
   }
-}
 
-type Flatten<T> = T extends Array<infer U> ? (U extends Array<any> ? Flatten<U> : U) : T
-
-type TransformResType<Spec> = {
-  [Method in keyof Spec]: Spec[Method] extends {
-    responses: infer Res extends { [key: number]: z.ZodObject<any> | Array<z.ZodObject<any>> }
-  }
-    ? { [Key in Exclude<keyof Spec[Method], 'responses'>]: Spec[Method][Key] } & {
-        responses: Flatten<Res[keyof Res] extends Array<infer V> ? V : [Res[keyof Res]]>
-      }
-    : Spec[Method]
-}
-
-function flattenToArray<Res extends { [key: number]: z.ZodObject<any> | Array<z.ZodObject<any>> }>(res: Res) {
-  return Object.values(res).flatMap((response) => (Array.isArray(response) ? response : [response]))
-}
-
-export function createSchema<Spec extends SwaggerPathSpec>(spec: Spec): TransformResType<Spec> {
-  const result: any = {}
-
-  for (const method in spec) {
-    if (spec.hasOwnProperty(method)) {
-      const { responses, ...rest } = spec[method]
-      result[method] = {
-        ...rest,
-        responses: flattenToArray(responses),
-      }
-    }
-  }
-
-  return result
+  return processedEndpoints
 }

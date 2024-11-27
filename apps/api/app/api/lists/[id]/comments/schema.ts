@@ -3,7 +3,7 @@ import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
 import { CommentSchema } from '@play-money/database'
 
 export default createSchema({
-  GET: {
+  get: {
     parameters: zod.object({ id: zod.string() }),
     responses: {
       200: zod.object({ comments: zod.array(CommentSchema) }),

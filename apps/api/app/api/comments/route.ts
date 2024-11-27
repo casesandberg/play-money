@@ -6,7 +6,7 @@ import schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
-export async function POST(req: Request): Promise<SchemaResponse<typeof schema.POST.responses>> {
+export async function POST(req: Request): Promise<SchemaResponse<typeof schema.post.flatResponses>> {
   try {
     const session = await auth()
 
@@ -15,7 +15,7 @@ export async function POST(req: Request): Promise<SchemaResponse<typeof schema.P
     }
 
     const body = (await req.json()) as unknown
-    const data = schema.POST.requestBody.parse(body)
+    const data = schema.post.requestBody.parse(body)
 
     const comment = await createComment({ ...data, authorId: session.user.id })
 

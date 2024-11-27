@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 export async function GET(
   _req: Request,
   { params }: { params: unknown }
-): Promise<SchemaResponse<typeof schema.get.responses>> {
+): Promise<SchemaResponse<typeof schema.get.flatResponses>> {
   try {
     const { id } = schema.get.parameters.parse(params)
     const userAccount = await getUserPrimaryAccount({ userId: id })

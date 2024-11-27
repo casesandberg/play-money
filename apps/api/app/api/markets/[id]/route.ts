@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic'
 export async function GET(
   req: Request,
   { params: idParams }: { params: Record<string, unknown> }
-): Promise<SchemaResponse<typeof schema.get.responses>> {
+): Promise<SchemaResponse<typeof schema.get.flatResponses>> {
   try {
     const url = new URL(req.url)
     const searchParams = new URLSearchParams(url.search)
@@ -38,7 +38,7 @@ export async function GET(
 export async function PATCH(
   req: Request,
   { params }: { params: unknown }
-): Promise<SchemaResponse<typeof schema.patch.responses>> {
+): Promise<SchemaResponse<typeof schema.patch.flatResponses>> {
   try {
     const session = await auth()
 

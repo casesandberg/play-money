@@ -3,7 +3,7 @@ import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
 import { UserSchema } from '@play-money/database'
 
 export default createSchema({
-  GET: {
+  get: {
     parameters: z.object({ code: z.string() }),
     responses: {
       200: UserSchema,

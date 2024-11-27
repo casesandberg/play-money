@@ -2,7 +2,7 @@ import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
 import { CommentSchema } from '@play-money/database'
 
 export default createSchema({
-  POST: {
+  post: {
     requestBody: CommentSchema.pick({
       content: true,
       parentId: true,
