@@ -4,7 +4,7 @@
   "globalDotEnv": [".env"],
   "pipeline": {
     "build": {
-      "dependsOn": ["^test", "^build", "^db:generate"],
+      "dependsOn": ["^test", "^build", "^db:generate", "^docs:generate"],
       "env": ["NEXT_PUBLIC_API_URL", "BLOB_READ_WRITE_TOKEN"],
       "inputs": ["$TURBO_DEFAULT$", "!**/*.stories.{tsx,jsx,mdx}"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "storybook-static/**"]
@@ -13,7 +13,7 @@
     "format": {},
     "type-check": {},
     "dev": {
-      "dependsOn": ["^db:generate"],
+      "dependsOn": ["^db:generate", "^docs:generate"],
       "cache": false,
       "persistent": true
     },
@@ -27,6 +27,9 @@
       "cache": false
     },
     "db:reset": {
+      "cache": false
+    },
+    "docs:generate": {
       "cache": false
     },
     "test": {},

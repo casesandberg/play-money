@@ -1,9 +1,9 @@
 import { z } from 'zod'
-import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
+import { ApiEndpoints, ServerErrorSchema } from '@play-money/api-helpers'
 import { CommentSchema } from '@play-money/database'
 
-export default createSchema({
-  GET: {
+export default {
+  get: {
     parameters: CommentSchema.pick({ id: true }),
     responses: {
       200: CommentSchema,
@@ -11,7 +11,7 @@ export default createSchema({
       500: ServerErrorSchema,
     },
   },
-  PATCH: {
+  patch: {
     parameters: CommentSchema.pick({ id: true }),
     requestBody: CommentSchema.pick({ content: true }),
     responses: {
@@ -20,7 +20,7 @@ export default createSchema({
       500: ServerErrorSchema,
     },
   },
-  DELETE: {
+  delete: {
     parameters: CommentSchema.pick({ id: true }),
     responses: {
       200: z.object({ message: z.string() }),
@@ -28,4 +28,4 @@ export default createSchema({
       500: ServerErrorSchema,
     },
   },
-})
+} as const satisfies ApiEndpoints

@@ -6,7 +6,7 @@ import schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(req: Request): Promise<SchemaResponse<typeof schema.GET.responses>> {
+export async function GET(req: Request): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
     const url = new URL(req.url)
     const searchParams = new URLSearchParams(url.search)
@@ -17,7 +17,7 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.GE
       params.transactionType = params.transactionType.split(',') as unknown as string
     }
 
-    const { marketId, userId, transactionType, page = 1, pageSize = 50 } = schema.GET.parameters.parse(params) ?? {}
+    const { marketId, userId, transactionType, page = 1, pageSize = 50 } = schema.get.parameters.parse(params) ?? {}
 
     const { transactions, total } = await getTransactions({ marketId, userId, transactionType }, undefined, {
       skip: (page - 1) * pageSize,

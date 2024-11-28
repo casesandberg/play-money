@@ -1,8 +1,8 @@
 import { z } from 'zod'
-import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
+import { ApiEndpoints, ServerErrorSchema } from '@play-money/api-helpers'
 import { NotificationGroupSchema } from '@play-money/database'
 
-export default createSchema({
+export default {
   get: {
     responses: {
       200: z.object({ notifications: z.array(NotificationGroupSchema), unreadCount: z.number() }),
@@ -17,4 +17,4 @@ export default createSchema({
       500: ServerErrorSchema,
     },
   },
-})
+} as const satisfies ApiEndpoints

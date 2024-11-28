@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
+import { ApiEndpoints, ServerErrorSchema } from '@play-money/api-helpers'
 
 const LeaderboardUserSchema = z.object({
   userId: z.string(),
@@ -10,8 +10,8 @@ const LeaderboardUserSchema = z.object({
   rank: z.number(),
 })
 
-export default createSchema({
-  GET: {
+export default {
+  get: {
     parameters: z
       .object({
         year: z.coerce.number().optional(),
@@ -40,4 +40,4 @@ export default createSchema({
       500: ServerErrorSchema,
     },
   },
-})
+} as const satisfies ApiEndpoints

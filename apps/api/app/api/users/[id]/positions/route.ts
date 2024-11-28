@@ -9,13 +9,13 @@ export const dynamic = 'force-dynamic'
 export async function GET(
   req: Request,
   { params }: { params: unknown }
-): Promise<SchemaResponse<typeof schema.GET.responses>> {
+): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
     const url = new URL(req.url)
     const searchParams = new URLSearchParams(url.search)
     const urlParams = Object.fromEntries(searchParams)
 
-    const { id, pageSize, status } = schema.GET.parameters.parse({ ...(params || {}), ...urlParams })
+    const { id, pageSize, status } = schema.get.parameters.parse({ ...(params || {}), ...urlParams })
 
     const user = await getUserById({ id })
 

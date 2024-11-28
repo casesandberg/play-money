@@ -1,15 +1,15 @@
-import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
+import { ApiEndpoints, ServerErrorSchema } from '@play-money/api-helpers'
 import { UserSchema } from '@play-money/database'
 
-export default createSchema({
-  GET: {
+export default {
+  get: {
     responses: {
       200: UserSchema,
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },
   },
-  PATCH: {
+  patch: {
     requestBody: UserSchema.pick({
       username: true,
       bio: true,
@@ -24,4 +24,4 @@ export default createSchema({
       500: ServerErrorSchema,
     },
   },
-})
+} as const satisfies ApiEndpoints

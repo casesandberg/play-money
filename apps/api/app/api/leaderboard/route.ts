@@ -6,7 +6,7 @@ import schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(req: Request): Promise<SchemaResponse<typeof schema.GET.responses>> {
+export async function GET(req: Request): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
     const session = await auth()
 
@@ -14,7 +14,7 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.GE
     const searchParams = new URLSearchParams(url.search)
     const params = Object.fromEntries(searchParams)
 
-    const { month, year } = schema.GET.parameters.parse(params) ?? {}
+    const { month, year } = schema.get.parameters.parse(params) ?? {}
 
     const now = month && year ? new Date(`${month}/01/${year}`) : new Date()
     const startDate = new Date(now.getFullYear(), now.getMonth(), 1)

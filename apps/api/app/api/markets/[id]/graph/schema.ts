@@ -1,8 +1,8 @@
 import { z } from 'zod'
-import { ServerErrorSchema, createSchema } from '@play-money/api-helpers'
+import { ApiEndpoints, ServerErrorSchema } from '@play-money/api-helpers'
 
-export default createSchema({
-  GET: {
+export default {
+  get: {
     parameters: z.object({ id: z.string() }),
     responses: {
       200: z.object({
@@ -23,4 +23,4 @@ export default createSchema({
       500: ServerErrorSchema,
     },
   },
-})
+} as const satisfies ApiEndpoints
