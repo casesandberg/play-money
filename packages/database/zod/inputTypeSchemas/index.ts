@@ -18,6 +18,7 @@ export { NotificationScalarFieldEnumSchema } from './NotificationScalarFieldEnum
 export { NotificationGroupScalarFieldEnumSchema } from './NotificationGroupScalarFieldEnumSchema';
 export { ListScalarFieldEnumSchema } from './ListScalarFieldEnumSchema';
 export { MarketListScalarFieldEnumSchema } from './MarketListScalarFieldEnumSchema';
+export { ApiKeyScalarFieldEnumSchema } from './ApiKeyScalarFieldEnumSchema';
 export { SortOrderSchema } from './SortOrderSchema';
 export { JsonNullValueInputSchema } from './JsonNullValueInputSchema';
 export { QueryModeSchema } from './QueryModeSchema';
