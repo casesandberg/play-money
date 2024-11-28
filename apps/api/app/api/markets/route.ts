@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
-import { auth } from '@play-money/auth'
+import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
 import { createList } from '@play-money/lists/lib/createList'
 import { createMarket } from '@play-money/markets/lib/createMarket'
 import { getMarkets } from '@play-money/markets/lib/getMarkets'
@@ -56,10 +56,9 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.ge
 
 export async function POST(req: Request): Promise<SchemaResponse<typeof schema.post.responses>> {
   try {
-    const session = await auth()
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'You must be signed in to create a market' }, { status: 401 })
+    const userId = await getAuthUser(req)
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = (await req.json()) as unknown
@@ -68,13 +67,13 @@ export async function POST(req: Request): Promise<SchemaResponse<typeof schema.p
     if (basicMarket.type === 'binary' || basicMarket.type === 'multi') {
       const newMarket = await createMarket({
         ...basicMarket,
-        createdBy: session.user.id,
+        createdBy: userId,
       })
       return NextResponse.json({ market: newMarket })
     } else if (basicMarket.type === 'list') {
       const newList = await createList({
         ...basicMarket,
-        ownerId: session.user.id,
+        ownerId: userId,
         title: basicMarket.question,
         markets: basicMarket.options,
         contributionPolicy: basicMarket.contributionPolicy || 'OWNERS_ONLY',

@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
-import { auth } from '@play-money/auth'
+import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
 import db from '@play-money/database'
 import type { NetBalance } from '@play-money/finance/lib/getBalances'
 import { transformMarketBalancesToNumbers } from '@play-money/finance/lib/getBalances'
@@ -11,13 +11,13 @@ import schema from './schema'
 export const dynamic = 'force-dynamic'
 
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: unknown }
 ): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
     const { id } = schema.get.parameters.parse(params)
-    const session = await auth()
-    const userAccount = session?.user?.id ? await getUserPrimaryAccount({ userId: session.user.id }) : undefined
+    const userId = await getAuthUser(req)
+    const userAccount = userId ? await getUserPrimaryAccount({ userId }) : undefined
 
     const [userBalances, userBalancesInMarket] = await Promise.all([
       db.balance.findMany({

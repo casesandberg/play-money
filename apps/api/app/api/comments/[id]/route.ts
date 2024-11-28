@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { stripUndefined, type SchemaResponse } from '@play-money/api-helpers'
-import { auth } from '@play-money/auth'
+import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
 import { deleteComment } from '@play-money/comments/lib/deleteComment'
 import { CommentNotFoundError } from '@play-money/comments/lib/exceptions'
 import { getComment } from '@play-money/comments/lib/getComment'
@@ -34,9 +34,9 @@ export async function PATCH(
   { params }: { params: unknown }
 ): Promise<SchemaResponse<typeof schema.patch.responses>> {
   try {
-    const session = await auth()
+    const userId = await getAuthUser(req)
 
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -45,7 +45,7 @@ export async function PATCH(
     const { content } = schema.patch.requestBody.transform(stripUndefined).parse(body)
 
     const comment = await getComment({ id })
-    if (comment.authorId !== session.user.id) {
+    if (comment.authorId !== userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -63,20 +63,20 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _req: Request,
+  req: Request,
   { params }: { params: unknown }
 ): Promise<SchemaResponse<typeof schema.delete.responses>> {
   try {
-    const session = await auth()
+    const userId = await getAuthUser(req)
 
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { id } = schema.delete.parameters.parse(params)
 
     const comment = await getComment({ id })
-    if (comment.authorId !== session.user.id) {
+    if (comment.authorId !== userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

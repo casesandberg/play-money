@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
-import { auth } from '@play-money/auth'
+import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
 import { createComment } from '@play-money/comments/lib/createComment'
 import schema from './schema'
 
@@ -8,16 +8,15 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request): Promise<SchemaResponse<typeof schema.post.responses>> {
   try {
-    const session = await auth()
-
-    if (!session?.user?.id) {
+    const userId = await getAuthUser(req)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = (await req.json()) as unknown
     const data = schema.post.requestBody.parse(body)
 
-    const comment = await createComment({ ...data, authorId: session.user.id })
+    const comment = await createComment({ ...data, authorId: userId })
 
     return NextResponse.json(comment)
   } catch (error) {

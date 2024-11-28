@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
-import { auth } from '@play-money/auth'
+import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
 import { reactToComment } from '@play-money/comments/lib/reactToComment'
 import schema from './schema'
 
@@ -11,9 +11,8 @@ export async function POST(
   { params }: { params: unknown }
 ): Promise<SchemaResponse<typeof schema.post.responses>> {
   try {
-    const session = await auth()
-
-    if (!session?.user?.id) {
+    const userId = await getAuthUser(req)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -21,7 +20,7 @@ export async function POST(
     const data = schema.post.requestBody.parse(body)
     const { id } = schema.post.parameters.parse(params)
 
-    const commentReaction = await reactToComment({ commentId: id, userId: session.user.id, ...data })
+    const commentReaction = await reactToComment({ commentId: id, userId, ...data })
 
     if (commentReaction === 'removed') {
       return NextResponse.json({ message: 'Reaction removed' })

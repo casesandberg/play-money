@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
-import { auth } from '@play-money/auth'
+import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
 import { getNotifications } from '@play-money/notifications/lib/getNotifications'
 import { getUnreadNotificationCount } from '@play-money/notifications/lib/getUnreadNotificationCount'
 import { updateNotificationsRead } from '@play-money/notifications/lib/updateNotificationsRead'
@@ -8,17 +8,16 @@ import type schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(_req: Request): Promise<SchemaResponse<typeof schema.get.responses>> {
+export async function GET(req: Request): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
-    const session = await auth()
-
-    if (!session?.user?.id) {
+    const userId = await getAuthUser(req)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const [unreadCount, notifications] = await Promise.all([
-      getUnreadNotificationCount({ userId: session.user.id }),
-      getNotifications({ userId: session.user.id }),
+      getUnreadNotificationCount({ userId }),
+      getNotifications({ userId }),
     ])
 
     return NextResponse.json({ notifications, unreadCount })
@@ -29,15 +28,14 @@ export async function GET(_req: Request): Promise<SchemaResponse<typeof schema.g
   }
 }
 
-export async function POST(_req: Request): Promise<SchemaResponse<typeof schema.post.responses>> {
+export async function POST(req: Request): Promise<SchemaResponse<typeof schema.post.responses>> {
   try {
-    const session = await auth()
-
-    if (!session?.user?.id) {
+    const userId = await getAuthUser(req)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    await updateNotificationsRead({ userId: session.user.id })
+    await updateNotificationsRead({ userId })
 
     return NextResponse.json({ success: true })
   } catch (error) {

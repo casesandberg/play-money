@@ -1,20 +1,19 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
-import { auth } from '@play-money/auth'
+import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
 import { getUserReferrals } from '@play-money/referrals/lib/getUserReferrals'
 import type schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(_req: Request): Promise<SchemaResponse<typeof schema.get.responses>> {
+export async function GET(req: Request): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
-    const session = await auth()
-
-    if (!session?.user?.id) {
+    const userId = await getAuthUser(req)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const referrals = await getUserReferrals({ userId: session.user.id })
+    const referrals = await getUserReferrals({ userId })
 
     return NextResponse.json({ referrals })
   } catch (error) {

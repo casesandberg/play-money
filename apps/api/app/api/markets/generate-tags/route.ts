@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
-import { auth } from '@play-money/auth'
+import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
 import { getMarketTagsLLM } from '@play-money/markets/lib/getMarketTagsLLM'
 import schema from './schema'
 
@@ -11,11 +11,9 @@ export async function POST(req: Request): Promise<SchemaResponse<typeof schema.p
     const body = (await req.json()) as unknown
     const { question } = schema.post.requestBody.parse(body)
 
-    const session = await auth()
-    if (!session?.user?.id) {
-      return NextResponse.json({
-        tags: [],
-      })
+    const userId = await getAuthUser(req)
+    if (!userId) {
+      return NextResponse.json({ tags: [] })
     }
 
     const tags = await getMarketTagsLLM({

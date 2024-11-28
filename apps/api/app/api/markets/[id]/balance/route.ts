@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
 import { auth } from '@play-money/auth'
+import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
 import db from '@play-money/database'
 import {
   getMarketBalances,
@@ -14,14 +15,14 @@ import schema from './schema'
 export const dynamic = 'force-dynamic'
 
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: unknown }
 ): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
     const { id } = schema.get.parameters.parse(params)
-    const session = await auth()
+    const userId = await getAuthUser(req)
     const ammAccount = await getMarketAmmAccount({ marketId: id })
-    const userAccount = session?.user?.id ? await getUserPrimaryAccount({ userId: session.user.id }) : undefined
+    const userAccount = userId ? await getUserPrimaryAccount({ userId }) : undefined
 
     const [ammBalances, userBalancesInMarket, userPositions] = await Promise.all([
       getMarketBalances({ accountId: ammAccount.id, marketId: id }),

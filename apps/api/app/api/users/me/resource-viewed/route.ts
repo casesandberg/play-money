@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { type SchemaResponse } from '@play-money/api-helpers'
-import { auth } from '@play-money/auth'
+import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
 import { updateNotificationsRead } from '@play-money/notifications/lib/updateNotificationsRead'
 import schema from './schema'
 
@@ -8,9 +8,8 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request): Promise<SchemaResponse<typeof schema.post.responses>> {
   try {
-    const session = await auth()
-
-    if (!session?.user?.id) {
+    const userId = await getAuthUser(req)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -18,9 +17,9 @@ export async function POST(req: Request): Promise<SchemaResponse<typeof schema.p
     const { resourceId, resourceType } = schema.post.requestBody.parse(body)
 
     if (resourceType === 'MARKET') {
-      await updateNotificationsRead({ userId: session.user.id, marketId: resourceId })
+      await updateNotificationsRead({ userId, marketId: resourceId })
     } else if (resourceType === 'LIST') {
-      await updateNotificationsRead({ userId: session.user.id, listId: resourceId })
+      await updateNotificationsRead({ userId, listId: resourceId })
     }
 
     return NextResponse.json({ success: true })

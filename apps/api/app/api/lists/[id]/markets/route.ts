@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
-import { auth } from '@play-money/auth'
+import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
 import db from '@play-money/database'
 import { LOWEST_MARKET_LIQUIDITY_PRIMARY } from '@play-money/finance/economy'
 import { getList } from '@play-money/lists/lib/getList'
@@ -18,9 +18,8 @@ export async function POST(
   try {
     const { id } = schema.post.parameters.parse(params)
 
-    const session = await auth()
-
-    if (!session?.user?.id) {
+    const userId = await getAuthUser(req)
+    if (!userId) {
       return NextResponse.json({ error: 'You must be signed in to create a market' }, { status: 401 })
     }
 
@@ -29,13 +28,13 @@ export async function POST(
 
     const list = await getList({ id })
 
-    if (!canAddToList({ list, userId: session.user.id })) {
+    if (!canAddToList({ list, userId })) {
       throw new Error('Cannot add to list')
     }
 
     const newMarket = await createMarket({
       ...basicMarket,
-      createdBy: session.user.id,
+      createdBy: userId,
       parentListId: list.id,
       subsidyAmount: new Decimal(LOWEST_MARKET_LIQUIDITY_PRIMARY),
     })

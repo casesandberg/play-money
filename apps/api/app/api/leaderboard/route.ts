@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { type SchemaResponse } from '@play-money/api-helpers'
-import { auth } from '@play-money/auth'
+import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
 import { getMonthlyLeaderboard } from '@play-money/finance/lib/getMonthlyLeaderboard'
 import schema from './schema'
 
@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(req: Request): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
-    const session = await auth()
+    const userId = await getAuthUser(req)
 
     const url = new URL(req.url)
     const searchParams = new URLSearchParams(url.search)
@@ -20,7 +20,7 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.ge
     const startDate = new Date(now.getFullYear(), now.getMonth(), 1)
     const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
 
-    const leaderboard = await getMonthlyLeaderboard(startDate, endDate, session?.user?.id)
+    const leaderboard = await getMonthlyLeaderboard(startDate, endDate, userId)
 
     return NextResponse.json(leaderboard, {
       headers: {

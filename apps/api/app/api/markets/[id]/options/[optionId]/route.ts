@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { stripUndefined, type SchemaResponse } from '@play-money/api-helpers'
-import { auth } from '@play-money/auth'
+import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
 import { CommentNotFoundError } from '@play-money/comments/lib/exceptions'
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import { updateMarketOption } from '@play-money/markets/lib/updateMarketOption'
@@ -15,9 +15,8 @@ export async function PATCH(
   { params }: { params: unknown }
 ): Promise<SchemaResponse<typeof schema.patch.responses>> {
   try {
-    const session = await auth()
-
-    if (!session?.user?.id) {
+    const userId = await getAuthUser(req)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -26,7 +25,7 @@ export async function PATCH(
     const { name, color } = schema.patch.requestBody.transform(stripUndefined).parse(body)
 
     const market = await getMarket({ id })
-    const user = await getUserById({ id: session.user.id })
+    const user = await getUserById({ id: userId })
 
     if (!canModifyMarket({ market, user })) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

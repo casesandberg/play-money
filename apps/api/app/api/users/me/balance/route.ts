@@ -1,21 +1,20 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
-import { auth } from '@play-money/auth'
+import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
 import { getBalance } from '@play-money/finance/lib/getBalances'
 import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
 import type schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(_req: Request): Promise<SchemaResponse<typeof schema.get.responses>> {
+export async function GET(req: Request): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
-    const session = await auth()
-
-    if (!session?.user?.id) {
+    const userId = await getAuthUser(req)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const userAccount = await getUserPrimaryAccount({ userId: session.user.id })
+    const userAccount = await getUserPrimaryAccount({ userId })
     const primaryBalance = await getBalance({
       accountId: userAccount.id,
       assetType: 'CURRENCY',

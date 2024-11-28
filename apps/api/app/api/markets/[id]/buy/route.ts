@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
-import { auth } from '@play-money/auth'
+import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
 import { marketBuy } from '@play-money/markets/lib/marketBuy'
 import schema from './schema'
 
@@ -12,9 +12,8 @@ export async function POST(
   { params }: { params: unknown }
 ): Promise<SchemaResponse<typeof schema.post.responses>> {
   try {
-    const session = await auth()
-
-    if (!session?.user?.id) {
+    const userId = await getAuthUser(req)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -27,7 +26,7 @@ export async function POST(
       marketId: id,
       optionId,
       amount: new Decimal(amount),
-      userId: session.user.id,
+      userId,
     })
 
     return NextResponse.json({})

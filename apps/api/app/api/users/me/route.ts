@@ -1,21 +1,20 @@
 import { NextResponse } from 'next/server'
 import { stripUndefined, type SchemaResponse } from '@play-money/api-helpers'
-import { auth } from '@play-money/auth'
+import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
 import { getUserById } from '@play-money/users/lib/getUserById'
 import { updateUserById } from '@play-money/users/lib/updateUserById'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(_req: Request): Promise<SchemaResponse<typeof schema.get.responses>> {
+export async function GET(req: Request): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
-    const session = await auth()
-
-    if (!session?.user?.id) {
+    const userId = await getAuthUser(req)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const user = await getUserById({ id: session.user.id })
+    const user = await getUserById({ id: userId })
 
     return NextResponse.json(user)
   } catch (error) {
@@ -27,16 +26,15 @@ export async function GET(_req: Request): Promise<SchemaResponse<typeof schema.g
 
 export async function PATCH(req: Request): Promise<SchemaResponse<typeof schema.patch.responses>> {
   try {
-    const session = await auth()
-
-    if (!session?.user?.id) {
+    const userId = await getAuthUser(req)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = (await req.json()) as unknown
     const updateData = schema.patch.requestBody.transform(stripUndefined).parse(body)
 
-    const user = await updateUserById({ id: session.user.id, ...updateData })
+    const user = await updateUserById({ id: userId, ...updateData })
 
     return NextResponse.json(user)
   } catch (error: unknown) {
