@@ -15,7 +15,7 @@ export function slugifyTitle(title: string, maxLen = 50) {
     slug = slug.substring(0, maxLen).replace(/-+[^-]*?$/, '') // Remove the last word, since it might be cut off
   }
 
-  return slug
+  return slug || 'market'
 }
 
 const chrono = baseChrono.casual.clone()
