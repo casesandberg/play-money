@@ -98,6 +98,7 @@ async function getDocument() {
     info: {
       title: 'PlayMoney API',
       version: '1.0',
+      description: `Include \`x-api-key: {{key}}\` in the header of your requests. Api key can be generated at [https://playmoney.dev/settings/api](https://playmoney.dev/settings/api)`,
     },
     servers: process.env.NEXT_PUBLIC_API_URL
       ? [
