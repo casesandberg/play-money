@@ -27,70 +27,69 @@ async function getDocument() {
   const apiFolder = 'app/api'
   const schemaFiles = glob.sync(path.join(apiFolder, '**/schema.ts'))
 
-  await Promise.all(
-    schemaFiles.map(async (file) => {
-      const route = path.relative(apiFolder, path.dirname(file))
-      const schemaModule = (await import(`../app/api/${route}/schema.ts`)) as { default: ApiEndpoints }
-      const endpoints = schemaModule.default
-      const pathname = `/${route}`
+  for (const file of schemaFiles.sort()) {
+    const route = path.relative(apiFolder, path.dirname(file))
+    // eslint-disable-next-line no-await-in-loop -- Can't promise.all here because we need to import the schema files in order
+    const schemaModule = (await import(`../app/api/${route}/schema.ts`)) as { default: ApiEndpoints }
+    const endpoints = schemaModule.default
+    const pathname = `/${route}`
 
-      for (const [method, endpoint] of Object.entries(endpoints)) {
-        const responses: RouteConfig['responses'] = {}
+    for (const [method, endpoint] of Object.entries(endpoints)) {
+      const responses: RouteConfig['responses'] = {}
 
-        for (const [status, responseSchema] of Object.entries(endpoint.responses)) {
-          responses[status] = {
-            description: getResponseDescription(parseInt(status, 10)),
-            content: {
-              'application/json': {
-                schema: responseSchema as ZodType,
-              },
+      for (const [status, responseSchema] of Object.entries(endpoint.responses)) {
+        responses[status] = {
+          description: getResponseDescription(parseInt(status, 10)),
+          content: {
+            'application/json': {
+              schema: responseSchema as ZodType,
             },
-          }
-        }
-
-        const params: Record<string, z.ZodTypeAny> = {}
-
-        if (endpoint.parameters) {
-          const paramsSchema =
-            endpoint.parameters instanceof z.ZodOptional ? endpoint.parameters.unwrap() : endpoint.parameters
-
-          const shapeEntries = Object.entries(paramsSchema.shape as Record<string, z.ZodTypeAny>)
-
-          for (const [key, paramType] of shapeEntries) {
-            const registeredParam = registry.registerParameter(
-              key,
-              paramType.openapi({
-                param: {
-                  name: key,
-                  in: 'path',
-                },
-              })
-            )
-
-            params[key] = registeredParam
-          }
-        }
-
-        registry.registerPath({
-          method: method as RouteConfig['method'],
-          path: pathname,
-          request: {
-            body: endpoint.requestBody
-              ? {
-                  content: {
-                    'application/json': {
-                      schema: endpoint.requestBody,
-                    },
-                  },
-                }
-              : undefined,
-            params: Object.keys(params).length !== 0 ? z.object(params) : undefined,
           },
-          responses,
-        })
+        }
       }
-    })
-  )
+
+      const params: Record<string, z.ZodTypeAny> = {}
+
+      if (endpoint.parameters) {
+        const paramsSchema =
+          endpoint.parameters instanceof z.ZodOptional ? endpoint.parameters.unwrap() : endpoint.parameters
+
+        const shapeEntries = Object.entries(paramsSchema.shape as Record<string, z.ZodTypeAny>)
+
+        for (const [key, paramType] of shapeEntries) {
+          const registeredParam = registry.registerParameter(
+            key,
+            paramType.openapi({
+              param: {
+                name: key,
+                in: 'path',
+              },
+            })
+          )
+
+          params[key] = registeredParam
+        }
+      }
+
+      registry.registerPath({
+        method: method as RouteConfig['method'],
+        path: pathname,
+        request: {
+          body: endpoint.requestBody
+            ? {
+                content: {
+                  'application/json': {
+                    schema: endpoint.requestBody,
+                  },
+                },
+              }
+            : undefined,
+          params: Object.keys(params).length !== 0 ? z.object(params) : undefined,
+        },
+        responses,
+      })
+    }
+  }
 
   const generator = new OpenApiGeneratorV31(registry.definitions)
   const document = generator.generateDocument({
