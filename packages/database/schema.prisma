@@ -60,8 +60,8 @@ model User {
   actorNotifications     Notification[]      @relation("NotificationActor")
   notificationGroups     NotificationGroup[] @relation()
 
-  createdLists List[] @relation("ListCreator")
-  apiKeys    ApiKey[]
+  createdLists List[]   @relation("ListCreator")
+  apiKeys      ApiKey[]
 }
 
 model AuthAccount {
@@ -456,16 +456,16 @@ model MarketList {
 }
 
 model ApiKey {
-  id          String    @id @default(cuid())
-  name        String    /// @zod.string.trim().min(1, { message: "Name is required" })
-  key         String    @unique
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lastUsedAt  DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  expiresAt   DateTime?
-  isRevoked   Boolean   @default(false)
+  id         String    @id @default(cuid())
+  name       String /// @zod.string.trim().min(1, { message: "Name is required" })
+  key        String    @unique
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  expiresAt  DateTime?
+  isRevoked  Boolean   @default(false)
 
   @@index([key])
   @@index([userId])
