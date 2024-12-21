@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { CommentWithReactions } from '@play-money/comments/lib/getComment'
-import { CommentEntityType, List, Market, MarketOption, MarketOptionPosition, User } from '@play-money/database'
+import { ApiKey, CommentEntityType, List, Market, MarketOption, MarketOptionPosition, User } from '@play-money/database'
 import { NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
 import { TransactionWithEntries, LeaderboardUser, ExtendedMarketOptionPosition } from '@play-money/finance/types'
 import { ExtendedList } from '@play-money/lists/types'
@@ -545,4 +545,17 @@ export async function getLeaderboard({ month, year }: { month?: string; year?: s
       referrer: LeaderboardUser
     }
   }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/leaderboard${month && year ? `?year=${year}&month=${month}` : ''}`)
+}
+
+export async function createMyApiKey({ name }: { name: string }): Promise<ApiKey> {
+  return apiHandler<ApiKey>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/api-keys`, {
+    method: 'POST',
+    body: {
+      name,
+    },
+  })
+}
+
+export async function getMyApiKeys(): Promise<{ keys: Array<ApiKey> }> {
+  return apiHandler<{ keys: Array<ApiKey> }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/api-keys`)
 }

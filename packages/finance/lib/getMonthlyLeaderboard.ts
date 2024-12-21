@@ -11,7 +11,7 @@ function transformUserOutput(input: LeaderboardUser): LeaderboardUser {
   }
 }
 
-export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, userId?: string) {
+export async function getMonthlyLeaderboard(startDate: Date, endDate: Date, userId?: string | null) {
   const usernamesToIgnore = ['house', 'community']
   const [topTraders, topCreators, topPromoters, topQuesters, topReferrers] = await Promise.all([
     db.$queryRaw<Array<LeaderboardUser>>`
