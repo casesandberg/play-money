@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
-import { auth } from '@play-money/auth'
 import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
 import db from '@play-money/database'
 import {
