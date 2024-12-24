@@ -2,7 +2,7 @@
 
 **Play Money** is a prediction market platform. This codebase is structured as a monorepo using Turborepo, containing multiple standalone apps and shared feature packages.
 
-[Join the discord!](https://discord.gg/3vgjSYT3)
+[Join the discord!](https://discord.gg/Q5CeSMFeBP)
 
 ## Project Structure
 
