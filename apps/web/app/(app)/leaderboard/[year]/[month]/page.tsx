@@ -74,7 +74,7 @@ function LeaderboardUserTable({
 }
 
 export default async function AppLeaderboardSearchPage({ params }: { params: { month: string; year: string } }) {
-  const leaderboard = await getLeaderboard({ year: params.year, month: params.month })
+  const {data: leaderboard} = await getLeaderboard({ year: params.year, month: params.month })
 
   const monthNames = [
     'January',

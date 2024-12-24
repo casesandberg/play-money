@@ -22,12 +22,15 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.ge
 
     const leaderboard = await getMonthlyLeaderboard(startDate, endDate, userId)
 
-    return NextResponse.json(leaderboard, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'max-age=600, s-maxage=600, stale-while-revalidate=59',
-      },
-    })
+    return NextResponse.json(
+      { data: leaderboard },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'max-age=600, s-maxage=600, stale-while-revalidate=59',
+        },
+      }
+    )
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
 

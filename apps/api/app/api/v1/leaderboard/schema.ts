@@ -20,21 +20,23 @@ export default {
       .optional(),
     responses: {
       200: z.object({
-        topTraders: z.array(LeaderboardUserSchema),
-        topCreators: z.array(LeaderboardUserSchema),
-        topPromoters: z.array(LeaderboardUserSchema),
-        topQuesters: z.array(LeaderboardUserSchema),
-        topReferrers: z.array(LeaderboardUserSchema),
-        userRankings: z
-          .object({
-            trader: LeaderboardUserSchema.optional(),
-            creator: LeaderboardUserSchema.optional(),
-            promoter: LeaderboardUserSchema.optional(),
-            quester: LeaderboardUserSchema.optional(),
-            referrer: LeaderboardUserSchema.optional(),
-          })
-          .or(z.null())
-          .optional(),
+        data: z.object({
+          topTraders: z.array(LeaderboardUserSchema),
+          topCreators: z.array(LeaderboardUserSchema),
+          topPromoters: z.array(LeaderboardUserSchema),
+          topQuesters: z.array(LeaderboardUserSchema),
+          topReferrers: z.array(LeaderboardUserSchema),
+          userRankings: z
+            .object({
+              trader: LeaderboardUserSchema.optional(),
+              creator: LeaderboardUserSchema.optional(),
+              promoter: LeaderboardUserSchema.optional(),
+              quester: LeaderboardUserSchema.optional(),
+              referrer: LeaderboardUserSchema.optional(),
+            })
+            .or(z.null())
+            .optional(),
+        }),
       }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
