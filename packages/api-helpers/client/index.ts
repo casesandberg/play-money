@@ -5,6 +5,7 @@ import { NetBalanceAsNumbers } from '@play-money/finance/lib/getBalances'
 import { TransactionWithEntries, LeaderboardUser, ExtendedMarketOptionPosition } from '@play-money/finance/types'
 import { ExtendedList } from '@play-money/lists/types'
 import { ExtendedMarket, ExtendedMarketPosition, MarketActivity } from '@play-money/markets/types'
+import { PaginatedResponse, PaginationRequest } from '../types'
 
 // TODO: @casesandberg Generate this from OpenAPI schema
 
@@ -132,33 +133,27 @@ export async function getMyReferrals() {
 }
 
 export async function getMarkets({
-  tag,
-  page,
-  pageSize,
   status,
-  sortField,
-  sortDirection,
+  createdBy,
+  tags,
+  ...paginationParams
 }: {
-  tag?: string
-  page?: string
-  pageSize?: string
   status?: string
-  sortField?: string
-  sortDirection?: string
-} = {}) {
+  createdBy?: string
+  tags?: Array<string>
+} & PaginationRequest = {}) {
   const currentParams = new URLSearchParams(
-    JSON.parse(JSON.stringify({ tag, page, pageSize, status, sortField, sortDirection }))
+    JSON.parse(JSON.stringify({ status, createdBy, tags, ...paginationParams }))
   )
+
   const search = currentParams.toString()
 
-  return apiHandler<{
-    markets: Array<ExtendedMarket>
-    page: number
-    pageSize: number
-    totalPages: number
-  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets${search ? `?${search}` : ''}`, {
-    next: { tags: ['markets'] },
-  })
+  return apiHandler<PaginatedResponse<ExtendedMarket>>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/markets${search ? `?${search}` : ''}`,
+    {
+      next: { tags: ['markets'] },
+    }
+  )
 }
 
 export async function getMarketPositions({

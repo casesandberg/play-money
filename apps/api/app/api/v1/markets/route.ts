@@ -14,36 +14,11 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.ge
     const searchParams = new URLSearchParams(url.search)
     const params = Object.fromEntries(searchParams)
 
-    const {
-      status = 'active',
-      createdBy,
-      pageSize = 50,
-      page = 1,
-      tag,
-      sortField,
-      sortDirection = 'desc',
-    } = schema.get.parameters.parse(params) ?? {}
+    const { status = 'active', createdBy, tags, ...paginationParams } = schema.get.parameters.parse(params) ?? {}
 
-    const { markets, total } = await getMarkets(
-      { createdBy, tag, status },
-      sortField
-        ? {
-            field: sortField,
-            direction: sortDirection,
-          }
-        : undefined,
-      {
-        skip: (page - 1) * pageSize,
-        take: pageSize,
-      }
-    )
+    const results = await getMarkets({ createdBy, tags, status }, paginationParams)
 
-    return NextResponse.json({
-      markets,
-      page,
-      pageSize,
-      totalPages: Math.ceil(total / pageSize),
-    })
+    return NextResponse.json(results)
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
     if (error instanceof Error) {

@@ -3,7 +3,7 @@ import { getMarkets } from '@play-money/api-helpers/client'
 import { MarketList } from '@play-money/markets/components/MarketList'
 
 export default async function AppQuestionsPage({ params }: { params: { tag: string } }) {
-  const { markets } = await getMarkets({ tag: params.tag })
+  const { data: markets } = await getMarkets({ tags: [params.tag] })
 
   return (
     <div className="mx-auto flex max-w-screen-lg flex-1 flex-col gap-8 md:flex-row">

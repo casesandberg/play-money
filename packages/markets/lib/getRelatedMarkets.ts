@@ -9,7 +9,7 @@ export async function getRelatedMarkets({ marketId }: { marketId: string }): Pro
     status: 'active',
   })
 
-  const rankedMarkets = relatedMarkets.markets
+  const rankedMarkets = relatedMarkets.data
     .filter((relatedMarket) => relatedMarket.id !== marketId)
     .map((relatedMarket) => {
       const sharedTagsCount = relatedMarket.tags.filter((tag) => market.tags.includes(tag)).length

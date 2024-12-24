@@ -1,5 +1,11 @@
 import { z } from 'zod'
-import { ApiEndpoints, ServerErrorSchema } from '@play-money/api-helpers'
+import {
+  ApiEndpoints,
+  createPaginatedResponseSchema,
+  paginationSchema,
+  ServerErrorSchema,
+  zodCoerceCSVToArray,
+} from '@play-money/api-helpers'
 import { ListSchema, MarketOptionSchema, MarketSchema, QuestionContributionPolicySchema } from '@play-money/database'
 
 export default {
@@ -8,20 +14,12 @@ export default {
       .object({
         status: z.enum(['active', 'halted', 'closed', 'resolved', 'canceled', 'all']).optional(),
         createdBy: z.string().optional(),
-        pageSize: z.coerce.number().optional(),
-        page: z.coerce.number().optional(),
-        tag: z.string().optional(),
-        sortField: z.string().optional(),
-        sortDirection: z.enum(['asc', 'desc']).optional(),
+        tags: zodCoerceCSVToArray.optional(),
       })
+      .merge(paginationSchema)
       .optional(),
     responses: {
-      200: z.object({
-        markets: z.array(MarketSchema),
-        page: z.number(),
-        pageSize: z.number(),
-        totalPages: z.number(),
-      }),
+      200: createPaginatedResponseSchema(MarketSchema),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },
