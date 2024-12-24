@@ -15,7 +15,7 @@ export async function GET(
 
     const comments = await getCommentsOnList({ listId: id })
 
-    return NextResponse.json({ comments })
+    return NextResponse.json({ data: comments })
   } catch (error) {
     if (error instanceof CommentNotFoundError) {
       return NextResponse.json({ error: error.message }, { status: 404 })

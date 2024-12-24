@@ -7,16 +7,24 @@ interface EndpointDefinition {
   parameters?: z.ZodObject<any> | z.ZodOptional<z.ZodObject<any>>
   requestBody?: z.ZodObject<any>
   responses: {
-    [statusCode: number]: z.ZodObject<any> | z.ZodObject<any>[]
+    [statusCode: number]: z.ZodObject<any> | z.ZodObject<any>[] | z.ZodVoid
   }
 }
 
 type InferZodResponse<T> =
-  T extends z.ZodObject<any> ? z.infer<T> : T extends z.ZodObject<any>[] ? z.infer<T[number]> : never
+  T extends z.ZodObject<any>
+    ? z.infer<T>
+    : T extends z.ZodObject<any>[]
+      ? z.infer<T[number]>
+      : T extends z.ZodVoid
+        ? void
+        : never
 
-type InferResponses<T extends { [key: number]: z.ZodObject<any> | z.ZodObject<any>[] }> = InferZodResponse<T[keyof T]>
+type InferResponses<T extends { [key: number]: z.ZodObject<any> | z.ZodObject<any>[] | z.ZodVoid }> = InferZodResponse<
+  T[keyof T]
+>
 
-export type SchemaResponse<T extends { [key: number]: z.ZodObject<any> | z.ZodObject<any>[] }> = Promise<
+export type SchemaResponse<T extends { [key: number]: z.ZodObject<any> | z.ZodObject<any>[] | z.ZodVoid }> = Promise<
   NextResponse<InferResponses<T>>
 >
 

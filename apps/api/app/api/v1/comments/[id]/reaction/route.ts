@@ -23,10 +23,10 @@ export async function POST(
     const commentReaction = await reactToComment({ commentId: id, userId, ...data })
 
     if (commentReaction === 'removed') {
-      return NextResponse.json({ message: 'Reaction removed' })
+      return new Response(null, { status: 204 }) as NextResponse<void>
     }
 
-    return NextResponse.json(commentReaction)
+    return NextResponse.json({ data: commentReaction })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 })

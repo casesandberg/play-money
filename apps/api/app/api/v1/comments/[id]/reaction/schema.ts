@@ -9,7 +9,8 @@ export default {
       emoji: true,
     }),
     responses: {
-      200: [CommentReactionSchema, zod.object({ message: zod.string() })],
+      200: zod.object({ data: CommentReactionSchema }),
+      204: zod.void(),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },

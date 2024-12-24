@@ -4,7 +4,7 @@ import { getListComments } from '@play-money/api-helpers/client'
 import { CommentsList } from '@play-money/comments/components/CommentsList'
 
 export async function ListComments({ listId }: { listId: string }) {
-  const { comments } = await getListComments({ listId })
+  const { data: comments } = await getListComments({ listId })
 
   const handleRevalidate = async () => {
     'use server'

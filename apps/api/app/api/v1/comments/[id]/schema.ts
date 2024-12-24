@@ -6,7 +6,7 @@ export default {
   get: {
     parameters: CommentSchema.pick({ id: true }),
     responses: {
-      200: CommentSchema,
+      200: z.object({ data: CommentSchema }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },
@@ -15,7 +15,7 @@ export default {
     parameters: CommentSchema.pick({ id: true }),
     requestBody: CommentSchema.pick({ content: true }),
     responses: {
-      200: CommentSchema,
+      200: z.object({ data: CommentSchema }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },
@@ -23,7 +23,7 @@ export default {
   delete: {
     parameters: CommentSchema.pick({ id: true }),
     responses: {
-      200: z.object({ message: z.string() }),
+      204: z.void(),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },

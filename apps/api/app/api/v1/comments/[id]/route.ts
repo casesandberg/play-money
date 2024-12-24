@@ -18,7 +18,7 @@ export async function GET(
 
     const comment = await getComment({ id })
 
-    return NextResponse.json(comment)
+    return NextResponse.json({ data: comment })
   } catch (error) {
     if (error instanceof CommentNotFoundError) {
       return NextResponse.json({ error: error.message }, { status: 404 })
@@ -51,7 +51,7 @@ export async function PATCH(
 
     const updatedComment = await updateComment({ id, content })
 
-    return NextResponse.json(updatedComment)
+    return NextResponse.json({ data: updatedComment })
   } catch (error) {
     if (error instanceof CommentNotFoundError) {
       return NextResponse.json({ error: error.message }, { status: 404 })
@@ -82,7 +82,7 @@ export async function DELETE(
 
     await deleteComment({ id })
 
-    return NextResponse.json({ message: 'Comment deleted' })
+    return new Response(null, { status: 204 }) as NextResponse<void>
   } catch (error) {
     if (error instanceof CommentNotFoundError) {
       return NextResponse.json({ error: error.message }, { status: 404 })

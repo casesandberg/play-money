@@ -29,9 +29,14 @@ async function apiHandler<T>(
     next: options?.next,
     ...creds,
   } as RequestInit)
+
   if (!res.ok || res.status >= 400) {
     const { error } = (await res.json()) as { error: string }
     throw new Error(error || 'There was an error with this request')
+  }
+
+  if (res.status === 204) {
+    throw new Error('deleted')
   }
 
   return res.json() as Promise<T>
@@ -339,8 +344,8 @@ export async function getMarketComments({
   marketId,
 }: {
   marketId: string
-}): Promise<{ comments: Array<CommentWithReactions> }> {
-  return apiHandler<{ comments: Array<CommentWithReactions> }>(
+}): Promise<{ data: Array<CommentWithReactions> }> {
+  return apiHandler<{ data: Array<CommentWithReactions> }>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/comments`,
     {
       next: { tags: [`${marketId}:comments`] },
@@ -357,12 +362,8 @@ export async function getMarketActivity({ marketId }: { marketId: string }): Pro
   )
 }
 
-export async function getListComments({
-  listId,
-}: {
-  listId: string
-}): Promise<{ comments: Array<CommentWithReactions> }> {
-  return apiHandler<{ comments: Array<CommentWithReactions> }>(
+export async function getListComments({ listId }: { listId: string }): Promise<{ data: Array<CommentWithReactions> }> {
+  return apiHandler<{ data: Array<CommentWithReactions> }>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/lists/${listId}/comments`,
     {
       next: { tags: [`list:${listId}:comments`] },
