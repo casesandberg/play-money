@@ -40,11 +40,11 @@ export default {
           color: true,
         })
       ),
-      type: z.enum(['binary', 'multi', 'list']).optional(),
+      type: z.enum(['binary', 'multi', 'list']),
       contributionPolicy: QuestionContributionPolicySchema.optional(),
     }),
     responses: {
-      200: z.object({ market: MarketSchema.optional(), list: ListSchema.optional() }),
+      200: z.object({ data: z.object({ market: MarketSchema.optional(), list: ListSchema.optional() }) }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },
