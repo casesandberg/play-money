@@ -11,6 +11,7 @@ interface EndpointDefinition {
   }
   security?: boolean
   summary?: string
+  private?: boolean // Internal or half-baked endpoints
 }
 
 type InferZodResponse<T> =

@@ -4,6 +4,7 @@ import { ApiKeySchema } from '@play-money/database'
 
 export default {
   post: {
+    private: true,
     summary: 'Create an API key',
     security: true,
     requestBody: z.object({
@@ -16,6 +17,7 @@ export default {
     },
   },
   get: {
+    private: true,
     summary: 'Get all API keys for a user',
     security: true,
     responses: {

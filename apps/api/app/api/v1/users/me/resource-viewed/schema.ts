@@ -3,6 +3,7 @@ import { ApiEndpoints, ServerErrorSchema } from '@play-money/api-helpers'
 
 export default {
   post: {
+    private: true,
     summary: 'Mark a resource as viewed for the current user',
     security: true,
     requestBody: z.object({ resourceType: z.string(), resourceId: z.string(), timestamp: z.string() }),
