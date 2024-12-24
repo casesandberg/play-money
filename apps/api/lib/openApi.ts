@@ -74,6 +74,8 @@ async function getDocument() {
       registry.registerPath({
         method: method as RouteConfig['method'],
         path: pathname,
+        summary: endpoint.summary,
+        security: endpoint.security ? [{ ApiKeyAuth: [] }] : undefined,
         request: {
           body: endpoint.requestBody
             ? {
@@ -90,6 +92,12 @@ async function getDocument() {
       })
     }
   }
+
+  registry.registerComponent('securitySchemes', 'ApiKeyAuth', {
+    type: 'apiKey',
+    in: 'header',
+    name: 'x-api-key',
+  })
 
   const generator = new OpenApiGeneratorV31(registry.definitions)
   const document = generator.generateDocument({

@@ -4,6 +4,7 @@ import { MarketSchema, UserSchema, ListSchema } from '@play-money/database'
 
 export default {
   get: {
+    summary: 'Search for users, markets, and lists',
     parameters: z.object({ query: z.string().optional() }),
     responses: {
       200: z.object({

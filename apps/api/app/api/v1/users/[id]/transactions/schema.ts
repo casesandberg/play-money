@@ -4,6 +4,7 @@ import { TransactionEntrySchema, TransactionSchema, UserSchema } from '@play-mon
 
 export default {
   get: {
+    summary: 'Get transactions for a user',
     parameters: UserSchema.pick({ id: true }),
     responses: {
       200: z.object({

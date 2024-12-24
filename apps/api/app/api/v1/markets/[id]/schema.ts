@@ -4,6 +4,7 @@ import { MarketSchema } from '@play-money/database'
 
 export default {
   get: {
+    summary: 'Get a market',
     parameters: MarketSchema.pick({ id: true }).extend({ extended: z.boolean().optional() }),
     responses: {
       200: z.object({ data: MarketSchema }),
@@ -12,6 +13,8 @@ export default {
     },
   },
   patch: {
+    summary: 'Update a market',
+    security: true,
     parameters: MarketSchema.pick({ id: true }),
     requestBody: MarketSchema.pick({ question: true, description: true, closeDate: true, tags: true }).partial(),
     responses: {

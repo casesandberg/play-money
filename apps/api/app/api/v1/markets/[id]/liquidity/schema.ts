@@ -4,6 +4,8 @@ import { MarketSchema } from '@play-money/database'
 
 export default {
   post: {
+    summary: 'Add liquidity to a market',
+    security: true,
     parameters: MarketSchema.pick({ id: true }),
     requestBody: z.object({ amount: z.number() }),
     responses: {

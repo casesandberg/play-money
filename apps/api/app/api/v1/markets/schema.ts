@@ -10,6 +10,7 @@ import { ListSchema, MarketOptionSchema, MarketSchema, QuestionContributionPolic
 
 export default {
   get: {
+    summary: 'Get markets',
     parameters: z
       .object({
         status: z.enum(['active', 'halted', 'closed', 'resolved', 'canceled', 'all']).optional(),
@@ -25,6 +26,8 @@ export default {
     },
   },
   post: {
+    summary: 'Create a market',
+    security: true,
     requestBody: MarketSchema.pick({
       question: true,
       description: true,

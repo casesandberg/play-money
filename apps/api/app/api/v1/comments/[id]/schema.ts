@@ -4,6 +4,7 @@ import { CommentSchema } from '@play-money/database'
 
 export default {
   get: {
+    summary: 'Get a comment',
     parameters: CommentSchema.pick({ id: true }),
     responses: {
       200: z.object({ data: CommentSchema }),
@@ -12,6 +13,8 @@ export default {
     },
   },
   patch: {
+    summary: 'Update a comment',
+    security: true,
     parameters: CommentSchema.pick({ id: true }),
     requestBody: CommentSchema.pick({ content: true }),
     responses: {
@@ -21,6 +24,8 @@ export default {
     },
   },
   delete: {
+    summary: 'Delete a comment',
+    security: true,
     parameters: CommentSchema.pick({ id: true }),
     responses: {
       204: z.object({}),

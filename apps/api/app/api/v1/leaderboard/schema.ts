@@ -12,6 +12,7 @@ const LeaderboardUserSchema = z.object({
 
 export default {
   get: {
+    summary: 'Get the leaderboard',
     parameters: z
       .object({
         year: z.coerce.number().optional(),

@@ -4,6 +4,7 @@ import { ListSchema } from '@play-money/database'
 
 export default {
   get: {
+    summary: 'Get a list',
     parameters: ListSchema.pick({ id: true }).extend({ extended: z.boolean().optional() }),
     responses: {
       200: z.object({ data: ListSchema }),

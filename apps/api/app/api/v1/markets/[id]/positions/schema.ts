@@ -9,6 +9,7 @@ import { MarketOptionPositionSchema } from '@play-money/database'
 
 export default {
   get: {
+    summary: 'Get positions for a market',
     parameters: z
       .object({
         id: z.string(),

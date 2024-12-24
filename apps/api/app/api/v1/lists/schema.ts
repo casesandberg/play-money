@@ -9,6 +9,7 @@ import { ListSchema } from '@play-money/database'
 
 export default {
   get: {
+    summary: 'Get lists',
     parameters: z
       .object({
         ownerId: z.string().optional(),

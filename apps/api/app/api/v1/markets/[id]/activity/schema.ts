@@ -4,6 +4,7 @@ import { MarketActivitySchema } from '@play-money/markets/types'
 
 export default {
   get: {
+    summary: 'Get the activity for a market',
     parameters: zod.object({ id: zod.string() }),
     responses: {
       200: zod.object({ data: zod.array(MarketActivitySchema) }),

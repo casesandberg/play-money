@@ -3,6 +3,7 @@ import { ApiEndpoints, ServerErrorSchema } from '@play-money/api-helpers'
 
 export default {
   get: {
+    summary: 'Get the balance for a list',
     parameters: z.object({ id: z.string() }),
     responses: {
       200: z.object({

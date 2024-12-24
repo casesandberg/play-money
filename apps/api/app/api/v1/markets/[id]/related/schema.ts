@@ -4,6 +4,7 @@ import { MarketSchema } from '@play-money/database'
 
 export default {
   get: {
+    summary: 'Get related markets',
     parameters: z.object({ id: z.string() }),
     responses: {
       200: z.object({ data: z.array(MarketSchema) }),

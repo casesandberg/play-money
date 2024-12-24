@@ -4,6 +4,8 @@ import { CommentReactionSchema } from '@play-money/database'
 
 export default {
   post: {
+    summary: 'React to a comment, will remove reaction if already exists',
+    security: true,
     parameters: z.object({ id: z.string() }),
     requestBody: CommentReactionSchema.pick({
       emoji: true,

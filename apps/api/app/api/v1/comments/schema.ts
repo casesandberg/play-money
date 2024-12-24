@@ -4,6 +4,8 @@ import { CommentSchema } from '@play-money/database'
 
 export default {
   post: {
+    summary: 'Create a comment on an entity',
+    security: true,
     requestBody: CommentSchema.pick({
       content: true,
       parentId: true,

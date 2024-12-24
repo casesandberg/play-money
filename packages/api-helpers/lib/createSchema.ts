@@ -9,6 +9,8 @@ interface EndpointDefinition {
   responses: {
     [statusCode: number]: z.ZodObject<any> | z.ZodObject<any>[] | z.ZodVoid
   }
+  security?: boolean
+  summary?: string
 }
 
 type InferZodResponse<T> =

@@ -4,6 +4,8 @@ import { UserSchema } from '@play-money/database'
 
 export default {
   get: {
+    summary: 'Get the current user',
+    security: true,
     responses: {
       200: z.object({ data: UserSchema }),
       404: ServerErrorSchema,
@@ -11,6 +13,8 @@ export default {
     },
   },
   patch: {
+    summary: 'Update the current user',
+    security: true,
     requestBody: UserSchema.pick({
       username: true,
       bio: true,

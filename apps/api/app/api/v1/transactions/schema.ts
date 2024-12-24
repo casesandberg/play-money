@@ -21,6 +21,7 @@ const ExtendedTransactionSchema = TransactionSchema.extend({
 
 export default {
   get: {
+    summary: 'Get transactions',
     parameters: z
       .object({
         marketId: z.string().optional(),

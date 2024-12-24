@@ -6,6 +6,13 @@
     "description": "Include `x-api-key: {{key}}` in the header of your requests. Api key can be generated at [https://playmoney.dev/settings/api](https://playmoney.dev/settings/api)"
   },
   "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    },
     "schemas": {
       "id": {
         "type": "string"
@@ -287,6 +294,7 @@
   "paths": {
     "/v1/activity": {
       "get": {
+        "summary": "Get all site activity",
         "responses": {
           "200": {
             "description": "Successful response",
@@ -810,6 +818,12 @@
     },
     "/v1/comments/[id]/reaction": {
       "post": {
+        "summary": "React to a comment, will remove reaction if already exists",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -924,6 +938,7 @@
     },
     "/v1/comments/[id]": {
       "get": {
+        "summary": "Get a comment",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -1047,6 +1062,12 @@
         }
       },
       "patch": {
+        "summary": "Update a comment",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -1189,6 +1210,12 @@
         }
       },
       "delete": {
+        "summary": "Delete a comment",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -1247,6 +1274,12 @@
     },
     "/v1/comments": {
       "post": {
+        "summary": "Create a comment on an entity",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1405,6 +1438,7 @@
     },
     "/v1/leaderboard": {
       "get": {
+        "summary": "Get the leaderboard",
         "parameters": [
           {
             "$ref": "#/components/parameters/year"
@@ -1912,6 +1946,7 @@
     },
     "/v1/lists/[id]/balance": {
       "get": {
+        "summary": "Get the balance for a list",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -1997,6 +2032,7 @@
     },
     "/v1/lists/[id]/comments": {
       "get": {
+        "summary": "Get comments for a list",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -2125,6 +2161,12 @@
     },
     "/v1/lists/[id]/markets": {
       "post": {
+        "summary": "Create a market in a list",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -2368,6 +2410,7 @@
     },
     "/v1/lists/[id]": {
       "get": {
+        "summary": "Get a list",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -2505,6 +2548,7 @@
     },
     "/v1/lists": {
       "get": {
+        "summary": "Get lists",
         "parameters": [
           {
             "$ref": "#/components/parameters/ownerId"
@@ -2673,6 +2717,7 @@
     },
     "/v1/markets/[id]/activity": {
       "get": {
+        "summary": "Get the activity for a market",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -3201,6 +3246,7 @@
     },
     "/v1/markets/[id]/balance": {
       "get": {
+        "summary": "Get the balance for a market",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -3294,6 +3340,7 @@
     },
     "/v1/markets/[id]/balances": {
       "get": {
+        "summary": "Get the balances for a market",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -3375,6 +3422,12 @@
     },
     "/v1/markets/[id]/buy": {
       "post": {
+        "summary": "Buy an option in a market",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -3469,6 +3522,12 @@
     },
     "/v1/markets/[id]/cancel": {
       "post": {
+        "summary": "Cancel a market",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -3559,6 +3618,7 @@
     },
     "/v1/markets/[id]/comments": {
       "get": {
+        "summary": "Get comments for a market",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -3687,6 +3747,7 @@
     },
     "/v1/markets/[id]/graph": {
       "get": {
+        "summary": "Get the graph for a market",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -3786,6 +3847,12 @@
     },
     "/v1/markets/[id]/liquidity": {
       "post": {
+        "summary": "Add liquidity to a market",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -3876,6 +3943,12 @@
     },
     "/v1/markets/[id]/options/[optionId]": {
       "patch": {
+        "summary": "Update an option in a market",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -4008,6 +4081,7 @@
     },
     "/v1/markets/[id]/positions": {
       "get": {
+        "summary": "Get positions for a market",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -4151,6 +4225,7 @@
     },
     "/v1/markets/[id]/quote": {
       "post": {
+        "summary": "Get a quote for a market",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -4252,6 +4327,7 @@
     },
     "/v1/markets/[id]/related": {
       "get": {
+        "summary": "Get related markets",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -4440,6 +4516,12 @@
     },
     "/v1/markets/[id]/resolve": {
       "post": {
+        "summary": "Resolve a market",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -4533,6 +4615,7 @@
     },
     "/v1/markets/[id]": {
       "get": {
+        "summary": "Get a market",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -4719,6 +4802,12 @@
         }
       },
       "patch": {
+        "summary": "Update a market",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -4935,6 +5024,12 @@
     },
     "/v1/markets/[id]/sell": {
       "post": {
+        "summary": "Sell an option in a market",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -5029,6 +5124,12 @@
     },
     "/v1/markets/generate-tags": {
       "post": {
+        "summary": "Generate tags for a market",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -5109,6 +5210,7 @@
     },
     "/v1/markets": {
       "get": {
+        "summary": "Get markets",
         "parameters": [
           {
             "$ref": "#/components/parameters/status"
@@ -5332,6 +5434,12 @@
         }
       },
       "post": {
+        "summary": "Create a market",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -5656,6 +5764,7 @@
     },
     "/v1/search": {
       "get": {
+        "summary": "Search for users, markets, and lists",
         "parameters": [
           {
             "$ref": "#/components/parameters/query"
@@ -6013,6 +6122,7 @@
     },
     "/v1/transactions": {
       "get": {
+        "summary": "Get transactions",
         "parameters": [
           {
             "$ref": "#/components/parameters/marketId"
@@ -6579,6 +6689,7 @@
     },
     "/v1/users/[id]/balance": {
       "get": {
+        "summary": "Get the balance for a user",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -6653,6 +6764,7 @@
     },
     "/v1/users/[id]/graph": {
       "get": {
+        "summary": "Get the graph for a user",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -6737,6 +6849,7 @@
     },
     "/v1/users/[id]/positions": {
       "get": {
+        "summary": "Get positions for a user",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -6857,6 +6970,7 @@
     },
     "/v1/users/[id]": {
       "get": {
+        "summary": "Get a user",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -7018,6 +7132,7 @@
     },
     "/v1/users/[id]/stats": {
       "get": {
+        "summary": "Get the stats for a user",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -7137,6 +7252,7 @@
     },
     "/v1/users/[id]/transactions": {
       "get": {
+        "summary": "Get transactions for a user",
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -7335,6 +7451,7 @@
     },
     "/v1/users/check-username": {
       "get": {
+        "summary": "Check if a username is available",
         "parameters": [
           {
             "$ref": "#/components/parameters/username"
@@ -7393,6 +7510,12 @@
     },
     "/v1/users/me/api-keys": {
       "post": {
+        "summary": "Create an API key",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -7522,6 +7645,12 @@
         }
       },
       "get": {
+        "summary": "Get all API keys for a user",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -7639,6 +7768,12 @@
     },
     "/v1/users/me/balance": {
       "get": {
+        "summary": "Get the balance for the current user",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -7707,6 +7842,12 @@
     },
     "/v1/users/me/notifications": {
       "get": {
+        "summary": "Get notifications for the current user",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -7843,6 +7984,12 @@
         }
       },
       "post": {
+        "summary": "Mark all notification as read for the currenty user",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -7911,6 +8058,12 @@
     },
     "/v1/users/me/referrals": {
       "get": {
+        "summary": "Get all referrals for the current user",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -8070,6 +8223,12 @@
     },
     "/v1/users/me/resource-viewed": {
       "post": {
+        "summary": "Mark a resource as viewed for the current user",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -8163,6 +8322,12 @@
     },
     "/v1/users/me": {
       "get": {
+        "summary": "Get the current user",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -8317,6 +8482,12 @@
         }
       },
       "patch": {
+        "summary": "Update the current user",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
