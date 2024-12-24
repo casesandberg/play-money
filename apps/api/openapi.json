@@ -4838,6 +4838,9 @@
                       "type": "string"
                     },
                     "maxItems": 5
+                  },
+                  "createdBy": {
+                    "type": "string"
                   }
                 }
               }

@@ -16,7 +16,13 @@ export default {
     summary: 'Update a market',
     security: true,
     parameters: MarketSchema.pick({ id: true }),
-    requestBody: MarketSchema.pick({ question: true, description: true, closeDate: true, tags: true }).partial(),
+    requestBody: MarketSchema.pick({
+      question: true,
+      description: true,
+      closeDate: true,
+      tags: true,
+      createdBy: true,
+    }).partial(),
     responses: {
       200: z.object({ data: MarketSchema }),
       404: ServerErrorSchema,
