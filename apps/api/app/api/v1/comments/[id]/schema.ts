@@ -23,7 +23,7 @@ export default {
   delete: {
     parameters: CommentSchema.pick({ id: true }),
     responses: {
-      204: z.void(),
+      204: z.object({}),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },

@@ -23,7 +23,7 @@ export async function POST(
     const commentReaction = await reactToComment({ commentId: id, userId, ...data })
 
     if (commentReaction === 'removed') {
-      return new Response(null, { status: 204 }) as NextResponse<void>
+      return new Response(null, { status: 204 }) as NextResponse<Record<string, never>>
     }
 
     return NextResponse.json({ data: commentReaction })

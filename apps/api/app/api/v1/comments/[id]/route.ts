@@ -82,7 +82,7 @@ export async function DELETE(
 
     await deleteComment({ id })
 
-    return new Response(null, { status: 204 }) as NextResponse<void>
+    return new Response(null, { status: 204 }) as NextResponse<Record<string, never>>
   } catch (error) {
     if (error instanceof CommentNotFoundError) {
       return NextResponse.json({ error: error.message }, { status: 404 })
