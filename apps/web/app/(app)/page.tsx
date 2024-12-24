@@ -15,7 +15,7 @@ import { Card } from '@play-money/ui/card'
 export default async function AppPage() {
   const { data: closingMarkets } = await getMarkets({ sortField: 'closeDate', sortDirection: 'asc', limit: 5 })
   const { data: newMarkets } = await getMarkets({ limit: 10 })
-  const { lists: newLists } = await getLists({ pageSize: '5' })
+  const { data: newLists } = await getLists({ limit: 5 })
 
   return (
     <div className="mx-auto flex max-w-screen-lg flex-1 flex-col gap-8 md:flex-row">

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import React from 'react'
 import {
   getMarketPositions,
-  getUserLists,
+  getLists,
   getUserMarkets,
   getUserPositions,
   getUserTransactions,
@@ -136,7 +136,7 @@ export async function UserMarketsTable({ userId }: { userId: string }) {
 }
 
 export async function UserListsTable({ userId }: { userId: string }) {
-  const { lists } = await getUserLists({ userId })
+  const { data: lists } = await getLists({ ownerId: userId })
 
   return (
     <Table>

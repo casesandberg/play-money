@@ -41,8 +41,10 @@ export function LIST_BALANCE_PATH(listId: string) {
 }
 export function useListBalance({ listId }: { listId: string }) {
   return useSWR<{
-    user: Array<NetBalanceAsNumbers>
-    userPositions: Array<MarketOptionPositionAsNumbers>
+    data: {
+      user: Array<NetBalanceAsNumbers>
+      userPositions: Array<MarketOptionPositionAsNumbers>
+    }
   }>(LIST_BALANCE_PATH(listId), {
     refreshInterval: SIXTY_SECONDS,
   })

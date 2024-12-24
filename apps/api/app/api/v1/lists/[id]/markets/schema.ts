@@ -19,7 +19,7 @@ export default {
       ),
     }),
     responses: {
-      200: z.object({ market: MarketSchema.optional() }),
+      200: z.object({ data: MarketSchema }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },

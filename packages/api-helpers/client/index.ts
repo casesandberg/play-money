@@ -194,33 +194,20 @@ export async function getMarketPositions({
 }
 
 export async function getLists({
-  tag,
-  page,
-  pageSize,
-  status,
-  sortField,
-  sortDirection,
+  ownerId,
+  ...paginationParams
 }: {
-  tag?: string
-  page?: string
-  pageSize?: string
-  status?: string
-  sortField?: string
-  sortDirection?: string
-} = {}) {
-  const currentParams = new URLSearchParams(
-    JSON.parse(JSON.stringify({ tag, page, pageSize, status, sortField, sortDirection }))
-  )
+  ownerId?: string
+} & PaginationRequest = {}): Promise<PaginatedResponse<ExtendedList>> {
+  const currentParams = new URLSearchParams(JSON.parse(JSON.stringify({ ownerId, ...paginationParams })))
   const search = currentParams.toString()
 
-  return apiHandler<{
-    lists: Array<ExtendedList>
-    page: number
-    pageSize: number
-    totalPages: number
-  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/lists${search ? `?${search}` : ''}`, {
-    next: { tags: ['lists'] },
-  })
+  return apiHandler<PaginatedResponse<ExtendedList>>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/lists${search ? `?${search}` : ''}`,
+    {
+      next: { tags: ['lists'] },
+    }
+  )
 }
 
 export async function getExtendedMarket({ marketId }: { marketId: string }) {
@@ -230,7 +217,7 @@ export async function getExtendedMarket({ marketId }: { marketId: string }) {
 }
 
 export async function getExtendedList({ listId }: { listId: string }) {
-  return apiHandler<ExtendedList>(`${process.env.NEXT_PUBLIC_API_URL}/v1/lists/${listId}?extended=true`, {
+  return apiHandler<{ data: ExtendedList }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/lists/${listId}?extended=true`, {
     next: { tags: [`list:${listId}`] },
   })
 }
@@ -243,10 +230,13 @@ export async function createMarket(body: Record<string, unknown>) {
 }
 
 export async function createListMarket({ listId }: { listId: string }, body: Record<string, unknown>) {
-  return apiHandler<{ market?: Market; list?: List }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/lists/${listId}/markets`, {
-    method: 'POST',
-    body,
-  })
+  return apiHandler<{ data: { market?: Market; list?: List } }>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/lists/${listId}/markets`,
+    {
+      method: 'POST',
+      body,
+    }
+  )
 }
 
 export async function updateMarket({ marketId, body }: { marketId: string; body: Record<string, unknown> }) {
@@ -507,10 +497,6 @@ export async function getUserMarkets({ userId }: { userId: string }): Promise<Pa
   return apiHandler<PaginatedResponse<ExtendedMarket>>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/markets?createdBy=${userId}`
   )
-}
-
-export async function getUserLists({ userId }: { userId: string }): Promise<{ lists: Array<ExtendedList> }> {
-  return apiHandler<{ lists: Array<ExtendedList> }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/lists?ownerId=${userId}`)
 }
 
 export async function createMarketGenerateTags({ question }: { question: string }) {

@@ -20,7 +20,8 @@ import { ExtendedList } from '../types'
 export function ListTradePanel({ list, onTradeComplete }: { list: ExtendedList; onTradeComplete?: () => void }) {
   const { selected, setSelected } = useSelectedItems()
   const { effect, resetEffect } = useSidebar()
-  const { data: balance, mutate: revalidate } = useListBalance({ listId: list.id })
+  const { data: balanceData, mutate: revalidate } = useListBalance({ listId: list.id })
+  const balance = balanceData?.data
   const selectedMarket = list.markets.find((m) => m.market.id === selected[0])
 
   const isTradable = selectedMarket ? isMarketTradable(selectedMarket) : false

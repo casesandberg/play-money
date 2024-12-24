@@ -24,7 +24,7 @@ export async function GET(
 
     const list = await getList({ id, extended })
 
-    return NextResponse.json(list)
+    return NextResponse.json({ data: list })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 })
