@@ -5,11 +5,15 @@ export async function updateList({
   title,
   description,
   marketIds,
+  tags,
+  ownerId,
 }: {
   id: string
   title?: string
   description?: string
   marketIds?: string[]
+  tags?: string[]
+  ownerId?: string
 }) {
   const updatedData: Partial<List> = {}
 
@@ -19,6 +23,14 @@ export async function updateList({
 
   if (description !== undefined) {
     updatedData.description = description
+  }
+
+  if (ownerId) {
+    updatedData.ownerId = ownerId
+  }
+
+  if (tags) {
+    updatedData.tags = tags
   }
 
   const updatedList = await db.list.update({

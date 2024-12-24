@@ -39,24 +39,26 @@ export async function POST(req: Request): Promise<SchemaResponse<typeof schema.p
     const body = (await req.json()) as unknown
     const basicMarket = schema.post.requestBody.parse(body)
 
-    if (basicMarket.type === 'binary' || basicMarket.type === 'multi') {
-      const newMarket = await createMarket({
-        ...basicMarket,
-        createdBy: userId,
-      })
-      return NextResponse.json({ market: newMarket })
-    } else if (basicMarket.type === 'list') {
-      const newList = await createList({
-        ...basicMarket,
-        ownerId: userId,
-        title: basicMarket.question,
-        markets: basicMarket.options,
-        contributionPolicy: basicMarket.contributionPolicy || 'OWNERS_ONLY',
-      })
-      return NextResponse.json({ list: newList })
+    switch (basicMarket.type) {
+      case 'binary':
+      case 'multi': {
+        const newMarket = await createMarket({
+          ...basicMarket,
+          createdBy: userId,
+        })
+        return NextResponse.json({ data: { market: newMarket } })
+      }
+      case 'list': {
+        const newList = await createList({
+          ...basicMarket,
+          ownerId: userId,
+          title: basicMarket.question,
+          markets: basicMarket.options,
+          contributionPolicy: basicMarket.contributionPolicy || 'OWNERS_ONLY',
+        })
+        return NextResponse.json({ data: { list: newList } })
+      }
     }
-
-    return NextResponse.json({})
   } catch (error: unknown) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
     if (error instanceof Error) {

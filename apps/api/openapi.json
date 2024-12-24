@@ -3,7 +3,7 @@
   "info": {
     "title": "PlayMoney API",
     "version": "1.0",
-    "description": "Include `x-api-key: {{key}}` in the header of your requests. Api key can be generated at [https://playmoney.dev/settings/api](https://playmoney.dev/settings/api)"
+    "description": "Include `x-api-key: {{key}}` in the header of your requests. \n\nApi key can be generated at [https://playmoney.dev/settings/api](https://playmoney.dev/settings/api)\n\nOpenAPI spec can be found at [https://github.com/casesandberg/play-money/blob/main/apps/api/openapi.json](https://github.com/casesandberg/play-money/blob/main/apps/api/openapi.json)"
   },
   "components": {
     "securitySchemes": {
@@ -2419,6 +2419,175 @@
             "$ref": "#/components/parameters/extended"
           }
         ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "contributionPolicy": {
+                          "type": "string",
+                          "enum": [
+                            "DISABLED",
+                            "OWNERS_ONLY",
+                            "FRIENDS_ONLY",
+                            "PUBLIC"
+                          ]
+                        },
+                        "id": {
+                          "type": "string",
+                          "format": "cuid"
+                        },
+                        "title": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "slug": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "description": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "ownerId": {
+                          "type": "string"
+                        },
+                        "contributionReview": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ]
+                        },
+                        "tags": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "maxItems": 5
+                        },
+                        "createdAt": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "updatedAt": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "contributionPolicy",
+                        "id",
+                        "title",
+                        "slug",
+                        "description",
+                        "ownerId",
+                        "contributionReview",
+                        "tags",
+                        "createdAt",
+                        "updatedAt"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a list",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 5
+                  },
+                  "ownerId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful response",
@@ -5512,7 +5681,8 @@
                   "description",
                   "closeDate",
                   "tags",
-                  "options"
+                  "options",
+                  "type"
                 ]
               }
             }
@@ -5526,202 +5696,210 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "market": {
+                    "data": {
                       "type": "object",
                       "properties": {
-                        "id": {
-                          "type": "string",
-                          "format": "cuid"
-                        },
-                        "question": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "description": {
-                          "type": "string"
-                        },
-                        "slug": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "closeDate": {
-                          "type": [
-                            "string",
-                            "null"
-                          ]
-                        },
-                        "resolvedAt": {
-                          "type": [
-                            "string",
-                            "null"
-                          ]
-                        },
-                        "canceledAt": {
-                          "type": [
-                            "string",
-                            "null"
-                          ]
-                        },
-                        "canceledById": {
-                          "type": [
-                            "string",
-                            "null"
-                          ]
-                        },
-                        "createdBy": {
-                          "type": "string"
-                        },
-                        "tags": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
+                        "market": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "format": "cuid"
+                            },
+                            "question": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "slug": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "closeDate": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "resolvedAt": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "canceledAt": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "canceledById": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "createdBy": {
+                              "type": "string"
+                            },
+                            "tags": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              },
+                              "maxItems": 5
+                            },
+                            "ammAccountId": {
+                              "type": "string"
+                            },
+                            "clearingAccountId": {
+                              "type": "string"
+                            },
+                            "createdAt": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "updatedAt": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "commentCount": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ]
+                            },
+                            "uniqueTradersCount": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ]
+                            },
+                            "uniquePromotersCount": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ]
+                            },
+                            "liquidityCount": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ]
+                            },
+                            "parentListId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
                           },
-                          "maxItems": 5
-                        },
-                        "ammAccountId": {
-                          "type": "string"
-                        },
-                        "clearingAccountId": {
-                          "type": "string"
-                        },
-                        "createdAt": {
-                          "type": [
-                            "string",
-                            "null"
+                          "required": [
+                            "id",
+                            "question",
+                            "description",
+                            "slug",
+                            "closeDate",
+                            "resolvedAt",
+                            "canceledAt",
+                            "canceledById",
+                            "createdBy",
+                            "tags",
+                            "ammAccountId",
+                            "clearingAccountId",
+                            "createdAt",
+                            "updatedAt",
+                            "commentCount",
+                            "uniqueTradersCount",
+                            "uniquePromotersCount",
+                            "liquidityCount",
+                            "parentListId"
                           ]
                         },
-                        "updatedAt": {
-                          "type": [
-                            "string",
-                            "null"
-                          ]
-                        },
-                        "commentCount": {
-                          "type": [
-                            "integer",
-                            "null"
-                          ]
-                        },
-                        "uniqueTradersCount": {
-                          "type": [
-                            "integer",
-                            "null"
-                          ]
-                        },
-                        "uniquePromotersCount": {
-                          "type": [
-                            "integer",
-                            "null"
-                          ]
-                        },
-                        "liquidityCount": {
-                          "type": [
-                            "integer",
-                            "null"
-                          ]
-                        },
-                        "parentListId": {
-                          "type": [
-                            "string",
-                            "null"
+                        "list": {
+                          "type": "object",
+                          "properties": {
+                            "contributionPolicy": {
+                              "type": "string",
+                              "enum": [
+                                "DISABLED",
+                                "OWNERS_ONLY",
+                                "FRIENDS_ONLY",
+                                "PUBLIC"
+                              ]
+                            },
+                            "id": {
+                              "type": "string",
+                              "format": "cuid"
+                            },
+                            "title": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "slug": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "description": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "ownerId": {
+                              "type": "string"
+                            },
+                            "contributionReview": {
+                              "type": [
+                                "boolean",
+                                "null"
+                              ]
+                            },
+                            "tags": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              },
+                              "maxItems": 5
+                            },
+                            "createdAt": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "updatedAt": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "contributionPolicy",
+                            "id",
+                            "title",
+                            "slug",
+                            "description",
+                            "ownerId",
+                            "contributionReview",
+                            "tags",
+                            "createdAt",
+                            "updatedAt"
                           ]
                         }
-                      },
-                      "required": [
-                        "id",
-                        "question",
-                        "description",
-                        "slug",
-                        "closeDate",
-                        "resolvedAt",
-                        "canceledAt",
-                        "canceledById",
-                        "createdBy",
-                        "tags",
-                        "ammAccountId",
-                        "clearingAccountId",
-                        "createdAt",
-                        "updatedAt",
-                        "commentCount",
-                        "uniqueTradersCount",
-                        "uniquePromotersCount",
-                        "liquidityCount",
-                        "parentListId"
-                      ]
-                    },
-                    "list": {
-                      "type": "object",
-                      "properties": {
-                        "contributionPolicy": {
-                          "type": "string",
-                          "enum": [
-                            "DISABLED",
-                            "OWNERS_ONLY",
-                            "FRIENDS_ONLY",
-                            "PUBLIC"
-                          ]
-                        },
-                        "id": {
-                          "type": "string",
-                          "format": "cuid"
-                        },
-                        "title": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "slug": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "description": {
-                          "type": [
-                            "string",
-                            "null"
-                          ]
-                        },
-                        "ownerId": {
-                          "type": "string"
-                        },
-                        "contributionReview": {
-                          "type": [
-                            "boolean",
-                            "null"
-                          ]
-                        },
-                        "tags": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          },
-                          "maxItems": 5
-                        },
-                        "createdAt": {
-                          "type": [
-                            "string",
-                            "null"
-                          ]
-                        },
-                        "updatedAt": {
-                          "type": [
-                            "string",
-                            "null"
-                          ]
-                        }
-                      },
-                      "required": [
-                        "contributionPolicy",
-                        "id",
-                        "title",
-                        "slug",
-                        "description",
-                        "ownerId",
-                        "contributionReview",
-                        "tags",
-                        "createdAt",
-                        "updatedAt"
-                      ]
+                      }
                     }
-                  }
+                  },
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
