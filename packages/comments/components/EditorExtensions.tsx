@@ -21,7 +21,7 @@ import { MentionList } from './MentionList'
 
 const suggestion: Omit<SuggestionOptions<unknown, MentionNodeAttrs>, 'editor'> = {
   items: async ({ query }) => {
-    const data = await getSearch({ query })
+    const { data } = await getSearch({ query })
 
     return data.users
   },

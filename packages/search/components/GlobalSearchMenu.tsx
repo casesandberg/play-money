@@ -25,7 +25,7 @@ export function GlobalSearchMenu({ open, onOpenChange }: { open: boolean; onOpen
   useEffect(() => {
     async function search() {
       if (open) {
-        const data = await getSearch({ query })
+        const { data } = await getSearch({ query })
         setResults(data)
       }
     }
