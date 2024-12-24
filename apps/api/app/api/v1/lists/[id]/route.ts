@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
-import { type SchemaResponse } from '@play-money/api-helpers'
+import { stripUndefined, type SchemaResponse } from '@play-money/api-helpers'
+import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
 import { getList } from '@play-money/lists/lib/getList'
+import { updateList } from '@play-money/lists/lib/updateList'
+import { canModifyList } from '@play-money/lists/rules'
+import { getUserById } from '@play-money/users/lib/getUserById'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'
@@ -25,6 +29,36 @@ export async function GET(
     const list = await getList({ id, extended })
 
     return NextResponse.json({ data: list })
+  } catch (error) {
+    console.log(error) // eslint-disable-line no-console -- Log error for debugging
+    return NextResponse.json({ error: 'Error processing request' }, { status: 500 })
+  }
+}
+
+export async function PATCH(
+  req: Request,
+  { params }: { params: unknown }
+): Promise<SchemaResponse<typeof schema.patch.responses>> {
+  try {
+    const userId = await getAuthUser(req)
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { id } = schema.patch.parameters.parse(params)
+    const body = (await req.json()) as unknown
+    const { title, description, tags, ownerId } = schema.patch.requestBody.transform(stripUndefined).parse(body)
+
+    const list = await getList({ id })
+    const user = await getUserById({ id: userId })
+
+    if (!canModifyList({ list, user })) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const updatedList = await updateList({ id, title, description, tags, ownerId })
+
+    return NextResponse.json({ data: updatedList })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 })
