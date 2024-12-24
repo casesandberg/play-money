@@ -44,43 +44,47 @@ async function apiHandler<T>(
 
 export async function getMarketTransactions({
   marketId,
-  page,
-  pageSize,
+  ...paginationParams
 }: {
   marketId: string
-  page?: string
-  pageSize?: string
-}) {
-  return apiHandler<{
-    transactions: Array<TransactionWithEntries>
-    page: number
-    pageSize: number
-    totalPages: number
-  }>(
-    `${process.env.NEXT_PUBLIC_API_URL}/v1/transactions?marketId=${marketId}&transactionType=TRADE_BUY,TRADE_SELL${
-      page ? `&page=${page}` : ''
-    }${pageSize ? `&pageSize=${pageSize}` : ''}`
+} & PaginationRequest) {
+  const currentParams = new URLSearchParams(
+    JSON.parse(
+      JSON.stringify({
+        marketId,
+        transactionType: ['TRADE_BUY', 'TRADE_SELL'],
+        ...paginationParams,
+      })
+    )
+  )
+
+  const search = currentParams.toString()
+
+  return apiHandler<PaginatedResponse<TransactionWithEntries>>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/transactions${search ? `?${search}` : ''}`
   )
 }
 
 export async function getMarketLiquidityTransactions({
   marketId,
-  page,
-  pageSize,
+  ...paginationParams
 }: {
   marketId: string
-  page?: string
-  pageSize?: string
-}) {
-  return apiHandler<{
-    transactions: Array<TransactionWithEntries>
-    page: number
-    pageSize: number
-    totalPages: number
-  }>(
-    `${process.env.NEXT_PUBLIC_API_URL}/v1/transactions?marketId=${marketId}&transactionType=LIQUIDITY_INITIALIZE,LIQUIDITY_DEPOSIT,LIQUIDITY_WITHDRAWAL${
-      page ? `&page=${page}` : ''
-    }${pageSize ? `&pageSize=${pageSize}` : ''}`
+} & PaginationRequest) {
+  const currentParams = new URLSearchParams(
+    JSON.parse(
+      JSON.stringify({
+        marketId,
+        transactionType: ['LIQUIDITY_INITIALIZE', 'LIQUIDITY_DEPOSIT', 'LIQUIDITY_WITHDRAWAL'],
+        ...paginationParams,
+      })
+    )
+  )
+
+  const search = currentParams.toString()
+
+  return apiHandler<PaginatedResponse<TransactionWithEntries>>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/transactions${search ? `?${search}` : ''}`
   )
 }
 
@@ -464,12 +468,8 @@ export async function getUserUsername({ username }: { username: string }): Promi
   })
 }
 
-export async function getUserTransactions({
-  userId,
-}: {
-  userId: string
-}): Promise<{ transactions: Array<TransactionWithEntries> }> {
-  return apiHandler<{ transactions: Array<TransactionWithEntries> }>(
+export async function getUserTransactions({ userId }: { userId: string }) {
+  return apiHandler<PaginatedResponse<TransactionWithEntries>>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/transactions`
   )
 }

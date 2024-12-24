@@ -1,5 +1,10 @@
 import { z } from 'zod'
-import { ApiEndpoints, ServerErrorSchema } from '@play-money/api-helpers'
+import {
+  ApiEndpoints,
+  createPaginatedResponseSchema,
+  paginationSchema,
+  ServerErrorSchema,
+} from '@play-money/api-helpers'
 import {
   MarketSchema,
   TransactionEntrySchema,
@@ -8,6 +13,12 @@ import {
   UserSchema,
 } from '@play-money/database'
 
+const ExtendedTransactionSchema = TransactionSchema.extend({
+  entries: z.array(TransactionEntrySchema),
+  market: MarketSchema.or(z.null()),
+  initiator: UserSchema.or(z.null()),
+})
+
 export default {
   get: {
     parameters: z
@@ -15,20 +26,11 @@ export default {
         marketId: z.string().optional(),
         userId: z.string().optional(),
         transactionType: z.array(TransactionTypeSchema).optional(),
-        pageSize: z.coerce.number().optional(),
-        page: z.coerce.number().optional(),
       })
+      .merge(paginationSchema)
       .optional(),
     responses: {
-      200: z.object({
-        transactions: z.array(
-          TransactionSchema.extend({
-            entries: z.array(TransactionEntrySchema),
-            market: MarketSchema.or(z.null()),
-            initiator: UserSchema.or(z.null()),
-          })
-        ),
-      }),
+      200: createPaginatedResponseSchema(ExtendedTransactionSchema),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },

@@ -24,7 +24,7 @@ import { UserPositionsTable } from './UserPositionsTable'
 import { UserProfileTabs } from './UserProfileTabs'
 
 export async function UserTradesTable({ userId }: { userId: string }) {
-  const { transactions } = await getUserTransactions({ userId })
+  const { data: transactions } = await getUserTransactions({ userId })
 
   return (
     <Table>

@@ -7,7 +7,7 @@ export default {
     parameters: UserSchema.pick({ id: true }),
     responses: {
       200: z.object({
-        transactions: z.array(TransactionSchema.extend({ entries: z.array(TransactionEntrySchema) })),
+        data: z.array(TransactionSchema.extend({ entries: z.array(TransactionEntrySchema) })),
       }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,

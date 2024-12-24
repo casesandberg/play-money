@@ -3,6 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table'
 import _ from 'lodash'
 import React from 'react'
+import { PageInfo } from '@play-money/api-helpers'
 import { User } from '@play-money/database'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { formatDistanceToNowShort } from '@play-money/ui'
@@ -62,6 +63,6 @@ export const columns: Array<ColumnDef<TransactionWithEntries>> = [
   },
 ]
 
-export function LiquidityTable({ data, totalPages }: { data: Array<TransactionWithEntries>; totalPages: number }) {
-  return <DataTable data={data} columns={columns} totalPages={totalPages} showViewOptions={false} />
+export function LiquidityTable({ data, pageInfo }: { data: Array<TransactionWithEntries>; pageInfo: PageInfo }) {
+  return <DataTable data={data} columns={columns} pageInfo={pageInfo} showViewOptions={false} />
 }

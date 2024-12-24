@@ -1,6 +1,7 @@
 import { format, isPast } from 'date-fns'
 import _ from 'lodash'
 import React from 'react'
+import { PageInfo } from '@play-money/api-helpers'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { LiquidityTable } from '@play-money/finance/components/LiquidityTable'
 import { TransactionWithEntries } from '@play-money/finance/types'
@@ -13,9 +14,11 @@ import { MarketToolbar } from './MarketToolbar'
 export function MarketLiquidityPage({
   market,
   liquidityTransactions,
+  pageInfo,
 }: {
   market: ExtendedMarket
   liquidityTransactions: Array<TransactionWithEntries>
+  pageInfo: PageInfo
 }) {
   const simplyIfTwoOptions = market.options.length === 2
 
@@ -55,7 +58,7 @@ export function MarketLiquidityPage({
       </CardHeader>
       <CardContent className="space-y-6 border-t pt-3 md:pt-6">
         {liquidityTransactions.length ? (
-          <LiquidityTable data={liquidityTransactions} totalPages={1} />
+          <LiquidityTable data={liquidityTransactions} pageInfo={pageInfo} />
         ) : (
           <div className="text-sm text-muted-foreground">No liquidity has been added yet.</div>
         )}

@@ -13,10 +13,9 @@ const FIVE_MINUTES = SIXTY_SECONDS * 5
 const ONE_HOUR = SIXTY_SECONDS * 60
 
 export function useRecentTrades() {
-  return useSWR<{ transactions: Array<TransactionWithEntries> }>(
-    `/v1/transactions?transactionType=TRADE_BUY,TRADE_SELL`,
-    { refreshInterval: FIVE_MINUTES }
-  )
+  return useSWR<{ data: Array<TransactionWithEntries> }>(`/v1/transactions?transactionType=TRADE_BUY,TRADE_SELL`, {
+    refreshInterval: FIVE_MINUTES,
+  })
 }
 
 export function useSiteActivity() {

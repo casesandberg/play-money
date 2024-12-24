@@ -16,15 +16,13 @@ export async function GET(
 
     await getUserById({ id })
 
-    const { transactions } = await getTransactions({
+    const results = await getTransactions({
       userId: id,
       transactionType: ['TRADE_BUY', 'TRADE_SELL'],
       isReverse: null,
     })
 
-    return NextResponse.json({
-      transactions,
-    })
+    return NextResponse.json(results)
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
 
