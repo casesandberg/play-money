@@ -6,8 +6,10 @@ export default {
     parameters: z.object({ id: z.string() }),
     responses: {
       200: z.object({
-        // TODO: Hookup with NetBalance
-        balance: z.object({}),
+        data: z.object({
+          // TODO: Hookup with NetBalance
+          balance: z.object({}),
+        }),
       }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,

@@ -25,7 +25,7 @@ export async function POST(req: Request): Promise<SchemaResponse<typeof schema.p
       },
     })
 
-    return NextResponse.json(apiKey)
+    return NextResponse.json({ data: apiKey })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
 
@@ -47,7 +47,7 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.ge
       },
     })
 
-    return NextResponse.json({ keys })
+    return NextResponse.json({ data: keys })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
 

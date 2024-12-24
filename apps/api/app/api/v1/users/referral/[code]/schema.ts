@@ -6,7 +6,7 @@ export default {
   get: {
     parameters: z.object({ code: z.string() }),
     responses: {
-      200: UserSchema,
+      200: z.object({ data: UserSchema }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },

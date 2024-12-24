@@ -41,7 +41,9 @@ function MainNav({
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   let initialBalance
   try {
-    const { balance } = await getMyBalance()
+    const {
+      data: { balance },
+    } = await getMyBalance()
     initialBalance = balance
   } catch (_error) {
     // Ignore

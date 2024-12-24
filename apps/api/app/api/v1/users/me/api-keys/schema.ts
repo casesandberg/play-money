@@ -8,14 +8,14 @@ export default {
       name: z.string(),
     }),
     responses: {
-      200: ApiKeySchema,
+      200: z.object({ data: ApiKeySchema }),
       401: ServerErrorSchema,
       500: ServerErrorSchema,
     },
   },
   get: {
     responses: {
-      200: z.object({ keys: z.array(ApiKeySchema) }),
+      200: z.object({ data: z.array(ApiKeySchema) }),
       401: ServerErrorSchema,
       500: ServerErrorSchema,
     },

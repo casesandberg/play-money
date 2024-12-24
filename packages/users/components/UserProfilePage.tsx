@@ -225,8 +225,10 @@ export async function UserProfilePage({
     sortDirection?: 'asc' | 'desc'
   }
 }) {
-  const user = await getUserUsername({ username })
-  const { positions } = await getUserPositions({ userId: user.id, pageSize: 5 })
+  const { data: user } = await getUserUsername({ username })
+  const {
+    data: { positions },
+  } = await getUserPositions({ userId: user.id, pageSize: 5 })
   const { data: markets } = await getUserMarkets({ userId: user.id })
 
   return (

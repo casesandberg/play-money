@@ -22,7 +22,7 @@ export async function POST(req: Request): Promise<SchemaResponse<typeof schema.p
       await updateNotificationsRead({ userId, listId: resourceId })
     }
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ data: { success: true } })
   } catch (error: unknown) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
 

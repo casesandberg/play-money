@@ -82,19 +82,19 @@ export function useMarketRelated({ marketId }: { marketId: string }) {
 
 export const MY_NOTIFICATIONS_PATH = '/v1/users/me/notifications'
 export function useNotifications({ skip = false }: { skip?: boolean }) {
-  return useSWR<{ unreadCount: number; notifications: Array<NotificationGroupWithLastNotification> }>(
+  return useSWR<{ data: { unreadCount: number; notifications: Array<NotificationGroupWithLastNotification> } }>(
     !skip ? MY_NOTIFICATIONS_PATH : null,
     { refreshInterval: FIVE_MINUTES }
   )
 }
 
 export function useUserStats({ userId, skip = false }: { userId: string; skip?: boolean }) {
-  return useSWR<{ quests: Array<Quest> }>(!skip ? `/v1/users/${userId}/stats` : null)
+  return useSWR<{ data: { quests: Array<Quest> } }>(!skip ? `/v1/users/${userId}/stats` : null)
 }
 
 export const MY_BALANCE_PATH = '/v1/users/me/balance'
 export function useMyBalance({ skip = false }: { skip?: boolean }) {
-  return useSWR<{ balance: number }>(!skip ? '/v1/users/me/balance' : null)
+  return useSWR<{ data: { balance: number } }>(!skip ? '/v1/users/me/balance' : null)
 }
 
 export function useUserGraph({ userId }: { userId: string }) {

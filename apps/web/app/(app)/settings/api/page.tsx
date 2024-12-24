@@ -12,7 +12,7 @@ export default async function AppSettingsPage() {
     redirect('/login?redirect=/settings/api')
   }
 
-  const { keys } = await getMyApiKeys()
+  const { data: keys } = await getMyApiKeys()
 
   async function handleCreateKey() {
     'use server'

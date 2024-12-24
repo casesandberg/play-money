@@ -11,7 +11,7 @@ export default async function AppSettingsPage() {
     redirect('/login?redirect=/settings/referrals')
   }
 
-  const { referrals } = await getMyReferrals()
+  const { data: referrals } = await getMyReferrals()
 
   return <SettingsReferralPage referrals={referrals} />
 }

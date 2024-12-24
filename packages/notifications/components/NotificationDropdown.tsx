@@ -15,7 +15,8 @@ import { NotificationItem } from './NotificationItem'
 export function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false)
   const { user } = useUser()
-  const { data, mutate } = useNotifications({ skip: !user })
+  const { data: notificationData, mutate } = useNotifications({ skip: !user })
+  const data = notificationData?.data
 
   const handleMarkAllRead = async () => {
     try {

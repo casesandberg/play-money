@@ -5,7 +5,7 @@ import { UserSchema } from '@play-money/database'
 export default {
   get: {
     responses: {
-      200: z.object({ referrals: z.array(UserSchema) }),
+      200: z.object({ data: z.array(UserSchema) }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },

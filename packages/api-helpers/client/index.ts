@@ -134,11 +134,11 @@ export async function deleteComment({ commentId }: { commentId: string }) {
 }
 
 export async function getMyBalance() {
-  return apiHandler<{ balance: number }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/balance`)
+  return apiHandler<{ data: { balance: number } }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/balance`)
 }
 
 export async function getMyReferrals() {
-  return apiHandler<{ referrals: Array<User> }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/referrals`)
+  return apiHandler<{ data: Array<User> }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/referrals`)
 }
 
 export async function getMarkets({
@@ -422,14 +422,14 @@ export async function getUserCheckUsername({
   username,
 }: {
   username: string
-}): Promise<{ available: boolean; message?: string }> {
-  return apiHandler<{ available: boolean; message?: string }>(
+}): Promise<{ data: { available: boolean; message?: string } }> {
+  return apiHandler<{ data: { available: boolean; message?: string } }>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/users/check-username?username=${encodeURIComponent(username)}`
   )
 }
 
 export async function updateMe(data: Record<string, unknown>) {
-  return apiHandler<User>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me`, {
+  return apiHandler<{ data: User }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me`, {
     method: 'PATCH',
     body: data,
   })
@@ -437,31 +437,33 @@ export async function updateMe(data: Record<string, unknown>) {
 
 export async function getUserStats({ userId }: { userId: string }) {
   return apiHandler<{
-    netWorth: number
-    tradingVolume: number
-    totalMarkets: number
-    lastTradeAt: Date
-    activeDayCount: number
-    otherIncome: number
-    quests: Array<{
-      title: string
-      award: number
-      completed: boolean
-      href: string
-    }>
+    data: {
+      netWorth: number
+      tradingVolume: number
+      totalMarkets: number
+      lastTradeAt: Date
+      activeDayCount: number
+      otherIncome: number
+      quests: Array<{
+        title: string
+        award: number
+        completed: boolean
+        href: string
+      }>
+    }
   }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/stats`)
 }
 
-export async function getUser({ userId }: { userId: string }): Promise<User> {
-  return apiHandler<User>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}`)
+export async function getUser({ userId }: { userId: string }): Promise<{ data: User }> {
+  return apiHandler<{ data: User }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}`)
 }
 
-export async function getUserReferral({ code }: { code: string }): Promise<User> {
-  return apiHandler<User>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/referral/${code}`)
+export async function getUserReferral({ code }: { code: string }): Promise<{ data: User }> {
+  return apiHandler<{ data: User }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/referral/${code}`)
 }
 
-export async function getUserUsername({ username }: { username: string }): Promise<User> {
-  return apiHandler<User>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/username/${username}`, {
+export async function getUserUsername({ username }: { username: string }): Promise<{ data: User }> {
+  return apiHandler<{ data: User }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/username/${username}`, {
     next: {
       revalidate: 0, // Equivalent to `cache: 'no-store'` in Next.js for disabling caching
     },
@@ -480,14 +482,20 @@ export async function getUserPositions({
 }: {
   userId: string
   pageSize?: number
-}): Promise<{ positions: Array<ExtendedMarketOptionPosition> }> {
-  return apiHandler<{ positions: Array<ExtendedMarketOptionPosition> }>(
+}): Promise<{ data: { positions: Array<ExtendedMarketOptionPosition> } }> {
+  return apiHandler<{ data: { positions: Array<ExtendedMarketOptionPosition> } }>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/positions${pageSize ? `?pageSize=${pageSize}` : ''}`
   )
 }
 
-export async function getUserBalance({ userId }: { userId: string }): Promise<{ balance: NetBalanceAsNumbers }> {
-  return apiHandler<{ balance: NetBalanceAsNumbers }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/balance`)
+export async function getUserBalance({
+  userId,
+}: {
+  userId: string
+}): Promise<{ data: { balance: NetBalanceAsNumbers } }> {
+  return apiHandler<{ data: { balance: NetBalanceAsNumbers } }>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/balance`
+  )
 }
 
 export async function getUserMarkets({ userId }: { userId: string }): Promise<PaginatedResponse<ExtendedMarket>> {
@@ -533,6 +541,6 @@ export async function createMyApiKey({ name }: { name: string }): Promise<ApiKey
   })
 }
 
-export async function getMyApiKeys(): Promise<{ keys: Array<ApiKey> }> {
-  return apiHandler<{ keys: Array<ApiKey> }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/api-keys`)
+export async function getMyApiKeys(): Promise<{ data: Array<ApiKey> }> {
+  return apiHandler<{ data: Array<ApiKey> }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/api-keys`)
 }

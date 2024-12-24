@@ -16,7 +16,9 @@ export async function GET(
     const balance = await getBalance({ accountId: userAccount.id, assetType: 'CURRENCY', assetId: 'PRIMARY' })
 
     return NextResponse.json({
-      balance: transformMarketBalancesToNumbers([balance])[0],
+      data: {
+        balance: transformMarketBalancesToNumbers([balance])[0],
+      },
     })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging

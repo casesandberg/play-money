@@ -10,7 +10,9 @@ export default {
     }),
     responses: {
       200: z.object({
-        positions: z.array(MarketOptionPositionSchema),
+        data: z.object({
+          positions: z.array(MarketOptionPositionSchema),
+        }),
       }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,

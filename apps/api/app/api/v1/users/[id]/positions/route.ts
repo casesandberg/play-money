@@ -29,7 +29,9 @@ export async function GET(
     )
 
     return NextResponse.json({
-      positions,
+      data: {
+        positions,
+      },
     })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging

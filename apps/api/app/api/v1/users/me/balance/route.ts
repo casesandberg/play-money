@@ -21,7 +21,7 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.ge
       assetId: 'PRIMARY',
     })
 
-    return NextResponse.json({ balance: primaryBalance.total.toNumber() })
+    return NextResponse.json({ data: { balance: primaryBalance.total.toNumber() } })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
 

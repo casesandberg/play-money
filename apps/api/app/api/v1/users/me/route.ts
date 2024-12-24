@@ -16,7 +16,7 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.ge
 
     const user = await getUserById({ id: userId })
 
-    return NextResponse.json(user)
+    return NextResponse.json({ data: user })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
 
@@ -36,7 +36,7 @@ export async function PATCH(req: Request): Promise<SchemaResponse<typeof schema.
 
     const user = await updateUserById({ id: userId, ...updateData })
 
-    return NextResponse.json(user)
+    return NextResponse.json({ data: user })
   } catch (error: unknown) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
 

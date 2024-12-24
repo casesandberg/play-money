@@ -15,7 +15,7 @@ export async function GET(
 
     const user = await getUserById({ id })
 
-    return NextResponse.json(user)
+    return NextResponse.json({ data: user })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
 
