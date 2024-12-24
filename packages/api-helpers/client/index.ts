@@ -164,33 +164,30 @@ export async function getMarkets({
 export async function getMarketPositions({
   ownerId,
   marketId,
-  page,
-  pageSize,
   status,
-  sortField,
-  sortDirection,
+  ...paginationParams
 }: {
   ownerId?: string
   marketId?: string
-  page?: string
-  pageSize?: string
   status?: 'active' | 'closed' | 'all'
-  sortField?: string
-  sortDirection?: string
-} = {}) {
+} & PaginationRequest = {}): Promise<PaginatedResponse<ExtendedMarketPosition>> {
   const currentParams = new URLSearchParams(
-    JSON.parse(JSON.stringify({ ownerId, page, pageSize, status, sortField, sortDirection, marketId }))
+    JSON.parse(
+      JSON.stringify({
+        ownerId,
+        status,
+        ...paginationParams,
+      })
+    )
   )
   const search = currentParams.toString()
 
-  return apiHandler<{
-    marketPositions: Array<ExtendedMarketPosition>
-    page: number
-    pageSize: number
-    totalPages: number
-  }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/market-positions${search ? `?${search}` : ''}`, {
-    next: { tags: ['markets'] },
-  })
+  return apiHandler<PaginatedResponse<ExtendedMarketPosition>>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/positions${search ? `?${search}` : ''}`,
+    {
+      next: { tags: ['markets'] },
+    }
+  )
 }
 
 export async function getLists({

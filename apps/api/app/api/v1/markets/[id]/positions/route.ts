@@ -5,7 +5,11 @@ import schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(req: Request): Promise<SchemaResponse<typeof schema.get.responses>> {
+// TODO: Look into a better way to handle mixing vercel params and search params together...
+export async function GET(
+  req: Request,
+  { params: idParams }: { params: Record<string, unknown> }
+): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
     const url = new URL(req.url)
     const searchParams = new URLSearchParams(url.search)
@@ -13,34 +17,14 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.ge
 
     const {
       ownerId,
-      marketId,
+      id: marketId,
       status,
-      pageSize = 50,
-      page = 1,
-      sortField,
-      sortDirection = 'desc',
-    } = schema.get.parameters.parse(params) ?? {}
+      ...paginationParams
+    } = schema.get.parameters.parse({ ...params, ...idParams }) ?? {}
 
-    const { marketPositions, total } = await getMarketPositions(
-      { ownerId, status, marketId },
-      sortField
-        ? {
-            field: sortField,
-            direction: sortDirection,
-          }
-        : undefined,
-      {
-        skip: (page - 1) * pageSize,
-        take: pageSize,
-      }
-    )
+    const results = await getMarketPositions({ ownerId, status, marketId }, paginationParams)
 
-    return NextResponse.json({
-      marketPositions,
-      page,
-      pageSize,
-      totalPages: Math.ceil(total / pageSize),
-    })
+    return NextResponse.json(results)
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
     if (error instanceof Error) {

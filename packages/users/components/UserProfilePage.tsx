@@ -196,10 +196,10 @@ async function UserPositionsTab({
     page?: string
     status?: 'active' | 'closed' | 'all'
     sortField?: string
-    sortDirection?: string
+    sortDirection?: 'asc' | 'desc'
   }
 }) {
-  const { marketPositions, totalPages } = await getMarketPositions({
+  const { data: marketPositions, pageInfo } = await getMarketPositions({
     ownerId: userId,
     ...filters,
     status: filters?.status ?? 'active',
@@ -207,7 +207,7 @@ async function UserPositionsTab({
 
   return (
     <div className="mt-3 md:mt-6">
-      <UserPositionsTable data={marketPositions} totalPages={totalPages} />
+      <UserPositionsTable data={marketPositions} pageInfo={pageInfo} />
     </div>
   )
 }
@@ -218,11 +218,11 @@ export async function UserProfilePage({
 }: {
   username: string
   filters?: {
-    pageSize?: string
-    page?: string
+    limit?: string
+    cursor?: string
     status?: 'active' | 'closed' | 'all'
     sortField?: string
-    sortDirection?: string
+    sortDirection?: 'asc' | 'desc'
   }
 }) {
   const user = await getUserUsername({ username })

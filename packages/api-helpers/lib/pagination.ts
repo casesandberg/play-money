@@ -29,6 +29,13 @@ export async function getPaginatedItems<T extends { id: string }>(data: {
   include?: Prisma.ListInclude
   orderBy?: Prisma.ListOrderByWithRelationInput
 }): Promise<PaginatedResponse<T>>
+export async function getPaginatedItems<T extends { id: string }>(data: {
+  model: typeof db.marketOptionPosition
+  pagination: PaginationRequest
+  where?: Prisma.MarketOptionPositionWhereInput
+  include?: Prisma.MarketOptionPositionInclude
+  orderBy?: Prisma.MarketOptionPositionOrderByWithRelationInput
+}): Promise<PaginatedResponse<T>>
 export async function getPaginatedItems<T extends { id: string }>({
   model,
   pagination,

@@ -5,16 +5,16 @@ export default function AppUsernamePage({
   searchParams,
 }: {
   params: { username: string }
-  searchParams: { pageSize?: string; page?: string; sort?: string; status?: string }
+  searchParams: { limit?: string; cursor?: string; sort?: string; status?: string }
 }) {
   return (
     <UserProfilePage
       filters={{
-        pageSize: searchParams.pageSize,
-        page: searchParams.page,
+        limit: searchParams.limit,
+        cursor: searchParams.cursor,
         status: searchParams.status as 'active' | 'closed' | 'all' | undefined,
         sortField: searchParams.sort?.split('-')[0],
-        sortDirection: searchParams.sort?.split('-')[1],
+        sortDirection: searchParams.sort?.split('-')[1] as 'asc' | 'desc' | undefined,
       }}
       username={params.username}
     />
