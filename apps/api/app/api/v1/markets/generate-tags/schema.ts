@@ -3,10 +3,12 @@ import { ApiEndpoints, ServerErrorSchema } from '@play-money/api-helpers'
 
 export default {
   post: {
+    summary: 'Generate tags for a market',
+    security: true,
     requestBody: z.object({ question: z.string() }),
     responses: {
       200: z.object({
-        tags: z.array(z.string()),
+        data: z.array(z.string()),
       }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,

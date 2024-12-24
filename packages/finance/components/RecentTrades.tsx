@@ -9,11 +9,12 @@ import { formatDistanceToNowShort } from '@play-money/ui'
 import { UserLink } from '@play-money/users/components/UserLink'
 
 export function RecentTrades() {
-  const { data } = useRecentTrades()
+  const { data: transactionsData } = useRecentTrades()
+  const transactions = transactionsData?.data
 
   return (
     <ul className="divide-y divide-muted text-sm">
-      {_.take(data?.transactions, 5).map((transaction) => {
+      {_.take(transactions, 5).map((transaction) => {
         if (!transaction.initiator) {
           return null
         }

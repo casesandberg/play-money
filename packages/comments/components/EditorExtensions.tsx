@@ -21,7 +21,7 @@ import { MentionList } from './MentionList'
 
 const suggestion: Omit<SuggestionOptions<unknown, MentionNodeAttrs>, 'editor'> = {
   items: async ({ query }) => {
-    const data = await getSearch({ query })
+    const { data } = await getSearch({ query })
 
     return data.users
   },
@@ -86,7 +86,7 @@ export function MentionChip(props: NodeViewProps) {
   const [user, setUser] = useState<User>()
   useEffect(() => {
     async function fetchUser() {
-      const user = await getUser({ userId: props.node.attrs.id })
+      const { data: user } = await getUser({ userId: props.node.attrs.id })
       setUser(user)
     }
 

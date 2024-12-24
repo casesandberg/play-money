@@ -56,7 +56,7 @@ export function SettingsProfileForm({
 
   async function onSubmit(data: ProfileFormValues) {
     try {
-      const user = await updateMe(data)
+      const { data: user } = await updateMe(data)
 
       setUser(user)
       toast({
@@ -142,7 +142,9 @@ export function SettingsProfileForm({
                 if (user?.username === value) {
                   return true
                 }
-                const { available, message } = await getUserCheckUsername({ username: value })
+                const {
+                  data: { available, message },
+                } = await getUserCheckUsername({ username: value })
                 return available || message || 'There is an error with that username'
               },
               500,

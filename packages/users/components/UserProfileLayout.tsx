@@ -49,9 +49,11 @@ export async function UserProfileLayout({
   params: { username: string }
   children: React.ReactNode
 }) {
-  const profile = await getUserUsername({ username })
-  const stats = await getUserStats({ userId: profile.id })
-  const { balance } = await getUserBalance({ userId: profile.id })
+  const { data: profile } = await getUserUsername({ username })
+  const { data: stats } = await getUserStats({ userId: profile.id })
+  const {
+    data: { balance },
+  } = await getUserBalance({ userId: profile.id })
 
   const quester =
     balance.subtotals['DAILY_TRADE_BONUS'] +

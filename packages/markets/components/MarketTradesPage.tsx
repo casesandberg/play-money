@@ -1,6 +1,7 @@
 import { format, isPast } from 'date-fns'
 import _ from 'lodash'
 import React from 'react'
+import { PageInfo } from '@play-money/api-helpers/types'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { TradesTable } from '@play-money/finance/components/TradesTable'
 import { TransactionWithEntries } from '@play-money/finance/types'
@@ -13,11 +14,11 @@ import { MarketToolbar } from './MarketToolbar'
 export function MarketTradesPage({
   market,
   transactions,
-  totalPages,
+  pageInfo,
 }: {
   market: ExtendedMarket
   transactions: Array<TransactionWithEntries>
-  totalPages: number
+  pageInfo: PageInfo
 }) {
   const simplyIfTwoOptions = market.options.length === 2
 
@@ -57,7 +58,7 @@ export function MarketTradesPage({
       </CardHeader>
       <CardContent className="space-y-6 border-t pt-3 md:pt-6">
         {transactions.length ? (
-          <TradesTable data={transactions} totalPages={totalPages} />
+          <TradesTable data={transactions} pageInfo={pageInfo} />
         ) : (
           <div className="text-sm text-muted-foreground">No trades have been made yet.</div>
         )}

@@ -28,7 +28,7 @@ export async function GET(
     const { id, extended } = schema.get.parameters.parse({ ...params, ...idParams })
 
     const market = await getMarket({ id, extended })
-    return NextResponse.json(market)
+    return NextResponse.json({ data: market })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 })
@@ -47,7 +47,9 @@ export async function PATCH(
 
     const { id } = schema.patch.parameters.parse(params)
     const body = (await req.json()) as unknown
-    const { question, description, closeDate, tags } = schema.patch.requestBody.transform(stripUndefined).parse(body)
+    const { question, description, closeDate, tags, createdBy } = schema.patch.requestBody
+      .transform(stripUndefined)
+      .parse(body)
 
     const market = await getMarket({ id })
     const user = await getUserById({ id: userId })
@@ -56,9 +58,9 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const updatedMarket = await updateMarket({ id, question, description, closeDate, tags })
+    const updatedMarket = await updateMarket({ id, question, description, closeDate, tags, createdBy })
 
-    return NextResponse.json(updatedMarket)
+    return NextResponse.json({ data: updatedMarket })
   } catch (error) {
     if (error instanceof CommentNotFoundError) {
       return NextResponse.json({ error: error.message }, { status: 404 })

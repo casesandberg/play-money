@@ -1,76 +1,36 @@
-import Decimal from 'decimal.js'
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
-import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
-import db from '@play-money/database'
-import type { NetBalance } from '@play-money/finance/lib/getBalances'
-import { transformMarketBalancesToNumbers } from '@play-money/finance/lib/getBalances'
-import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
+import { getMarketPositions } from '@play-money/markets/lib/getMarketPositions'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'
 
+// TODO: Look into a better way to handle mixing vercel params and search params together...
 export async function GET(
   req: Request,
-  { params }: { params: unknown }
+  { params: idParams }: { params: Record<string, unknown> }
 ): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
-    const { id } = schema.get.parameters.parse(params)
-    const userId = await getAuthUser(req)
-    const userAccount = userId ? await getUserPrimaryAccount({ userId }) : undefined
+    const url = new URL(req.url)
+    const searchParams = new URLSearchParams(url.search)
+    const params = Object.fromEntries(searchParams)
 
-    const [userBalances, userBalancesInMarket] = await Promise.all([
-      db.balance.findMany({
-        where: {
-          marketId: id,
-          assetType: 'CURRENCY',
-          assetId: 'PRIMARY',
-          account: {
-            NOT: {
-              userPrimary: null,
-            },
-          },
-          total: {
-            gt: new Decimal(0),
-          },
-        },
-        orderBy: {
-          total: 'desc',
-        },
-        include: {
-          account: {
-            include: {
-              userPrimary: true,
-            },
-          },
-        },
-        take: 5,
-      }) as unknown as Array<NetBalance>,
-      userAccount
-        ? (db.balance.findFirst({
-            where: {
-              accountId: userAccount.id,
-              assetType: 'CURRENCY',
-              assetId: 'PRIMARY',
-              marketId: id,
-            },
-            include: {
-              account: {
-                include: {
-                  userPrimary: true,
-                },
-              },
-            },
-          }) as unknown as NetBalance | undefined)
-        : undefined,
-    ])
+    const {
+      ownerId,
+      id: marketId,
+      status,
+      ...paginationParams
+    } = schema.get.parameters.parse({ ...params, ...idParams }) ?? {}
 
-    return NextResponse.json({
-      balances: transformMarketBalancesToNumbers(userBalances),
-      user: userBalancesInMarket ? transformMarketBalancesToNumbers([userBalancesInMarket])[0] : undefined,
-    })
+    const results = await getMarketPositions({ ownerId, status, marketId }, paginationParams)
+
+    return NextResponse.json(results)
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 })
   }
 }

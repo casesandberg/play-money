@@ -1,14 +1,15 @@
 import { generateMnemonic } from 'bip39'
 import { NextResponse } from 'next/server'
 import { SchemaResponse } from '@play-money/api-helpers'
-import { getAuthUser } from '@play-money/auth/lib/getAuthUser'
+import { auth } from '@play-money/auth'
 import db from '@play-money/database'
 import schema from './schema'
 
 export async function POST(req: Request): Promise<SchemaResponse<typeof schema.post.responses>> {
   try {
-    const userId = await getAuthUser(req)
-    if (!userId) {
+    const session = await auth()
+
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -21,11 +22,11 @@ export async function POST(req: Request): Promise<SchemaResponse<typeof schema.p
       data: {
         name,
         key: key.replace(/\s+/g, '-'),
-        userId,
+        userId: session.user.id,
       },
     })
 
-    return NextResponse.json(apiKey)
+    return NextResponse.json({ data: apiKey })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
 
@@ -33,21 +34,22 @@ export async function POST(req: Request): Promise<SchemaResponse<typeof schema.p
   }
 }
 
-export async function GET(req: Request): Promise<SchemaResponse<typeof schema.get.responses>> {
+export async function GET(): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
-    const userId = await getAuthUser(req)
-    if (!userId) {
+    const session = await auth()
+
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const keys = await db.apiKey.findMany({
       where: {
-        userId,
+        userId: session.user.id,
         isRevoked: false,
       },
     })
 
-    return NextResponse.json({ keys })
+    return NextResponse.json({ data: keys })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
 

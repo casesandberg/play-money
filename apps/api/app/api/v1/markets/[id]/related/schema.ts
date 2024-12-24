@@ -1,12 +1,13 @@
-import zod from 'zod'
+import { z } from 'zod'
 import { ApiEndpoints, ServerErrorSchema } from '@play-money/api-helpers'
 import { MarketSchema } from '@play-money/database'
 
 export default {
   get: {
-    parameters: zod.object({ id: zod.string() }),
+    summary: 'Get related markets',
+    parameters: z.object({ id: z.string() }),
     responses: {
-      200: zod.object({ markets: zod.array(MarketSchema) }),
+      200: z.object({ data: z.array(MarketSchema) }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },

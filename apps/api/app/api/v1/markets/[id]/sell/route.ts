@@ -29,7 +29,7 @@ export async function POST(
       amount: new Decimal(amount),
     })
 
-    return NextResponse.json({})
+    return NextResponse.json({ data: { success: true } })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 })

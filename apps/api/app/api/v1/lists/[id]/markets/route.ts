@@ -62,7 +62,7 @@ export async function POST(
       },
     })
 
-    return NextResponse.json({ market: newMarket })
+    return NextResponse.json({ data: newMarket })
   } catch (error: unknown) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
     if (error instanceof Error) {

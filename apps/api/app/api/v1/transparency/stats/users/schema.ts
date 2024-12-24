@@ -3,6 +3,7 @@ import { ApiEndpoints, ServerErrorSchema } from '@play-money/api-helpers'
 
 export default {
   get: {
+    private: true,
     responses: {
       200: z.object({
         data: z.array(

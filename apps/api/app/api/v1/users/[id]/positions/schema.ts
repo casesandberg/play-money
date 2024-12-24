@@ -4,13 +4,16 @@ import { MarketOptionPositionSchema, UserSchema } from '@play-money/database'
 
 export default {
   get: {
+    summary: 'Get positions for a user',
     parameters: UserSchema.pick({ id: true }).extend({
       pageSize: z.coerce.number().optional(),
       status: z.enum(['active', 'closed', 'all']).optional(),
     }),
     responses: {
       200: z.object({
-        positions: z.array(MarketOptionPositionSchema),
+        data: z.object({
+          positions: z.array(MarketOptionPositionSchema),
+        }),
       }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,

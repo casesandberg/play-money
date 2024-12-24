@@ -1,15 +1,25 @@
 import { z } from 'zod'
-import { ApiEndpoints, ServerErrorSchema } from '@play-money/api-helpers'
+import {
+  ApiEndpoints,
+  createPaginatedResponseSchema,
+  paginationSchema,
+  ServerErrorSchema,
+} from '@play-money/api-helpers'
+import { MarketOptionPositionSchema } from '@play-money/database'
 
 export default {
   get: {
-    parameters: z.object({ id: z.string() }),
+    summary: 'Get positions for a market',
+    parameters: z
+      .object({
+        id: z.string(),
+        status: z.enum(['active', 'closed', 'all']).optional(),
+        ownerId: z.string().optional(),
+      })
+      .merge(paginationSchema)
+      .optional(),
     responses: {
-      200: z.object({
-        // TODO: Hookup with NetBalance
-        balances: z.array(z.object({})),
-        user: z.object({}).optional(),
-      }),
+      200: createPaginatedResponseSchema(MarketOptionPositionSchema),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },

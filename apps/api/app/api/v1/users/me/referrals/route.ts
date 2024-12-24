@@ -15,7 +15,7 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.ge
 
     const referrals = await getUserReferrals({ userId })
 
-    return NextResponse.json({ referrals })
+    return NextResponse.json({ data: referrals })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
 

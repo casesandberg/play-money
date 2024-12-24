@@ -4,9 +4,10 @@ import { CommentSchema } from '@play-money/database'
 
 export default {
   get: {
+    summary: 'Get comments for a market',
     parameters: zod.object({ id: zod.string() }),
     responses: {
-      200: zod.object({ comments: zod.array(CommentSchema) }),
+      200: zod.object({ data: zod.array(CommentSchema) }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },

@@ -4,18 +4,24 @@ import { ApiKeySchema } from '@play-money/database'
 
 export default {
   post: {
+    private: true,
+    summary: 'Create an API key',
+    security: true,
     requestBody: z.object({
       name: z.string(),
     }),
     responses: {
-      200: ApiKeySchema,
+      200: z.object({ data: ApiKeySchema }),
       401: ServerErrorSchema,
       500: ServerErrorSchema,
     },
   },
   get: {
+    private: true,
+    summary: 'Get all API keys for a user',
+    security: true,
     responses: {
-      200: z.object({ keys: z.array(ApiKeySchema) }),
+      200: z.object({ data: z.array(ApiKeySchema) }),
       401: ServerErrorSchema,
       500: ServerErrorSchema,
     },

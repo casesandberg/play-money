@@ -21,7 +21,7 @@ export default function AppSetupPage() {
 
       if (user && !user.referredBy && referringUser?.id) {
         try {
-          const updatedUser = await updateMe({ referredBy: referringUser.id })
+          const { data: updatedUser } = await updateMe({ referredBy: referringUser.id })
 
           setUser(updatedUser)
           clear()

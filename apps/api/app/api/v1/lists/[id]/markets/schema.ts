@@ -4,6 +4,8 @@ import { MarketOptionSchema, MarketSchema } from '@play-money/database'
 
 export default {
   post: {
+    summary: 'Create a market in a list',
+    security: true,
     parameters: z.object({ id: z.string() }),
     requestBody: MarketSchema.pick({
       question: true,
@@ -19,7 +21,7 @@ export default {
       ),
     }),
     responses: {
-      200: z.object({ market: MarketSchema.optional() }),
+      200: z.object({ data: MarketSchema }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },

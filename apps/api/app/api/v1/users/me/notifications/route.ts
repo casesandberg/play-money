@@ -20,7 +20,7 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.ge
       getNotifications({ userId }),
     ])
 
-    return NextResponse.json({ notifications, unreadCount })
+    return NextResponse.json({ data: { notifications, unreadCount } })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
 
@@ -37,7 +37,7 @@ export async function POST(req: Request): Promise<SchemaResponse<typeof schema.p
 
     await updateNotificationsRead({ userId })
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ data: { success: true } })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
 

@@ -1,4 +1,5 @@
 import Decimal from 'decimal.js'
+import { getPaginatedItems, PaginationRequest } from '@play-money/api-helpers'
 import db, { MarketOptionPosition } from '@play-money/database'
 
 interface MarketPositionFilterOptions {
@@ -7,21 +8,7 @@ interface MarketPositionFilterOptions {
   marketId?: string
 }
 
-interface SortOptions {
-  field: string
-  direction: 'asc' | 'desc'
-}
-
-interface PaginationOptions {
-  skip: number
-  take: number
-}
-
-export async function getMarketPositions(
-  filters: MarketPositionFilterOptions = {},
-  sort: SortOptions = { field: 'createdAt', direction: 'desc' },
-  pagination: PaginationOptions = { skip: 0, take: 10 }
-): Promise<{ marketPositions: Array<MarketOptionPosition>; total: number }> {
+export async function getMarketPositions(filters: MarketPositionFilterOptions = {}, pagination?: PaginationRequest) {
   const statusFilters =
     filters.status === 'active'
       ? {
@@ -39,44 +26,26 @@ export async function getMarketPositions(
           ? {}
           : {}
 
-  const [marketPositions, total] = await Promise.all([
-    db.marketOptionPosition.findMany({
-      where: {
-        ...statusFilters,
-        marketId: filters.marketId,
-        account: {
-          userPrimary: {
-            id: filters.ownerId,
-          },
+  return getPaginatedItems<MarketOptionPosition>({
+    model: db.marketOptionPosition,
+    pagination: pagination ?? {},
+    where: {
+      ...statusFilters,
+      marketId: filters.marketId,
+      account: {
+        userPrimary: {
+          id: filters.ownerId,
         },
       },
-      include: {
-        account: {
-          include: {
-            user: true,
-          },
-        },
-        market: true,
-        option: true,
-      },
-      orderBy: {
-        [sort.field]: sort.direction,
-      },
-      skip: pagination.skip,
-      take: pagination.take,
-    }),
-    db.marketOptionPosition.count({
-      where: {
-        ...statusFilters,
-        marketId: filters.marketId,
-        account: {
-          userPrimary: {
-            id: filters.ownerId,
-          },
+    },
+    include: {
+      account: {
+        include: {
+          user: true,
         },
       },
-    }),
-  ])
-
-  return { marketPositions, total }
+      market: true,
+      option: true,
+    },
+  })
 }

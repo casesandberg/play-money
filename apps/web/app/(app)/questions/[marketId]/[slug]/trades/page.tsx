@@ -6,14 +6,14 @@ export default async function AppPostsSlugPage({
   searchParams,
 }: {
   params: { marketId: string }
-  searchParams: { pageSize?: string; page?: string }
+  searchParams: { limit?: string; cursor?: string }
 }) {
-  const market = await getExtendedMarket({ marketId: params.marketId })
-  const { transactions = [], totalPages } = await getMarketTransactions({
+  const { data: market } = await getExtendedMarket({ marketId: params.marketId })
+  const { data: transactions = [], pageInfo } = await getMarketTransactions({
     marketId: params.marketId,
-    pageSize: searchParams.pageSize,
-    page: searchParams.page,
+    limit: searchParams.limit ? Number(searchParams.limit) : undefined,
+    cursor: searchParams.cursor,
   })
 
-  return <MarketTradesPage market={market} totalPages={totalPages} transactions={transactions} />
+  return <MarketTradesPage market={market} pageInfo={pageInfo} transactions={transactions} />
 }

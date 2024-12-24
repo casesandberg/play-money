@@ -4,6 +4,7 @@ import { ColumnDef, RowData } from '@tanstack/react-table'
 import { MinusIcon } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
+import { PageInfo } from '@play-money/api-helpers'
 import { User } from '@play-money/database'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { formatDistanceToNowShort } from '@play-money/ui'
@@ -158,12 +159,12 @@ function MarketTableStatusSelect({ defaultValue = 'active' }: { defaultValue?: s
   )
 }
 
-export function MarketsTable({ data, totalPages }: { data: Array<ExtendedMarket>; totalPages: number }) {
+export function MarketsTable({ data, pageInfo }: { data: Array<ExtendedMarket>; pageInfo: PageInfo }) {
   return (
     <DataTable
       data={data}
       columns={columns}
-      totalPages={totalPages}
+      pageInfo={pageInfo}
       controls={
         <div>
           <MarketTableStatusSelect />

@@ -102,7 +102,7 @@ export function CreateMarketForm({
 
   async function onSubmit(market: MarketCreateFormValues) {
     try {
-      const created = await createMarket(market)
+      const { data: created } = await createMarket(market)
 
       clearPresistedData({ localStorageKey: CREATE_MARKET_FORM_KEY })
       form.reset({})
@@ -198,7 +198,7 @@ export function CreateMarketForm({
   async function handleQuestionBlur() {
     const question = form.getValues('question')
     if (!form.getValues('tags')?.length) {
-      const { tags } = await createMarketGenerateTags({ question })
+      const { data: tags } = await createMarketGenerateTags({ question })
       form.setValue('tags', tags)
     }
 

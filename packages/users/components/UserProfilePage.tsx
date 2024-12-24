@@ -5,7 +5,7 @@ import Link from 'next/link'
 import React from 'react'
 import {
   getMarketPositions,
-  getUserLists,
+  getLists,
   getUserMarkets,
   getUserPositions,
   getUserTransactions,
@@ -24,7 +24,7 @@ import { UserPositionsTable } from './UserPositionsTable'
 import { UserProfileTabs } from './UserProfileTabs'
 
 export async function UserTradesTable({ userId }: { userId: string }) {
-  const { transactions } = await getUserTransactions({ userId })
+  const { data: transactions } = await getUserTransactions({ userId })
 
   return (
     <Table>
@@ -99,7 +99,7 @@ export async function UserTradesTable({ userId }: { userId: string }) {
 }
 
 export async function UserMarketsTable({ userId }: { userId: string }) {
-  const { markets } = await getUserMarkets({ userId })
+  const { data: markets } = await getUserMarkets({ userId })
 
   return (
     <Table>
@@ -136,7 +136,7 @@ export async function UserMarketsTable({ userId }: { userId: string }) {
 }
 
 export async function UserListsTable({ userId }: { userId: string }) {
-  const { lists } = await getUserLists({ userId })
+  const { data: lists } = await getLists({ ownerId: userId })
 
   return (
     <Table>
@@ -196,10 +196,10 @@ async function UserPositionsTab({
     page?: string
     status?: 'active' | 'closed' | 'all'
     sortField?: string
-    sortDirection?: string
+    sortDirection?: 'asc' | 'desc'
   }
 }) {
-  const { marketPositions, totalPages } = await getMarketPositions({
+  const { data: marketPositions, pageInfo } = await getMarketPositions({
     ownerId: userId,
     ...filters,
     status: filters?.status ?? 'active',
@@ -207,7 +207,7 @@ async function UserPositionsTab({
 
   return (
     <div className="mt-3 md:mt-6">
-      <UserPositionsTable data={marketPositions} totalPages={totalPages} />
+      <UserPositionsTable data={marketPositions} pageInfo={pageInfo} />
     </div>
   )
 }
@@ -218,16 +218,18 @@ export async function UserProfilePage({
 }: {
   username: string
   filters?: {
-    pageSize?: string
-    page?: string
+    limit?: string
+    cursor?: string
     status?: 'active' | 'closed' | 'all'
     sortField?: string
-    sortDirection?: string
+    sortDirection?: 'asc' | 'desc'
   }
 }) {
-  const user = await getUserUsername({ username })
-  const { positions } = await getUserPositions({ userId: user.id, pageSize: 5 })
-  const { markets } = await getUserMarkets({ userId: user.id })
+  const { data: user } = await getUserUsername({ username })
+  const {
+    data: { positions },
+  } = await getUserPositions({ userId: user.id, pageSize: 5 })
+  const { data: markets } = await getUserMarkets({ userId: user.id })
 
   return (
     <div className="flex flex-col gap-4">

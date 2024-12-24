@@ -15,7 +15,7 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.ge
 
     const { available, message } = await checkUsername({ username })
 
-    return NextResponse.json({ available, message })
+    return NextResponse.json({ data: { available, message } })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
 

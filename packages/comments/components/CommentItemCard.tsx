@@ -36,7 +36,13 @@ export function CommentItemCard({
   }, [])
 
   const handleToggleEmojiReaction = (commentId: string) => async (emoji: string) => {
-    await createCommentReaction({ commentId, emoji })
+    try {
+      await createCommentReaction({ commentId, emoji })
+    } catch (error) {
+      if (error instanceof Error && error.message !== 'deleted') {
+        throw error
+      }
+    }
     onRevalidate()
   }
 
@@ -58,7 +64,13 @@ export function CommentItemCard({
   }
 
   const handleDelete = (commentId: string) => async () => {
-    await deleteComment({ commentId })
+    try {
+      await deleteComment({ commentId })
+    } catch (error) {
+      if (error instanceof Error && error.message !== 'deleted') {
+        throw error
+      }
+    }
     onRevalidate()
   }
 

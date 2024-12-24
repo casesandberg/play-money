@@ -60,7 +60,8 @@ export function MarketOverviewPage({
   const { user } = useUser()
   const { selected, setSelected } = useSelectedItems()
   const { triggerEffect } = useSidebar()
-  const { data: balance } = useMarketBalance({ marketId: market.id })
+  const { data: balanceData } = useMarketBalance({ marketId: market.id })
+  const balance = balanceData?.data
   const [isEditing, setIsEditing] = useSearchParam('edit')
   const [isEditOption, setIsEditOption] = useSearchParam('editOption')
   const [isBoosting, setIsBoosting] = useSearchParam('boost')

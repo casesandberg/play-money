@@ -8,9 +8,9 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(_req: Request): Promise<SchemaResponse<typeof schema.get.responses>> {
   try {
-    const activities = await getSiteActivity({})
+    const data = await getSiteActivity({})
 
-    return NextResponse.json({ activities })
+    return NextResponse.json({ data })
   } catch (error) {
     if (error instanceof CommentNotFoundError) {
       return NextResponse.json({ error: error.message }, { status: 404 })

@@ -18,7 +18,7 @@ export async function POST(req: Request): Promise<SchemaResponse<typeof schema.p
 
     const comment = await createComment({ ...data, authorId: userId })
 
-    return NextResponse.json(comment)
+    return NextResponse.json({ data: comment })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 })

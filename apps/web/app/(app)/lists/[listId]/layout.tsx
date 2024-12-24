@@ -9,7 +9,7 @@ export default async function AppListsLayout({
   children: React.ReactNode
   params: { listId: string }
 }) {
-  const list = await getExtendedList({ listId: params.listId })
+  const { data: list } = await getExtendedList({ listId: params.listId })
 
   // eslint-disable-next-line @typescript-eslint/require-await -- Next requires this to be async since its SSR
   const handleRevalidate = async () => {

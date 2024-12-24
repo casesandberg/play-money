@@ -5,6 +5,7 @@ import Decimal from 'decimal.js'
 import _ from 'lodash'
 import Link from 'next/link'
 import React from 'react'
+import { PageInfo } from '@play-money/api-helpers/types'
 import { Market, MarketOption, MarketOptionPosition } from '@play-money/database'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { ExtendedMarketPosition } from '@play-money/markets/types'
@@ -107,12 +108,12 @@ function UserPositionsStatusSelect({ defaultValue = 'active' }: { defaultValue?:
   )
 }
 
-export function UserPositionsTable({ data, totalPages }: { data: Array<ExtendedMarketPosition>; totalPages: number }) {
+export function UserPositionsTable({ data, pageInfo }: { data: Array<ExtendedMarketPosition>; pageInfo: PageInfo }) {
   return (
     <DataTable
       data={data}
       columns={columns}
-      totalPages={totalPages}
+      pageInfo={pageInfo}
       controls={
         <div>
           <UserPositionsStatusSelect />

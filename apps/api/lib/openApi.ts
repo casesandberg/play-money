@@ -71,25 +71,35 @@ async function getDocument() {
         }
       }
 
-      registry.registerPath({
-        method: method as RouteConfig['method'],
-        path: pathname,
-        request: {
-          body: endpoint.requestBody
-            ? {
-                content: {
-                  'application/json': {
-                    schema: endpoint.requestBody,
+      if (!endpoint.private) {
+        registry.registerPath({
+          method: method as RouteConfig['method'],
+          path: pathname,
+          summary: endpoint.summary,
+          security: endpoint.security ? [{ ApiKeyAuth: [] }] : undefined,
+          request: {
+            body: endpoint.requestBody
+              ? {
+                  content: {
+                    'application/json': {
+                      schema: endpoint.requestBody,
+                    },
                   },
-                },
-              }
-            : undefined,
-          params: Object.keys(params).length !== 0 ? z.object(params) : undefined,
-        },
-        responses,
-      })
+                }
+              : undefined,
+            params: Object.keys(params).length !== 0 ? z.object(params) : undefined,
+          },
+          responses,
+        })
+      }
     }
   }
+
+  registry.registerComponent('securitySchemes', 'ApiKeyAuth', {
+    type: 'apiKey',
+    in: 'header',
+    name: 'x-api-key',
+  })
 
   const generator = new OpenApiGeneratorV31(registry.definitions)
   const document = generator.generateDocument({

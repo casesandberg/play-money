@@ -26,7 +26,7 @@ function summarizeTransactions(transactions: Array<TransactionWithEntries>) {
 }
 
 export async function MarketActivity({ marketId }: { marketId: string }) {
-  const { activities } = await getMarketActivity({ marketId })
+  const { data: activities = [] } = await getMarketActivity({ marketId })
 
   const handleRevalidate = async () => {
     'use server'

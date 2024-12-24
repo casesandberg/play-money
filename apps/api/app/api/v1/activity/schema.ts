@@ -4,8 +4,9 @@ import { MarketActivitySchema } from '@play-money/markets/types'
 
 export default {
   get: {
+    summary: 'Get all site activity',
     responses: {
-      200: zod.object({ activities: zod.array(MarketActivitySchema) }),
+      200: zod.object({ data: zod.array(MarketActivitySchema) }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },

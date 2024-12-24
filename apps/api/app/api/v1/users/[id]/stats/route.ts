@@ -36,38 +36,40 @@ export async function GET(
     } = await getUserStats({ userId: id })
 
     return NextResponse.json({
-      netWorth: netWorth.toNumber(),
-      tradingVolume: tradingVolume.toNumber(),
-      totalMarkets,
-      lastTradeAt,
-      activeDayCount,
-      otherIncome: otherIncome.toNumber(),
-      quests: [
-        {
-          title: 'Bet in a market',
-          award: DAILY_TRADE_BONUS_PRIMARY,
-          completed: hasPlacedMarketTrade,
-          href: '/questions',
-        },
-        {
-          title: 'Create a market',
-          award: DAILY_MARKET_BONUS_PRIMARY,
-          completed: hasCreatedMarket,
-          href: '/create-post',
-        },
-        {
-          title: 'Write a comment',
-          award: DAILY_COMMENT_BONUS_PRIMARY,
-          completed: hasCommented,
-          href: '/questions',
-        },
-        {
-          title: 'Boost liquidity in a market',
-          award: DAILY_LIQUIDITY_BONUS_PRIMARY,
-          completed: hasBoostedLiquidity,
-          href: '/questions',
-        },
-      ],
+      data: {
+        netWorth: netWorth.toNumber(),
+        tradingVolume: tradingVolume.toNumber(),
+        totalMarkets,
+        lastTradeAt,
+        activeDayCount,
+        otherIncome: otherIncome.toNumber(),
+        quests: [
+          {
+            title: 'Bet in a market',
+            award: DAILY_TRADE_BONUS_PRIMARY,
+            completed: hasPlacedMarketTrade,
+            href: '/questions',
+          },
+          {
+            title: 'Create a market',
+            award: DAILY_MARKET_BONUS_PRIMARY,
+            completed: hasCreatedMarket,
+            href: '/create-post',
+          },
+          {
+            title: 'Write a comment',
+            award: DAILY_COMMENT_BONUS_PRIMARY,
+            completed: hasCommented,
+            href: '/questions',
+          },
+          {
+            title: 'Boost liquidity in a market',
+            award: DAILY_LIQUIDITY_BONUS_PRIMARY,
+            completed: hasBoostedLiquidity,
+            href: '/questions',
+          },
+        ],
+      },
     })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging

@@ -26,10 +26,16 @@ declare module '@tanstack/react-table' {
   }
 }
 
+export type PageInfo = {
+  hasNextPage: boolean
+  endCursor?: string
+  total: number
+}
+
 interface DataTableProps<TData, TValue> {
   columns: Array<ColumnDef<TData, TValue>>
   data: Array<TData>
-  totalPages: number
+  pageInfo: PageInfo
   controls?: React.ReactNode
   showViewOptions?: boolean
 }
@@ -58,15 +64,14 @@ function useURLSorting(): SortingOptions<unknown> & { sorting: SortingState } {
   }
 }
 
-function useURLPagination({ pageCount }: { pageCount: number }): PaginationOptions & { pagination: PaginationState } {
-  const [pageSize] = useSearchParam('pageSize')
-  const [page] = useSearchParam('page')
+function useURLPagination({ total }: { total: number }): PaginationOptions & { pagination: PaginationState } {
+  const [pageSize] = useSearchParam('limit')
   const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: page ? parseInt(page) - 1 : 0,
+    pageIndex: -1,
     pageSize: pageSize ? parseInt(pageSize) : 50,
   })
 
-  return { pagination, onPaginationChange: setPagination, manualPagination: true, pageCount }
+  return { pagination, onPaginationChange: setPagination, manualPagination: true, rowCount: total }
 }
 
 function useLocalStorageColumnVisibility(): VisibilityOptions & { columnVisibility: VisibilityState } {
@@ -85,12 +90,13 @@ function useLocalStorageColumnVisibility(): VisibilityOptions & { columnVisibili
 export function DataTable<TData, TValue>({
   data,
   columns,
-  totalPages,
+  pageInfo,
+  // eslint-disable-next-line react/jsx-no-useless-fragment -- empty controls are fine
   controls = <></>,
   showViewOptions = true,
 }: DataTableProps<TData, TValue>) {
   const { sorting, ...sortingOptions } = useURLSorting()
-  const { pagination, ...paginationOptions } = useURLPagination({ pageCount: totalPages })
+  const { pagination, ...paginationOptions } = useURLPagination({ total: pageInfo.total })
   const { columnVisibility, ...columnVisibilityOptions } = useLocalStorageColumnVisibility()
 
   const table = useReactTable({
@@ -146,7 +152,7 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      <DataTablePagination table={table} />
+      <DataTablePagination pageInfo={pageInfo} table={table} />
     </div>
   )
 }
