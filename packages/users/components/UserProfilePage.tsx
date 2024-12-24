@@ -99,7 +99,7 @@ export async function UserTradesTable({ userId }: { userId: string }) {
 }
 
 export async function UserMarketsTable({ userId }: { userId: string }) {
-  const { markets } = await getUserMarkets({ userId })
+  const { data: markets } = await getUserMarkets({ userId })
 
   return (
     <Table>
@@ -227,7 +227,7 @@ export async function UserProfilePage({
 }) {
   const user = await getUserUsername({ username })
   const { positions } = await getUserPositions({ userId: user.id, pageSize: 5 })
-  const { markets } = await getUserMarkets({ userId: user.id })
+  const { data: markets } = await getUserMarkets({ userId: user.id })
 
   return (
     <div className="flex flex-col gap-4">

@@ -503,8 +503,8 @@ export async function getUserBalance({ userId }: { userId: string }): Promise<{ 
   return apiHandler<{ balance: NetBalanceAsNumbers }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/balance`)
 }
 
-export async function getUserMarkets({ userId }: { userId: string }): Promise<{ markets: Array<ExtendedMarket> }> {
-  return apiHandler<{ markets: Array<ExtendedMarket> }>(
+export async function getUserMarkets({ userId }: { userId: string }): Promise<PaginatedResponse<ExtendedMarket>> {
+  return apiHandler<PaginatedResponse<ExtendedMarket>>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/markets?createdBy=${userId}`
   )
 }
