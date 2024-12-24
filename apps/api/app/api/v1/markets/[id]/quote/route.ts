@@ -24,8 +24,10 @@ export async function POST(
     })
 
     return NextResponse.json({
-      newProbability: probability.toNumber(),
-      potentialReturn: shares.toNumber(),
+      data: {
+        newProbability: probability.toNumber(),
+        potentialReturn: shares.toNumber(),
+      },
     })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging

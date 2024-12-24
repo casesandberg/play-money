@@ -6,7 +6,7 @@ export default {
   get: {
     parameters: MarketSchema.pick({ id: true }).extend({ extended: z.boolean().optional() }),
     responses: {
-      200: MarketSchema,
+      200: z.object({ data: MarketSchema }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },
@@ -15,7 +15,7 @@ export default {
     parameters: MarketSchema.pick({ id: true }),
     requestBody: MarketSchema.pick({ question: true, description: true, closeDate: true, tags: true }).partial(),
     responses: {
-      200: MarketSchema,
+      200: z.object({ data: MarketSchema }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },

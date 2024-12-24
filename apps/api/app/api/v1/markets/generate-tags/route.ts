@@ -13,7 +13,7 @@ export async function POST(req: Request): Promise<SchemaResponse<typeof schema.p
 
     const userId = await getAuthUser(req)
     if (!userId) {
-      return NextResponse.json({ tags: [] })
+      return NextResponse.json({ data: [] })
     }
 
     const tags = await getMarketTagsLLM({
@@ -21,7 +21,7 @@ export async function POST(req: Request): Promise<SchemaResponse<typeof schema.p
     })
 
     return NextResponse.json({
-      tags,
+      data: tags,
     })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging

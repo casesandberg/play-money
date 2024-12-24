@@ -9,7 +9,7 @@ export default async function AppQuestionsLayout({
   children: React.ReactNode
   params: { marketId: string }
 }) {
-  const market = await getExtendedMarket({ marketId: params.marketId })
+  const { data: market } = await getExtendedMarket({ marketId: params.marketId })
 
   // eslint-disable-next-line @typescript-eslint/require-await -- Next requires this to be async since its SSR
   const handleRevalidate = async () => {

@@ -33,7 +33,7 @@ export async function PATCH(
 
     const updatedComment = await updateMarketOption({ id: optionId, name, color })
 
-    return NextResponse.json(updatedComment)
+    return NextResponse.json({ data: updatedComment })
   } catch (error) {
     if (error instanceof CommentNotFoundError) {
       return NextResponse.json({ error: error.message }, { status: 404 })

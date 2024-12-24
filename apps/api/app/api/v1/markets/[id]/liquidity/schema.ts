@@ -8,7 +8,9 @@ export default {
     requestBody: z.object({ amount: z.number() }),
     responses: {
       200: z.object({
-        message: z.string(),
+        data: z.object({
+          success: z.boolean(),
+        }),
       }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,

@@ -7,8 +7,10 @@ export default {
     requestBody: z.object({ optionId: z.string(), amount: z.number(), isBuy: z.boolean().optional() }),
     responses: {
       200: z.object({
-        newProbability: z.number(),
-        potentialReturn: z.number(),
+        data: z.object({
+          newProbability: z.number(),
+          potentialReturn: z.number(),
+        }),
       }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,

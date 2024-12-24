@@ -28,7 +28,7 @@ export async function GET(
     const { id, extended } = schema.get.parameters.parse({ ...params, ...idParams })
 
     const market = await getMarket({ id, extended })
-    return NextResponse.json(market)
+    return NextResponse.json({ data: market })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 })
@@ -58,7 +58,7 @@ export async function PATCH(
 
     const updatedMarket = await updateMarket({ id, question, description, closeDate, tags })
 
-    return NextResponse.json(updatedMarket)
+    return NextResponse.json({ data: updatedMarket })
   } catch (error) {
     if (error instanceof CommentNotFoundError) {
       return NextResponse.json({ error: error.message }, { status: 404 })

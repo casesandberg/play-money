@@ -6,7 +6,7 @@ export default {
     parameters: z.object({ id: z.string() }),
     requestBody: z.object({ optionId: z.string(), amount: z.number() }),
     responses: {
-      200: z.object({}),
+      200: z.object({ data: z.object({ success: z.boolean() }) }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },

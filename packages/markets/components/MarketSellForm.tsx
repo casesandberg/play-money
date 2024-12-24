@@ -67,7 +67,7 @@ export function MarketSellForm({
 
   const fetchQuote = async (amount: number, optionId: string) => {
     try {
-      const data = await getMarketQuote({ marketId, optionId, amount, isBuy: false })
+      const { data } = await getMarketQuote({ marketId, optionId, amount, isBuy: false })
       setQuote(data)
     } catch (error) {
       console.error('Failed to fetch quote:', error)

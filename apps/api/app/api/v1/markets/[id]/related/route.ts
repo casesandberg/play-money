@@ -14,7 +14,7 @@ export async function GET(
 
     const markets = await getRelatedMarkets({ marketId: id })
 
-    return NextResponse.json({ markets })
+    return NextResponse.json({ data: markets })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 })

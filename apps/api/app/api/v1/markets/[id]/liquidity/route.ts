@@ -29,7 +29,9 @@ export async function POST(
     })
 
     return NextResponse.json({
-      message: 'success',
+      data: {
+        success: true,
+      },
     })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging

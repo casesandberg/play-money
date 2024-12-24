@@ -8,7 +8,7 @@ export default async function AppPostsSlugPage({
   params: { marketId: string }
   searchParams: { limit?: string; cursor?: string }
 }) {
-  const market = await getExtendedMarket({ marketId: params.marketId })
+  const { data: market } = await getExtendedMarket({ marketId: params.marketId })
   const { data: transactions = [], pageInfo } = await getMarketTransactions({
     marketId: params.marketId,
     limit: searchParams.limit ? Number(searchParams.limit) : undefined,

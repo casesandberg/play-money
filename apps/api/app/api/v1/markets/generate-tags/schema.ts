@@ -6,7 +6,7 @@ export default {
     requestBody: z.object({ question: z.string() }),
     responses: {
       200: z.object({
-        tags: z.array(z.string()),
+        data: z.array(z.string()),
       }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,

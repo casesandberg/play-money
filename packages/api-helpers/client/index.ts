@@ -212,9 +212,12 @@ export async function getLists({
 }
 
 export async function getExtendedMarket({ marketId }: { marketId: string }) {
-  return apiHandler<ExtendedMarket>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}?extended=true`, {
-    next: { tags: [`market:${marketId}`] },
-  })
+  return apiHandler<{ data: ExtendedMarket }>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}?extended=true`,
+    {
+      next: { tags: [`market:${marketId}`] },
+    }
+  )
 }
 
 export async function getExtendedList({ listId }: { listId: string }) {
@@ -224,7 +227,7 @@ export async function getExtendedList({ listId }: { listId: string }) {
 }
 
 export async function createMarket(body: Record<string, unknown>) {
-  return apiHandler<{ market?: Market; list?: List }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets`, {
+  return apiHandler<{ data: { market?: Market; list?: List } }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets`, {
     method: 'POST',
     body,
   })
@@ -241,7 +244,7 @@ export async function createListMarket({ listId }: { listId: string }, body: Rec
 }
 
 export async function updateMarket({ marketId, body }: { marketId: string; body: Record<string, unknown> }) {
-  return apiHandler<Market>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}`, {
+  return apiHandler<{ data: Market }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}`, {
     method: 'PATCH',
     body: body,
   })
@@ -256,7 +259,7 @@ export async function updateMarketOption({
   optionId: string
   body: Record<string, unknown>
 }) {
-  return apiHandler<Market>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/options/${optionId}`, {
+  return apiHandler<{ data: Market }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/options/${optionId}`, {
     method: 'PATCH',
     body: body,
   })
@@ -318,7 +321,7 @@ export async function getMarketQuote({
   amount: number
   isBuy?: boolean
 }) {
-  return apiHandler<{ newProbability: number; potentialReturn: number }>(
+  return apiHandler<{ data: { newProbability: number; potentialReturn: number } }>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/quote`,
     {
       method: 'POST',
@@ -505,7 +508,7 @@ export async function getUserMarkets({ userId }: { userId: string }): Promise<Pa
 }
 
 export async function createMarketGenerateTags({ question }: { question: string }) {
-  return apiHandler<{ tags: Array<string> }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/generate-tags`, {
+  return apiHandler<{ data: Array<string> }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/markets/generate-tags`, {
     method: 'POST',
     body: {
       question,
