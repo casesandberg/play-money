@@ -80,7 +80,11 @@ export async function createList({
           contributionPolicy,
         },
         include: {
-          markets: true,
+          markets: {
+            include: {
+              market: true,
+            },
+          },
         },
       })
 
