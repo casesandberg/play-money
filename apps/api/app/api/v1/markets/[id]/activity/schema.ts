@@ -6,7 +6,7 @@ export default {
   get: {
     parameters: zod.object({ id: zod.string() }),
     responses: {
-      200: zod.object({ activities: zod.array(MarketActivitySchema) }),
+      200: zod.object({ data: zod.array(MarketActivitySchema) }),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },

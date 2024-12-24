@@ -348,12 +348,8 @@ export async function getMarketComments({
   )
 }
 
-export async function getMarketActivity({
-  marketId,
-}: {
-  marketId: string
-}): Promise<{ activities: Array<MarketActivity> }> {
-  return apiHandler<{ activities: Array<MarketActivity> }>(
+export async function getMarketActivity({ marketId }: { marketId: string }): Promise<{ data: Array<MarketActivity> }> {
+  return apiHandler<{ data: Array<MarketActivity> }>(
     `${process.env.NEXT_PUBLIC_API_URL}/v1/markets/${marketId}/activity`,
     {
       next: { tags: [`${marketId}:activity`] },

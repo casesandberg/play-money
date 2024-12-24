@@ -28,7 +28,7 @@ function summarizeTransactions(transactions: Array<TransactionWithEntries>) {
 
 export function SiteActivity() {
   const { data } = useSiteActivity()
-  const { activities = [] } = data || {}
+  const { data: activities = [] } = data || {}
 
   return (
     <div className="space-y-4">

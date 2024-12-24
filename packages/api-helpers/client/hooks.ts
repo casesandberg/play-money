@@ -26,7 +26,7 @@ export function useRecentTrades() {
 }
 
 export function useSiteActivity() {
-  return useSWR<{ activities: Array<MarketActivity> }>(`/v1/activity`, { refreshInterval: FIVE_MINUTES })
+  return useSWR<{ data: Array<MarketActivity> }>(`/v1/activity`, { refreshInterval: FIVE_MINUTES })
 }
 
 export function MARKET_BALANCE_PATH(marketId: string) {

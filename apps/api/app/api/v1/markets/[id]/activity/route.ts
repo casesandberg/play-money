@@ -13,9 +13,9 @@ export async function GET(
   try {
     const { id } = schema.get.parameters.parse(params)
 
-    const activities = await getActivityOnMarket({ marketId: id })
+    const data = await getActivityOnMarket({ marketId: id })
 
-    return NextResponse.json({ activities })
+    return NextResponse.json({ data })
   } catch (error) {
     if (error instanceof CommentNotFoundError) {
       return NextResponse.json({ error: error.message }, { status: 404 })
