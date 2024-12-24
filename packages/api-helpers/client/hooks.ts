@@ -50,11 +50,13 @@ export function useListBalance({ listId }: { listId: string }) {
   })
 }
 
-export function useMarketPositions({ marketId }: { marketId: string }) {
+export function useMarketBalances({ marketId }: { marketId: string }) {
   return useSWR<{
-    balances: Array<NetBalanceAsNumbers & { account: { userPrimary: User } }>
-    user: NetBalanceAsNumbers & { account: { userPrimary: User } }
-  }>(`/v1/markets/${marketId}/positions`)
+    data: {
+      balances: Array<NetBalanceAsNumbers & { account: { userPrimary: User } }>
+      user: NetBalanceAsNumbers & { account: { userPrimary: User } }
+    }
+  }>(`/v1/markets/${marketId}/balances`)
 }
 
 export function MARKET_GRAPH_PATH(marketId: string) {

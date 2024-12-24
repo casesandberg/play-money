@@ -1,5 +1,5 @@
 import React from 'react'
-import { useMarketPositions } from '@play-money/api-helpers/client/hooks'
+import { useMarketBalances } from '@play-money/api-helpers/client/hooks'
 import { CurrencyDisplay } from '@play-money/finance/components/CurrencyDisplay'
 import { Badge } from '@play-money/ui/badge'
 import { Card, CardContent } from '@play-money/ui/card'
@@ -8,7 +8,8 @@ import { UserLink } from '@play-money/users/components/UserLink'
 import { ExtendedMarket } from '../types'
 
 export function MarketLeaderboardPanel({ market }: { market: ExtendedMarket }) {
-  const { data: positions } = useMarketPositions({ marketId: market.id })
+  const { data: positionsData } = useMarketBalances({ marketId: market.id })
+  const positions = positionsData?.data
   const userInLeaderboard = positions?.user && positions?.balances.find((b) => b.accountId === positions.user.accountId)
 
   return positions?.balances.length || positions?.user ? (

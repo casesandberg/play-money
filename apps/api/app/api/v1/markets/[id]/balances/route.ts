@@ -66,8 +66,10 @@ export async function GET(
     ])
 
     return NextResponse.json({
-      balances: transformMarketBalancesToNumbers(userBalances),
-      user: userBalancesInMarket ? transformMarketBalancesToNumbers([userBalancesInMarket])[0] : undefined,
+      data: {
+        balances: transformMarketBalancesToNumbers(userBalances),
+        user: userBalancesInMarket ? transformMarketBalancesToNumbers([userBalancesInMarket])[0] : undefined,
+      },
     })
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
