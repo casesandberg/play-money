@@ -86,7 +86,7 @@ export function MentionChip(props: NodeViewProps) {
   const [user, setUser] = useState<User>()
   useEffect(() => {
     async function fetchUser() {
-      const user = await getUser({ userId: props.node.attrs.id })
+      const { data: user } = await getUser({ userId: props.node.attrs.id })
       setUser(user)
     }
 

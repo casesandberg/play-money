@@ -1,7 +1,7 @@
 'use client'
 
 import type { Table } from '@tanstack/react-table'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React from 'react'
 import useUpdateSearchParams from '../../hooks/useUpdateSearchParams'

@@ -36,8 +36,9 @@ export function MarketTradePanel({
 }) {
   const { selected, setSelected } = useSelectedItems()
   // We can SSR this now, since the P&L will be the one thats updated externally and this one will only ever be updated by a user!
-  const { data: balance, mutate: revalidate } = useMarketBalance({ marketId: market.id })
+  const { data: balanceData, mutate: revalidate } = useMarketBalance({ marketId: market.id })
   const { effect, resetEffect } = useSidebar()
+  const balance = balanceData?.data
   const activeOption = market.options.find((o) => o.id === selected[0])
   const activePosition = balance?.userPositions.find((p) => p.optionId === activeOption?.id)
 

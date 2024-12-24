@@ -14,7 +14,10 @@ export const Default: Story = {
   args: {
     market: mockExtendedMarket(),
     transactions: [mockTransactionWithEntries(), mockTransactionWithEntries(), mockTransactionWithEntries()],
-    totalPages: 1,
+    pageInfo: {
+      hasNextPage: true,
+      total: 100,
+    },
   },
 }
 
@@ -22,6 +25,9 @@ export const Empty: Story = {
   args: {
     market: mockExtendedMarket(),
     transactions: [],
-    totalPages: 1,
+    pageInfo: {
+      hasNextPage: false,
+      total: 0,
+    },
   },
 }

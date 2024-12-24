@@ -535,8 +535,8 @@ export async function getLeaderboard({ month, year }: { month?: string; year?: s
   }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/leaderboard${month && year ? `?year=${year}&month=${month}` : ''}`)
 }
 
-export async function createMyApiKey({ name }: { name: string }): Promise<ApiKey> {
-  return apiHandler<ApiKey>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/api-keys`, {
+export async function createMyApiKey({ name }: { name: string }): Promise<{ data: ApiKey }> {
+  return apiHandler<{ data: ApiKey }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/api-keys`, {
     method: 'POST',
     body: {
       name,

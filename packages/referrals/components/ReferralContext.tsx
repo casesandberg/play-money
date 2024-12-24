@@ -30,7 +30,7 @@ export const ReferralProvider = ({ children }: { children: ReactNode }) => {
       if (!user && code && Date.now() - timestamp < THIRTY_DAYS) {
         setIsLoading(true)
         try {
-          const user = await getUserReferral({ code })
+          const { data: user } = await getUserReferral({ code })
           setReferringUser(user)
         } catch (error) {
           console.error('Error fetching referral info:', error)

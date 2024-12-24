@@ -91,6 +91,7 @@ export function DataTable<TData, TValue>({
   data,
   columns,
   pageInfo,
+  // eslint-disable-next-line react/jsx-no-useless-fragment -- empty controls are fine
   controls = <></>,
   showViewOptions = true,
 }: DataTableProps<TData, TValue>) {

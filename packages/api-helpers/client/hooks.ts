@@ -27,9 +27,11 @@ export function MARKET_BALANCE_PATH(marketId: string) {
 }
 export function useMarketBalance({ marketId }: { marketId: string }) {
   return useSWR<{
-    amm: Array<NetBalanceAsNumbers>
-    user: Array<NetBalanceAsNumbers>
-    userPositions: Array<MarketOptionPositionAsNumbers>
+    data: {
+      amm: Array<NetBalanceAsNumbers>
+      user: Array<NetBalanceAsNumbers>
+      userPositions: Array<MarketOptionPositionAsNumbers>
+    }
   }>(MARKET_BALANCE_PATH(marketId), {
     refreshInterval: SIXTY_SECONDS,
   })
@@ -76,7 +78,7 @@ export function useMarketGraph({ marketId }: { marketId: string }) {
 
 export function useMarketRelated({ marketId }: { marketId: string }) {
   return useSWR<{
-    markets: Array<ExtendedMarket>
+    data: Array<ExtendedMarket>
   }>(`/v1/markets/${marketId}/related`)
 }
 

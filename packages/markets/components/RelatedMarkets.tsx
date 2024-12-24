@@ -6,13 +6,14 @@ import { useMarketRelated } from '@play-money/api-helpers/client/hooks'
 import { MarketProbabilityDetail } from './MarketProbabilityDetail'
 
 export function RelatedMarkets({ marketId, listId }: { marketId: string; listId?: string }) {
-  const { data } = useMarketRelated({ marketId })
+  const { data: relatedData } = useMarketRelated({ marketId })
+  const markets = relatedData?.data ?? []
 
-  return data?.markets.length ? (
+  return markets.length ? (
     <div>
       <div className="pb-2 text-xs font-semibold uppercase text-muted-foreground">Related Markets</div>
       <ul className="divide-y divide-muted text-sm">
-        {data.markets.map((market) => {
+        {markets.map((market) => {
           return (
             <li className="py-2" key={market.id}>
               <Link className="visited:text-muted-foreground" href={`/questions/${market.id}/${market.slug}`}>
