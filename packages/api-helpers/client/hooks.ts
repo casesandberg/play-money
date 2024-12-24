@@ -12,12 +12,6 @@ const SIXTY_SECONDS = 1000 * 60
 const FIVE_MINUTES = SIXTY_SECONDS * 5
 const ONE_HOUR = SIXTY_SECONDS * 60
 
-export function useLiquidity() {
-  return useSWR<{ transactions: Array<TransactionWithEntries> }>(`/v1/liquidity`, {
-    refreshInterval: FIVE_MINUTES,
-  })
-}
-
 export function useRecentTrades() {
   return useSWR<{ transactions: Array<TransactionWithEntries> }>(
     `/v1/transactions?transactionType=TRADE_BUY,TRADE_SELL`,
