@@ -107,7 +107,7 @@ async function getDocument() {
     info: {
       title: 'PlayMoney API',
       version: '1.0',
-      description: `Include \`x-api-key: {{key}}\` in the header of your requests. \n\nApi key can be generated at [https://playmoney.dev/settings/api](https://playmoney.dev/settings/api)\n\nOpenAPI spec can be found at [https://github.com/casesandberg/play-money/blob/main/apps/api/openapi.json](https://github.com/casesandberg/play-money/blob/main/apps/api/openapi.json)`,
+      description: `[Discord](https://discord.gg/Q5CeSMFeBP) · [API key](https://playmoney.dev/settings/api) · [OpenAPI spec](https://github.com/casesandberg/play-money/blob/main/apps/api/openapi.json) · [Trading bot](https://github.com/casesandberg/playmoney-bot-trading) · [Mirror bot](https://github.com/casesandberg/playmoney-bot-manifold-mirror)\n\n Include \`x-api-key: {{key}}\` in the header of your requests.`,
     },
     servers: process.env.NEXT_PUBLIC_API_URL
       ? [
