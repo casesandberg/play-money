@@ -29,6 +29,8 @@ export async function GET(req: Request): Promise<SchemaResponse<typeof schema.ge
   }
 }
 
+export const maxDuration = 60 // Extend max duration for creating lists with lots of markets.
+
 export async function POST(req: Request): Promise<SchemaResponse<typeof schema.post.responses>> {
   try {
     const userId = await getAuthUser(req)

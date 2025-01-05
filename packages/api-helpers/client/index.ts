@@ -250,6 +250,13 @@ export async function updateMarket({ marketId, body }: { marketId: string; body:
   })
 }
 
+export async function updateList({ listId, body }: { listId: string; body: Record<string, unknown> }) {
+  return apiHandler<{ data: Market }>(`${process.env.NEXT_PUBLIC_API_URL}/v1/lists/${listId}`, {
+    method: 'PATCH',
+    body: body,
+  })
+}
+
 export async function updateMarketOption({
   marketId,
   optionId,

@@ -1,11 +1,26 @@
 import Decimal from 'decimal.js'
+import _ from 'lodash'
 import db, { Market } from '@play-money/database'
 import { QuestionContributionPolicyType } from '@play-money/database/zod/inputTypeSchemas/QuestionContributionPolicySchema'
 import { getBalance } from '@play-money/finance/lib/getBalances'
 import { createMarket } from '@play-money/markets/lib/createMarket'
+import { getMarketTagsLLM } from '@play-money/markets/lib/getMarketTagsLLM'
 import { slugifyTitle } from '@play-money/markets/lib/helpers'
 import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
 import { calculateTotalCost } from './helpers'
+
+const COLORS = [
+  '#f44336',
+  '#9c27b0',
+  '#3f51b5',
+  '#2196f3',
+  '#009688',
+  '#8bc34a',
+  '#ffc107',
+  '#ff9800',
+  '#795548',
+  '#607d8b',
+]
 
 export async function createList({
   title,
@@ -27,6 +42,7 @@ export async function createList({
   const slug = slugifyTitle(title)
   const totalCost = calculateTotalCost(markets.length)
   const costPerMarket = new Decimal(totalCost).div(markets.length)
+  const SHUFFLED_COLORS = _.shuffle(COLORS)
 
   const userAccount = await getUserPrimaryAccount({ userId: ownerId })
   const userPrimaryBalance = await getBalance({
@@ -39,15 +55,36 @@ export async function createList({
     throw new Error('User does not have enough balance to create list')
   }
 
+  const generatedTags = tags ?? (await getMarketTagsLLM({ question: title }))
+
+  const list = await db.list.create({
+    data: {
+      title,
+      description,
+      ownerId,
+      slug,
+      tags: generatedTags.map((tag) => slugifyTitle(tag)),
+      contributionPolicy,
+    },
+    include: {
+      markets: {
+        include: {
+          market: true,
+        },
+      },
+    },
+  })
+
   const createdMarkets: Array<Market> = []
   for (const market of markets) {
     const createdMarket = await createMarket({
+      parentListId: list.id,
       question: market.name,
       description: description ?? '',
       options: [
         {
           name: 'Yes',
-          color: market.color ?? '#3B82F6',
+          color: market.color ?? SHUFFLED_COLORS[createdMarkets.length % SHUFFLED_COLORS.length],
         },
         {
           name: 'No',
@@ -61,53 +98,16 @@ export async function createList({
     createdMarkets.push(createdMarket)
   }
 
-  const createdList = await db.$transaction(
-    async (tx) => {
-      const list = await tx.list.create({
-        data: {
-          title,
-          description,
-          ownerId,
-          slug,
-          tags: tags?.map((tag) => slugifyTitle(tag)),
-          markets: {
-            createMany: {
-              data: createdMarkets.map((market) => ({
-                marketId: market.id,
-              })),
-            },
-          },
-          contributionPolicy,
-        },
-        include: {
-          markets: {
-            include: {
-              market: true,
-            },
-          },
-        },
-      })
-
-      await Promise.all(
-        createdMarkets.map((market) => {
-          return tx.market.update({
-            where: {
-              id: market.id,
-            },
-            data: {
-              parentListId: list.id,
-            },
-          })
-        })
-      )
-
-      return list
+  return db.list.findFirstOrThrow({
+    where: {
+      id: list.id,
     },
-    {
-      maxWait: 5000,
-      timeout: 10000,
-    }
-  )
-
-  return createdList
+    include: {
+      markets: {
+        include: {
+          market: true,
+        },
+      },
+    },
+  })
 }

@@ -19,6 +19,10 @@ export function isMarketTradable({ market }: { market: Market }): boolean {
   return !market.closeDate || new Date(market.closeDate) > now
 }
 
+export function isMarketClosed({ market }: { market: Market }): boolean {
+  return !isMarketTradable({ market }) && !isMarketResolved({ market }) && !isMarketCanceled({ market })
+}
+
 export function isMarketResolved({ market }: { market: Market }): boolean {
   return Boolean(market.resolvedAt)
 }

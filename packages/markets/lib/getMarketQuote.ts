@@ -22,15 +22,19 @@ export async function getMarketQuote({
   const optionBalances = ammBalances.filter(({ assetType }) => assetType === 'MARKET_OPTION')
   const optionsShares = optionBalances.map(({ total }) => total)
 
+  if (!targetBalance) {
+    throw new Error('Target balance not found')
+  }
+
   // TODO: Change to multi-step quote to account for limit orders
   let { newProbabilities, shares } = await quote({
     amount,
     probability: isBuy ? new Decimal(0.99) : new Decimal(0.01),
-    targetShare: targetBalance!.total,
+    targetShare: targetBalance.total,
     shares: optionsShares,
   })
 
-  const shareIndex = findShareIndex(optionsShares, targetBalance!.total)
+  const shareIndex = findShareIndex(optionsShares, targetBalance.total)
   const distributed = distributeRemainder(newProbabilities)
   const tax = calculateRealizedGainsTax({ cost: amount, salePrice: shares })
 
