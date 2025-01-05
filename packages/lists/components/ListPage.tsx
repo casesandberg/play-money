@@ -17,9 +17,10 @@ import { UserLink } from '@play-money/users/components/UserLink'
 import { useUser } from '@play-money/users/context/UserContext'
 import { useSelectedItems } from '../../ui/src/contexts/SelectedItemContext'
 import { useSearchParam } from '../../ui/src/hooks/useSearchParam'
-import { canAddToList } from '../rules'
+import { canAddToList, canModifyList } from '../rules'
 import { ExtendedList } from '../types'
 import { AddMoreListDialog } from './AddMoreListDialog'
+import { EditListDialog } from './EditListDialog'
 import { ListMarketRow } from './ListMarketRow'
 import { ListToolbar } from './ListToolbar'
 
@@ -36,6 +37,7 @@ export function ListPage({
   const { triggerEffect } = useSidebar()
   const { selected, setSelected } = useSelectedItems()
   const [isAddMore, setIsAddMore] = useSearchParam('addMore')
+  const [isEditing, setIsEditing] = useSearchParam('edit')
 
   const handleRevalidateBalance = async () => {
     void onRevalidate?.()
@@ -45,7 +47,11 @@ export function ListPage({
 
   return (
     <Card className="flex-1">
-      <ListToolbar list={list} />
+      <ListToolbar
+        list={list}
+        canEdit={user ? canModifyList({ list, user }) : false}
+        onInitiateEdit={() => setIsEditing('true')}
+      />
 
       <CardHeader className="pt-0 md:pt-0">
         <CardTitle className="leading-relaxed">{list.title}</CardTitle>
@@ -124,6 +130,14 @@ export function ListPage({
 
       <div className="px-6 text-lg font-semibold">Comments</div>
       {renderComments}
+
+      <EditListDialog
+        key={list.updatedAt.toString()} // reset form when list updates
+        list={list}
+        open={isEditing === 'true'}
+        onClose={() => setIsEditing(undefined)}
+        onSuccess={onRevalidate}
+      />
 
       <AddMoreListDialog
         list={list}
