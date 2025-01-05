@@ -2,7 +2,7 @@
 
 import { format, isPast } from 'date-fns'
 import _ from 'lodash'
-import { CircleCheckBig, ChevronDown, Link2Icon } from 'lucide-react'
+import { CircleCheckBig, ChevronDown, Link2Icon, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 import { mutate } from 'swr'
@@ -28,7 +28,7 @@ import { UserLink } from '@play-money/users/components/UserLink'
 import { useUser } from '@play-money/users/context/UserContext'
 import { useSelectedItems } from '../../ui/src/contexts/SelectedItemContext'
 import { useSearchParam } from '../../ui/src/hooks/useSearchParam'
-import { canModifyMarket } from '../rules'
+import { canModifyMarket, isMarketClosed } from '../rules'
 import { ExtendedMarket } from '../types'
 import { EditMarketDialog } from './EditMarketDialog'
 import { EditMarketOptionDialog } from './EditMarketOptionDialog'
@@ -65,6 +65,7 @@ export function MarketOverviewPage({
   const [isEditing, setIsEditing] = useSearchParam('edit')
   const [isEditOption, setIsEditOption] = useSearchParam('editOption')
   const [isBoosting, setIsBoosting] = useSearchParam('boost')
+  const [, setResolving] = useSearchParam('resolve')
   const isCreator = user?.id === market.createdBy
   const probabilities = marketOptionBalancesToProbabilities(balance?.amm)
 
@@ -94,194 +95,208 @@ export function MarketOverviewPage({
   }
 
   return (
-    <Card className="flex-1">
-      <MarketToolbar
-        market={market}
-        canEdit={user ? canModifyMarket({ market, user }) : false}
-        onInitiateEdit={() => setIsEditing('true')}
-        onInitiateBoost={() => setIsBoosting('true')}
-        onRevalidate={handleRevalidateBalance}
-      />
-
-      <CardHeader className="pt-0 md:pt-0">
-        {market.parentList ? (
-          <Link
-            href={`/lists/${market.parentList.id}/${market.parentList.slug}`}
-            className="flex items-center gap-2 text-muted-foreground"
-          >
-            <Link2Icon className="size-5" />
-            {market.parentList.title}
-          </Link>
-        ) : null}
-        <CardTitle className="leading-relaxed">{market.question}</CardTitle>
-        <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground md:flex-nowrap">
-          {market.canceledAt ? (
-            <div className="text-muted-foreground">
-              <span className="font-semibold">Canceled</span>
-            </div>
-          ) : null}
-          {!market.marketResolution && !market.canceledAt ? (
-            <div style={{ color: mostLikelyOption.color }} className="flex-shrink-0 font-medium">
-              {Math.round(mostLikelyOption.probability || 0)}% {_.truncate(mostLikelyOption.name, { length: 30 })}
-            </div>
-          ) : null}
-          {market.liquidityCount ? (
-            <div className="flex-shrink-0">
-              <CurrencyDisplay value={market.liquidityCount} isShort /> Vol.
-            </div>
-          ) : null}
-
-          {market.closeDate ? (
-            <div className="flex-shrink-0">
-              {isPast(market.closeDate) ? 'Ended' : 'Ending'} {format(market.closeDate, 'MMM d, yyyy')}
-            </div>
-          ) : null}
-          {market.user ? (
-            <div className="flex items-center gap-1 truncate">
-              <UserAvatar user={market.user} size="sm" />
-              <UserLink user={market.user} hideUsername />
-            </div>
-          ) : null}
-          {/* <div>15 Traders</div>
-          <div>$650 Volume</div> */}
+    <>
+      {isMarketClosed({ market }) ? (
+        <div
+          className="flex flex-row items-center justify-between gap-2 rounded border border-primary bg-primary/10 p-1 pl-3 text-foreground"
+          onClick={() => setResolving('true')}
+        >
+          This question has ended, please resolve it now.
+          <Button size="sm">
+            Resolve <ArrowRight className="h-4 w-4" />
+          </Button>
         </div>
-      </CardHeader>
-      <CardContent>
-        <MarketGraph market={market} activeOptionId={selected[0]} />
-      </CardContent>
-
-      <CardContent>
-        {market.marketResolution ? (
-          <>
-            <Alert>
-              <CircleCheckBig style={{ color: market.marketResolution.resolution.color }} className="h-4 w-4" />
-              <AlertTitle className="flex justify-between">
-                <span className="text-lg leading-none">{market.marketResolution.resolution.name}</span>
-                <Badge
-                  style={{
-                    backgroundColor: market.marketResolution.resolution.color,
-                    color: getTextContrast(market.marketResolution.resolution.color),
-                  }}
-                >
-                  Resolved
-                </Badge>
-              </AlertTitle>
-              <AlertDescription className="text-muted-foreground">
-                By <UserLink user={market.marketResolution.resolvedBy} /> on{' '}
-                {format(market.marketResolution.updatedAt, 'MMM d, yyyy')}
-              </AlertDescription>
-              {market.marketResolution.supportingLink ? (
-                <AlertDescription>
-                  <a
-                    href={market.marketResolution.supportingLink}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    {market.marketResolution.supportingLink}
-                  </a>
-                </AlertDescription>
-              ) : null}
-            </Alert>
-            {orderedMarketOptions.length ? (
-              <Collapsible>
-                <CollapsibleTrigger asChild>
-                  <Button variant="ghost" className="text-muted-foreground" size="sm">
-                    View more <ChevronDown className="ml-1 h-4 w-4" />
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <Card>
-                    {orderedMarketOptions.map((option, i) => (
-                      <MarketOptionRow
-                        key={option.id}
-                        option={option}
-                        active={option.id === selected[0]}
-                        probability={probabilities[option.id] || option.probability || 0}
-                        className={i > 0 ? 'border-t' : ''}
-                        canEdit={user ? canModifyMarket({ market, user }) : false}
-                        onEdit={() => setIsEditOption(option.id)}
-                        onSelect={() => {
-                          setSelected([option.id])
-                          triggerEffect()
-                        }}
-                      />
-                    ))}
-                  </Card>
-                </CollapsibleContent>
-              </Collapsible>
-            ) : null}
-          </>
-        ) : orderedMarketOptions.length ? (
-          <Card>
-            {orderedMarketOptions.map((option, i) => (
-              <MarketOptionRow
-                key={option.id}
-                option={option}
-                active={option.id === selected[0]}
-                probability={probabilities[option.id] || option.probability || 0}
-                className={i > 0 ? 'border-t' : ''}
-                canEdit={user ? canModifyMarket({ market, user }) : false}
-                onEdit={() => setIsEditOption(option.id)}
-                onSelect={() => {
-                  setSelected([option.id])
-                  triggerEffect()
-                }}
-              />
-            ))}
-          </Card>
-        ) : null}
-      </CardContent>
-
-      <CardContent className="space-y-2">
-        {market.description ? <ReadMoreEditor value={market.description} maxLines={6} /> : null}
-
-        {market.tags.length ? (
-          <div className="flex flex-wrap gap-2">
-            {market.tags.map((tag) => (
-              <Link href={`/questions/tagged/${tag}`} key={tag}>
-                <Badge variant="secondary">{tag}</Badge>
-              </Link>
-            ))}
-          </div>
-        ) : null}
-      </CardContent>
-
-      {!market.resolvedAt && !market.canceledAt ? (
-        <CardContent>
-          <LiquidityBoostAlert onClick={() => setIsBoosting('true')} />
-        </CardContent>
       ) : null}
 
-      <div className="flex flex-row items-center justify-between px-6 ">
-        <div className="text-lg font-semibold">Activity</div>
-      </div>
+      <Card className="flex-1">
+        <MarketToolbar
+          market={market}
+          canEdit={user ? canModifyMarket({ market, user }) : false}
+          onInitiateEdit={() => setIsEditing('true')}
+          onInitiateBoost={() => setIsBoosting('true')}
+          onRevalidate={handleRevalidateBalance}
+        />
 
-      <div className="mt-2 px-6">
-        <CreateCommentForm onSubmit={handleCreateComment} startCollapsed />
-      </div>
-      {renderActivitiy}
+        <CardHeader className="pt-0 md:pt-0">
+          {market.parentList ? (
+            <Link
+              href={`/lists/${market.parentList.id}/${market.parentList.slug}`}
+              className="flex items-center gap-2 text-muted-foreground"
+            >
+              <Link2Icon className="size-5" />
+              {market.parentList.title}
+            </Link>
+          ) : null}
+          <CardTitle className="leading-relaxed">{market.question}</CardTitle>
+          <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground md:flex-nowrap">
+            {market.canceledAt ? (
+              <div className="text-muted-foreground">
+                <span className="font-semibold">Canceled</span>
+              </div>
+            ) : null}
+            {!market.marketResolution && !market.canceledAt ? (
+              <div style={{ color: mostLikelyOption.color }} className="flex-shrink-0 font-medium">
+                {Math.round(mostLikelyOption.probability || 0)}% {_.truncate(mostLikelyOption.name, { length: 30 })}
+              </div>
+            ) : null}
+            {market.liquidityCount ? (
+              <div className="flex-shrink-0">
+                <CurrencyDisplay value={market.liquidityCount} isShort /> Vol.
+              </div>
+            ) : null}
 
-      <EditMarketDialog
-        key={market.updatedAt.toString()} // reset form when market updates
-        market={market}
-        open={isEditing === 'true'}
-        onClose={() => setIsEditing(undefined)}
-        onSuccess={onRevalidate}
-      />
-      <EditMarketOptionDialog
-        market={market}
-        optionId={isEditOption!}
-        open={isEditOption != null}
-        onClose={() => setIsEditOption(undefined)}
-        onSuccess={onRevalidate}
-      />
-      <LiquidityBoostDialog
-        market={market}
-        open={isBoosting === 'true'}
-        onClose={() => setIsBoosting(undefined)}
-        onSuccess={handleRevalidateBalance}
-      />
-    </Card>
+            {market.closeDate ? (
+              <div className="flex-shrink-0">
+                {isPast(market.closeDate) ? 'Ended' : 'Ending'} {format(market.closeDate, 'MMM d, yyyy')}
+              </div>
+            ) : null}
+            {market.user ? (
+              <div className="flex items-center gap-1 truncate">
+                <UserAvatar user={market.user} size="sm" />
+                <UserLink user={market.user} hideUsername />
+              </div>
+            ) : null}
+            {/* <div>15 Traders</div>
+          <div>$650 Volume</div> */}
+          </div>
+        </CardHeader>
+        <CardContent>
+          <MarketGraph market={market} activeOptionId={selected[0]} />
+        </CardContent>
+
+        <CardContent>
+          {market.marketResolution ? (
+            <>
+              <Alert>
+                <CircleCheckBig style={{ color: market.marketResolution.resolution.color }} className="h-4 w-4" />
+                <AlertTitle className="flex justify-between">
+                  <span className="text-lg leading-none">{market.marketResolution.resolution.name}</span>
+                  <Badge
+                    style={{
+                      backgroundColor: market.marketResolution.resolution.color,
+                      color: getTextContrast(market.marketResolution.resolution.color),
+                    }}
+                  >
+                    Resolved
+                  </Badge>
+                </AlertTitle>
+                <AlertDescription className="text-muted-foreground">
+                  By <UserLink user={market.marketResolution.resolvedBy} /> on{' '}
+                  {format(market.marketResolution.updatedAt, 'MMM d, yyyy')}
+                </AlertDescription>
+                {market.marketResolution.supportingLink ? (
+                  <AlertDescription>
+                    <a
+                      href={market.marketResolution.supportingLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary hover:underline"
+                    >
+                      {market.marketResolution.supportingLink}
+                    </a>
+                  </AlertDescription>
+                ) : null}
+              </Alert>
+              {orderedMarketOptions.length ? (
+                <Collapsible>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" className="text-muted-foreground" size="sm">
+                      View more <ChevronDown className="ml-1 h-4 w-4" />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <Card>
+                      {orderedMarketOptions.map((option, i) => (
+                        <MarketOptionRow
+                          key={option.id}
+                          option={option}
+                          active={option.id === selected[0]}
+                          probability={probabilities[option.id] || option.probability || 0}
+                          className={i > 0 ? 'border-t' : ''}
+                          canEdit={user ? canModifyMarket({ market, user }) : false}
+                          onEdit={() => setIsEditOption(option.id)}
+                          onSelect={() => {
+                            setSelected([option.id])
+                            triggerEffect()
+                          }}
+                        />
+                      ))}
+                    </Card>
+                  </CollapsibleContent>
+                </Collapsible>
+              ) : null}
+            </>
+          ) : orderedMarketOptions.length ? (
+            <Card>
+              {orderedMarketOptions.map((option, i) => (
+                <MarketOptionRow
+                  key={option.id}
+                  option={option}
+                  active={option.id === selected[0]}
+                  probability={probabilities[option.id] || option.probability || 0}
+                  className={i > 0 ? 'border-t' : ''}
+                  canEdit={user ? canModifyMarket({ market, user }) : false}
+                  onEdit={() => setIsEditOption(option.id)}
+                  onSelect={() => {
+                    setSelected([option.id])
+                    triggerEffect()
+                  }}
+                />
+              ))}
+            </Card>
+          ) : null}
+        </CardContent>
+
+        <CardContent className="space-y-2">
+          {market.description ? <ReadMoreEditor value={market.description} maxLines={6} /> : null}
+
+          {market.tags.length ? (
+            <div className="flex flex-wrap gap-2">
+              {market.tags.map((tag) => (
+                <Link href={`/questions/tagged/${tag}`} key={tag}>
+                  <Badge variant="secondary">{tag}</Badge>
+                </Link>
+              ))}
+            </div>
+          ) : null}
+        </CardContent>
+
+        {!market.resolvedAt && !market.canceledAt ? (
+          <CardContent>
+            <LiquidityBoostAlert onClick={() => setIsBoosting('true')} />
+          </CardContent>
+        ) : null}
+
+        <div className="flex flex-row items-center justify-between px-6 ">
+          <div className="text-lg font-semibold">Activity</div>
+        </div>
+
+        <div className="mt-2 px-6">
+          <CreateCommentForm onSubmit={handleCreateComment} startCollapsed />
+        </div>
+        {renderActivitiy}
+
+        <EditMarketDialog
+          key={market.updatedAt.toString()} // reset form when market updates
+          market={market}
+          open={isEditing === 'true'}
+          onClose={() => setIsEditing(undefined)}
+          onSuccess={onRevalidate}
+        />
+        <EditMarketOptionDialog
+          market={market}
+          optionId={isEditOption!}
+          open={isEditOption != null}
+          onClose={() => setIsEditOption(undefined)}
+          onSuccess={onRevalidate}
+        />
+        <LiquidityBoostDialog
+          market={market}
+          open={isBoosting === 'true'}
+          onClose={() => setIsBoosting(undefined)}
+          onSuccess={handleRevalidateBalance}
+        />
+      </Card>
+    </>
   )
 }
