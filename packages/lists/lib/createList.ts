@@ -1,4 +1,5 @@
 import Decimal from 'decimal.js'
+import _ from 'lodash'
 import db, { Market } from '@play-money/database'
 import { QuestionContributionPolicyType } from '@play-money/database/zod/inputTypeSchemas/QuestionContributionPolicySchema'
 import { getBalance } from '@play-money/finance/lib/getBalances'
@@ -6,6 +7,19 @@ import { createMarket } from '@play-money/markets/lib/createMarket'
 import { slugifyTitle } from '@play-money/markets/lib/helpers'
 import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
 import { calculateTotalCost } from './helpers'
+
+const COLORS = [
+  '#f44336',
+  '#9c27b0',
+  '#3f51b5',
+  '#2196f3',
+  '#009688',
+  '#8bc34a',
+  '#ffc107',
+  '#ff9800',
+  '#795548',
+  '#607d8b',
+]
 
 export async function createList({
   title,
@@ -27,6 +41,7 @@ export async function createList({
   const slug = slugifyTitle(title)
   const totalCost = calculateTotalCost(markets.length)
   const costPerMarket = new Decimal(totalCost).div(markets.length)
+  const SHUFFLED_COLORS = _.shuffle(COLORS)
 
   const userAccount = await getUserPrimaryAccount({ userId: ownerId })
   const userPrimaryBalance = await getBalance({
@@ -66,7 +81,7 @@ export async function createList({
       options: [
         {
           name: 'Yes',
-          color: market.color ?? '#3B82F6',
+          color: market.color ?? SHUFFLED_COLORS[createdMarkets.length % SHUFFLED_COLORS.length],
         },
         {
           name: 'No',
