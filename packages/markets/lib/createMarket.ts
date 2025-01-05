@@ -7,6 +7,7 @@ import { createDailyMarketBonusTransaction } from '@play-money/quests/lib/create
 import { hasCreatedMarketToday } from '@play-money/quests/lib/helpers'
 import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
 import { createMarketLiquidityTransaction } from './createMarketLiquidityTransaction'
+import { getMarketTagsLLM } from './getMarketTagsLLM'
 import { slugifyTitle } from './helpers'
 
 type PartialOptions = Pick<MarketOption, 'name' | 'color'>
@@ -60,6 +61,8 @@ export async function createMarket({
     throw new Error('User does not have enough balance to create market')
   }
 
+  const generatedTags = tags ?? (await getMarketTagsLLM({ question }))
+
   const now = new Date()
   const createdMarket = await db.market.create({
     data: {
@@ -67,7 +70,7 @@ export async function createMarket({
       description,
       closeDate,
       slug,
-      tags: tags?.map((tag) => slugifyTitle(tag)),
+      tags: generatedTags.map((tag) => slugifyTitle(tag)),
       options: {
         createMany: {
           data: parsedOptions.map((option, i) => ({

@@ -4,6 +4,7 @@ import db, { Market } from '@play-money/database'
 import { QuestionContributionPolicyType } from '@play-money/database/zod/inputTypeSchemas/QuestionContributionPolicySchema'
 import { getBalance } from '@play-money/finance/lib/getBalances'
 import { createMarket } from '@play-money/markets/lib/createMarket'
+import { getMarketTagsLLM } from '@play-money/markets/lib/getMarketTagsLLM'
 import { slugifyTitle } from '@play-money/markets/lib/helpers'
 import { getUserPrimaryAccount } from '@play-money/users/lib/getUserPrimaryAccount'
 import { calculateTotalCost } from './helpers'
@@ -54,13 +55,15 @@ export async function createList({
     throw new Error('User does not have enough balance to create list')
   }
 
+  const generatedTags = tags ?? (await getMarketTagsLLM({ question: title }))
+
   const list = await db.list.create({
     data: {
       title,
       description,
       ownerId,
       slug,
-      tags: tags?.map((tag) => slugifyTitle(tag)),
+      tags: generatedTags.map((tag) => slugifyTitle(tag)),
       contributionPolicy,
     },
     include: {
