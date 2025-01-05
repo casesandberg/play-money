@@ -39,9 +39,28 @@ export async function createList({
     throw new Error('User does not have enough balance to create list')
   }
 
+  const list = await db.list.create({
+    data: {
+      title,
+      description,
+      ownerId,
+      slug,
+      tags: tags?.map((tag) => slugifyTitle(tag)),
+      contributionPolicy,
+    },
+    include: {
+      markets: {
+        include: {
+          market: true,
+        },
+      },
+    },
+  })
+
   const createdMarkets: Array<Market> = []
   for (const market of markets) {
     const createdMarket = await createMarket({
+      parentListId: list.id,
       question: market.name,
       description: description ?? '',
       options: [
@@ -61,53 +80,16 @@ export async function createList({
     createdMarkets.push(createdMarket)
   }
 
-  const createdList = await db.$transaction(
-    async (tx) => {
-      const list = await tx.list.create({
-        data: {
-          title,
-          description,
-          ownerId,
-          slug,
-          tags: tags?.map((tag) => slugifyTitle(tag)),
-          markets: {
-            createMany: {
-              data: createdMarkets.map((market) => ({
-                marketId: market.id,
-              })),
-            },
-          },
-          contributionPolicy,
-        },
-        include: {
-          markets: {
-            include: {
-              market: true,
-            },
-          },
-        },
-      })
-
-      await Promise.all(
-        createdMarkets.map((market) => {
-          return tx.market.update({
-            where: {
-              id: market.id,
-            },
-            data: {
-              parentListId: list.id,
-            },
-          })
-        })
-      )
-
-      return list
+  return db.list.findFirstOrThrow({
+    where: {
+      id: list.id,
     },
-    {
-      maxWait: 5000,
-      timeout: 10000,
-    }
-  )
-
-  return createdList
+    include: {
+      markets: {
+        include: {
+          market: true,
+        },
+      },
+    },
+  })
 }

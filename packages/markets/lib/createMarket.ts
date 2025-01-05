@@ -86,6 +86,11 @@ export async function createMarket({
                 id: parentListId,
               },
             } as unknown as undefined,
+            lists: {
+              create: {
+                listId: parentListId,
+              },
+            },
           }
         : {}),
 
