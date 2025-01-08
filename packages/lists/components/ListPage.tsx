@@ -122,13 +122,21 @@ export function ListPage({
       <CardContent>
         <ReadMoreEditor value={list.description ?? ''} maxLines={6} />
 
-        {list.tags.length ? (
+        {list.markets.length ? (
           <div className="mt-2 flex flex-wrap gap-2">
-            {list.tags.map((tag) => (
-              <Link href={`/questions/tagged/${tag}`} key={tag}>
-                <Badge variant="secondary">{tag}</Badge>
-              </Link>
-            ))}
+            {_(list.markets)
+              .flatMap((market) => market.market.tags)
+              .countBy()
+              .toPairs()
+              .sortBy(1)
+              .reverse()
+              .take(5)
+              .map(([tag, count]) => (
+                <Link href={`/questions/tagged/${tag}`} key={tag}>
+                  <Badge variant="secondary">{tag}</Badge>
+                </Link>
+              ))
+              .value()}
           </div>
         ) : null}
       </CardContent>
