@@ -3,6 +3,7 @@
 import { MoreVertical, Link, Pencil } from 'lucide-react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import React, { useCallback } from 'react'
+import { updateMarket } from '@play-money/api-helpers/client'
 import { Button } from '@play-money/ui/button'
 import {
   DropdownMenu,
@@ -78,6 +79,11 @@ export function MarketToolbar({
     }
   }
 
+  const handleHalt = async () => {
+    await updateMarket({ marketId: market.id, body: { closeDate: new Date() } })
+    onRevalidate?.()
+  }
+
   return (
     <div className="flex items-center justify-end">
       {canEdit ? (
@@ -113,6 +119,12 @@ export function MarketToolbar({
           {canResolve ? (
             <>
               <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={handleHalt}
+                disabled={!!market.closeDate && new Date() > new Date(market.closeDate)}
+              >
+                Halt trading
+              </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
                   setResolving('true')

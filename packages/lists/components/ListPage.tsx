@@ -21,6 +21,7 @@ import { canAddToList, canModifyList } from '../rules'
 import { ExtendedList } from '../types'
 import { AddMoreListDialog } from './AddMoreListDialog'
 import { EditListDialog } from './EditListDialog'
+import { ListGraph } from './ListGraph'
 import { ListMarketRow } from './ListMarketRow'
 import { ListToolbar } from './ListToolbar'
 
@@ -78,6 +79,10 @@ export function ListPage({
       </CardHeader>
 
       <CardContent>
+        <ListGraph list={list} activeOptionId={selected[0]} />
+      </CardContent>
+
+      <CardContent>
         {list.markets.length ? (
           <Card className="divide-y">
             {list.markets.map((market, i) => (
@@ -117,13 +122,21 @@ export function ListPage({
       <CardContent>
         <ReadMoreEditor value={list.description ?? ''} maxLines={6} />
 
-        {list.tags.length ? (
+        {list.markets.length ? (
           <div className="mt-2 flex flex-wrap gap-2">
-            {list.tags.map((tag) => (
-              <Link href={`/questions/tagged/${tag}`} key={tag}>
-                <Badge variant="secondary">{tag}</Badge>
-              </Link>
-            ))}
+            {_(list.markets)
+              .flatMap((market) => market.market.tags)
+              .countBy()
+              .toPairs()
+              .sortBy(1)
+              .reverse()
+              .take(5)
+              .map(([tag, count]) => (
+                <Link href={`/questions/tagged/${tag}`} key={tag}>
+                  <Badge variant="secondary">{tag}</Badge>
+                </Link>
+              ))
+              .value()}
           </div>
         ) : null}
       </CardContent>
