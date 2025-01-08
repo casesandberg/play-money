@@ -69,3 +69,10 @@ The **Play Money** database package manages the platform's database interactions
      ```bash
       npx prisma migrate dev --name migration_name
      ```
+
+5. **Running One-Off Scripts**:
+
+   - To run any one-off scripts, such as sending a user a gift, use the following command:
+     ```bash
+     npx dotenv -- npx tsx ./packages/database/scripts/send-user-gift.ts
+     ```
