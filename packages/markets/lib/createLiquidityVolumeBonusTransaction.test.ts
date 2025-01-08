@@ -7,6 +7,7 @@ import {
   mockTransactionEntry,
   mockTransactionWithEntries,
 } from '@play-money/database/mocks'
+import { LIQUIDITY_VOLUME_BONUS_PERCENT } from '@play-money/finance/economy'
 import { executeTransaction } from '@play-money/finance/lib/executeTransaction'
 import { getHouseAccount } from '@play-money/finance/lib/getHouseAccount'
 import { createLiquidityVolumeBonusTransaction } from './createLiquidityVolumeBonusTransaction'
@@ -25,6 +26,19 @@ describe('createLiquidityVolumeBonusTransaction', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
+
+  if (!LIQUIDITY_VOLUME_BONUS_PERCENT) {
+    it('should not create a transaction if the bonus is 0', async () => {
+      await createLiquidityVolumeBonusTransaction({
+        marketId: 'market-1',
+        amountTraded: new Decimal(100),
+      })
+
+      expect(executeTransaction).not.toHaveBeenCalled()
+    })
+
+    return
+  }
 
   it('should handle a single LP', async () => {
     jest.mocked(getMarketAmmAccount).mockResolvedValue(mockAccount({ id: 'amm-1-account' }))
