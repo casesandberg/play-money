@@ -21,6 +21,7 @@ import { canAddToList, canModifyList } from '../rules'
 import { ExtendedList } from '../types'
 import { AddMoreListDialog } from './AddMoreListDialog'
 import { EditListDialog } from './EditListDialog'
+import { ListGraph } from './ListGraph'
 import { ListMarketRow } from './ListMarketRow'
 import { ListToolbar } from './ListToolbar'
 
@@ -76,6 +77,10 @@ export function ListPage({
           <div>$650 Volume</div> */}
         </div>
       </CardHeader>
+
+      <CardContent>
+        <ListGraph list={list} activeOptionId={selected[0]} />
+      </CardContent>
 
       <CardContent>
         {list.markets.length ? (

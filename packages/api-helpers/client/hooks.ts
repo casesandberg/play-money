@@ -76,6 +76,22 @@ export function useMarketGraph({ marketId }: { marketId: string }) {
   }>(MARKET_GRAPH_PATH(marketId), { refreshInterval: FIVE_MINUTES })
 }
 
+export function LIST_GRAPH_PATH(listId: string) {
+  return `/v1/lists/${listId}/graph`
+}
+export function useListGraph({ listId }: { listId: string }) {
+  return useSWR<{
+    data: Array<{
+      startAt: Date
+      endAt: Date
+      markets: Array<{
+        id: string
+        probability: number
+      }>
+    }>
+  }>(LIST_GRAPH_PATH(listId), { refreshInterval: FIVE_MINUTES })
+}
+
 export function useMarketRelated({ marketId }: { marketId: string }) {
   return useSWR<{
     data: Array<ExtendedMarket>
