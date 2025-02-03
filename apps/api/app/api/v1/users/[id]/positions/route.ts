@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { SchemaResponse } from '@play-money/api-helpers'
-import { getPositions } from '@play-money/finance/lib/getPositions'
 import { getUserById } from '@play-money/users/lib/getUserById'
+import { getUserPositions } from '@play-money/users/lib/getUserPositions'
 import schema from './schema'
 
 export const dynamic = 'force-dynamic'
@@ -15,24 +15,13 @@ export async function GET(
     const searchParams = new URLSearchParams(url.search)
     const urlParams = Object.fromEntries(searchParams)
 
-    const { id, pageSize, status } = schema.get.parameters.parse({ ...(params || {}), ...urlParams })
+    const { id: userId, status, ...paginationParams } = schema.get.parameters.parse({ ...(params || {}), ...urlParams })
 
-    const user = await getUserById({ id })
+    await getUserById({ id: userId })
 
-    const { positions } = await getPositions(
-      {
-        accountId: user.primaryAccountId,
-        status,
-      },
-      { field: 'updatedAt', direction: 'desc' },
-      { take: pageSize ?? 25, skip: 0 }
-    )
+    const results = await getUserPositions({ userId, status }, paginationParams)
 
-    return NextResponse.json({
-      data: {
-        positions,
-      },
-    })
+    return NextResponse.json(results)
   } catch (error) {
     console.log(error) // eslint-disable-line no-console -- Log error for debugging
 
