@@ -4,7 +4,7 @@ import { createMarketResolveWinTransactions } from '@play-money/markets/lib/crea
 import { getMarket } from '@play-money/markets/lib/getMarket'
 import db from '../prisma'
 
-const marketId = 'cm0amvq8v001910v7iq2mvf4m'
+const marketId = 'cm5od3mim075xt20i1ummyi2u'
 
 async function main() {
   try {
@@ -32,7 +32,7 @@ async function main() {
       const liquidityTransactions = await createMarketExcessLiquidityTransactions({ marketId, initiatorId: '' })
 
       console.log(
-        `Market ${marketId} resolution re-run. ${lossTransactions.flat().length} losses, ${winTransactions.length} wins. ${liquidityTransactions.length} liquidity accounts returned.`
+        `Market ${marketId} resolution re-run. ${lossTransactions.length} losses, ${winTransactions.length} wins. ${liquidityTransactions.length} liquidity accounts returned.`
       )
       return
     }

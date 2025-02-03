@@ -85,15 +85,6 @@ describe('createMarketResolveLossTransactions', () => {
             assetId: 'option-2',
             amount: new Decimal(60),
           },
-        ],
-      })
-    )
-
-    expect(executeTransaction).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: 'TRADE_LOSS',
-        marketId: 'market-1',
-        entries: [
           {
             fromAccountId: 'user-2',
             toAccountId: 'amm-account-id',
