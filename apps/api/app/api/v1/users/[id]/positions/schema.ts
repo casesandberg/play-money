@@ -1,20 +1,23 @@
 import { z } from 'zod'
-import { ApiEndpoints, ServerErrorSchema } from '@play-money/api-helpers'
-import { MarketOptionPositionSchema, UserSchema } from '@play-money/database'
+import {
+  ApiEndpoints,
+  createPaginatedResponseSchema,
+  paginationSchema,
+  ServerErrorSchema,
+} from '@play-money/api-helpers'
+import { MarketOptionPositionSchema } from '@play-money/database'
 
 export default {
   get: {
     summary: 'Get positions for a user',
-    parameters: UserSchema.pick({ id: true }).extend({
-      pageSize: z.coerce.number().optional(),
-      status: z.enum(['active', 'closed', 'all']).optional(),
-    }),
+    parameters: z
+      .object({
+        id: z.string(),
+        status: z.enum(['active', 'closed', 'all']).optional(),
+      })
+      .merge(paginationSchema),
     responses: {
-      200: z.object({
-        data: z.object({
-          positions: z.array(MarketOptionPositionSchema),
-        }),
-      }),
+      200: createPaginatedResponseSchema(MarketOptionPositionSchema),
       404: ServerErrorSchema,
       500: ServerErrorSchema,
     },

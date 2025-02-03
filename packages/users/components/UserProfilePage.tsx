@@ -199,8 +199,8 @@ async function UserPositionsTab({
     sortDirection?: 'asc' | 'desc'
   }
 }) {
-  const { data: marketPositions, pageInfo } = await getMarketPositions({
-    ownerId: userId,
+  const { data: marketPositions, pageInfo } = await getUserPositions({
+    userId,
     ...filters,
     status: filters?.status ?? 'active',
   })
@@ -226,9 +226,7 @@ export async function UserProfilePage({
   }
 }) {
   const { data: user } = await getUserUsername({ username })
-  const {
-    data: { positions },
-  } = await getUserPositions({ userId: user.id, pageSize: 5 })
+  const { data: positions } = await getUserPositions({ userId: user.id, limit: 5 })
   const { data: markets } = await getUserMarkets({ userId: user.id })
 
   return (

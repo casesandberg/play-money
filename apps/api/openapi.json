@@ -108,12 +108,6 @@
           ]
         }
       },
-      "pageSize": {
-        "type": [
-          "number",
-          "null"
-        ]
-      },
       "username": {
         "type": "string"
       },
@@ -263,14 +257,6 @@
         },
         "required": false,
         "name": "transactionType",
-        "in": "path"
-      },
-      "pageSize": {
-        "schema": {
-          "$ref": "#/components/schemas/pageSize"
-        },
-        "required": false,
-        "name": "pageSize",
         "in": "path"
       },
       "username": {
@@ -2109,6 +2095,106 @@
                           "parentId",
                           "hidden",
                           "entityId"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/lists/[id]/graph": {
+      "get": {
+        "summary": "Get the graph for a List of Markets",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "startAt": {
+                            "type": "string"
+                          },
+                          "endAt": {
+                            "type": "string"
+                          },
+                          "markets": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "probability": {
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "probability"
+                              ]
+                            }
+                          }
+                        },
+                        "required": [
+                          "startAt",
+                          "endAt",
+                          "markets"
                         ]
                       }
                     }
@@ -6949,10 +7035,19 @@
             "$ref": "#/components/parameters/id"
           },
           {
-            "$ref": "#/components/parameters/pageSize"
+            "$ref": "#/components/parameters/status"
           },
           {
-            "$ref": "#/components/parameters/status"
+            "$ref": "#/components/parameters/cursor"
+          },
+          {
+            "$ref": "#/components/parameters/limit"
+          },
+          {
+            "$ref": "#/components/parameters/sortField"
+          },
+          {
+            "$ref": "#/components/parameters/sortDirection"
           }
         ],
         "responses": {
@@ -6964,60 +7059,71 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "type": "object",
-                      "properties": {
-                        "positions": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "string",
-                                "format": "cuid"
-                              },
-                              "accountId": {
-                                "type": "string"
-                              },
-                              "marketId": {
-                                "type": "string"
-                              },
-                              "optionId": {
-                                "type": "string"
-                              },
-                              "cost": {},
-                              "quantity": {},
-                              "value": {},
-                              "createdAt": {
-                                "type": [
-                                  "string",
-                                  "null"
-                                ]
-                              },
-                              "updatedAt": {
-                                "type": [
-                                  "string",
-                                  "null"
-                                ]
-                              }
-                            },
-                            "required": [
-                              "id",
-                              "accountId",
-                              "marketId",
-                              "optionId",
-                              "createdAt",
-                              "updatedAt"
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "cuid"
+                          },
+                          "accountId": {
+                            "type": "string"
+                          },
+                          "marketId": {
+                            "type": "string"
+                          },
+                          "optionId": {
+                            "type": "string"
+                          },
+                          "cost": {},
+                          "quantity": {},
+                          "value": {},
+                          "createdAt": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "updatedAt": {
+                            "type": [
+                              "string",
+                              "null"
                             ]
                           }
+                        },
+                        "required": [
+                          "id",
+                          "accountId",
+                          "marketId",
+                          "optionId",
+                          "createdAt",
+                          "updatedAt"
+                        ]
+                      }
+                    },
+                    "pageInfo": {
+                      "type": "object",
+                      "properties": {
+                        "hasNextPage": {
+                          "type": "boolean"
+                        },
+                        "endCursor": {
+                          "type": "string"
+                        },
+                        "total": {
+                          "type": "number"
                         }
                       },
                       "required": [
-                        "positions"
+                        "hasNextPage",
+                        "total"
                       ]
                     }
                   },
                   "required": [
-                    "data"
+                    "data",
+                    "pageInfo"
                   ]
                 }
               }

@@ -32,7 +32,7 @@ export type ExtendedMarketPosition = MarketOptionPosition & {
   option: MarketOption
   market: Market
   account: Account & {
-    user: User
+    user: User | null
   }
 }
 

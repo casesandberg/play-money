@@ -488,13 +488,24 @@ export async function getUserTransactions({ userId }: { userId: string }) {
 
 export async function getUserPositions({
   userId,
-  pageSize,
+  status,
+  ...paginationParams
 }: {
   userId: string
-  pageSize?: number
-}): Promise<{ data: { positions: Array<ExtendedMarketOptionPosition> } }> {
-  return apiHandler<{ data: { positions: Array<ExtendedMarketOptionPosition> } }>(
-    `${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/positions${pageSize ? `?pageSize=${pageSize}` : ''}`
+  status?: 'active' | 'closed' | 'all'
+} & PaginationRequest): Promise<PaginatedResponse<ExtendedMarketOptionPosition>> {
+  const currentParams = new URLSearchParams(
+    JSON.parse(
+      JSON.stringify({
+        status,
+        ...paginationParams,
+      })
+    )
+  )
+  const search = currentParams.toString()
+
+  return apiHandler<PaginatedResponse<ExtendedMarketOptionPosition>>(
+    `${process.env.NEXT_PUBLIC_API_URL}/v1/users/${userId}/positions${search ? `?${search}` : ''}`
   )
 }
 
