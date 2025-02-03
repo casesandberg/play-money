@@ -68,21 +68,34 @@ export async function addLiquidity({
     })
   }
 
-  const recipientIds = await getUniqueLiquidityProviderIds(marketId, [userId])
+  // TODO: Feedback was it was unncessary to notify all liquidity providers, instead just nofify owner if other user
+  // const recipientIds = await getUniqueLiquidityProviderIds(marketId, [userId])
 
-  await Promise.all(
-    recipientIds.map((recipientId) =>
-      createNotification({
-        type: 'MARKET_LIQUIDITY_ADDED',
-        actorId: userId,
-        marketId: market.id,
-        transactionId: transaction.id,
-        groupKey: market.id,
-        userId: recipientId,
-        actionUrl: `/questions/${market.id}/${market.slug}`,
-      })
-    )
-  )
+  // await Promise.all(
+  //   recipientIds.map((recipientId) =>
+  //     createNotification({
+  //       type: 'MARKET_LIQUIDITY_ADDED',
+  //       actorId: userId,
+  //       marketId: market.id,
+  //       transactionId: transaction.id,
+  //       groupKey: market.id,
+  //       userId: recipientId,
+  //       actionUrl: `/questions/${market.id}/${market.slug}`,
+  //     })
+  //   )
+  // )
+
+  if (userId !== market.createdBy) {
+    await createNotification({
+      type: 'MARKET_LIQUIDITY_ADDED',
+      actorId: userId,
+      marketId: market.id,
+      transactionId: transaction.id,
+      groupKey: market.id,
+      userId: market.createdBy,
+      actionUrl: `/questions/${market.id}/${market.slug}`,
+    })
+  }
 
   if (!(await hasBoostedLiquidityToday({ userId: userId }))) {
     await createDailyLiquidityBonusTransaction({ accountId: userAccount.id, marketId: market.id, initiatorId: userId })
