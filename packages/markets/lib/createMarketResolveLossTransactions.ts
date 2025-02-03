@@ -44,55 +44,53 @@ export async function createMarketResolveLossTransactions({
     {} as Record<string, Record<string, Decimal>>
   )
 
-  const transactions: Array<Promise<Transaction>> = []
+  const entries = Object.entries(summedLosingQuantities).flatMap(([accountId, optionQuantity]) =>
+    Object.entries(optionQuantity)
+      .filter(([_, quantity]) => quantity.toDecimalPlaces(0).gt(0))
+      .map(([optionId, quantity]) => ({
+        fromAccountId: accountId,
+        toAccountId: ammAccount.id,
+        assetType: 'MARKET_OPTION' as const,
+        assetId: optionId,
+        amount: quantity,
+      }))
+  )
 
-  // Transfer all losing shares back to the AMM
-  for (const [accountId, optionQuantity] of Object.entries(summedLosingQuantities)) {
-    const entries = []
-
-    for (const [optionId, quantity] of Object.entries(optionQuantity)) {
-      if (quantity.toDecimalPlaces(0).gt(0)) {
-        entries.push({
-          fromAccountId: accountId,
-          toAccountId: ammAccount.id,
-          assetType: 'MARKET_OPTION',
-          assetId: optionId,
-          amount: quantity,
-        } as const)
-      }
-    }
-
-    entries.length &&
-      transactions.push(
-        executeTransaction({
-          type: 'TRADE_LOSS',
-          entries,
-          marketId,
-          additionalLogic: async (txParams) => {
-            return Promise.all([
-              ...Object.entries(optionQuantity).map(([optionId, quantity]) => {
-                return txParams.tx.marketOptionPosition.update({
-                  where: {
-                    accountId_optionId: {
-                      accountId,
-                      optionId,
-                    },
-                  },
-                  data: {
-                    quantity: {
-                      decrement: quantity.toNumber(),
-                    },
-                    value: 0,
-                    updatedAt: new Date(),
-                  },
-                })
-              }),
-              updateMarketBalances({ ...txParams, marketId }),
-            ])
-          },
-        })
-      )
+  // Short circuit if no entries
+  if (entries.length === 0) {
+    return []
   }
 
-  return Promise.all(transactions)
+  await executeTransaction({
+    type: 'TRADE_LOSS',
+    entries,
+    marketId,
+    additionalLogic: async (txParams) => {
+      return Promise.all([
+        // Batch update all positions in a single transaction
+        ...Object.entries(summedLosingQuantities).flatMap(([accountId, optionQuantity]) =>
+          Object.entries(optionQuantity).map(([optionId, quantity]) =>
+            txParams.tx.marketOptionPosition.update({
+              where: {
+                accountId_optionId: {
+                  accountId,
+                  optionId,
+                },
+              },
+              data: {
+                quantity: {
+                  decrement: quantity.toNumber(),
+                },
+                value: 0,
+                updatedAt: new Date(),
+              },
+            })
+          )
+        ),
+        updateMarketBalances({ ...txParams, marketId }),
+      ])
+    },
+  })
+
+  return entries
 }
