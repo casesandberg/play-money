@@ -22,19 +22,22 @@ async function main() {
 
       const marketBalances = await getMarketBalances({ accountId: userAccount.id, marketId })
 
-      console.log(user.username)
+      const userBalance = marketBalances.find(
+        ({ accountId, assetType }) => accountId === userAccount.id && assetType === 'CURRENCY'
+      )
+
+      if (!userBalance) {
+        return
+      }
+
+      console.log(`${user.username} (¤${userBalance.total.toDecimalPlaces(2)})`)
+      console.log(`\x1b[2m  ${JSON.stringify(userBalance.subtotals)}\x1b[0m`)
 
       market.options.map((option) => {
         const optionBalance = marketBalances.find(({ assetId }) => assetId === option.id)
 
         if (optionBalance) {
-          const cashedOut = new Decimal(optionBalance.subtotals.TRADE_SELL ?? 0)
-            .plus(optionBalance.subtotals.TRADE_WIN ?? 0)
-            .abs()
-            .toDecimalPlaces(2)
-          console.log(
-            `· Option: ${option.name}, Pending Balance: ${optionBalance.total.toDecimalPlaces(2)}, Cashed Out: ${cashedOut}`
-          )
+          console.log(`· Option: ${option.name}, Shares Held: ${optionBalance.total.toDecimalPlaces(2)}`)
           console.log(`\x1b[2m  ${JSON.stringify(optionBalance.subtotals)}\x1b[0m`)
         }
       })
