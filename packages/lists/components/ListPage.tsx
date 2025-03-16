@@ -39,6 +39,8 @@ export function ListPage({
   const { selected, setSelected } = useSelectedItems()
   const [isAddMore, setIsAddMore] = useSearchParam('addMore')
   const [isEditing, setIsEditing] = useSearchParam('edit')
+  const canEdit = user ? canModifyList({ list, user }) : false
+  const canAddMore = user ? canAddToList({ list, userId: user.id }) : false
 
   const handleRevalidateBalance = async () => {
     void onRevalidate?.()
@@ -48,11 +50,7 @@ export function ListPage({
 
   return (
     <Card className="flex-1">
-      <ListToolbar
-        list={list}
-        canEdit={user ? canModifyList({ list, user }) : false}
-        onInitiateEdit={() => setIsEditing('true')}
-      />
+      <ListToolbar list={list} canEdit={canEdit} onInitiateEdit={() => setIsEditing('true')} />
 
       <CardHeader className="pt-0 md:pt-0">
         <CardTitle className="leading-relaxed">{list.title}</CardTitle>
@@ -110,7 +108,7 @@ export function ListPage({
           </Card>
         ) : null}
 
-        {canAddToList({ list, userId: user?.id }) ? (
+        {canAddMore ? (
           <div className="flex justify-end">
             <Button variant="ghost" className="text-muted-foreground" size="sm" onClick={() => setIsAddMore('true')}>
               <PlusIcon className="h-4 w-4" /> Add more
@@ -147,14 +145,14 @@ export function ListPage({
       <EditListDialog
         key={list.updatedAt.toString()} // reset form when list updates
         list={list}
-        open={isEditing === 'true'}
+        open={isEditing === 'true' && canEdit}
         onClose={() => setIsEditing(undefined)}
         onSuccess={onRevalidate}
       />
 
       <AddMoreListDialog
         list={list}
-        open={isAddMore != null}
+        open={isAddMore != null && canAddMore}
         onClose={() => setIsAddMore(undefined)}
         onSuccess={onRevalidate}
       />

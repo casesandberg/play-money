@@ -28,7 +28,7 @@ import { UserLink } from '@play-money/users/components/UserLink'
 import { useUser } from '@play-money/users/context/UserContext'
 import { useSelectedItems } from '../../ui/src/contexts/SelectedItemContext'
 import { useSearchParam } from '../../ui/src/hooks/useSearchParam'
-import { canModifyMarket, isMarketClosed } from '../rules'
+import { canModifyMarket, isMarketClosed, isMarketTradable } from '../rules'
 import { ExtendedMarket } from '../types'
 import { EditMarketDialog } from './EditMarketDialog'
 import { EditMarketOptionDialog } from './EditMarketOptionDialog'
@@ -68,6 +68,8 @@ export function MarketOverviewPage({
   const [, setResolving] = useSearchParam('resolve')
   const isCreator = user?.id === market.createdBy
   const probabilities = marketOptionBalancesToProbabilities(balance?.amm)
+  const canEdit = user ? canModifyMarket({ market, user }) : false
+  const canTrade = isMarketTradable({ market })
 
   const mostLikelyOption = market.options.reduce((prev, current) =>
     (prev.probability || 0) > (current.probability || 0) ? prev : current
@@ -111,7 +113,7 @@ export function MarketOverviewPage({
       <Card className="flex-1">
         <MarketToolbar
           market={market}
-          canEdit={user ? canModifyMarket({ market, user }) : false}
+          canEdit={canEdit}
           onInitiateEdit={() => setIsEditing('true')}
           onInitiateBoost={() => setIsBoosting('true')}
           onRevalidate={handleRevalidateBalance}
@@ -279,20 +281,20 @@ export function MarketOverviewPage({
         <EditMarketDialog
           key={market.updatedAt.toString()} // reset form when market updates
           market={market}
-          open={isEditing === 'true'}
+          open={isEditing === 'true' && canEdit}
           onClose={() => setIsEditing(undefined)}
           onSuccess={onRevalidate}
         />
         <EditMarketOptionDialog
           market={market}
           optionId={isEditOption!}
-          open={isEditOption != null}
+          open={isEditOption != null && canEdit}
           onClose={() => setIsEditOption(undefined)}
           onSuccess={onRevalidate}
         />
         <LiquidityBoostDialog
           market={market}
-          open={isBoosting === 'true'}
+          open={isBoosting === 'true' && canTrade}
           onClose={() => setIsBoosting(undefined)}
           onSuccess={handleRevalidateBalance}
         />

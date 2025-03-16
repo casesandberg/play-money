@@ -1,5 +1,6 @@
 import Decimal from 'decimal.js'
 import { executeTransaction } from '@play-money/finance/lib/executeTransaction'
+import { findBalanceChange } from '@play-money/finance/lib/helpers'
 import { executeTrade } from './executeTrade'
 import { updateMarketBalances } from './updateMarketBalances'
 import { updateMarketOptionProbabilities } from './updateMarketOptionProbabilities'
@@ -36,6 +37,12 @@ export async function createMarketSellTransaction({
     additionalLogic: async (txParams) => {
       // Create or update the position before we value it
       await updateMarketPosition({ ...txParams, marketId, accountId, optionId })
+      const primaryChange = findBalanceChange({
+        balanceChanges: txParams.balanceChanges,
+        accountId,
+        assetType: 'CURRENCY',
+        assetId: 'PRIMARY',
+      })!
 
       const [balances] = await Promise.all([
         updateMarketBalances({ ...txParams, marketId }),
@@ -47,7 +54,7 @@ export async function createMarketSellTransaction({
           },
           data: {
             liquidityCount: {
-              decrement: amount.toNumber(),
+              decrement: primaryChange.change,
             },
             updatedAt: new Date(),
           },

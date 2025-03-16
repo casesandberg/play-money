@@ -162,14 +162,14 @@ export function MarketToolbar({
 
       <ResolveMarketDialog
         market={market}
-        open={isResolving === 'true'}
+        open={isResolving === 'true' && canResolve}
         onClose={() => setResolving(undefined)}
         onSuccess={onRevalidate}
       />
 
       <CancelMarketDialog
         market={market}
-        open={isCanceling === 'true'}
+        open={isCanceling === 'true' && canCancel}
         onClose={() => setCanceling(undefined)}
         onSuccess={onRevalidate}
       />

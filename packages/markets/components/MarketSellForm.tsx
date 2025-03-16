@@ -104,7 +104,7 @@ export function MarketSellForm({
 
   const proportionateCost =
     (form.getValues('amount') * (selectedPosition?.cost || 0)) / (selectedPosition?.quantity || 0)
-  const disabled = !selectedPosition || new Decimal(selectedPosition.quantity).toDecimalPlaces(4).lt(0)
+  const disabled = !selectedPosition || new Decimal(selectedPosition.quantity).toDecimalPlaces(4).lte(0)
   const orderedOptions = _.orderBy(options, 'createdAt')
 
   return (

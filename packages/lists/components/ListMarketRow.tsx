@@ -101,7 +101,7 @@ export function ListMarketRow({
 
       <ResolveMarketDialog
         market={market}
-        open={isResolving === market.id}
+        open={isResolving === market.id && canResolve}
         onClose={() => setResolving(undefined)}
         onSuccess={onRevalidate}
       />

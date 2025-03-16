@@ -44,7 +44,12 @@ export async function updateUserById({
     updatedData.displayName = displayName
   }
   if (referredBy && !user.referredBy) {
-    updatedData.referredBy = referredBy
+    try {
+      const user = await getUserById({ id: referredBy })
+      if (user) {
+        updatedData.referredBy = referredBy
+      }
+    } catch (_error) {}
   }
 
   const updatedUser = await db.user.update({
